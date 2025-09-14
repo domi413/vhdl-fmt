@@ -1,0 +1,79 @@
+name: PR Labeler
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const patterns = {
+              '^build':    'build',
+              '^chore':    'chore',
+              '^ci':       'pipeline',
+              '^doc':      'documentation',
+              '^feat':     'feature',
+              '^fix':      'fix',
+              '^perf':     'performance',
+              '^refactor': 'refactor',
+              '^test':     'test'
+            };
+
+            // Get label of the title
+            let newLabel = null;
+            for (const [pattern, label] of Object.entries(patterns)) {
+              if (new RegExp(pattern, 'i').test(context.payload.pull_request.title)) {
+                newLabel = label;
+                break;
+              }
+            }
+
+            // Get current labels
+            const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number
+            });
+
+            const allPatternLabels = Object.values(patterns);
+            const currentPatternLabels = currentLabels
+              .filter(label => allPatternLabels.includes(label.name))
+              .map(label => label.name);
+
+            // If correct label already exists, do nothing
+            if (newLabel && currentPatternLabels.includes(newLabel)) {
+              console.log(`Label '${newLabel}' already exists. No changes needed.`);
+            } else {
+              // Remove old pattern labels
+              for (const labelName of currentPatternLabels) {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  name: labelName
+                });
+              }
+
+              // Add new label if applicable
+              if (newLabel) {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  labels: [newLabel]
+                });
+              }
+            }
+          shell: bash
