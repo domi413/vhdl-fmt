@@ -1,0 +1,74 @@
+---
+Checks: >
+  *,
+  -altera-id-dependent-backward-branch,
+  -altera-struct-pack-align,
+  -altera-unroll-loops,
+  -concurrency-mt-unsafe,
+  -cppcoreguidelines-pro-type-vararg,
+  -hicpp-vararg,
+  -fuchsia-default-arguments-calls,
+  -fuchsia-trailing-return,
+  -llvm-header-guard,
+  -llvm-header-guard,
+  -llvmlibc-callee-namespace,
+  -llvmlibc-callee-namespace,
+  -llvmlibc-implementation-in-namespace,
+  -llvmlibc-inline-function-decl,
+  -llvmlibc-restrict-system-libc-headers,
+  -readability-identifier-length,
+
+CheckOptions:
+  # Types start with upper case: MyClass
+  - key: readability-identifier-naming.ClassCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.StructCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.EnumCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.TypedefCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.TypeAliasCase
+    value: "CamelCase"
+  - key: readability-identifier-naming.UnionCase
+    value: "CamelCase"
+
+  # Functions and variables start with lower case: myMethod
+  - key: readability-identifier-naming.FunctionCase
+    value: "camelBack"
+  - key: readability-identifier-naming.MethodCase
+    value: "camelBack"
+
+  # Constants are all upper case: const double PI=3.14159265358979323
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: "UPPER_CASE"
+
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: "UPPER_CASE"
+
+  # Macro names use upper case with underscores: INT_MAX
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: "UPPER_CASE"
+
+  # Template parameter names use camel case: InputIterator
+  - key: readability-identifier-naming.TemplateParameterCase
+    value: "CamelCase"
+
+  # All other names use snake case: unordered_map
+  - key: readability-identifier-naming.StaticConstantCase
+    value: "lower_case"
+  - key: readability-identifier-naming.ConstantCase
+    value: "lower_case"
+  - key: readability-identifier-naming.NamespaceCase
+    value: "lower_case"
+  - key: readability-identifier-naming.EnumConstantCase
+    value: "lower_case"
+  - key: readability-identifier-naming.ParameterCase
+    value: "lower_case"
+  - key: readability-identifier-naming.VariableCase
+    value: "lower_case"
+  - key: readability-identifier-naming.MemberCase
+    value: "lower_case"
+
+HeaderFilterRegex: ".*"
+FormatStyle: file

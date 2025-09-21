@@ -1,4 +1,3 @@
-
 .PHONY: all clean run lint format check-format fix
 
 SOURCES_CPP = $(shell find FOLDERNAME/ tests/ -name "*.cpp" -o -name "*.hpp")
