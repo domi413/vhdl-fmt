@@ -44,5 +44,5 @@ lint: build
 
 fix: build
 	@echo "Auto-fixing clang-tidy issues..."
-	@clang-tidy --fix $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SOURCES_CPP)
+	@clang-tidy --fix $(LINT_COMMON_FLAGS) $(SOURCES_CPP)
 	@echo "✓ Auto-fixes applied"
