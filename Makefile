@@ -16,8 +16,8 @@ clean:
 	@rm -rf build/
 
 run: build
-	@echo "Running the typetrace backend..."
-	@./build/typetrace/backend/typetrace_backend
+	@echo "Running the project..."
+	# @THIS PATH SHOULD BE DEFINED WITH A CONSTANT 
 
 check-format:
 	@echo "Checking code formatting..."
