@@ -1,0 +1,39 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+
+branches:
+  - main
+
+categories:
+  - title: "📚 Documentation"
+    label: "docs"
+
+  - title: "✨ Features"
+    labels:
+      - "feat"
+      - "perf"
+
+  - title: "🔧 Fixes"
+    labels:
+      - "fix"
+
+  - title: "🛠️ Maintenance"
+    label:
+      - "build"
+      - "chore"
+      - "ci"
+      - "refactor"
+
+  - title: "🧪 Tests"
+    label: "test"
+
+category-template: "### $TITLE"
+change-template: "- $TITLE by @$AUTHOR (#$NUMBER)"
+change-title-escapes: '\<*_&'
