@@ -3,7 +3,7 @@ version: "0.2"
 
 dictionaryDefinitions:
   - name: ignored-words
-    path: .cspell_ignored.txt
+    path: .cspell_ignored
 
 dictionaries:
   - ignored-words
