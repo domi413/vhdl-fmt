@@ -30,16 +30,16 @@ jobs:
           # Check if all ignored words are actually used
           bash .github/scripts/check-cspell-ignored.sh
 
-          if [ ! -f ".cspell_ignored.txt" ]; then
-            echo -e "${BOLD_RED}Error: .cspell_ignored.txt not found${RESET}"
+          if [ ! -f ".cspell_ignored" ]; then
+            echo -e "${BOLD_RED}Error: .cspell_ignored not found${RESET}"
             exit 1
           fi
 
           # Check if file is sorted (case-insensitive)
-          if sort -cf .cspell_ignored.txt; then
-            echo -e "${BOLD_GREEN}✓ .cspell_ignored.txt is properly sorted${RESET}"
+          if sort -cf .cspell_ignored; then
+            echo -e "${BOLD_GREEN}✓ .cspell_ignored is properly sorted${RESET}"
           else
-            echo -e "${BOLD_RED}Error: .cspell_ignored.txt is not sorted alphabetically (case-insensitive)${RESET}"
+            echo -e "${BOLD_RED}Error: .cspell_ignored is not sorted alphabetically (case-insensitive)${RESET}"
             echo -e "${BOLD_YELLOW}To fix this, run: make sort-dictionary{RESET}"
             exit 1
           fi
