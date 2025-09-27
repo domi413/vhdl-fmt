@@ -1,4 +1,4 @@
-.PHONY: all clean run lint format check-format fix
+.PHONY: all clean run lint format check-format
 
 SOURCES_CPP = $(shell find FOLDERNAME/ tests/ -name "*.cpp" -o -name "*.hpp")
 SOURCES_CMake = $(shell find FOLDERNAME/ tests/ -name "*CMakeLists.txt")
@@ -16,7 +16,7 @@ clean:
 
 run: build
 	@echo "Running the project..."
-	# @THIS PATH SHOULD BE DEFINED WITH A CONSTANT 
+	# THIS PATH SHOULD BE DEFINED WITH A CONSTANT 
 
 check-format:
 	@echo "Checking code formatting..."
@@ -40,8 +40,3 @@ lint: build
 	@echo "Running clang-tidy..."
 	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SOURCES_CPP)
 	@echo "✓ Linting complete"
-
-fix: build
-	@echo "Auto-fixing clang-tidy issues..."
-	@clang-tidy --fix $(LINT_COMMON_FLAGS) $(SOURCES_CPP)
-	@echo "✓ Auto-fixes applied"
