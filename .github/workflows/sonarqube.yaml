@@ -10,27 +10,33 @@ jobs:
     name: Build and analyze
     runs-on: ubuntu-latest
     env:
-      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
+      BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Install uv and setup Python
+        uses: astral-sh/setup-uv@v6
         with:
+          enable-cache: true
           python-version: "3.x"
 
       - name: Install Conan
-        run: |
-          pip install conan
-          # Ensure conan is on PATH for the next step
-          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
+        run: uv pip install conan
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
 
       - name: Install Build Wrapper
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v6
 
-      # The 'make' command relies on having the 'conan' command available
       - name: Run Build Wrapper
         run: |
           build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} make
