@@ -1,13 +1,11 @@
 clangd
 gersemi
-iain
-packrat
-peglib
 vhdl
 wconversion
 wdouble
 werror
 wextra
+wlifetime
 wmisleading
 wnon
 wnull
