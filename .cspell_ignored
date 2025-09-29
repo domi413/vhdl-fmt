@@ -1,0 +1,16 @@
+clangd
+gersemi
+vhdl
+wconversion
+wdouble
+werror
+wextra
+wlifetime
+wmisleading
+wnon
+wnull
+woverloaded
+wpedantic
+wshadow
+wsign
+wunused

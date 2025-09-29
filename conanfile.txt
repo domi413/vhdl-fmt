@@ -1,0 +1,11 @@
+[requires]
+catch2/3.10.0
+spdlog/1.15.3
+cli11/2.5.0
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout

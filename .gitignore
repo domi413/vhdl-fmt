@@ -1,41 +1,12 @@
-# Prerequisites
-*.d
+*.cache
+build/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Conan generated files
+CMakeUserPresets.json
+conandata.yml
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# clangd symlink
+compile_commands.json

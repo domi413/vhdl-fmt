@@ -11,14 +11,14 @@ on:
 jobs:
   dictionary:
     runs-on: ubuntu-latest
-    name: Check dictionary sorting
+    name: Check if dictionary is sorted and all ignored words are used
     timeout-minutes: 1
 
     if: ${{ !github.event.pull_request.draft }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check if dictionary is sorted
         run: |
@@ -27,16 +27,19 @@ jobs:
           BOLD_GREEN="\033[1;32m"
           RESET="\033[0m"
 
-          if [ ! -f ".cspell_ignored.txt" ]; then
-            echo -e "${BOLD_RED}Error: .cspell_ignored.txt not found${RESET}"
+          # Check if all ignored words are actually used
+          bash .github/scripts/check-cspell-ignored.sh
+
+          if [ ! -f ".cspell_ignored" ]; then
+            echo -e "${BOLD_RED}Error: .cspell_ignored not found${RESET}"
             exit 1
           fi
 
           # Check if file is sorted (case-insensitive)
-          if sort -cf .cspell_ignored.txt; then
-            echo -e "${BOLD_GREEN}✓ .cspell_ignored.txt is properly sorted${RESET}"
+          if sort -cf .cspell_ignored; then
+            echo -e "${BOLD_GREEN}✓ .cspell_ignored is properly sorted${RESET}"
           else
-            echo -e "${BOLD_RED}Error: .cspell_ignored.txt is not sorted alphabetically (case-insensitive)${RESET}"
+            echo -e "${BOLD_RED}Error: .cspell_ignored is not sorted alphabetically (case-insensitive)${RESET}"
             echo -e "${BOLD_YELLOW}To fix this, run: make sort-dictionary{RESET}"
             exit 1
           fi
@@ -51,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Starting cspell
         uses: streetsidesoftware/cspell-action@v7
@@ -67,3 +70,83 @@ jobs:
           incremental_files_only: ${{ env.ACT != 'true' }}
           verbose: true
           use_cspell_files: false
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Build, Lint, Format Check and Test
+    timeout-minutes: 20
+    container:
+      image: archlinux:base-devel
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          # Install base packages
+          pacman -Sy --needed git base-devel --noconfirm
+
+          # Create a non-root user for AUR operations
+          useradd -m -G wheel -s /bin/bash aur
+          echo 'aur ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+          # Create cache directories
+          mkdir -p /home/aur/.cache/yay
+          chown -R aur:aur /home/aur
+
+          # Install yay
+          su - aur -c "
+            git clone https://aur.archlinux.org/yay.git
+            cd yay
+            makepkg -si --noconfirm
+          "
+
+          # Install packages
+          su - aur -c "
+            yay -Sy --noconfirm --needed \
+              clang \
+              conan-bin \
+              cmake \
+              make \
+              ninja \
+              python-gersemi
+          "
+
+      - name: Setup Conan profile
+        run: conan profile detect --force
+
+      - name: Build
+        run: make build
+
+      - name: Check formatting
+        run: make check-format
+
+      - name: Run lint
+        run: make lint
+
+      # - name: Run tests
+      #   run: make test

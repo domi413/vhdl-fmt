@@ -1,0 +1,40 @@
+---
+# BreakBeforeBraces: Allman
+# ReflowComments: false
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Right
+AlignEscapedNewlines: Left
+AlignOperands: AlignAfterOperator
+AllowShortLoopsOnASingleLine: true
+AlwaysBreakAfterDefinitionReturnType: None
+BasedOnStyle: Mozilla
+BinPackParameters: false
+BreakAfterReturnType: None
+BreakBeforeBinaryOperators: true
+BreakBinaryOperations: OnePerLine
+BreakConstructorInitializers: AfterColon
+ColumnLimit: 100
+FixNamespaceComments: true
+IncludeBlocks: Regroup
+IndentPPDirectives: BeforeHash
+IndentWidth: 4
+PackConstructorInitializers: CurrentLine
+PointerAlignment: Right
+QualifierAlignment: Left
+TabWidth: 4
+
+# BraceWrapping:
+#   AfterCaseLabel: true
+#   AfterClass: true
+#   AfterControlStatement: MultiLine
+#   AfterEnum: true
+#   AfterFunction: true
+#   AfterNamespace: false
+#   AfterStruct: true
+#   BeforeCatch: true
+#   BeforeElse: false
+#   BeforeLambdaBody: false
+#   indentBraces: false
+#   SplitEmptyFunction: false
+#   SplitEmptyRecord: false
+#   SplitEmptyNamespace: false
