@@ -16,14 +16,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install uv and setup Python
-        uses: astral-sh/setup-uv@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
         with:
-          enable-cache: true
           python-version: "3.x"
+          cache: "pip"
 
       - name: Install Conan
-        run: uv pip install conan
+        run: |
+          pip install conan
+          echo "$(python -m site --user-base)/bin" >> $GITHUB_PATH
 
       - name: Cache Conan packages
         uses: actions/cache@v4
