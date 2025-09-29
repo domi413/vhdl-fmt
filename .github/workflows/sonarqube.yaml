@@ -1,10 +1,13 @@
 name: SonarQube
+
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    types: [opened, synchronize, reopened]
+    types:
+      - opened
+      - synchronize
+      - ready_for_review
+      - reopened
+
 jobs:
   build:
     name: Build and analyze
