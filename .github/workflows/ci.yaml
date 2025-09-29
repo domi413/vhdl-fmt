@@ -71,66 +71,82 @@ jobs:
           verbose: true
           use_cspell_files: false
 
-  # FIXME: Implement test, lint and formatting. We may not use
-  # archlinux:latest or at least only one runner for all tasks (not
-  # really clean solution)
-  #
-  # A General C++ workflow: https://github.com/marketplace/actions/setup-cpp-c-c
-  # Not sure what the difference here is: https://github.com/marketplace/actions/get-cmake
-
-  test:
-    # https://github.com/marketplace/actions/gcovr-action
-    runs-on: ubuntu-latest
-    name: Test
-    timeout-minutes: 3
-
-    if: ${{ !github.event.pull_request.draft }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: XXXXX
-
-  build:
-    strategy:
-      matrix:
-        go: [stable]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    name: Build
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 3
-    permissions:
-      contents: read
-      pull-requests: read
-
-    if: ${{ !github.event.pull_request.draft }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: XXXXX
-
   lint:
-    # https://github.com/marketplace/actions/c-c-linter
     runs-on: ubuntu-latest
-    name: Lint and format
-    timeout-minutes: 10
-    container: archlinux:latest
+    name: Build, Lint, Format Check and Test
+    timeout-minutes: 20
+    container:
+      image: archlinux:base-devel
 
     if: ${{ !github.event.pull_request.draft }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Install archlinux dependencies
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Install dependencies
         run: |
-          pacman -Sy --noconfirm --needed \
-            clang \
-            cmake \
+          # Install base packages
+          pacman -Sy --needed git base-devel --noconfirm
+
+          # Create a non-root user for AUR operations
+          useradd -m -G wheel -s /bin/bash aur
+          echo 'aur ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+          # Create cache directories
+          mkdir -p /home/aur/.cache/yay
+          chown -R aur:aur /home/aur
+
+          # Install yay
+          su - aur -c "
+            git clone https://aur.archlinux.org/yay.git
+            cd yay
+            makepkg -si --noconfirm
+          "
+
+          # Install packages
+          su - aur -c "
+            yay -Sy --noconfirm --needed \
+              clang \
+              conan-bin \
+              cmake \
+              make \
+              ninja \
+              python-gersemi
+          "
+
+      - name: Setup Conan profile
+        run: conan profile detect --force
+
+      - name: Build
+        run: make build
+
+      - name: Check formatting
+        run: make check-format
 
       - name: Run lint
         run: make lint
+
+      # - name: Run tests
+      #   run: make test

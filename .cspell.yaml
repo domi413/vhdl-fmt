@@ -2,14 +2,16 @@ $schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell
 version: "0.2"
 
 dictionaryDefinitions:
-  - name: ignored-words
+  - name: project-words
     path: .cspell_ignored
 
 dictionaries:
-  - ignored-words
-  - en_US
   - cpp
+  - en_US
+  - project-words
 
 ignorePaths:
   - "build/"
-  - .*
+  - "example/"
+  - "grammar/"
+  - ".*"

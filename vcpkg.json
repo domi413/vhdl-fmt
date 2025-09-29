@@ -1,3 +1,0 @@
-{
-    "dependencies": ["catch2", "cli11", "spdlog"]
-}

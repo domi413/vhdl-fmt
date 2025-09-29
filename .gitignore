@@ -1,2 +1,12 @@
-build/
 *.cache
+build/
+
+# Conan generated files
+CMakeUserPresets.json
+conandata.yml
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+
+# clangd symlink
+compile_commands.json

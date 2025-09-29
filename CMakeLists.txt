@@ -1,18 +1,12 @@
-# TODO(domi413): THIS FILE IS JUST A TEMPLATE AND NOT READY YET
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.31)
 
 # ==================================================================
 # Project Definition
 # ==================================================================
 
-set(CMAKE_CXX_COMPILER "clang++")
-project(
-    vhdl-fmt
-    VERSION 0.1.0
-    DESCRIPTION "VHDL Formatter"
-    LANGUAGES CXX
-)
+project(vhdl_parser VERSION 0.1.0 DESCRIPTION "A VHDL parser" LANGUAGES CXX)
 
+set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -22,59 +16,76 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ==================================================================
-# Version Information
+# Conan Integration
 # ==================================================================
 
-find_package(Git QUIET)
-if(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_COMMIT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} diff --quiet
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        RESULT_VARIABLE GIT_DIRTY
-        ERROR_QUIET
-    )
-    if(NOT GIT_DIRTY EQUAL 0)
-        set(GIT_COMMIT "${GIT_COMMIT}-dirty")
-    endif()
-else()
-    set(GIT_COMMIT "unknown")
-endif()
-
-configure_file(
-    typetrace/common/include/version.hpp.in
-    ${CMAKE_BINARY_DIR}/generated/version.hpp
-    @ONLY
+find_file(
+    CONAN_TOOLCHAIN
+    conan_toolchain.cmake
+    PATHS ${CMAKE_BINARY_DIR}
+    NO_DEFAULT_PATH
 )
+if(CONAN_TOOLCHAIN)
+    include(${CONAN_TOOLCHAIN})
+endif()
 
 # ==================================================================
 # Dependencies
 # ==================================================================
 
-find_package(PkgConfig REQUIRED)
-find_package(spdlog CONFIG REQUIRED)
-
-
-# ==================================================================
-# Subdirectories
-# ==================================================================
-
-add_subdirectory(tests)
+find_package(spdlog REQUIRED)
+find_package(Catch2 REQUIRED)
+find_package(CLI11 REQUIRED)
 
 # ==================================================================
-# Installation & Build Info
+# Main Executable
 # ==================================================================
 
-install(TARGETS typetrace_backend RUNTIME DESTINATION bin)
+add_executable(vhdl_parser parser/vhdl_parser.cpp)
 
-message(STATUS "${PROJECT_NAME}")
-message(STATUS "  Version: ${PROJECT_VERSION} (${GIT_COMMIT})")
+target_link_libraries(vhdl_parser PRIVATE spdlog::spdlog CLI11::CLI11)
+
+# ==================================================================
+# Compiler Flags
+# ==================================================================
+
+target_compile_options(
+    vhdl_parser
+    PRIVATE
+        # Optimization
+        -O3
+        # Warnings
+        -Wall
+        -Wcast-align
+        -Wconversion
+        -Wdouble-promotion
+        -Werror
+        -Wextra
+        -Wformat=2
+        # -Wlifetime # Not available yet
+        -Wmisleading-indentation
+        -Wnon-virtual-dtor
+        -Wnull-dereference
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpedantic
+        -Wshadow
+        -Wsign-conversion
+        -Wunused
+)
+
+# ==================================================================
+# Installation
+# ==================================================================
+
+install(TARGETS vhdl_parser RUNTIME DESTINATION bin)
+
+# ==================================================================
+# Build Info
+# ==================================================================
+
+message(STATUS "VHDL Parser:")
+message(STATUS "  Version: ${PROJECT_VERSION}")
 message(STATUS "  Build: ${CMAKE_BUILD_TYPE}")
 message(
     STATUS
