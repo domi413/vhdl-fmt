@@ -7,9 +7,11 @@ class ConfigManager
     explicit ConfigManager(std::span<char *> args);
 
   private:
-    auto parseArguments(std::span<char *> args) -> void {}
+    /// Parses and processes the CLI arguments
+    auto parseArguments(std::span<char *> args) -> void;
 
-    auto readConfigFile(std::filesystem::path &path) -> void {}
+    /// Reads the configuration file
+    auto readConfigFile(std::filesystem::path &path) -> void;
 };
 
 } // namespace vhdl_fmt
