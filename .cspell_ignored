@@ -1,4 +1,3 @@
-antic
 antlr4
 clangd
 gersemi
@@ -13,6 +12,7 @@ wnon
 wnull
 woverloaded
 wped
+wpedantic
 wshadow
 wsign
 wunused
