@@ -1,7 +1,9 @@
 [requires]
+antlr4-cppruntime/4.13.2
+antlr4/4.13.1
+argparse/3.2
 catch2/3.10.0
 spdlog/1.15.3
-cli11/2.5.0
 
 [generators]
 CMakeDeps

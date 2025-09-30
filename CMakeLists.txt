@@ -16,26 +16,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # ==================================================================
-# Conan Integration
-# ==================================================================
-
-find_file(
-    CONAN_TOOLCHAIN
-    conan_toolchain.cmake
-    PATHS ${CMAKE_BINARY_DIR}
-    NO_DEFAULT_PATH
-)
-if(CONAN_TOOLCHAIN)
-    include(${CONAN_TOOLCHAIN})
-endif()
-
-# ==================================================================
 # Dependencies
 # ==================================================================
 
 find_package(spdlog REQUIRED)
 find_package(Catch2 REQUIRED)
-find_package(CLI11 REQUIRED)
+find_package(argparse REQUIRED)
+find_package(antlr4-runtime REQUIRED)
 
 # ==================================================================
 # Main Executable
@@ -43,7 +30,10 @@ find_package(CLI11 REQUIRED)
 
 add_executable(vhdl_parser parser/vhdl_parser.cpp)
 
-target_link_libraries(vhdl_parser PRIVATE spdlog::spdlog CLI11::CLI11)
+target_link_libraries(
+    vhdl_parser
+    PRIVATE spdlog::spdlog argparse::argparse stlr4_static
+)
 
 # ==================================================================
 # Compiler Flags
@@ -73,12 +63,6 @@ target_compile_options(
         -Wsign-conversion
         -Wunused
 )
-
-# ==================================================================
-# Installation
-# ==================================================================
-
-install(TARGETS vhdl_parser RUNTIME DESTINATION bin)
 
 # ==================================================================
 # Build Info
