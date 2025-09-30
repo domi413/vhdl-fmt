@@ -32,7 +32,7 @@ add_executable(vhdl_parser parser/vhdl_parser.cpp)
 
 target_link_libraries(
     vhdl_parser
-    PRIVATE spdlog::spdlog argparse::argparse stlr4_static
+    PRIVATE spdlog::spdlog argparse::argparse antlr4_static
 )
 
 # ==================================================================
