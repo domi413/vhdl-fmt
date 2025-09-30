@@ -4,6 +4,7 @@ antlr4/4.13.1
 argparse/3.2
 catch2/3.10.0
 spdlog/1.15.3
+yaml-cpp/0.8.0
 
 [generators]
 CMakeDeps

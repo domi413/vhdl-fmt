@@ -19,10 +19,11 @@ endif()
 # Dependencies
 # ==================================================================
 
-find_package(spdlog REQUIRED)
-find_package(Catch2 REQUIRED)
-find_package(argparse REQUIRED)
 find_package(antlr4-runtime REQUIRED)
+find_package(argparse REQUIRED)
+find_package(Catch2 REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # ==================================================================
 # Main Executable
@@ -30,7 +31,12 @@ find_package(antlr4-runtime REQUIRED)
 
 target_link_libraries(
     vhdl_parser
-    PRIVATE spdlog::spdlog argparse::argparse antlr4_static
+    PRIVATE
+        antlr4_static
+        argparse::argparse
+        Catch2::Catch2WithMain
+        spdlog::spdlog
+        yaml-cpp::yaml-cpp
 )
 
 # ==================================================================
