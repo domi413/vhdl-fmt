@@ -1,6 +1,7 @@
 add_library(
     vhdl_fmt_formatter
     STATIC
+    placeholder.cpp
     # Add your formatter source files here
 )
 

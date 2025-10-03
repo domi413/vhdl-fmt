@@ -15,10 +15,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Global Compiler Flags
 # ==================================================================
 
+add_library(vhdl_fmt_options INTERFACE)
 target_compile_options(
-    VHDL_FMT_COMPILER_FLAGS
+    vhdl_fmt_options
+    INTERFACE
+
     # Optimization
     -O3
+
     # Warnings
     -Wall
     -Wcast-align
@@ -27,7 +31,6 @@ target_compile_options(
     -Werror
     -Wextra
     -Wformat=2
-    # -Wlifetime # Not available yet
     -Wmisleading-indentation
     -Wnon-virtual-dtor
     -Wnull-dereference
@@ -38,9 +41,6 @@ target_compile_options(
     -Wsign-conversion
     -Wunused
 )
-
-add_library(vhdl_fmt_options INTERFACE)
-target_compile_options(vhdl_fmt_options INTERFACE ${VHDL_FMT_COMPILER_FLAGS})
 
 # ==================================================================
 # Dependencies

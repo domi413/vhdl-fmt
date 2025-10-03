@@ -8,6 +8,7 @@ add_library(
     vhdl_fmt_common
     STATIC
     logger.cpp
+    Config.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/version.hpp
 )
 

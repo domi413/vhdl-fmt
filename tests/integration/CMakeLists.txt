@@ -1,5 +1,6 @@
 add_executable(
     integration_tests
+    placeholder_test.cpp
     # Add your integration test source files here
 )
 
