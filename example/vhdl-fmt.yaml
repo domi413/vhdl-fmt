@@ -1,0 +1,23 @@
+line_length: 100
+indentation:
+  style: "spaces" # "spaces" or "tabs"
+  size: 4
+end_of_line: "lf" # "lf", "crlf", or "auto"
+
+formatting:
+  align_portmap_signals: true
+
+casing:
+  default_identifier: "all_lower" # e.g., "lower", "upper", "PascaLcase"
+
+  identifier_types:
+    port_signals: "UPPER"
+    constants: "PascalCase"
+
+  exceptions:
+    - name: "my_reset"
+      case: "UPPER"
+    - name: "CLK"
+      case: "UPPER"
+    - name: "data_bus"
+      case: "lower"
