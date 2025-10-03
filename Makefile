@@ -1,6 +1,6 @@
 .PHONY: all clean run lint format check-format install
 
-SOURCES_CPP = $(shell find parser/ -name "*.cpp" -o -name "*.hpp")
+SOURCES_CPP = $(shell find . -name "*.cpp" -o -name "*.hpp")
 SOURCES_CMake = $(shell find . -name "CMakeLists.txt")
 
 all: clean build

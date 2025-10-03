@@ -1,3 +1,4 @@
+antlr4
 clangd
 gersemi
 vhdl
@@ -10,6 +11,7 @@ wmisleading
 wnon
 wnull
 woverloaded
+wped
 wpedantic
 wshadow
 wsign
