@@ -1,84 +1,149 @@
 #include "ConfigManager.hpp"
 
+#include "Config.hpp"
+
+#include <exception>
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <memory>
 #include <span>
 #include <stdexcept>
 #include <string>
+#include <string_view>
+#include <unordered_map>
 #include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace vhdl_fmt {
 
+// =========================================================================
+// Configuration Data Maps (Static Helpers)
+// =========================================================================
+
+using CaseStyleMemberPtr = CaseStyle CasingConfig::*;
+using BoolMemberPtr = bool DeclarationsConfig::*;
+
+static const std::unordered_map<std::string_view, CaseStyle> CASE_STYLE_MAP = {
+    { "lower_case", CaseStyle::LOWER },
+    { "UPPER_CASE", CaseStyle::UPPER },
+};
+
+static const std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP = {
+    { "auto", EndOfLine::AUTO },
+    { "crlf", EndOfLine::CRLF },
+    {   "lf",   EndOfLine::LF },
+};
+
+static const std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STYLE_MAP = {
+    { "spaces", IndentationStyle::SPACES },
+    {   "tabs",   IndentationStyle::TABS },
+};
+
+static const std::unordered_map<std::string_view, CaseStyleMemberPtr> CASING_ASSIGNMENTS = {
+    {    "keywords",    &CasingConfig::keywords },
+    {   "constants",   &CasingConfig::constants },
+    { "identifiers", &CasingConfig::identifiers },
+};
+
+static const std::unordered_map<std::string_view, BoolMemberPtr> DECLARATION_ASSIGNMENTS = {
+    {         "align_colons",         &DeclarationsConfig::align_colons },
+    {          "align_types",          &DeclarationsConfig::align_types },
+    { "align_initialization", &DeclarationsConfig::align_initialization },
+};
+
+// =========================================================================
+// Static Parsing Functions
+// =========================================================================
+
+auto parseStyle(const std::string_view style,
+                const std::unordered_map<std::string_view, CaseStyle> &map) -> CaseStyle
+{
+    if (const auto it = map.find(style); it != map.end()) {
+        return it->second;
+    }
+    throw std::invalid_argument("Invalid case style config: " + std::string(style));
+}
+
+auto parseStyle(const std::string_view style,
+                const std::unordered_map<std::string_view, EndOfLine> &map) -> EndOfLine
+{
+    if (const auto it = map.find(style); it != map.end()) {
+        return it->second;
+    }
+    throw std::invalid_argument("Invalid eol config: " + std::string(style));
+}
+
+auto parseStyle(const std::string_view style,
+                const std::unordered_map<std::string_view, IndentationStyle> &map)
+  -> IndentationStyle
+{
+    if (const auto it = map.find(style); it != map.end()) {
+        return it->second;
+    }
+    throw std::invalid_argument("Invalid indentation config: " + std::string(style));
+}
+
+// =========================================================================
+// ConfigManager Implementation
+// =========================================================================
+
 ConfigManager::ConfigManager(std::span<char *> args) :
-  m_configReader(std::make_unique<ConfigReader>(args)),
-  m_config(Config::getDefault())
+  config_reader(std::make_unique<ConfigReader>(args)),
+  config(Config::getDefault())
 {
     processConfiguration();
 }
 
-ConfigManager::ConfigManager(std::unique_ptr<IConfigReader> configReader) :
-  m_configReader(std::move(configReader)),
-  m_config(Config::getDefault())
+ConfigManager::ConfigManager(std::unique_ptr<IConfigReader> config_reader) :
+  config_reader(std::move(config_reader)),
+  config(Config::getDefault())
 {
     processConfiguration();
 }
 
 auto ConfigManager::getConfig() const -> const Config &
 {
-    return m_config;
+    return config;
 }
 
 auto ConfigManager::getCliArgs() const -> const CliArgs &
 {
-    return m_cliArgs;
+    return cli_args;
 }
 
 auto ConfigManager::processConfiguration() -> void
 {
-    // Parse CLI arguments
-    m_cliArgs = m_configReader->readConfig();
+    cli_args = config_reader->readConfig();
 
-    // If version or help is requested, no need to process configuration
-    if (m_cliArgs.show_version || m_cliArgs.show_help) {
+    if (cli_args.show_version || cli_args.show_help) {
         return;
     }
 
-    Config yamlConfig = Config::getDefault();
+    Config yaml_config = Config::getDefault();
+    std::filesystem::path config_path = findConfigFile();
 
-    // Determine config file path
-    std::filesystem::path configPath;
-    if (!m_cliArgs.config_location.empty()) {
-        // Use explicitly provided config file
-        configPath = m_cliArgs.config_location;
-    } else {
-        // Look for config file in current working directory
-        configPath = findConfigFile();
+    if (!cli_args.config_location.empty()) {
+        config_path = cli_args.config_location;
     }
 
-    // Read configuration file if it exists
-    if (!configPath.empty() && std::filesystem::exists(configPath)) {
+    if (!config_path.empty() && std::filesystem::exists(config_path)) {
         try {
-            yamlConfig = readConfigFile(configPath);
+            yaml_config = readConfigFile(config_path);
         } catch (const std::exception &e) {
             std::cerr
               << "Warning: Failed to read configuration file '"
-              << configPath
+              << config_path
               << "': "
               << e.what()
-              << std::endl;
-            std::cerr << "Using default configuration." << std::endl;
-            yamlConfig = Config::getDefault();
+              << '\n';
+            std::cerr << "Using default configuration." << '\n';
+            yaml_config = Config::getDefault();
         }
     }
 
-    // Merge configurations (YAML serves as base, CLI can override)
-    m_config = mergeConfigurations(yamlConfig);
+    config = mergeConfigurations(yaml_config);
 
-    // Validate final configuration
-    if (!m_config.validate()) {
+    if (!config.validate()) {
         throw std::invalid_argument("Invalid configuration");
     }
 }
@@ -92,96 +157,60 @@ auto ConfigManager::readConfigFile(const std::filesystem::path &path) -> Config
     Config config = Config::getDefault();
 
     try {
-        YAML::Node yamlNode = YAML::LoadFile(path.string());
+        YAML::Node yaml_node = YAML::LoadFile(path.string());
 
-        // Read line_length
-        if (yamlNode["line_length"]) {
-            config.line_length = yamlNode["line_length"].as<std::size_t>();
+        if (yaml_node["line_length"]) {
+            config.line_length = yaml_node["line_length"].as<std::size_t>();
         }
 
-        // Read indentation settings
-        if (yamlNode["indentation"]) {
-            const auto &indentNode = yamlNode["indentation"];
-
-            if (indentNode["style"]) {
-                std::string style = indentNode["style"].as<std::string>();
-                if (style == "spaces") {
-                    config.indentation.style = IndentationStyle::SPACES;
-                } else if (style == "tabs") {
-                    config.indentation.style = IndentationStyle::TABS;
-                }
+        if (yaml_node["indentation"]) {
+            const auto &indent_node = yaml_node["indentation"];
+            if (indent_node["style"]) {
+                const auto style_str = indent_node["style"].as<std::string>();
+                config.indentation.style = parseStyle(style_str, INDENTATION_STYLE_MAP);
             }
-
-            if (indentNode["size"]) {
-                config.indentation.size = indentNode["size"].as<std::size_t>();
+            if (indent_node["size"]) {
+                config.indentation.size = indent_node["size"].as<std::size_t>();
             }
         }
 
-        // Read end_of_line
-        if (yamlNode["end_of_line"]) {
-            std::string eol = yamlNode["end_of_line"].as<std::string>();
-            if (eol == "lf") {
-                config.end_of_line = EndOfLine::LF;
-            } else if (eol == "crlf") {
-                config.end_of_line = EndOfLine::CRLF;
-            } else if (eol == "auto") {
-                config.end_of_line = EndOfLine::AUTO;
-            }
+        if (yaml_node["end_of_line"]) {
+            const auto eol_str = yaml_node["end_of_line"].as<std::string>();
+            config.end_of_line = parseStyle(eol_str, EOL_STYLE_MAP);
         }
 
-        // Read formatting settings
-        if (yamlNode["formatting"]) {
-            const auto &formatNode = yamlNode["formatting"];
+        if (yaml_node["formatting"]) {
+            const auto &format_node = yaml_node["formatting"];
 
-            if (formatNode["port_map"] && formatNode["port_map"]["align_signals"]) {
+            if (format_node["port_map"] && format_node["port_map"]["align_signals"]) {
                 config.formatting.port_map.align_signals
-                  = formatNode["port_map"]["align_signals"].as<bool>();
+                  = format_node["port_map"]["align_signals"].as<bool>();
             }
 
-            if (formatNode["declarations"]) {
-                const auto &declNode = formatNode["declarations"];
+            if (format_node["declarations"]) {
+                const auto &decl_node = format_node["declarations"];
 
-                if (declNode["align_colons"]) {
-                    config.formatting.declarations.align_colons
-                      = declNode["align_colons"].as<bool>();
-                }
-
-                if (declNode["align_types"]) {
-                    config.formatting.declarations.align_types = declNode["align_types"].as<bool>();
-                }
-
-                if (declNode["align_initialization"]) {
-                    config.formatting.declarations.align_initialization
-                      = declNode["align_initialization"].as<bool>();
+                // Data-driven loading for bool flags using pointer-to-member
+                for (const auto &[key_str, member_ptr] : DECLARATION_ASSIGNMENTS) {
+                    if (decl_node[key_str.data()]) {
+                        config.formatting.declarations.*member_ptr
+                          = decl_node[key_str.data()].as<bool>();
+                    }
                 }
             }
         }
 
-        // Read casing settings
-        if (yamlNode["casing"]) {
-            const auto &casingNode = yamlNode["casing"];
+        if (yaml_node["casing"]) {
+            const auto &casing_node = yaml_node["casing"];
 
-            auto parseCaseStyle = [](const std::string &style) -> CaseStyle {
-                if (style == "lower")
-                    return CaseStyle::LOWER;
-                if (style == "upper")
-                    return CaseStyle::UPPER;
-                if (style == "snake_case")
-                    return CaseStyle::SNAKE_CASE;
-                return CaseStyle::LOWER; // default
-            };
+            // Data-driven loading for CaseStyle enums using pointer-to-member
+            for (const auto &[key_str, member_ptr] : CASING_ASSIGNMENTS) {
+                if (casing_node[key_str.data()]) {
+                    const auto style_str = casing_node[key_str.data()].as<std::string>();
+                    const CaseStyle style_enum = parseStyle(style_str, CASE_STYLE_MAP);
 
-            if (casingNode["keywords"]) {
-                config.casing.keywords = parseCaseStyle(casingNode["keywords"].as<std::string>());
-            }
-
-            if (casingNode["constants"]) {
-                config.casing.constants = parseCaseStyle(casingNode["constants"].as<std::string>());
-            }
-
-            if (casingNode["identifiers"]) {
-                config.casing.identifiers
-                  = parseCaseStyle(casingNode["identifiers"].as<std::string>());
+                    config.casing.*member_ptr = style_enum;
+                }
             }
         }
 
@@ -194,25 +223,23 @@ auto ConfigManager::readConfigFile(const std::filesystem::path &path) -> Config
 
 auto ConfigManager::findConfigFile() -> std::filesystem::path
 {
-    const std::vector<std::string> configNames
+    const std::vector<std::string> config_file_name
       = { "vhdl-fmt.yaml", "vhdl-fmt.yml", ".vhdl-fmt.yaml", ".vhdl-fmt.yml" };
 
     std::filesystem::path cwd = std::filesystem::current_path();
 
-    for (const auto &configName : configNames) {
-        std::filesystem::path configPath = cwd / configName;
-        if (std::filesystem::exists(configPath) && std::filesystem::is_regular_file(configPath)) {
-            return configPath;
+    for (const auto &file : config_file_name) {
+        std::filesystem::path path = cwd / file;
+        if (std::filesystem::exists(path) && std::filesystem::is_regular_file(path)) {
+            return path;
         }
     }
 
-    return {}; // Return empty path if no config file found
+    return {};
 }
 
 auto ConfigManager::mergeConfigurations(const Config &yamlConfig) -> Config
 {
-    // For now, we just return the YAML config since CLI doesn't override YAML settings
-    // In the future, CLI flags could override specific YAML settings
     return yamlConfig;
 }
 

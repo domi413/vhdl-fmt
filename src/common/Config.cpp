@@ -21,7 +21,6 @@ auto Config::getDefault() -> Config
 
     config.casing.keywords = CaseStyle::LOWER;
     config.casing.constants = CaseStyle::UPPER;
-    config.casing.identifiers = CaseStyle::SNAKE_CASE;
 
     return config;
 }

@@ -2,7 +2,6 @@
 #define VHDL_FMT_CONFIG_HPP
 
 #include <filesystem>
-#include <string>
 #include <vector>
 
 namespace vhdl_fmt {
@@ -27,7 +26,6 @@ enum class CaseStyle
 {
     LOWER,
     UPPER,
-    SNAKE_CASE,
 };
 
 /// Configuration for port map formatting
@@ -63,7 +61,7 @@ struct CasingConfig
 {
     CaseStyle keywords = CaseStyle::LOWER;
     CaseStyle constants = CaseStyle::UPPER;
-    CaseStyle identifiers = CaseStyle::SNAKE_CASE;
+    CaseStyle identifiers = CaseStyle::LOWER;
 };
 
 /// Main configuration structure

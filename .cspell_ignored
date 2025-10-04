@@ -1,6 +1,8 @@
 antlr4
 clangd
+domi
 gersemi
+nodiscard
 vhdl
 wconversion
 wdouble

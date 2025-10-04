@@ -16,6 +16,6 @@ formatting:
     align_initialization: true # Align the ':= default_value'
 
 casing: # e.g., "lower_case" or "UPPER_CASE"
-  keywords: "lower"
-  constants: "upper"
-  identifiers: "snake_case"
+  keywords: "lower_case"
+  constants: "UPPER_CASE"
+  identifiers: "lower_case"

@@ -18,47 +18,47 @@ ConfigReader::ConfigReader(std::span<char *> args) :
 
 auto ConfigReader::readConfig() -> CliArgs
 {
-    CliArgs cliArgs;
+    CliArgs cli_args;
 
     try {
         m_parser.parse_args(static_cast<int>(m_args.size()), m_args.data());
 
         // Handle version flag
         if (m_parser.get<bool>("--version")) {
-            cliArgs.show_version = true;
-            return cliArgs;
+            cli_args.show_version = true;
+            return cli_args;
         }
 
         // Handle help flag (argparse handles this automatically, but we track it)
         if (m_parser.get<bool>("--help")) {
-            cliArgs.show_help = true;
-            return cliArgs;
+            cli_args.show_help = true;
+            return cli_args;
         }
 
         // Handle config location
         if (m_parser.is_used("--location")) {
-            cliArgs.config_location = m_parser.get<std::string>("--location");
+            cli_args.config_location = m_parser.get<std::string>("--location");
         }
 
         // Handle input files
         if (m_parser.is_used("files")) {
             auto files = m_parser.get<std::vector<std::string>>("files");
             for (const auto &file : files) {
-                cliArgs.input_files.emplace_back(file);
+                cli_args.input_files.emplace_back(file);
             }
         }
 
-        if (!validateArguments(cliArgs)) {
+        if (!validateArguments(cli_args)) {
             throw std::invalid_argument("Invalid command line arguments");
         }
 
     } catch (const std::exception &e) {
-        std::cerr << "Error parsing arguments: " << e.what() << std::endl;
-        std::cerr << m_parser << std::endl;
+        std::cerr << "Error parsing arguments: " << e.what() << '\n';
+        std::cerr << m_parser << '\n';
         throw;
     }
 
-    return cliArgs;
+    return cli_args;
 }
 
 auto ConfigReader::getVersion() -> std::string
@@ -104,7 +104,7 @@ auto ConfigReader::validateArguments(const CliArgs &args) -> bool
             std::cerr
               << "Error: Configuration file directory does not exist: "
               << args.config_location.parent_path()
-              << std::endl;
+              << '\n';
             return false;
         }
     }
@@ -112,12 +112,12 @@ auto ConfigReader::validateArguments(const CliArgs &args) -> bool
     // Validate input files
     for (const auto &file : args.input_files) {
         if (!std::filesystem::exists(file)) {
-            std::cerr << "Error: Input file does not exist: " << file << std::endl;
+            std::cerr << "Error: Input file does not exist: " << file << '\n';
             return false;
         }
 
         if (!std::filesystem::is_regular_file(file)) {
-            std::cerr << "Error: Input path is not a regular file: " << file << std::endl;
+            std::cerr << "Error: Input path is not a regular file: " << file << '\n';
             return false;
         }
     }

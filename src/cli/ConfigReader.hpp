@@ -4,11 +4,8 @@
 #include "Config.hpp"
 
 #include <argparse/argparse.hpp>
-#include <filesystem>
-#include <memory>
 #include <span>
 #include <string>
-#include <vector>
 
 namespace vhdl_fmt {
 

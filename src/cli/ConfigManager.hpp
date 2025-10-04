@@ -1,63 +1,128 @@
-#ifndef VHDL_FMT_CONFIG_MANAGER_HPP
-#define VHDL_FMT_CONFIG_MANAGER_HPP
-
-#include "Config.hpp"
 #include "ConfigReader.hpp"
 
 #include <filesystem>
-#include <memory>
+#include <iostream>
 #include <span>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace vhdl_fmt {
 
-/// Interface for managing configuration from multiple sources
-class IConfigManager
+ConfigReader::ConfigReader(std::span<char *> args) :
+  m_parser("vhdl-fmt", "VHDL Code Formatter"),
+  m_args(args)
 {
-  public:
-    virtual ~IConfigManager() = default;
-    virtual auto getConfig() const -> const Config & = 0;
-    virtual auto getCliArgs() const -> const CliArgs & = 0;
-};
+    setupArgumentParser();
+}
 
-/// Manages configuration by combining CLI arguments and YAML file settings
-class ConfigManager : public IConfigManager
+auto ConfigReader::readConfig() -> CliArgs
 {
-  public:
-    /// Creates a new ConfigManager and processes the CLI arguments
-    explicit ConfigManager(std::span<char *> args);
+    CliArgs cli_args;
 
-    /// Creates a ConfigManager with a custom config reader (for testing)
-    explicit ConfigManager(std::unique_ptr<IConfigReader> configReader);
+    try {
+        m_parser.parse_args(static_cast<int>(m_args.size()), m_args.data());
 
-    /// Returns the final merged configuration
-    auto getConfig() const -> const Config & override;
+        // Extract and assign simple flags directly
+        cli_args.show_version = m_parser.get<bool>("--version");
+        cli_args.show_help = m_parser.get<bool>("--help");
 
-    /// Returns the CLI arguments
-    auto getCliArgs() const -> const CliArgs & override;
+        // If a terminal flag is set, return early without further processing/validation
+        if (cli_args.show_version || cli_args.show_help) {
+            return cli_args;
+        }
 
-  private:
-    std::unique_ptr<IConfigReader> m_configReader;
-    CliArgs m_cliArgs;
-    Config m_config;
+        // Handle config location (using optional return to simplify check)
+        if (const auto &location_opt = m_parser.get<std::optional<std::string>>("--location")) {
+            cli_args.config_location = *location_opt;
+        }
 
-    /// Processes the CLI arguments and loads configuration
-    auto processConfiguration() -> void;
+        // Handle input files (using optional return to simplify check)
+        if (const auto &files_opt
+            = m_parser.get<std::optional<std::vector<std::string>>>("files")) {
+            for (const auto &file : *files_opt) {
+                cli_args.input_files.emplace_back(file);
+            }
+        }
 
-    /// Reads the configuration file from the specified path
-    auto readConfigFile(const std::filesystem::path &path) -> Config;
+        if (!validateArguments(cli_args)) {
+            throw std::invalid_argument("Invalid command line arguments");
+        }
 
-    /// Finds configuration file in current working directory
-    auto findConfigFile() -> std::filesystem::path;
+    } catch (const std::exception &e) {
+        std::cerr << "Error parsing arguments: " << e.what() << '\n';
+        // Only print help if the error occurred before the help flag could be checked/parsed
+        if (!cli_args.show_help) {
+            std::cerr << m_parser << '\n';
+        }
+        throw;
+    }
 
-    /// Merges CLI arguments with YAML configuration
-    auto mergeConfigurations(const Config &yamlConfig) -> Config;
+    return cli_args;
+}
 
-    /// Validates configuration file extensions
-    auto isValidConfigFile(const std::filesystem::path &path) -> bool;
-};
+auto ConfigReader::getVersion() -> std::string
+{
+    return "vhdl-fmt 1.0.0";
+}
+
+auto ConfigReader::setupArgumentParser() -> void
+{
+    m_parser.add_description("A VHDL code formatter that automatically formats VHDL source files");
+
+    m_parser.add_argument("-v", "--version")
+      .help("Show version information")
+      .default_value(false)
+      .implicit_value(true);
+
+    m_parser.add_argument("-h", "--help")
+      .help("Show this help message and exit")
+      .default_value(false)
+      .implicit_value(true);
+
+    // Note: argparse::ArgumentParser should be configured to return std::optional<T> for optional
+    // args.
+    m_parser.add_argument("-l", "--location")
+      .help("Specify configuration file location (e.g., -l=/src/config/vhdl-fmt.yaml)")
+      .metavar("PATH")
+      .nargs(argparse::nargs_pattern::optional); // Ensure this is treated as optional/nullable
+
+    m_parser.add_argument("files")
+      .help("VHDL files to format")
+      .remaining()
+      .nargs(argparse::nargs_pattern::optional) // Ensure this is treated as optional/nullable
+      .metavar("FILES");
+}
+
+auto ConfigReader::validateArguments(const CliArgs &args) -> bool
+{
+    // Validation only proceeds if show_version/show_help are false (checked in readConfig)
+
+    // Validate config location if provided
+    if (!args.config_location.empty()) {
+        if (!std::filesystem::exists(args.config_location.parent_path())) {
+            std::cerr
+              << "Error: Configuration file directory does not exist: "
+              << args.config_location.parent_path()
+              << '\n';
+            return false;
+        }
+    }
+
+    // Validate input files
+    for (const auto &file : args.input_files) {
+        if (!std::filesystem::exists(file)) {
+            std::cerr << "Error: Input file does not exist: " << file << '\n';
+            return false;
+        }
+
+        if (!std::filesystem::is_regular_file(file)) {
+            std::cerr << "Error: Input path is not a regular file: " << file << '\n';
+            return false;
+        }
+    }
+
+    return true;
+}
 
 } // namespace vhdl_fmt
-
-#endif // VHDL_FMT_CONFIG_MANAGER_HPP
