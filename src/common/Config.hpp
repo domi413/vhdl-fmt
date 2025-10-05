@@ -79,14 +79,14 @@ struct Config final
     }
 
   private:
-    static constexpr uint16_t DEFAULT_LINE_LENGTH{ 100 };
+    static constexpr uint8_t DEFAULT_LINE_LENGTH{ 100 };
     static constexpr uint8_t DEFAULT_INDENT_SIZE{ 4 };
 
     static constexpr uint8_t MIN_LINE_LENGTH{ 10 };
-    static constexpr uint16_t MAX_LINE_LENGTH{ 200 };
+    static constexpr uint8_t MAX_LINE_LENGTH{ 200 };
 
-    static constexpr uint8_t MIN_INDENT_SIZE{ 10 };
-    static constexpr uint16_t MAX_INDENT_SIZE{ 200 };
+    static constexpr uint8_t MIN_INDENT_SIZE{ 1 };
+    static constexpr uint8_t MAX_INDENT_SIZE{ 16 };
 
     IndentationStyle indent_style{ IndentationStyle::SPACES };
     EndOfLine eol{ EndOfLine::AUTO };

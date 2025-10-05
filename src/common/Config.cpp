@@ -26,4 +26,5 @@ auto Config::validate() const -> void
         throw std::invalid_argument(msg);
     }
 }
+
 } // namespace vhdl_fmt

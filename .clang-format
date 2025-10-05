@@ -2,7 +2,7 @@
 # BreakBeforeBraces: Allman
 # ReflowComments: false
 AlignAfterOpenBracket: Align
-AlignArrayOfStructures: Right
+AlignArrayOfStructures: Left
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
 AllowShortLoopsOnASingleLine: true

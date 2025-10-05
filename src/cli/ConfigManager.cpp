@@ -15,31 +15,31 @@ namespace vhdl_fmt {
 using CaseStyleMemberPtr = CaseStyle CasingConfig::*;
 using BoolMemberPtr = bool DeclarationsConfig::*;
 
-static const std::unordered_map<std::string_view, CaseStyle> CASE_STYLE_MAP = {
+static const std::unordered_map<std::string_view, CaseStyle> CASE_STYLE = {
     { "lower_case", CaseStyle::LOWER },
     { "UPPER_CASE", CaseStyle::UPPER },
 };
 
-static const std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP = {
+static const std::unordered_map<std::string_view, EndOfLine> EOL_STYLE = {
     { "auto", EndOfLine::AUTO },
     { "crlf", EndOfLine::CRLF },
-    {   "lf",   EndOfLine::LF },
+    { "lf",   EndOfLine::LF   },
 };
 
-static const std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STYLE_MAP = {
+static const std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STYLE = {
     { "spaces", IndentationStyle::SPACES },
-    {   "tabs",   IndentationStyle::TABS },
+    { "tabs",   IndentationStyle::TABS   },
 };
 
 static const std::unordered_map<std::string_view, CaseStyleMemberPtr> CASING_ASSIGNMENTS = {
-    {    "keywords",    &CasingConfig::keywords },
-    {   "constants",   &CasingConfig::constants },
+    { "keywords",    &CasingConfig::keywords    },
+    { "constants",   &CasingConfig::constants   },
     { "identifiers", &CasingConfig::identifiers },
 };
 
 static const std::unordered_map<std::string_view, BoolMemberPtr> DECLARATION_ASSIGNMENTS = {
-    {         "align_colons",         &DeclarationsConfig::align_colons },
-    {          "align_types",          &DeclarationsConfig::align_types },
+    { "align_colons",         &DeclarationsConfig::align_colons         },
+    { "align_types",          &DeclarationsConfig::align_types          },
     { "align_initialization", &DeclarationsConfig::align_initialization },
 };
 
@@ -49,6 +49,7 @@ auto parseStyle(const std::string_view style,
     if (const auto it = map.find(style); it != map.end()) {
         return it->second;
     }
+
     throw std::invalid_argument("Invalid case style config: " + std::string(style));
 }
 

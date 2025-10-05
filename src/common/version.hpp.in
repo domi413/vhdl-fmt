@@ -1,0 +1,20 @@
+#ifndef VHDL_FMT_VERSION_HPP
+#define VHDL_FMT_VERSION_HPP
+
+#include <string_view>
+
+namespace vhdl_fmt {
+
+// ============================================================================
+// Build Information
+// ============================================================================
+
+/// Application version string
+constexpr std::string_view PROJECT_VERSION = "@PROJECT_VERSION@";
+
+/// Application name
+constexpr std::string_view PROJECT_NAME = "@PROJECT_NAME@";
+
+} // namespace vhdl_fmt
+
+#endif
