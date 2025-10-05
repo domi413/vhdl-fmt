@@ -5,10 +5,10 @@
 
 namespace vhdl_fmt {
 
-/// Application version string
+/// Program version
 constexpr std::string_view PROJECT_VERSION = "@PROJECT_VERSION@";
 
-/// Application name
+/// Program name
 constexpr std::string_view PROJECT_NAME = "@PROJECT_NAME@";
 
 } // namespace vhdl_fmt
