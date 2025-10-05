@@ -60,6 +60,10 @@ struct CasingConfig final
 struct Config final
 {
 
+    // TODO(domi): There must be a more elegant solution than passing all the
+    // options to the constructor. This is also not friendly for further
+    // additions
+
   public:
     /// Creates a config object that holds the user config
     Config(IndentationStyle indent_style,
