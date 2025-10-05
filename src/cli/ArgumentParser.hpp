@@ -19,9 +19,6 @@ class ArgumentParser final
     /// Parses and processes the cli arguments
     auto parseArguments(std::span<char *> args) -> void;
 
-    /// Displays the program version
-    static auto showversion() -> void;
-
     std::filesystem::path config_file_path = std::filesystem::current_path();
 };
 

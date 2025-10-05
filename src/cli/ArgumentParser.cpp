@@ -22,9 +22,4 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
       .implicit_value(true);
 }
 
-auto ArgumentParser::showversion() -> void
-{
-    //
-}
-
 } // namespace vhdl_fmt
