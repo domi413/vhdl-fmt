@@ -9,7 +9,7 @@ namespace vhdl_fmt {
 class ArgumentParser final
 {
   public:
-    /// Constructs a ArgumentParser instate and parses the cli arguments
+    /// Constructs an ArgumentParser instance and parses the cli arguments
     explicit ArgumentParser(std::span<char *> args);
 
     /// Returns the path to the config file
