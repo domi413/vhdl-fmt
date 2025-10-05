@@ -1,63 +1,55 @@
 #ifndef VHDL_FMT_CONFIG_HPP
 #define VHDL_FMT_CONFIG_HPP
 
-#include <filesystem>
-#include <vector>
+#include <cstdint>
 
 namespace vhdl_fmt {
 
-/// Enumeration for indentation style
-enum class IndentationStyle
+/// Indentation style used for formatting
+enum class IndentationStyle : std::uint8_t
 {
     SPACES,
     TABS
 };
 
-/// Enumeration for end of line style
-enum class EndOfLine
+/// End of line character sequence configuration
+enum class EndOfLine : std::uint8_t
 {
     LF,
     CRLF,
     AUTO
 };
 
-/// Enumeration for case formatting
-enum class CaseStyle
+/// Casing conventions
+enum class CaseStyle : std::uint8_t
 {
     LOWER,
     UPPER,
 };
 
-/// Configuration for port map formatting
-struct PortMapConfig
+/// General configuration for line wrapping and indentation
+struct LineConfig final
 {
-    bool align_signals = true;
+    uint16_t line_length;
+    uint8_t indent_size;
 };
 
-/// Configuration for declarations formatting
-struct DeclarationsConfig
+/// Port map signal alignment configuration
+struct PortMapConfig final
 {
-    bool align_colons = true;
-    bool align_types = true;
-    bool align_initialization = true;
+    bool align_signals{ true };
 };
 
-/// Configuration for formatting options
-struct FormattingConfig
+/// Declaration alignment configuration
+struct DeclarationsConfig final
 {
-    PortMapConfig port_map;
-    DeclarationsConfig declarations;
+    bool align_colons{ true };
+    bool align_types{ true };
+    bool align_initialization{ true };
 };
 
-/// Configuration for indentation
-struct IndentationConfig
-{
-    IndentationStyle style = IndentationStyle::SPACES;
-    std::size_t size = 4;
-};
-
-/// Configuration for case formatting
-struct CasingConfig
+/// Specific casing configuration that overwrites the default casing
+struct CasingConfig final
 {
     CaseStyle keywords = CaseStyle::LOWER;
     CaseStyle constants = CaseStyle::UPPER;
@@ -65,30 +57,50 @@ struct CasingConfig
 };
 
 /// Main configuration structure
-struct Config
+struct Config final
 {
-    std::size_t line_length = 100;
-    IndentationConfig indentation;
-    EndOfLine end_of_line = EndOfLine::AUTO;
-    FormattingConfig formatting;
+
+  public:
+    /// Creates a config object that holds the user config
+    Config(IndentationStyle indent_style,
+           LineConfig line_config,
+           EndOfLine eol,
+           PortMapConfig port_map,
+           DeclarationsConfig declarations,
+           CasingConfig casing) :
+      indent_style(indent_style),
+      eol(eol),
+      line_config(line_config),
+      port_map(port_map),
+      declarations(declarations),
+      casing(casing)
+    {
+        validate();
+    }
+
+  private:
+    static constexpr uint16_t DEFAULT_LINE_LENGTH{ 100 };
+    static constexpr uint8_t DEFAULT_INDENT_SIZE{ 4 };
+
+    static constexpr uint8_t MIN_LINE_LENGTH{ 10 };
+    static constexpr uint16_t MAX_LINE_LENGTH{ 200 };
+
+    static constexpr uint8_t MIN_INDENT_SIZE{ 10 };
+    static constexpr uint16_t MAX_INDENT_SIZE{ 200 };
+
+    IndentationStyle indent_style{ IndentationStyle::SPACES };
+    EndOfLine eol{ EndOfLine::AUTO };
+
+    LineConfig line_config{ .line_length = DEFAULT_LINE_LENGTH,
+                            .indent_size = DEFAULT_INDENT_SIZE };
+    PortMapConfig port_map;
+    DeclarationsConfig declarations;
     CasingConfig casing;
 
-    /// Returns default configuration
-    static auto getDefault() -> Config;
-
     /// Validates the configuration
-    [[nodiscard]] auto validate() const -> bool;
-};
-
-/// CLI arguments structure
-struct CliArgs
-{
-    bool show_version = false;
-    bool show_help = false;
-    std::filesystem::path config_location;
-    std::vector<std::filesystem::path> input_files;
+    auto validate() const -> void;
 };
 
 } // namespace vhdl_fmt
 
-#endif // VHDL_FMT_CONFIG_HPP
+#endif

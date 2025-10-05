@@ -9,23 +9,15 @@
 
 namespace vhdl_fmt {
 
-/// Interface for reading configuration from various sources
-class IConfigReader
-{
-  public:
-    virtual ~IConfigReader() = default;
-    virtual auto readConfig() -> CliArgs = 0;
-};
-
 /// Handles CLI argument parsing using argparse
-class ConfigReader : public IConfigReader
+class ConfigReader
 {
   public:
     /// Constructor that takes command line arguments
     explicit ConfigReader(std::span<char *> args);
 
     /// Parses CLI arguments and returns the configuration
-    auto readConfig() -> CliArgs override;
+    auto readConfig() -> CliArgs;
 
     /// Returns the version string
     static auto getVersion() -> std::string;

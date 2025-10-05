@@ -13,9 +13,9 @@ formatting:
   declarations:
     align_colons: true # Align the ':'
     align_types: true # Align the data type
-    align_initialization: true # Align the ':= default_value'
+    align_initialization: true # Align the ':='
 
-casing: # e.g., "lower_case" or "UPPER_CASE"
+casing: # "lower_case" or "UPPER_CASE"
   keywords: "lower_case"
   constants: "UPPER_CASE"
   identifiers: "lower_case"

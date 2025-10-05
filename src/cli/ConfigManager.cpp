@@ -2,23 +2,15 @@
 
 #include "Config.hpp"
 
-#include <exception>
-#include <filesystem>
-#include <iostream>
 #include <memory>
 #include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace vhdl_fmt {
-
-// =========================================================================
-// Configuration Data Maps (Static Helpers)
-// =========================================================================
 
 using CaseStyleMemberPtr = CaseStyle CasingConfig::*;
 using BoolMemberPtr = bool DeclarationsConfig::*;
@@ -50,10 +42,6 @@ static const std::unordered_map<std::string_view, BoolMemberPtr> DECLARATION_ASS
     {          "align_types",          &DeclarationsConfig::align_types },
     { "align_initialization", &DeclarationsConfig::align_initialization },
 };
-
-// =========================================================================
-// Static Parsing Functions
-// =========================================================================
 
 auto parseStyle(const std::string_view style,
                 const std::unordered_map<std::string_view, CaseStyle> &map) -> CaseStyle

@@ -1,44 +1,29 @@
 #include "Config.hpp"
 
+#include <stdexcept>
+
 namespace vhdl_fmt {
 
-auto Config::getDefault() -> Config
+auto Config::validate() const -> void
 {
-    Config config;
+    if (line_config.line_length < MIN_LINE_LENGTH || line_config.line_length > MAX_LINE_LENGTH) {
+        const std::string msg = "Line length must be between "
+                              + std::to_string(MIN_LINE_LENGTH)
+                              + " and "
+                              + std::to_string(MAX_LINE_LENGTH)
+                              + ".";
 
-    // Set default values (already set in struct definition, but being explicit)
-    config.line_length = 100;
-
-    config.indentation.style = IndentationStyle::SPACES;
-    config.indentation.size = 4;
-
-    config.end_of_line = EndOfLine::AUTO;
-
-    config.formatting.port_map.align_signals = true;
-    config.formatting.declarations.align_colons = true;
-    config.formatting.declarations.align_types = true;
-    config.formatting.declarations.align_initialization = true;
-
-    config.casing.keywords = CaseStyle::LOWER;
-    config.casing.constants = CaseStyle::UPPER;
-
-    return config;
-}
-
-auto Config::validate() const -> bool
-{
-    // Validate line length
-    if (line_length < 1 || line_length > 1000) {
-        return false;
+        throw std::invalid_argument(msg);
     }
 
-    // Validate indentation size
-    if (indentation.size < 1 || indentation.size > 16) {
-        return false;
+    if (line_config.indent_size < MIN_INDENT_SIZE || line_config.indent_size > MAX_INDENT_SIZE) {
+        const std::string msg = "Indent size must be between "
+                              + std::to_string(MIN_INDENT_SIZE)
+                              + " and "
+                              + std::to_string(MAX_INDENT_SIZE)
+                              + ".";
+
+        throw std::invalid_argument(msg);
     }
-
-    // All enum values are inherently valid due to type safety
-    return true;
 }
-
 } // namespace vhdl_fmt
