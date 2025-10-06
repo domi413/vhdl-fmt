@@ -1,0 +1,58 @@
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <span>
+#include <sstream>
+
+#include "ast/design_file.hpp"
+#include "vhdlLexer.h"
+#include "vhdlParser.h"
+
+#include "builder/assembly/node_builder.hpp"
+#include "builder/translator.hpp"
+#include "builder/visitor.hpp"
+
+#include "emit/debug_printer.hpp"
+
+auto main(int argc, char* argv[]) -> int {
+    std::span args(argv, static_cast<size_t>(argc));
+
+    if (args.size() < 2) {
+        std::cerr << "Usage: vhdl_formatter <file.vhdl>\n";
+        return 1;
+    }
+
+    const std::filesystem::path path{args[1]};
+    std::ifstream in(path);
+    if (!in) {
+        std::cerr << "Could not open input file: " << path << '\n';
+        return 1;
+    }
+
+    std::stringstream buffer;
+    buffer << in.rdbuf();
+
+    antlr4::ANTLRInputStream input(buffer.str());
+    vhdlLexer lexer(&input);
+    antlr4::CommonTokenStream tokens(&lexer);
+    tokens.fill();
+
+    vhdlParser parser(&tokens);
+    auto* tree = parser.design_file();
+
+    //--- AST construction pipeline ---
+    ast::DesignFile root;
+    builder::ASTBuilder builder(root.units);
+    
+    builder::Translator translator(builder, tokens);
+
+    builder::Visitor visitor(translator);
+    visitor.walk(tree);
+
+    std::cout << tree->toStringTree(&parser, true) << "\n\n";
+
+    emit::DebugPrinter printer;
+    root.accept(printer);
+
+    return 0;
+}

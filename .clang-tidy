@@ -8,6 +8,7 @@ Checks: >
   -fuchsia-trailing-return,
   -llvm-header-guard,
   -readability-identifier-length,
+  -readability-implicit-bool-conversion,
 
 CheckOptions:
   # Types start with upper case (PascalCase): MyClass

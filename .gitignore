@@ -1,12 +1,36 @@
-*.cache
-build/
-
-# Conan generated files
+# ---------------------------
+# Build artifacts
+# ---------------------------
+/build/
+CMakeCache.txt
+CMakeFiles/
+/.cache/
 CMakeUserPresets.json
-conandata.yml
-conaninfo.txt
-conanbuildinfo.*
-conan.lock
 
-# clangd symlink
+# Compiled objects and binaries
+*.o
+*.obj
+*.exe
+
+# Build system files
+*.ninja
+cmake_install.cmake
 compile_commands.json
+
+# ---------------------------
+# Generated code
+# ---------------------------
+# ANTLR and other generated sources
+build/generated/
+
+# ---------------------------
+# Test output
+# ---------------------------
+/tests/Testing/
+*.log
+
+# ---------------------------
+# Editor / environment files
+# ---------------------------
+.vscode/
+.idea/

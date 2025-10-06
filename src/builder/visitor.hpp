@@ -1,0 +1,35 @@
+#pragma once
+
+#include "builder/adapter/base_void_visitor.hpp"
+#include "translator.hpp"
+
+namespace builder {
+
+/**
+ * @brief Traverses ANTLR contexts (CST nodes).
+ *
+ * The `Visitor` walks the parse tree produced by the ANTLR4 VHDL grammar
+ * and delegates semantic node creation to `Translator`.
+ *
+ * Responsibilities:
+ *  - Traverse ANTLR contexts (CST nodes)
+ *  - Route subtrees to the correct AST construction functions
+ *  - Maintain traversal structure (e.g., visitEntity, visitPort)
+ *  - Pure traversal logic; no AST construction occurs here directly
+ */
+class Visitor : public adapter::BaseVoidVisitor
+{
+  public:
+    explicit Visitor(Translator &t);
+    void walk(antlr4::tree::ParseTree *ctx) { adapter::BaseVoidVisitor::walk(ctx); }
+
+    void visitEntity_declaration(vhdlParser::Entity_declarationContext *ctx) override;
+    void visitGeneric_clause(vhdlParser::Generic_clauseContext *ctx) override;
+    void visitPort_clause(vhdlParser::Port_clauseContext *ctx) override;
+    void visitConstraint(vhdlParser::ConstraintContext *ctx) override;
+
+  private:
+    Translator &translator;
+};
+
+} // namespace builder
