@@ -25,5 +25,8 @@ target_include_directories(
         ${CMAKE_CURRENT_SOURCE_DIR}/../build/generated
 )
 
+# Copy test data
+file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+
 include(Catch)
 catch_discover_tests(tests)

@@ -12,19 +12,21 @@
 #include <string>
 #include <vector>
 
+namespace {
+auto loadVhdl(const std::string &filename) -> std::string
+{
+    std::ifstream file(filename);
+    REQUIRE(file.is_open());
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
+} // namespace
+
 TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 {
     // --- Input VHDL ---
-    const std::string vhdl_code = R"vhdl(
-        entity MyEntity is
-            port (
-                clk     : in  std_logic;
-                rst_n   : in  std_logic;
-                load_val: in  std_logic_vector(DATA_WIDTH-1 downto 0);
-                count   : out std_logic_vector(DATA_WIDTH-1 downto 0)
-            );
-        end MyEntity;
-    )vhdl";
+    const std::string vhdl_code = loadVhdl("../data/ports.vhdl");
 
     // --- Setup ANTLR ---
     antlr4::ANTLRInputStream input(vhdl_code);
