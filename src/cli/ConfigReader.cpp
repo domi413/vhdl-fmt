@@ -96,7 +96,7 @@ auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
 
     YAML::Node root_node{};
     try {
-        root_node = YAML::LoadFile(this->config_file_path.string()); // Assignment works now
+        root_node = YAML::LoadFile(this->config_file_path.string());
     } catch (const YAML::BadFile &e) {
         return std::unexpected{ ConfigReadError{ std::string("Could not load config file: ")
                                                  + e.what() } };
