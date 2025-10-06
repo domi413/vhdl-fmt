@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <type_traits>
+#include <vector>
 
 namespace builder {
 

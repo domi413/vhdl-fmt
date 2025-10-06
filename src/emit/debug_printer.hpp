@@ -6,8 +6,10 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/visitor.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <typeinfo>
 
 namespace emit {
@@ -87,7 +89,7 @@ struct DebugPrinter : ast::ASTVisitor
         std::ostringstream oss;
 
         // Names
-        for (size_t i = 0; i < p.names.size(); ++i) {
+        for (std::size_t i = 0; i < p.names.size(); ++i) {
             if (i > 0) {
                 oss << ", ";
             }

@@ -3,6 +3,7 @@
 
 #include "antlr_void_adapter.hpp"
 #include "tree/ParseTree.h"
+#include "vhdlParser.h"
 #include "void_visitor.hpp"
 
 namespace builder::adapter {

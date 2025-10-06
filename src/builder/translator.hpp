@@ -1,10 +1,18 @@
 #ifndef BUILDER_TRANSLATOR_HPP
 #define BUILDER_TRANSLATOR_HPP
 
+#include "CommonTokenStream.h"
+#include "ParserRuleContext.h"
+#include "Token.h"
+#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "builder/assembly/node_builder.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
+
+#include <cstddef>
+#include <unordered_set>
+#include <vector>
 
 namespace builder {
 
@@ -77,7 +85,7 @@ class Translator
             if (!t) {
                 return;
             }
-            const size_t idx = t->getTokenIndex();
+            const std::size_t idx = t->getTokenIndex();
             if (consumed_comment_token_indices.contains(idx)) {
                 return;
             }
@@ -94,7 +102,10 @@ class Translator
         // unconsumed here so the next node will pick them up as leading.
         const int stop_line = static_cast<int>(ctx->getStop()->getLine());
         for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
-            if (t && static_cast<int>(t->getLine()) == stop_line) {
+            if (!t) {
+                continue;
+            }
+            if (static_cast<std::size_t>(t->getLine()) == static_cast<std::size_t>(stop_line)) {
                 push(t, cm.trailing, true);
             }
         }

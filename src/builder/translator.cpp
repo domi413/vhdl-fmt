@@ -1,5 +1,8 @@
 #include "translator.hpp"
 
+#include "ast/nodes/declarations.hpp"
+#include "vhdlParser.h"
+
 namespace builder {
 
 auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &

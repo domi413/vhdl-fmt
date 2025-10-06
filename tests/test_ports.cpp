@@ -1,3 +1,6 @@
+#include "ANTLRInputStream.h"
+#include "CommonTokenStream.h"
+#include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "builder/assembly/node_builder.hpp"
 #include "builder/translator.hpp"
@@ -6,6 +9,8 @@
 #include "vhdlParser.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <string>
+#include <vector>
 
 TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 {

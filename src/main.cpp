@@ -1,3 +1,5 @@
+#include "ANTLRInputStream.h"
+#include "CommonTokenStream.h"
 #include "ast/nodes/design_file.hpp"
 #include "builder/assembly/node_builder.hpp"
 #include "builder/translator.hpp"
@@ -6,6 +8,7 @@
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -14,7 +17,7 @@
 
 auto main(int argc, char *argv[]) -> int
 {
-    std::span args(argv, static_cast<size_t>(argc));
+    const std::span args(argv, static_cast<std::size_t>(argc));
 
     if (args.size() < 2) {
         std::cerr << "Usage: vhdl_formatter <file.vhdl>\n";
@@ -22,7 +25,7 @@ auto main(int argc, char *argv[]) -> int
     }
 
     const std::filesystem::path path{ args[1] };
-    std::ifstream in(path);
+    const std::ifstream in(path);
     if (!in) {
         std::cerr << "Could not open input file: " << path << '\n';
         return 1;

@@ -6,6 +6,7 @@
 #include "builder/assembly/builder_sink.hpp"
 
 #include <cassert>
+#include <concepts>
 #include <memory>
 #include <vector>
 

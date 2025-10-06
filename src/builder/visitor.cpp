@@ -1,5 +1,7 @@
 #include "visitor.hpp"
 
+#include "vhdlParser.h"
+
 namespace builder {
 
 void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)

@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <memory>
+#include <vector>
 
 namespace builder {
 

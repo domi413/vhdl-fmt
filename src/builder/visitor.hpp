@@ -3,6 +3,8 @@
 
 #include "builder/adapter/base_void_visitor.hpp"
 #include "translator.hpp"
+#include "tree/ParseTree.h"
+#include "vhdlParser.h"
 
 namespace builder {
 

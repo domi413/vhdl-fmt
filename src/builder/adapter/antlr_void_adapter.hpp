@@ -2,7 +2,10 @@
 #define BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
 
 #include "vhdlBaseVisitor.h"
+#include "vhdlParser.h"
 #include "void_visitor.hpp"
+
+#include <any>
 
 namespace builder::adapter {
 class AntlrVoidAdapter : public vhdlBaseVisitor
