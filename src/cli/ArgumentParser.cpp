@@ -39,19 +39,20 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 
     program.add_argument("-l", "--location")
       .help("Path to the configuration file (e.g., /path/to/vhdl-fmt.yaml)")
-      .action([this](const std::string &value) -> std::string {
-          const std::filesystem::path config_path{ value };
+      .action([this](const std::string &location) -> std::string {
+          const std::filesystem::path config_path{ location };
 
           if (!std::filesystem::exists(config_path)) {
-              throw std::runtime_error("Configuration file does not exist: " + value);
+              throw std::runtime_error("Configuration file does not exist: " + location);
           }
 
           if (!std::filesystem::is_regular_file(config_path)) {
-              throw std::runtime_error("Configuration path is not a regular file: " + value);
+              throw std::runtime_error("Configuration path is not a regular file: " + location);
           }
 
           config_file_path = std::filesystem::canonical(config_path);
-          return value;
+
+          return location;
       });
 
     try {
