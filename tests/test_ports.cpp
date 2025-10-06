@@ -41,7 +41,7 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 
     // --- Build AST ---
     ast::DesignFile design;
-    builder::NodeBuilder builder(design.units);
+    builder::NodeAssembler builder(design.units);
     builder::Translator translator(builder, tokens);
     builder::Visitor visitor(translator);
 

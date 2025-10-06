@@ -12,23 +12,37 @@
 
 namespace builder {
 
-struct NodeBuilder
+/**
+ * @brief Assembles AST nodes into hierarchical structures.
+ *
+ * The `NodeAssembler` manages node creation and insertion into active
+ * AST containers (sinks). It provides scoped control over where new
+ * nodes are appended during AST assembly.
+ *
+ * Responsibilities:
+ *  - Spawn and insert new AST nodes
+ *  - Manage nested insertion scopes via `with` / `into`
+ *  - Ensure sink stack integrity during construction
+ *
+ * Contains no parsing or traversal logic.
+ */
+struct NodeAssembler
 {
     using Node = ast::Node;
     using NodePtr = std::unique_ptr<Node>;
 
     // Attach to any node container (e.g. DesignFile.units)
-    explicit NodeBuilder(std::vector<std::unique_ptr<ast::Node>> &sink)
+    explicit NodeAssembler(std::vector<std::unique_ptr<ast::Node>> &sink)
     {
         sinks.push_back(std::make_unique<SinkImpl<ast::Node>>(sink));
     }
 
-    ~NodeBuilder() noexcept { assert(sinks.size() <= 1 && "Unclosed sinks remain!"); }
+    ~NodeAssembler() noexcept { assert(sinks.size() <= 1 && "Unclosed sinks remain!"); }
 
-    NodeBuilder(const NodeBuilder &) = delete;
-    auto operator=(const NodeBuilder &) -> NodeBuilder & = delete;
-    NodeBuilder(NodeBuilder &&) = delete;
-    auto operator=(NodeBuilder &&) -> NodeBuilder & = delete;
+    NodeAssembler(const NodeAssembler &) = delete;
+    auto operator=(const NodeAssembler &) -> NodeAssembler & = delete;
+    NodeAssembler(NodeAssembler &&) = delete;
+    auto operator=(NodeAssembler &&) -> NodeAssembler & = delete;
 
     // Spawn node and insert into current sink
     template<typename T, typename... Args>

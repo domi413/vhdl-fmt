@@ -44,7 +44,7 @@ auto main(int argc, char *argv[]) -> int
 
     //--- AST construction pipeline ---
     ast::DesignFile root;
-    builder::NodeBuilder builder(root.units);
+    builder::NodeAssembler builder(root.units);
 
     builder::Translator translator(builder, tokens);
 

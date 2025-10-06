@@ -30,11 +30,11 @@ namespace builder {
  */
 class Translator
 {
-    NodeBuilder &builder;
+    NodeAssembler &builder;
     antlr4::CommonTokenStream &tokens;
 
   public:
-    Translator(NodeBuilder &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
+    Translator(NodeAssembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
 
     ~Translator() = default;
     Translator(const Translator &) = delete;
