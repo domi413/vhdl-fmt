@@ -2,7 +2,9 @@ GRAMMARS := grammars/vhdl.g4
 GENERATED := build/generated/vhdlLexer.cpp build/generated/vhdlParser.cpp
 EXCLUDES := src/builder/adapter
 EXCLUDE_EXPR := $(foreach d,$(EXCLUDES),-path '$(d)' -prune -o)
-SRCS := $(shell find ./ src tests \( $(EXCLUDE_EXPR) -false \) -o -type f \( -name '*.cpp' -o -name '*.hpp' \))
+SRCS := $(shell find src tests \
+    $(foreach d,$(EXCLUDES), -path '$(d)' -prune -o) \
+    -type f \( -name '*.cpp' -o -name '*.hpp' \) -print)
 SRCS_CMAKE := $(shell find -name 'CMakeLists.txt')
 TARGET := build/Debug/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.stamp
@@ -10,7 +12,7 @@ ANTLR_STAMP := build/.antlr.stamp
 BUILD_STAMP := build/.build.stamp
 
 # Flags for clang-tidy
-LINT_COMMON_FLAGS = -p build/Release/
+LINT_COMMON_FLAGS = -p build/Debug/generators/
 LINT_TIDY_FLAGS = --warnings-as-errors='*'
 
 all: $(TARGET)
@@ -81,7 +83,7 @@ format:
 
 lint: build
 	@echo "Running clang-tidy..."
-	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SOURCES_CPP)
+	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SRCS)
 	@echo "✓ Linting complete"
 
 sort-dictionary:

@@ -27,7 +27,6 @@ message(
 )
 message(STATUS "  Standard: C++${CMAKE_CXX_STANDARD}")
 
-
 include(CTest)
 enable_testing()
 add_subdirectory(src)

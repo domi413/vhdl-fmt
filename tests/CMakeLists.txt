@@ -2,7 +2,8 @@ find_package(antlr4-runtime CONFIG REQUIRED)
 find_package(Catch2 REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 
-add_executable(tests
+add_executable(
+    tests
     test_ports.cpp
     ../src/builder/visitor.cpp
     ../src/builder/translator.cpp
@@ -12,15 +13,16 @@ add_executable(tests
     ../build/generated/vhdlVisitor.cpp
 )
 
-target_link_libraries(tests PRIVATE
-    Catch2::Catch2WithMain
-    fmt::fmt
-    antlr4_static
+target_link_libraries(
+    tests
+    PRIVATE Catch2::Catch2WithMain fmt::fmt antlr4_static
 )
 
-target_include_directories(tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../build/generated
+target_include_directories(
+    tests
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src
+        ${CMAKE_CURRENT_SOURCE_DIR}/../build/generated
 )
 
 include(Catch)
