@@ -1,6 +1,9 @@
+antlr
 antlr4
-clangd
+conanfile
+conanrun
 gersemi
+subnature
 vhdl
 wconversion
 wdouble

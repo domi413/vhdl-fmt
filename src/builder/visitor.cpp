@@ -18,26 +18,26 @@ void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 
 void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
-    auto *glist = ctx->generic_list();
-    if (glist == nullptr) {
+    auto *g_list = ctx->generic_list();
+    if (g_list == nullptr) {
         return;
     }
-    for (auto *icdecl : glist->interface_constant_declaration()) {
-        translator.makeGenericParam(icdecl);
+    for (auto *i_c_decl : g_list->interface_constant_declaration()) {
+        translator.makeGenericParam(i_c_decl);
     }
 }
 
 void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
 {
-    auto *plist = ctx->port_list();
-    if (!plist) {
+    auto *p_list = ctx->port_list();
+    if (p_list == nullptr) {
         return;
     }
-    if (auto *iplist_ctx = plist->interface_port_list()) {
-        for (auto *ipdecl : iplist_ctx->interface_port_declaration()) {
-            auto &port = translator.makeSignalPort(ipdecl);
-            if (auto *stype = ipdecl->subtype_indication()) {
-                if (auto *con = stype->constraint()) {
+    if (auto *i_p_list = p_list->interface_port_list()) {
+        for (auto *i_p_decl : i_p_list->interface_port_declaration()) {
+            auto &port = translator.makeSignalPort(i_p_decl);
+            if (auto *s_type = i_p_decl->subtype_indication()) {
+                if (auto *con = s_type->constraint()) {
                     translator.into(port.constraints, [&] { dispatch(con); });
                 }
             }
@@ -47,10 +47,10 @@ void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
 
 void Visitor::visitConstraint(vhdlParser::ConstraintContext *ctx)
 {
-    if (auto *idx = ctx->index_constraint()) {
-        for (auto *dr : idx->discrete_range()) {
-            if (auto *rdecl = dr->range_decl()) {
-                if (auto *erange = rdecl->explicit_range()) {
+    if (auto *i_con = ctx->index_constraint()) {
+        for (auto *d_range : i_con->discrete_range()) {
+            if (auto *r_decl = d_range->range_decl()) {
+                if (auto *erange = r_decl->explicit_range()) {
                     translator.makeRange(erange);
                 }
             }
