@@ -52,7 +52,7 @@ conan: $(CONAN_STAMP)
 # Run & Test targets
 # -----------------------------
 run: $(BUILD_STAMP)
-	@./$(TARGET) ./examples/simple.vhdl
+	@./$(TARGET) ./tests/examples/simple.vhdl
 
 test: $(BUILD_STAMP)
 	@ctest --test-dir build/Debug --output-on-failure
