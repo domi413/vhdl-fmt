@@ -18,38 +18,38 @@ using PortMapMember = bool PortMapConfig::*;
 using DeclarationMember = bool DeclarationConfig::*;
 using CaseStyleMember = CaseStyle CasingConfig::*;
 
-constexpr std::unordered_map<std::string_view, LineConfigMember> LINE_CONFIG_ASSIGNMENTS_MAP = {
+const std::unordered_map<std::string_view, LineConfigMember> LINE_CONFIG_ASSIGNMENTS_MAP = {
     { "line_length", &LineConfig::line_length },
     { "indent_size", &LineConfig::indent_size },
 };
 
-constexpr std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STYLE_MAP = {
+const std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STYLE_MAP = {
     { "spaces", IndentationStyle::SPACES },
     { "tabs",   IndentationStyle::TABS   },
 };
 
-constexpr std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP = {
+const std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP = {
     { "auto", EndOfLine::AUTO },
     { "crlf", EndOfLine::CRLF },
     { "lf",   EndOfLine::LF   },
 };
 
-constexpr std::unordered_map<std::string_view, CaseStyle> CASE_STYLE_MAP = {
+const std::unordered_map<std::string_view, CaseStyle> CASE_STYLE_MAP = {
     { "lower_case", CaseStyle::LOWER },
     { "UPPER_CASE", CaseStyle::UPPER },
 };
 
-constexpr std::unordered_map<std::string_view, PortMapMember> PORT_MAP_ASSIGNMENTS_MAP = {
+const std::unordered_map<std::string_view, PortMapMember> PORT_MAP_ASSIGNMENTS_MAP = {
     { "align_signals", &PortMapConfig::align_signals },
 };
 
-constexpr std::unordered_map<std::string_view, DeclarationMember> DECLARATION_ASSIGNMENTS_MAP = {
+const std::unordered_map<std::string_view, DeclarationMember> DECLARATION_ASSIGNMENTS_MAP = {
     { "align_colons",         &DeclarationConfig::align_colons         },
     { "align_types",          &DeclarationConfig::align_types          },
     { "align_initialization", &DeclarationConfig::align_initialization },
 };
 
-constexpr std::unordered_map<std::string_view, CaseStyleMember> CASING_ASSIGNMENTS_MAP = {
+const std::unordered_map<std::string_view, CaseStyleMember> CASING_ASSIGNMENTS_MAP = {
     { "keywords",    &CasingConfig::keywords    },
     { "constants",   &CasingConfig::constants   },
     { "identifiers", &CasingConfig::identifiers },

@@ -27,6 +27,8 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
     program.add_description("A VHDL formatter for beautifying and standardizing VHDL code.");
     program.add_epilog("For more information, visit the project documentation.");
 
+    program.add_argument("input").help("VHDL file or directory to format").metavar("file.vhd");
+
     program.add_argument("-w", "--write")
       .help("Overwrites the input file with formatted content")
       .default_value(false)
