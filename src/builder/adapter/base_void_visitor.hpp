@@ -7,16 +7,22 @@ namespace builder::adapter {
 class BaseVoidVisitor : public VoidVisitor {
 protected:
     void dispatch(antlr4::tree::ParseTree *node) {
-        if (!node) return;
+        if (!node) { 
+            return;
+        }
         AntlrVoidAdapter adapter(*this);
         node->accept(&adapter);
     }
 
     void walk(antlr4::tree::ParseTree *node) {
-        if (!node) return;
+        if (!node) { 
+            return;
+        }
         AntlrVoidAdapter adapter(*this);
         for (auto *child : node->children) {
-            if (child) child->accept(&adapter);
+            if (child) { 
+                child->accept(&adapter);
+            }
         }
     }
 

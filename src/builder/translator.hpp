@@ -53,23 +53,23 @@ class Translator
   private:
     ASTBuilder &builder;
     antlr4::CommonTokenStream &tokens;
-    std::unordered_set<size_t> consumed_comment_token_indices;
+    std::unordered_set<std::size_t> consumed_comment_token_indices;
 
-    void attachComments(ast::Node &node, antlr4::ParserRuleContext *ctx)
+    void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     {
         if (!ctx) {
             return;
         }
         auto &cm = node.getComments();
-        auto kind = [](antlr4::Token *t) {
+        auto kind = [](const antlr4::Token *t) {
             return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::line
                                                       : ast::Comment::Kind::block;
         };
-        auto push = [&](antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
+        auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
             if (!t) {
                 return;
             }
-            size_t idx = t->getTokenIndex();
+            const size_t idx = t->getTokenIndex();
             if (consumed_comment_token_indices.contains(idx)) {
                 return;
             }
@@ -78,14 +78,14 @@ class Translator
         };
 
         // Leading: everything hidden to the left of start (consume all)
-        for (auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
+        for (const auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
             push(t, cm.leading, false);
         }
 
         // Trailing: only inline. Standalone comments are left
         // unconsumed here so the next node will pick them up as leading.
         const int stop_line = static_cast<int>(ctx->getStop()->getLine());
-        for (auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
+        for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
             if (t && static_cast<int>(t->getLine()) == stop_line) {
                 push(t, cm.trailing, true);
             }
