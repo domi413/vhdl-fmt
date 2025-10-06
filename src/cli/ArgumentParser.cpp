@@ -11,12 +11,12 @@ namespace vhdl_fmt {
 
 ArgumentParser::ArgumentParser(std::span<char *> args)
 {
-    parseArguments(args);
+    this->parseArguments(args);
 }
 
 auto ArgumentParser::getConfigPath() const -> const std::filesystem::path &
 {
-    return config_file_path;
+    return this->config_file_path;
 }
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
