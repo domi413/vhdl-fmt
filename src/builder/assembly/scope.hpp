@@ -1,7 +1,7 @@
 #ifndef BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP
 #define BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP
 
-#include "builder/assembly/builder_sink.hpp"
+#include "builder/assembly/sink.hpp"
 
 #include <memory>
 #include <type_traits>

@@ -20,16 +20,15 @@ target_link_libraries(
 
 target_include_directories(
     tests
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/build/generated
+    PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/build/generated
 )
 
 # Copy test data and define path
 file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-target_compile_definitions(tests PRIVATE
-    TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
+target_compile_definitions(
+    tests
+    PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
 )
 
 include(Catch)

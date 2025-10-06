@@ -1,9 +1,9 @@
-#ifndef BUILDER_ASSEMBLY_NODE_BUILDER_HPP
-#define BUILDER_ASSEMBLY_NODE_BUILDER_HPP
+#ifndef BUILDER_ASSEMBLY_ASSEMBLER_HPP
+#define BUILDER_ASSEMBLY_ASSEMBLER_HPP
 
 #include "ast/node.hpp"
-#include "builder/assembly/builder_scope.hpp"
-#include "builder/assembly/builder_sink.hpp"
+#include "builder/assembly/scope.hpp"
+#include "builder/assembly/sink.hpp"
 
 #include <cassert>
 #include <concepts>
@@ -15,7 +15,7 @@ namespace builder {
 /**
  * @brief Assembles AST nodes into hierarchical structures.
  *
- * The `NodeAssembler` manages node creation and insertion into active
+ * The `Assembler` manages node creation and insertion into active
  * AST containers (sinks). It provides scoped control over where new
  * nodes are appended during AST assembly.
  *
@@ -26,23 +26,23 @@ namespace builder {
  *
  * Contains no parsing or traversal logic.
  */
-struct NodeAssembler
+struct Assembler
 {
     using Node = ast::Node;
     using NodePtr = std::unique_ptr<Node>;
 
     // Attach to any node container (e.g. DesignFile.units)
-    explicit NodeAssembler(std::vector<std::unique_ptr<ast::Node>> &sink)
+    explicit Assembler(std::vector<std::unique_ptr<ast::Node>> &sink)
     {
         sinks.push_back(std::make_unique<SinkImpl<ast::Node>>(sink));
     }
 
-    ~NodeAssembler() noexcept { assert(sinks.size() <= 1 && "Unclosed sinks remain!"); }
+    ~Assembler() noexcept { assert(sinks.size() <= 1 && "Unclosed sinks remain!"); }
 
-    NodeAssembler(const NodeAssembler &) = delete;
-    auto operator=(const NodeAssembler &) -> NodeAssembler & = delete;
-    NodeAssembler(NodeAssembler &&) = delete;
-    auto operator=(NodeAssembler &&) -> NodeAssembler & = delete;
+    Assembler(const Assembler &) = delete;
+    auto operator=(const Assembler &) -> Assembler & = delete;
+    Assembler(Assembler &&) = delete;
+    auto operator=(Assembler &&) -> Assembler & = delete;
 
     // Spawn node and insert into current sink
     template<typename T, typename... Args>
@@ -76,4 +76,4 @@ struct NodeAssembler
 
 } // namespace builder
 
-#endif /* BUILDER_ASSEMBLY_NODE_BUILDER_HPP */
+#endif /* BUILDER_ASSEMBLY_ASSEMBLER_HPP */

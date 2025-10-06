@@ -1,7 +1,7 @@
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
 #include "ast/nodes/design_file.hpp"
-#include "builder/assembly/node_builder.hpp"
+#include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitor.hpp"
 #include "emit/debug_printer.hpp"
@@ -44,7 +44,7 @@ auto main(int argc, char *argv[]) -> int
 
     //--- AST construction pipeline ---
     ast::DesignFile root;
-    builder::NodeAssembler builder(root.units);
+    builder::Assembler builder(root.units);
 
     builder::Translator translator(builder, tokens);
 

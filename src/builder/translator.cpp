@@ -1,7 +1,11 @@
 #include "translator.hpp"
 
+#include "Token.h"
 #include "ast/nodes/declarations.hpp"
+#include "vhdlLexer.h"
 #include "vhdlParser.h"
+
+#include <vector>
 
 namespace builder {
 
@@ -61,6 +65,46 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range
     range.right_expr = ctx->simple_expression(1)->getText();
 
     return range;
+}
+
+void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx)
+{
+    if (ctx == nullptr) {
+        return;
+    }
+    auto &cm = node.getComments();
+    auto kind = [](const antlr4::Token *t) {
+        return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::line
+                                                  : ast::Comment::Kind::block;
+    };
+    auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
+        if (!t) {
+            return;
+        }
+        const std::size_t idx = t->getTokenIndex();
+        if (consumed_comment_token_indices.contains(idx)) {
+            return;
+        }
+        consumed_comment_token_indices.insert(idx);
+        dst.push_back({ t->getText(), kind(t), static_cast<int>(t->getLine()), is_inline });
+    };
+
+    // Leading: everything hidden to the left of start (consume all)
+    for (const auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
+        push(t, cm.leading, false);
+    }
+
+    // Trailing: only inline. Standalone comments are left
+    // unconsumed here so the next node will pick them up as leading.
+    const std::size_t stop_line = ctx->getStop()->getLine();
+    for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
+        if (t == nullptr) {
+            continue;
+        }
+        if (t->getLine() == stop_line) {
+            push(t, cm.trailing, true);
+        }
+    }
 }
 
 } // namespace builder

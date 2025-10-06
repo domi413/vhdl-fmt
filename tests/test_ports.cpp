@@ -2,7 +2,7 @@
 #include "CommonTokenStream.h"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
-#include "builder/assembly/node_builder.hpp"
+#include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitor.hpp"
 #include "vhdlLexer.h"
@@ -41,7 +41,7 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 
     // --- Build AST ---
     ast::DesignFile design;
-    builder::NodeAssembler builder(design.units);
+    builder::Assembler builder(design.units);
     builder::Translator translator(builder, tokens);
     builder::Visitor visitor(translator);
 
