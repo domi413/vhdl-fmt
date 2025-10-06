@@ -2,6 +2,7 @@
 #include "ConfigReader.hpp"
 
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <span>
 
@@ -9,11 +10,11 @@
 auto main(int argc, char *argv[]) -> int
 {
     try {
-        vhdl_fmt::ArgumentParser argparser{
+        const vhdl_fmt::ArgumentParser argparser{
             std::span<char *>{ argv, static_cast<std::size_t>(argc) }
         };
 
-        vhdl_fmt::ConfigReader config_reader{ argparser.getConfigPath() };
+        const vhdl_fmt::ConfigReader config_reader{ argparser.getConfigPath() };
 
         // Call the formatter and pass the config object
         // formatter{ config_reader.readConfigFile() };

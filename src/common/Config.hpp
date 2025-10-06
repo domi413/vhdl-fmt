@@ -1,6 +1,7 @@
 #ifndef VHDL_FMT_CONFIG_HPP
 #define VHDL_FMT_CONFIG_HPP
 
+#include <algorithm>
 #include <cstdint>
 #include <stdexcept>
 #include <string>

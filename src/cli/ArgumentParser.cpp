@@ -3,7 +3,9 @@
 #include "version.hpp"
 
 #include <argparse/argparse.hpp>
+#include <filesystem>
 #include <iostream>
+#include <span>
 #include <stdexcept>
 #include <vector>
 
@@ -25,7 +27,8 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
     argparse::ArgumentParser program{ "vhdl-fmt", "1.0.0" };
 
     program.add_description("A VHDL formatter for beautifying and standardizing VHDL code.");
-    program.add_epilog("For more information, visit the project documentation.");
+    program.add_epilog("For more information, visit the project "
+                       "documentation.\nhttps://github.com/domi413/vhdl-fmt");
 
     program.add_argument("input").help("VHDL file or directory to format").metavar("file.vhd");
 

@@ -2,12 +2,15 @@
 
 #include "Config.hpp"
 
+#include <cstdint>
+#include <expected>
 #include <filesystem>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <yaml-cpp/exceptions.h>
 #include <yaml-cpp/node/parse.h>
-#include <yaml-cpp/yaml.h>
 
 namespace vhdl_fmt {
 
@@ -72,16 +75,17 @@ auto parseStyle(const std::string_view style,
 }
 
 template<typename T>
-auto parseScalar(const YAML::Node &node, const char *name) -> T
+auto parseScalar(const YAML::Node &node, std::string_view name) -> T
 {
     if (!IS_VALID(node)) {
-        throw std::runtime_error(std::string("Missing required config field: ") + name);
+        throw std::runtime_error(std::string("Missing required config field: ")
+                                 + std::string(name));
     }
 
     try {
         return node.as<T>();
     } catch (const YAML::BadConversion &e) {
-        throw std::runtime_error(std::string("Invalid value for config field '") + name
+        throw std::runtime_error(std::string("Invalid value for config field '") + std::string(name)
                                  + "': " + e.what());
     }
 }
@@ -189,7 +193,7 @@ auto ConfigReader::readPortMapConfig(const YAML::Node &root_node, const PortMapC
         if (const auto port_map_node = formatting_node["port_map"]; IS_VALID(port_map_node)) {
             for (const auto &[key, member_ptr] : PORT_MAP_ASSIGNMENTS_MAP) {
                 if (const auto val_node = port_map_node[std::string{ key }]; IS_VALID(val_node)) {
-                    port_map.*member_ptr = parseScalar<bool>(val_node, key.data());
+                    port_map.*member_ptr = parseScalar<bool>(val_node, key);
                 }
             }
         }
@@ -209,7 +213,7 @@ auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
             for (const auto &[key, member_ptr] : DECLARATION_ASSIGNMENTS_MAP) {
                 if (const auto val_node = declarations_node[std::string{ key }];
                     IS_VALID(val_node)) {
-                    declarations.*member_ptr = parseScalar<bool>(val_node, key.data());
+                    declarations.*member_ptr = parseScalar<bool>(val_node, key);
                 }
             }
         }
@@ -227,7 +231,7 @@ auto ConfigReader::readCasingConfig(const YAML::Node &root_node, const CasingCon
         if (const auto casing_node = formatting_node["casing"]; IS_VALID(casing_node)) {
             for (const auto &[key, member_ptr] : CASING_ASSIGNMENTS_MAP) {
                 if (const auto val_node = casing_node[std::string{ key }]; IS_VALID(val_node)) {
-                    const auto style_str = parseScalar<std::string_view>(val_node, key.data());
+                    const auto style_str = parseScalar<std::string_view>(val_node, key);
                     casing.*member_ptr = parseStyle(style_str, CASE_STYLE_MAP, "casing");
                 }
             }
