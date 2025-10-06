@@ -1,9 +1,9 @@
 ---
 CompileFlags:
+  CompilationDatabase: build/Debug
   Add:
     - -xc++
     - -std=c++23
     - -D_GNU_SOURCE
     - -Ibuild/generated
-  Remove: [-fmodules-ts, -fmodule-mapper=*, -fdeps-format=*]
   Compiler: clang
