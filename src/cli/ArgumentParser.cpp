@@ -24,7 +24,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
     // TODO(domi): After the `.in` file gets correctly generated, use PROJECT_NAME & PROJECT_VERSION
     argparse::ArgumentParser program{ "vhdl-fmt", "1.0.0" };
 
-    program.add_description("A VHDL formatter tool for beautifying and standardizing VHDL code.");
+    program.add_description("A VHDL formatter for beautifying and standardizing VHDL code.");
     program.add_epilog("For more information, visit the project documentation.");
 
     program.add_argument("-w", "--write")
@@ -51,7 +51,6 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
           }
 
           config_file_path = std::filesystem::canonical(config_path);
-
           return location;
       });
 
