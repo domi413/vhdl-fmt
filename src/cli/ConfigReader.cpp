@@ -12,13 +12,6 @@
 
 namespace vhdl_fmt {
 
-// TODO(domi): Check how this would look like with a switch-case / if-else
-// - Switch / If is simpler and maybe less code
-// - Although hash map is O(1), with this small amount of options its prolly more overhead
-// + The map is easier to extent with additional options
-// + Map looks cooler (and is maybe "more" modern C++?)
-// ? Ask Felix for review and opinion
-
 namespace {
 
 using LineConfigMember = std::variant<std::uint16_t LineConfig::*, std::uint8_t LineConfig::*>;
@@ -36,7 +29,7 @@ constexpr std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STY
     { "tabs",   IndentationStyle::TABS   },
 };
 
-constexpr std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP_MAP_MAP = {
+constexpr std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP = {
     { "auto", EndOfLine::AUTO },
     { "crlf", EndOfLine::CRLF },
     { "lf",   EndOfLine::LF   },
@@ -63,6 +56,9 @@ constexpr std::unordered_map<std::string_view, CaseStyleMember> CASING_ASSIGNMEN
     { "identifiers", &CasingConfig::identifiers },
 };
 
+/// Checks if a node node exists and is not null
+constexpr auto IS_VALID = [](const YAML::Node &node) -> bool { return node && !node.IsNull(); };
+
 template<typename T>
 auto parseStyle(const std::string_view style,
                 const std::unordered_map<std::string_view, T> &map,
@@ -76,82 +72,118 @@ auto parseStyle(const std::string_view style,
                                 + " config: " + style.data());
 }
 
-/// Checks if a node node exists and is not null
-constexpr auto IS_VALID = [](const YAML::Node &node) -> bool { return node && !node.IsNull(); };
+template<typename T>
+auto parseScalar(const YAML::Node &node, const char *name) -> T
+{
+    if (!IS_VALID(node)) {
+        throw std::runtime_error(std::string("Missing required config field: ") + name);
+    }
+
+    try {
+        return node.as<T>();
+    } catch (const YAML::BadConversion &e) {
+        throw std::runtime_error(std::string("Invalid value for config field '") + name
+                                 + "': " + e.what());
+    }
+}
 
 } // namespace
 
-auto ConfigReader::readConfigFile() -> void
+auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
 {
     if (!std::filesystem::exists(this->config_file_path)) {
-        // TODO(domi): Do we have to create a Config object here with default arguments?
-        return;
+        return Config{};
     }
 
-    const YAML::Node root_node = YAML::LoadFile(this->config_file_path);
+    YAML::Node root_node{};
+    try {
+        root_node = YAML::LoadFile(this->config_file_path.string()); // Assignment works now
+    } catch (const YAML::BadFile &e) {
+        return std::unexpected{ ConfigReadError{ std::string("Could not load config file: ")
+                                                 + e.what() } };
+    } catch (const std::exception &e) {
+        return std::unexpected{ ConfigReadError{ std::string("Error reading config file: ")
+                                                 + e.what() } };
+    }
 
     if (!root_node.IsMap()) {
         throw std::runtime_error(
           "Config file is not a valid map or could not be correctly loaded.");
     }
 
-    Config config{};
+    const Config default_config{};
 
-    // --- LineConfig (line length) ---
-    if (const auto node = root_node["line_length"]; IS_VALID(node)) {
-        config.line_config.line_length
-          = parseStyle(node.as<std::uint16_t>(), LINE_CONFIG_ASSIGNMENTS_MAP, "line length");
-    }
+    IndentationStyle indent_style = default_config.getIndentStyle();
+    EndOfLine eol = default_config.getEol();
+    LineConfig line_config = default_config.getLineConfig();
+    PortMapConfig port_map = default_config.getPortMapConfig();
+    DeclarationConfig declarations = default_config.getDeclarationConfig();
+    CasingConfig casing = default_config.getCasingConfig();
 
-    // --- IndentationStyle & LineConfig (indent size) ---
-    if (const auto node = root_node["indentation"]; IS_VALID(node)) {
-        if (const auto style_node = node["style"]; IS_VALID(style_node)) {
-            config.indent_style
-              = parseStyle(node.as<std::string_view>(), INDENTATION_STYLE_MAP, "indentation style");
+    try {
+        // --- LineConfig (line length) ---
+        if (const auto node = root_node["line_length"]; IS_VALID(node)) {
+            line_config.line_length = parseScalar<std::uint16_t>(node, "line_length");
         }
-        if (const auto size_node = node["size"]; IS_VALID(node)) {
-            config.indent_size = parseStyle(
-              node.as<std::uint8_t>(), LINE_CONFIG_ASSIGNMENTS_MAP, "indentation size");
+
+        // --- IndentationStyle & LineConfig (indent size) ---
+        if (const auto node = root_node["indentation"]; IS_VALID(node)) {
+            if (const auto style_node = node["style"]; IS_VALID(style_node)) {
+                const auto style_str
+                  = parseScalar<std::string_view>(style_node, "indentation.style");
+                indent_style = parseStyle(style_str, INDENTATION_STYLE_MAP, "indentation style");
+            }
+            if (const auto size_node = node["size"]; IS_VALID(size_node)) {
+                line_config.indent_size = parseScalar<std::uint8_t>(size_node, "indentation.size");
+            }
         }
-    }
 
-    // --- EndOfLine ---
-    if (const auto node = root_node["end_of_line"]; IS_VALID(node)) {
-        config.eol
-          = parseStyle(node.as<std::string_view>, EOL_STYLE_MAP_MAP_MAP, "end of line style");
-    }
+        // --- EndOfLine ---
+        if (const auto node = root_node["end_of_line"]; IS_VALID(node)) {
+            const auto style_str = parseScalar<std::string_view>(node, "end_of_line");
+            eol = parseStyle(style_str, EOL_STYLE_MAP, "end of line style");
+        }
 
-    // --- PortMapConfig ---
-    if (const auto formatting_node = root_node["formatting"]; IS_VALID(formatting_node)) {
-        if (const auto port_map_node = formatting_node["port_map"]; IS_VALID(port_map_node)) {
-            for (const auto &[key, member_ptr] : PORT_MAP_ASSIGNMENTS_MAP) {
-                if (const auto val_node = port_map_node[std::string{ key }]; is_valid(val_node)) {
-                    loaded_config.port_map.*member_ptr = val_node.as<bool>();
+        // --- Formatting Sub-nodes (PortMapConfig, DeclarationConfig, CasingConfig) ---
+        if (const auto formatting_node = root_node["formatting"]; IS_VALID(formatting_node)) {
+
+            // --- PortMapConfig ---
+            if (const auto port_map_node = formatting_node["port_map"]; IS_VALID(port_map_node)) {
+                for (const auto &[key, member_ptr] : PORT_MAP_ASSIGNMENTS_MAP) {
+                    if (const auto val_node = port_map_node[std::string{ key }];
+                        IS_VALID(val_node)) {
+                        port_map.*member_ptr = parseScalar<bool>(val_node, key.data());
+                    }
+                }
+            }
+
+            // --- DeclarationConfig ---
+            if (const auto declarations_node = formatting_node["declarations"];
+                IS_VALID(declarations_node)) {
+                for (const auto &[key, member_ptr] : DECLARATION_ASSIGNMENTS_MAP) {
+                    if (const auto val_node = declarations_node[std::string{ key }];
+                        IS_VALID(val_node)) {
+                        declarations.*member_ptr = parseScalar<bool>(val_node, key.data());
+                    }
+                }
+            }
+
+            // --- CasingConfig ---
+            if (const auto casing_node = formatting_node["casing"]; IS_VALID(casing_node)) {
+                for (const auto &[key, member_ptr] : CASING_ASSIGNMENTS_MAP) {
+                    if (const auto val_node = casing_node[std::string{ key }]; IS_VALID(val_node)) {
+                        const auto style_str = parseScalar<std::string_view>(val_node, key.data());
+                        casing.*member_ptr = parseStyle(style_str, CASE_STYLE_MAP, "casing");
+                    }
                 }
             }
         }
 
-        // --- DeclarationConfig ---
-        if (const auto declarations_node = formatting_node["declarations"];
-            IS_VALID(declarations_node)) {
-            for (const auto &[key, member_ptr] : DECLARATION_ASSIGNMENTS_MAP) {
-                if (const auto val_node = declarations_node[std::string{ key }];
-                    is_valid(val_node)) {
-                    config.declarations.*member_ptr = val_node.as<bool>();
-                }
-            }
-        }
+        return Config{ indent_style, eol, line_config, port_map, declarations, casing };
 
-        // --- CasingConfig ---
-        if (const auto casing_node = root_node["casing"]; is_valid(casing_node)) {
-            for (const auto &[key, member_ptr] : CASING_ASSIGNMENTS_MAP) {
-                if (const auto val_node = casing_node[std::string{ key }]; is_valid(val_node)) {
-                    const auto style_str = val_node.as<std::string_view>();
-                    loaded_config.casing.*member_ptr
-                      = parseStyle(style_str, CASE_STYLE_MAP, "casing");
-                }
-            }
-        }
+    } catch (const std::exception &e) {
+        return std::unexpected{ ConfigReadError{ std::string("Config parsing failed: ")
+                                                 + e.what() } };
     }
 }
 

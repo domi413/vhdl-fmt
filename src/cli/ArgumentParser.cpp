@@ -14,12 +14,13 @@ auto ArgumentParser::getConfigPath() const -> const std::filesystem::path &
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 {
-    argparse::ArgumentParser program{ PROJECT_NAME, PROJECT_VERSION };
-
-    program.add_argument("-v", "--version")
-      .help("increase output verbosity")
-      .default_value(false)
-      .implicit_value(true);
+    std::cout << args[0] << '\n'; // NOTE: To make compiler not fail
+    // argparse::ArgumentParser program{ PROJECT_NAME, PROJECT_VERSION };
+    //
+    // program.add_argument("-v", "--version")
+    //   .help("increase output verbosity")
+    //   .default_value(false)
+    //   .implicit_value(true);
 }
 
 } // namespace vhdl_fmt

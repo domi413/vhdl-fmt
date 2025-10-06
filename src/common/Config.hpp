@@ -62,24 +62,20 @@ struct CasingConfig final
 struct Config final
 {
 
-    // TODO(domi): There must be a more elegant solution than passing all the
-    // options to the constructor. This is also not friendly for further
-    // additions
-
   public:
     // Default constructor uses default member initializers
     Config() { validate(); }
 
-    // Explicit constructor to fully initialize (e.g., from ConfigReader)
+    // Explicit constructor to fully initialize
     Config(IndentationStyle indent_style,
            EndOfLine eol,
            LineConfig line_config,
            PortMapConfig port_map,
            DeclarationConfig declarations,
            CasingConfig casing) :
+      line_config(line_config),
       indent_style(indent_style),
       eol(eol),
-      line_config(line_config),
       port_map(port_map),
       declarations(declarations),
       casing(casing)
