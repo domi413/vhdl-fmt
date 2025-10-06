@@ -10,7 +10,7 @@ namespace vhdl_fmt {
 /// General configuration for line wrapping and indentation
 struct LineConfig final
 {
-    std::uint16_t line_length;
+    std::uint8_t line_length;
     std::uint8_t indent_size;
 };
 

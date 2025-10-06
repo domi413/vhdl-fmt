@@ -14,7 +14,7 @@ namespace vhdl_fmt {
 
 namespace {
 
-using LineConfigMember = std::variant<std::uint16_t LineConfig::*, std::uint8_t LineConfig::*>;
+using LineConfigMember = std::uint8_t LineConfig::*;
 using PortMapMember = bool DeclarationConfig::*;
 using DeclrationMember = bool DeclarationConfig::*;
 using CaseStyleMember = CaseStyle CasingConfig::*;
@@ -123,7 +123,7 @@ auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
     try {
         // --- LineConfig (line length) ---
         if (const auto node = root_node["line_length"]; IS_VALID(node)) {
-            line_config.line_length = parseScalar<std::uint16_t>(node, "line_length");
+            line_config.line_length = parseScalar<std::uint8_t>(node, "line_length");
         }
 
         // --- IndentationStyle & LineConfig (indent size) ---
