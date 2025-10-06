@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <yaml-cpp/yaml.h>
 
 namespace vhdl_fmt {
 
@@ -11,7 +12,11 @@ class ConfigReader
       config_file_path(std::move(config_file_path)) {};
 
   private:
+    /// Reads the config file
+    auto readConfigFile() -> void;
+
     std::filesystem::path config_file_path;
+    Config config{};
 };
 
 } // namespace vhdl_fmt

@@ -5,15 +5,17 @@
 #include <stdexcept>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 #include <yaml-cpp/yaml.h>
 
 namespace vhdl_fmt {
 
 // TODO(domi): Check how this would look like with a switch-case / if-else
 // - Switch / If is simpler and maybe less code
-// - Although hash map is O(1), with this amount of options its prolly more overhead
-// - The map is easier to extent with additional options
-// - Ask Felix for review and opinion?
+// - Although hash map is O(1), with this small amount of options its prolly more overhead
+// + The map is easier to extent with additional options
+// + Map looks cooler (and is maybe "more" modern C++?)
+// ? Ask Felix for review and opinion
 
 namespace {
 
@@ -60,4 +62,37 @@ auto parseStyle(const std::string_view style,
 
 } // namespace
 
+auto ConfigReader::readConfigFile() -> void
+{
+    YAML::Node config_file = YAML::Loadfile{ this->config_file_path };
+
+    if (!config_file.IsMap()) {
+        throw std::runtime_error(
+          "Config file is not a valid map or could not be correctly loaded.");
+    }
+
+    for (const auto &option : options) {
+        if (!config_file[option]) {
+            throw std::runtime_error("Unknown " + option + " in config file.");
+        }
+    }
+}
+
 } // namespace vhdl_fmt
+
+// line_length
+// indentation
+//   style
+//   size
+// end_of_line
+// formatting
+//   port_map
+//     align_signals
+//   declarations
+//     align_colons
+//     align_types
+//     align_initialization
+// casing
+//   keywords
+//   constants
+//   identifiers
