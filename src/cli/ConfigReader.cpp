@@ -14,7 +14,7 @@ namespace vhdl_fmt {
 namespace {
 
 using LineConfigMember = std::uint8_t LineConfig::*;
-using PortMapMember = bool DeclarationConfig::*;
+using PortMapMember = bool PortMapConfig::*;
 using DeclarationMember = bool DeclarationConfig::*;
 using CaseStyleMember = CaseStyle CasingConfig::*;
 
@@ -55,7 +55,7 @@ constexpr std::unordered_map<std::string_view, CaseStyleMember> CASING_ASSIGNMEN
     { "identifiers", &CasingConfig::identifiers },
 };
 
-/// Checks if a node node exists and is not null
+/// Checks if a node exists and is not null
 constexpr auto IS_VALID = [](const YAML::Node &node) -> bool { return node && !node.IsNull(); };
 
 template<typename T>

@@ -86,7 +86,7 @@ struct Config final
     /// Returns the line configuration
     [[nodiscard]] auto getLineConfig() const noexcept -> const LineConfig & { return line_config; }
 
-    /// Retuns the indentation style
+    /// Returns the indentation style
     [[nodiscard]] auto getIndentStyle() const noexcept -> IndentationStyle { return indent_style; }
 
     /// Returns the end of line sequence

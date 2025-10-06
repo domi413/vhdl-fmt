@@ -21,7 +21,7 @@ auto ArgumentParser::getConfigPath() const -> const std::filesystem::path &
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 {
-    // TOOD: After the `.in` file gets correctly generated, use PROJECT_NAME & PROJECT_VERSION
+    // TODO(domi): After the `.in` file gets correctly generated, use PROJECT_NAME & PROJECT_VERSION
     argparse::ArgumentParser program{ "vhdl-fmt", "1.0.0" };
 
     program.add_description("A VHDL formatter tool for beautifying and standardizing VHDL code.");
@@ -58,7 +58,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
         std::vector<std::string> arguments;
         arguments.reserve(args.size());
 
-        // NOTE: This loop is required because `parse_args()` exepcts a c-style array.
+        // NOTE: This loop is required because `parse_args()` expects a c-style array.
         for (const auto *arg : args) {
             if (arg != nullptr) {
                 arguments.emplace_back(arg);
