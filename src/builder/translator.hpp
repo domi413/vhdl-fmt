@@ -100,12 +100,12 @@ class Translator
 
         // Trailing: only inline. Standalone comments are left
         // unconsumed here so the next node will pick them up as leading.
-        const int stop_line = static_cast<int>(ctx->getStop()->getLine());
+        const std::size_t stop_line = ctx->getStop()->getLine();
         for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
             if (t == nullptr) {
                 continue;
             }
-            if (static_cast<std::size_t>(t->getLine()) == static_cast<std::size_t>(stop_line)) {
+            if (t->getLine() == stop_line) {
                 push(t, cm.trailing, true);
             }
         }

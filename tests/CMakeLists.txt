@@ -21,12 +21,16 @@ target_link_libraries(
 target_include_directories(
     tests
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/../src
-        ${CMAKE_CURRENT_SOURCE_DIR}/../build/generated
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/build/generated
 )
 
-# Copy test data
+# Copy test data and define path
 file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+
+target_compile_definitions(tests PRIVATE
+    TEST_DATA_DIR="${CMAKE_BINARY_DIR}/data"
+)
 
 include(Catch)
 catch_discover_tests(tests)

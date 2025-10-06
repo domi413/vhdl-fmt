@@ -28,7 +28,7 @@ auto loadVhdl(const std::string &filename) -> std::string
 TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 {
     // --- Input VHDL ---
-    const std::string vhdl_code = loadVhdl("../data/ports.vhdl");
+    const std::string vhdl_code = loadVhdl(std::string(TEST_DATA_DIR) + "/ports.vhdl");
 
     // --- Setup ANTLR ---
     antlr4::ANTLRInputStream input(vhdl_code);
