@@ -14,8 +14,17 @@ namespace builder {
 /// - Contains no traversal logic
 class Translator
 {
+    ASTBuilder &builder;
+    antlr4::CommonTokenStream &tokens;
+
   public:
     Translator(ASTBuilder &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
+
+    ~Translator() = default;
+    Translator(const Translator &) = delete;
+    auto operator=(const Translator &) -> Translator & = delete;
+    Translator(Translator &&) = delete;
+    auto operator=(Translator &&) -> Translator & = delete;
 
     // ---- AST node constructors ----
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
@@ -26,13 +35,13 @@ class Translator
 
     // ---- Builder forwarding helpers ----
     template<typename T>
-    T &spawn()
+    auto spawn() -> T &
     {
         return builder.spawn<T>();
     }
 
     template<typename T>
-    T &spawn(antlr4::ParserRuleContext *ctx)
+    auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
         auto &node = builder.spawn<T>();
         attachComments(node, ctx);
@@ -52,8 +61,6 @@ class Translator
     }
 
   private:
-    ASTBuilder &builder;
-    antlr4::CommonTokenStream &tokens;
     std::unordered_set<std::size_t> consumed_comment_token_indices;
 
     void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx)

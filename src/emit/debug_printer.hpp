@@ -88,18 +88,21 @@ struct DebugPrinter : ast::ASTVisitor
 
         // Names
         for (size_t i = 0; i < p.names.size(); ++i) {
-            if (i > 0)
+            if (i > 0) {
                 oss << ", ";
+            }
             oss << p.names[i];
         }
 
         // Mode + Type
         if (!p.mode.empty() || !p.type.empty()) {
             oss << " :";
-            if (!p.mode.empty())
+            if (!p.mode.empty()) {
                 oss << " " << p.mode;
-            if (!p.type.empty())
+            }
+            if (!p.type.empty()) {
                 oss << " " << p.type;
+            }
         }
 
         printNode(p, oss.str(), "Port");
@@ -122,6 +125,5 @@ struct DebugPrinter : ast::ASTVisitor
 };
 
 } // namespace emit
-
 
 #endif /* EMIT_DEBUG_PRINTER_HPP */

@@ -5,15 +5,9 @@ namespace ast {
 
 struct DesignFile;
 struct Entity;
-struct PortList;
 struct GenericParam;
 struct Range;
 struct Port;
-struct Architecture;
-struct Signal;
-struct Process;
-struct If;
-struct Assign;
 
 struct ASTVisitor
 {
