@@ -19,7 +19,7 @@ void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
     auto *glist = ctx->generic_list();
-    if (!glist) {
+    if (glist == nullptr) {
         return;
     }
     for (auto *icdecl : glist->interface_constant_declaration()) {

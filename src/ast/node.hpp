@@ -53,4 +53,4 @@ struct Node
 
 } // namespace ast
 
-#endif // AST_NODE_HPP
+#endif /* AST_NODE_HPP */

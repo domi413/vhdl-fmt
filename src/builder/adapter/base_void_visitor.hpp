@@ -12,7 +12,7 @@ class BaseVoidVisitor : public VoidVisitor
   protected:
     void dispatch(antlr4::tree::ParseTree *node)
     {
-        if (!node) {
+        if (node == nullptr) {
             return;
         }
         AntlrVoidAdapter adapter(*this);
@@ -21,12 +21,12 @@ class BaseVoidVisitor : public VoidVisitor
 
     void walk(antlr4::tree::ParseTree *node)
     {
-        if (!node) {
+        if (node == nullptr) {
             return;
         }
         AntlrVoidAdapter adapter(*this);
         for (auto *child : node->children) {
-            if (child) {
+            if (child != nullptr) {
                 child->accept(&adapter);
             }
         }

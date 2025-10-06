@@ -21,7 +21,7 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
     }
 
     param.type = ctx->subtype_indication()->getText();
-    if (ctx->expression()) {
+    if (ctx->expression() != nullptr) {
         param.init = ctx->expression()->getText();
     }
     return param;
@@ -35,7 +35,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         port.names.push_back(id_ctx->getText());
     }
 
-    if (ctx->signal_mode()) {
+    if (ctx->signal_mode() != nullptr) {
         port.mode = ctx->signal_mode()->getText();
     }
 
@@ -46,7 +46,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
     }
 
     // Optional initializer
-    if (ctx->expression()) {
+    if (ctx->expression() != nullptr) {
         port.init = ctx->expression()->getText();
     }
 

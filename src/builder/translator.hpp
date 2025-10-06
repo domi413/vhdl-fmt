@@ -73,7 +73,7 @@ class Translator
 
     void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     {
-        if (!ctx) {
+        if (ctx == nullptr) {
             return;
         }
         auto &cm = node.getComments();
@@ -102,7 +102,7 @@ class Translator
         // unconsumed here so the next node will pick them up as leading.
         const int stop_line = static_cast<int>(ctx->getStop()->getLine());
         for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
-            if (!t) {
+            if (t == nullptr) {
                 continue;
             }
             if (static_cast<std::size_t>(t->getLine()) == static_cast<std::size_t>(stop_line)) {
