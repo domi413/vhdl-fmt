@@ -9,8 +9,7 @@ namespace ast {
 
 struct DesignFile : Node
 {
-    std::vector<std::unique_ptr<Node>>
-      units; // NOLINT(misc-non-private-member-variables-in-classes)
+    std::vector<std::unique_ptr<Node>> units;
     void accept(ASTVisitor &v) const override { v.visit(*this); }
 };
 

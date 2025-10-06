@@ -1,9 +1,9 @@
 #ifndef EMIT_DEBUG_PRINTER_HPP
 #define EMIT_DEBUG_PRINTER_HPP
 
-#include "ast/design_file.hpp"
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
+#include "ast/nodes/design_file.hpp"
 #include "ast/visitor.hpp"
 
 #include <iostream>
