@@ -9,6 +9,14 @@
 
 namespace vhdl_fmt {
 
+// TODO(domi): Check how this would look like with a switch-case / if-else
+// - Switch / If is simpler and maybe less code
+// - Although hash map is O(1), with this amount of options its prolly more overhead
+// - The map is easier to extent with additional options
+// - Ask Felix for review and opinion?
+
+namespace {
+
 constexpr std::unordered_map<std::string_view, CaseStyle> CASE_STYLE = {
     { "lower_case", CaseStyle::LOWER },
     { "UPPER_CASE", CaseStyle::UPPER },
@@ -49,5 +57,7 @@ auto parseStyle(const std::string_view style,
     throw std::invalid_argument(std::string("Invalid ") + error_context.data()
                                 + " config: " + style.data());
 }
+
+} // namespace
 
 } // namespace vhdl_fmt
