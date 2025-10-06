@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BUILDER_VISITOR_HPP
+#define BUILDER_VISITOR_HPP
 
 #include "builder/adapter/base_void_visitor.hpp"
 #include "translator.hpp"
@@ -40,3 +41,6 @@ class Visitor : public adapter::BaseVoidVisitor
 };
 
 } // namespace builder
+
+
+#endif /* BUILDER_VISITOR_HPP */

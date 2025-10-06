@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BUILDER_ADAPTER_BASE_VOID_VISITOR_HPP
+#define BUILDER_ADAPTER_BASE_VOID_VISITOR_HPP
+
 #include "antlr_void_adapter.hpp"
 #include "tree/ParseTree.h"
 #include "void_visitor.hpp"
@@ -893,3 +895,5 @@ class BaseVoidVisitor : public VoidVisitor
     }
 };
 } // namespace builder::adapter
+
+#endif /* BUILDER_ADAPTER_BASE_VOID_VISITOR_HPP */

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BUILDER_ASSEMBLY_NODE_BUILDER_HPP
+#define BUILDER_ASSEMBLY_NODE_BUILDER_HPP
+
 #include "ast/node.hpp"
 #include "builder/assembly/builder_scope.hpp"
 #include "builder/assembly/builder_sink.hpp"
@@ -58,3 +60,6 @@ struct ASTBuilder
 };
 
 } // namespace builder
+
+
+#endif /* BUILDER_ASSEMBLY_NODE_BUILDER_HPP */

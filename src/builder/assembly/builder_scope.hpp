@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP
+#define BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP
+
 #include "builder/assembly/builder_sink.hpp"
 
 #include <memory>
@@ -29,3 +31,6 @@ struct SlotGuard
 };
 
 } // namespace builder
+
+
+#endif /* BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP */

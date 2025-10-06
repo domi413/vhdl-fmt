@@ -1,3 +1,6 @@
+#ifndef EMIT_DEBUG_PRINTER_HPP
+#define EMIT_DEBUG_PRINTER_HPP
+
 #include "ast/design_file.hpp"
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
@@ -119,3 +122,6 @@ struct DebugPrinter : ast::ASTVisitor
 };
 
 } // namespace emit
+
+
+#endif /* EMIT_DEBUG_PRINTER_HPP */

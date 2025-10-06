@@ -1,4 +1,6 @@
-#pragma once
+#ifndef AST_NODE_HPP
+#define AST_NODE_HPP
+
 #include "ast/visitor.hpp"
 
 #include <cstdint>
@@ -49,3 +51,5 @@ struct Node
 };
 
 } // namespace ast
+
+#endif // AST_NODE_HPP

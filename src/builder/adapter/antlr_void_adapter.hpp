@@ -1,4 +1,6 @@
-#pragma once
+#ifndef BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
+#define BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
+
 #include "vhdlBaseVisitor.h"
 #include "void_visitor.hpp"
 
@@ -1688,3 +1690,6 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
     }
 };
 } // namespace builder::adapter
+
+
+#endif /* BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP */

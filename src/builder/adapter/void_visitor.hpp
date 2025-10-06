@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BUILDER_ADAPTER_VOID_VISITOR_HPP
+#define BUILDER_ADAPTER_VOID_VISITOR_HPP
 
 #include "vhdlParser.h"
 
@@ -393,3 +394,6 @@ class VoidVisitor
     virtual void visitWaveformElement(vhdlParser::Waveform_elementContext *context) = 0;
 };
 } // namespace builder::adapter
+
+
+#endif /* BUILDER_ADAPTER_VOID_VISITOR_HPP */

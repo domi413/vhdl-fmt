@@ -1,4 +1,6 @@
-#pragma once
+#ifndef AST_NODES_DECLARATIONS_HPP
+#define AST_NODES_DECLARATIONS_HPP
+
 #include "ast/node.hpp"
 #include "ast/visitor.hpp"
 
@@ -44,3 +46,5 @@ struct Entity : Node
 };
 
 } // namespace ast
+
+#endif /* AST_NODES_DECLARATIONS_HPP */

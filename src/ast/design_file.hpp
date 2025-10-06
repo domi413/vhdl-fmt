@@ -1,4 +1,6 @@
-#pragma once
+#ifndef AST_DESIGN_FILE_HPP
+#define AST_DESIGN_FILE_HPP
+
 #include "ast/node.hpp"
 
 #include <memory>
@@ -13,3 +15,6 @@ struct DesignFile : Node
 };
 
 } // namespace ast
+
+
+#endif /* AST_DESIGN_FILE_HPP */

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BUILDER_TRANSLATOR_HPP
+#define BUILDER_TRANSLATOR_HPP
 
 #include "ast/nodes/declarations.hpp"
 #include "builder/assembly/node_builder.hpp"
@@ -93,3 +94,6 @@ class Translator
     }
 };
 } // namespace builder
+
+
+#endif /* BUILDER_TRANSLATOR_HPP */

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef AST_VISITOR_HPP
+#define AST_VISITOR_HPP
 
 namespace ast {
 
@@ -35,3 +36,6 @@ struct ASTVisitor
 };
 
 } // namespace ast
+
+
+#endif /* AST_VISITOR_HPP */
