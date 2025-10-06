@@ -20,12 +20,19 @@ namespace builder {
 class Visitor : public adapter::BaseVoidVisitor
 {
   public:
-    explicit Visitor(Translator &t);
+    explicit Visitor(Translator &t) : translator(t) {};
+
+    ~Visitor() override = default;
+    Visitor(const Visitor &) = delete;
+    auto operator=(const Visitor &) -> Visitor & = delete;
+    Visitor(Visitor &&) = delete;
+    auto operator=(Visitor &&) -> Visitor & = delete;
+
     void walk(antlr4::tree::ParseTree *ctx) { adapter::BaseVoidVisitor::walk(ctx); }
 
-    void visitEntity_declaration(vhdlParser::Entity_declarationContext *ctx) override;
-    void visitGeneric_clause(vhdlParser::Generic_clauseContext *ctx) override;
-    void visitPort_clause(vhdlParser::Port_clauseContext *ctx) override;
+    void visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx) override;
+    void visitGenericClause(vhdlParser::Generic_clauseContext *ctx) override;
+    void visitPortClause(vhdlParser::Port_clauseContext *ctx) override;
     void visitConstraint(vhdlParser::ConstraintContext *ctx) override;
 
   private:

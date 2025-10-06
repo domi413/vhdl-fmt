@@ -2,9 +2,7 @@
 
 namespace builder {
 
-Visitor::Visitor(Translator &t) : translator(t) {}
-
-void Visitor::visitEntity_declaration(vhdlParser::Entity_declarationContext *ctx)
+void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 {
     auto &entity = translator.makeEntity(ctx);
     if (auto *header = ctx->entity_header()) {
@@ -16,7 +14,7 @@ void Visitor::visitEntity_declaration(vhdlParser::Entity_declarationContext *ctx
     }
 }
 
-void Visitor::visitGeneric_clause(vhdlParser::Generic_clauseContext *ctx)
+void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
     auto *glist = ctx->generic_list();
     if (!glist) {
@@ -27,7 +25,7 @@ void Visitor::visitGeneric_clause(vhdlParser::Generic_clauseContext *ctx)
     }
 }
 
-void Visitor::visitPort_clause(vhdlParser::Port_clauseContext *ctx)
+void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
 {
     auto *plist = ctx->port_list();
     if (!plist) {

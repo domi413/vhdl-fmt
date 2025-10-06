@@ -1,10 +1,6 @@
 GRAMMARS := grammars/vhdl.g4
 GENERATED := build/generated/vhdlLexer.cpp build/generated/vhdlParser.cpp
-EXCLUDES := src/builder/adapter
-EXCLUDE_EXPR := $(foreach d,$(EXCLUDES),-path '$(d)' -prune -o)
-SRCS := $(shell find src tests \
-    $(foreach d,$(EXCLUDES), -path '$(d)' -prune -o) \
-    -type f \( -name '*.cpp' -o -name '*.hpp' \) -print)
+SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
 SRCS_CMAKE := $(shell find -name 'CMakeLists.txt')
 TARGET := build/Debug/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.stamp
