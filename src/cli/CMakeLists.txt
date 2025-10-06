@@ -1,4 +1,4 @@
-add_executable(vhdl_fmt main.cpp ConfigManager.cpp ConfigReader.cpp)
+add_executable(vhdl_fmt main.cpp ArgumentParser.cpp ConfigReader.cpp)
 
 target_link_libraries(
     vhdl_fmt
@@ -8,8 +8,7 @@ target_link_libraries(
         vhdl_fmt_parser
         argparse::argparse
         yaml-cpp::yaml-cpp
-    PUBLIC
-        vhdl_fmt_common
+    PUBLIC vhdl_fmt_common
 )
 
 target_include_directories(vhdl_fmt PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
