@@ -16,17 +16,25 @@
 
 namespace builder {
 
-/// Translator: CST -> AST construction helper.
-/// - Builds AST nodes from CST contexts
-/// - Forwards ASTBuilder functionality (spawn, into, with)
-/// - Contains no traversal logic
+/**
+ * @brief Builds semantic AST nodes from CST contexts.
+ *
+ * The `Translator` converts ANTLR CST nodes into AST representations.
+ *
+ * Responsibilities:
+ *  - Construct AST nodes from parser contexts
+ *  - Attach comments and source metadata
+ *  - Delegate structural operations to `NodeBuilder`
+ *
+ * Contains no traversal logic — called by `Visitor` during tree walking.
+ */
 class Translator
 {
-    ASTBuilder &builder;
+    NodeBuilder &builder;
     antlr4::CommonTokenStream &tokens;
 
   public:
-    Translator(ASTBuilder &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
+    Translator(NodeBuilder &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
 
     ~Translator() = default;
     Translator(const Translator &) = delete;

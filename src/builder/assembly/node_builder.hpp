@@ -12,23 +12,23 @@
 
 namespace builder {
 
-struct ASTBuilder
+struct NodeBuilder
 {
     using Node = ast::Node;
     using NodePtr = std::unique_ptr<Node>;
 
     // Attach to any node container (e.g. DesignFile.units)
-    explicit ASTBuilder(std::vector<std::unique_ptr<ast::Node>> &sink)
+    explicit NodeBuilder(std::vector<std::unique_ptr<ast::Node>> &sink)
     {
         sinks.push_back(std::make_unique<SinkImpl<ast::Node>>(sink));
     }
 
-    ~ASTBuilder() noexcept { assert(sinks.size() <= 1 && "Unclosed sinks remain!"); }
+    ~NodeBuilder() noexcept { assert(sinks.size() <= 1 && "Unclosed sinks remain!"); }
 
-    ASTBuilder(const ASTBuilder &) = delete;
-    auto operator=(const ASTBuilder &) -> ASTBuilder & = delete;
-    ASTBuilder(ASTBuilder &&) = delete;
-    auto operator=(ASTBuilder &&) -> ASTBuilder & = delete;
+    NodeBuilder(const NodeBuilder &) = delete;
+    auto operator=(const NodeBuilder &) -> NodeBuilder & = delete;
+    NodeBuilder(NodeBuilder &&) = delete;
+    auto operator=(NodeBuilder &&) -> NodeBuilder & = delete;
 
     // Spawn node and insert into current sink
     template<typename T, typename... Args>
