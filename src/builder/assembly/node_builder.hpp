@@ -61,5 +61,4 @@ struct ASTBuilder
 
 } // namespace builder
 
-
 #endif /* BUILDER_ASSEMBLY_NODE_BUILDER_HPP */

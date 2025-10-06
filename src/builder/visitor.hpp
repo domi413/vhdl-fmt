@@ -42,5 +42,4 @@ class Visitor : public adapter::BaseVoidVisitor
 
 } // namespace builder
 
-
 #endif /* BUILDER_VISITOR_HPP */

@@ -102,5 +102,4 @@ class Translator
 };
 } // namespace builder
 
-
 #endif /* BUILDER_TRANSLATOR_HPP */

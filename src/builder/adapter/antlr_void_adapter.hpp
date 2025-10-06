@@ -1691,5 +1691,4 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
 };
 } // namespace builder::adapter
 
-
 #endif /* BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP */

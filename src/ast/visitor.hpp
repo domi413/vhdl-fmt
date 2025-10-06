@@ -31,5 +31,4 @@ struct ASTVisitor
 
 } // namespace ast
 
-
 #endif /* AST_VISITOR_HPP */

@@ -16,5 +16,4 @@ struct DesignFile : Node
 
 } // namespace ast
 
-
 #endif /* AST_DESIGN_FILE_HPP */

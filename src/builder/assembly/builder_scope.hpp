@@ -32,5 +32,4 @@ struct SlotGuard
 
 } // namespace builder
 
-
 #endif /* BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP */

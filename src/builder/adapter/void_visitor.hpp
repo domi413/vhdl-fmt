@@ -395,5 +395,4 @@ class VoidVisitor
 };
 } // namespace builder::adapter
 
-
 #endif /* BUILDER_ADAPTER_VOID_VISITOR_HPP */

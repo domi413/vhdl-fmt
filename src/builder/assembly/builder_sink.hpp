@@ -47,5 +47,4 @@ struct SinkImpl : ISink
 
 } // namespace builder
 
-
 #endif /* BUILDER_ASSEMBLY_BUILDER_SINK_HPP */
