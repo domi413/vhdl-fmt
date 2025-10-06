@@ -26,10 +26,10 @@ target_include_directories(
 )
 
 # Copy test data and define path
-file(COPY data DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 target_compile_definitions(tests PRIVATE
-    TEST_DATA_DIR="${CMAKE_BINARY_DIR}/data"
+    TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
 )
 
 include(Catch)
