@@ -1,4 +1,5 @@
 #include "ArgumentParser.hpp"
+#include "ConfigReader.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -11,6 +12,8 @@ auto main(int argc, char *argv[]) -> int
         vhdl_fmt::ArgumentParser argparser{
             std::span<char *>{ argv, static_cast<std::size_t>(argc) }
         };
+
+        vhdl_fmt::ConfigReader config_reader{ argparser.getConfigPath() };
 
         // Call the formatter and pass the config object
 

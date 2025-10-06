@@ -1,11 +1,8 @@
 #include <filesystem>
-#include <yaml-cpp/yaml.h>
 
 namespace vhdl_fmt {
 
-// TODO(domi): Fix {} config so its on the same line
-
-class ConfigReader
+class ConfigReader final
 {
   public:
     explicit ConfigReader(std::filesystem::path config_file_path) :
@@ -16,7 +13,6 @@ class ConfigReader
     auto readConfigFile() -> void;
 
     std::filesystem::path config_file_path;
-    Config config{};
 };
 
 } // namespace vhdl_fmt
