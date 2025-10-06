@@ -16,6 +16,7 @@ auto main(int argc, char *argv[]) -> int
         vhdl_fmt::ConfigReader config_reader{ argparser.getConfigPath() };
 
         // Call the formatter and pass the config object
+        // formatter{ config_reader.readConfigFile() };
 
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << '\n';

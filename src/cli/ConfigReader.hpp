@@ -2,6 +2,7 @@
 
 #include <expected>
 #include <filesystem>
+#include <yaml-cpp/node/node.h>
 
 namespace vhdl_fmt {
 
@@ -18,10 +19,36 @@ class ConfigReader final
     explicit ConfigReader(std::filesystem::path config_file_path) :
       config_file_path(std::move(config_file_path)) {};
 
-    /// Reads the config file
+    /// Reads the config file and returns either a Config object or a ConfigReadError
     auto readConfigFile() -> std::expected<Config, ConfigReadError>;
 
   private:
+    /// Reads the line config options
+    [[nodiscard]] static auto readLineconfig(const YAML::Node &root_node,
+                                             const LineConfig &defaults) -> LineConfig;
+
+    /// Reads the indentation style options
+    [[nodiscard]] static auto readIndentationStyle(const YAML::Node &root_node,
+                                                   const IndentationStyle &defaults)
+      -> IndentationStyle;
+
+    /// Reads the end of line options
+    [[nodiscard]] static auto readEndOfLine(const YAML::Node &root_node, const EndOfLine &defaults)
+      -> EndOfLine;
+
+    /// Reads the port map options
+    [[nodiscard]] static auto readPortMapConfig(const YAML::Node &root_node,
+                                                const PortMapConfig &defaults) -> PortMapConfig;
+
+    /// Reads the declaration options
+    [[nodiscard]] static auto readDeclarationConfig(const YAML::Node &root_node,
+                                                    const DeclarationConfig &defaults)
+      -> DeclarationConfig;
+
+    /// Reads the casing options
+    [[nodiscard]] static auto readCasingConfig(const YAML::Node &root_node,
+                                               const CasingConfig &defaults) -> CasingConfig;
+
     std::filesystem::path config_file_path;
 };
 
