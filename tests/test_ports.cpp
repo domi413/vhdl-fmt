@@ -1,11 +1,11 @@
-#include "vhdlLexer.h"
-#include "vhdlParser.h"
-#include <catch2/catch_test_macros.hpp>
-
 #include "ast/design_file.hpp"
 #include "builder/assembly/node_builder.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitor.hpp"
+#include "vhdlLexer.h"
+#include "vhdlParser.h"
+
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 {
@@ -48,24 +48,24 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
     REQUIRE(entity->ports.size() == 4);
 
     // clk
-    REQUIRE(entity->ports[0]->names == std::vector<std::string>{"clk"});
+    REQUIRE(entity->ports[0]->names == std::vector<std::string>{ "clk" });
     REQUIRE(entity->ports[0]->mode == "in");
     REQUIRE(entity->ports[0]->type == "std_logic");
 
     // rst_n
-    REQUIRE(entity->ports[1]->names == std::vector<std::string>{"rst_n"});
+    REQUIRE(entity->ports[1]->names == std::vector<std::string>{ "rst_n" });
     REQUIRE(entity->ports[1]->mode == "in");
     REQUIRE(entity->ports[1]->type == "std_logic");
 
     // load_val
-    REQUIRE(entity->ports[2]->names == std::vector<std::string>{"load_val"});
+    REQUIRE(entity->ports[2]->names == std::vector<std::string>{ "load_val" });
     REQUIRE(entity->ports[2]->mode == "in");
     REQUIRE(entity->ports[2]->type == "std_logic_vector");
     REQUIRE(entity->ports[2]->constraints.size() == 1);
     REQUIRE(entity->ports[2]->constraints[0]->direction == "downto");
 
     // count
-    REQUIRE(entity->ports[3]->names == std::vector<std::string>{"count"});
+    REQUIRE(entity->ports[3]->names == std::vector<std::string>{ "count" });
     REQUIRE(entity->ports[3]->mode == "out");
     REQUIRE(entity->ports[3]->type == "std_logic_vector");
 }

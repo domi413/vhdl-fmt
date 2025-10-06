@@ -1,9 +1,9 @@
 #pragma once
+#include "ast/node.hpp"
+
 #include <memory>
 #include <string>
 
-#include "ast/node.hpp"
-
 namespace ast {
 
-}  // namespace ast
+} // namespace ast

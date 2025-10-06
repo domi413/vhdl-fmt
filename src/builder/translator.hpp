@@ -1,7 +1,7 @@
 #pragma once
 
-#include "builder/assembly/node_builder.hpp"
 #include "ast/nodes/declarations.hpp"
+#include "builder/assembly/node_builder.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
@@ -18,7 +18,8 @@ class Translator
 
     // ---- AST node constructors ----
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
-    auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx) -> ast::GenericParam &;
+    auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
+      -> ast::GenericParam &;
     auto makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port &;
     auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range &;
 
@@ -73,10 +74,7 @@ class Translator
                 return;
             }
             consumed_comment_token_indices.insert(idx);
-            dst.push_back({ t->getText(),
-                            kind(t),
-                            static_cast<int>(t->getLine()),
-                            is_inline });
+            dst.push_back({ t->getText(), kind(t), static_cast<int>(t->getLine()), is_inline });
         };
 
         // Leading: everything hidden to the left of start (consume all)

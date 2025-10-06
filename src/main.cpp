@@ -1,20 +1,19 @@
+#include "ast/design_file.hpp"
+#include "builder/assembly/node_builder.hpp"
+#include "builder/translator.hpp"
+#include "builder/visitor.hpp"
+#include "emit/debug_printer.hpp"
+#include "vhdlLexer.h"
+#include "vhdlParser.h"
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <span>
 #include <sstream>
 
-#include "ast/design_file.hpp"
-#include "vhdlLexer.h"
-#include "vhdlParser.h"
-
-#include "builder/assembly/node_builder.hpp"
-#include "builder/translator.hpp"
-#include "builder/visitor.hpp"
-
-#include "emit/debug_printer.hpp"
-
-auto main(int argc, char* argv[]) -> int {
+auto main(int argc, char *argv[]) -> int
+{
     std::span args(argv, static_cast<size_t>(argc));
 
     if (args.size() < 2) {
@@ -22,7 +21,7 @@ auto main(int argc, char* argv[]) -> int {
         return 1;
     }
 
-    const std::filesystem::path path{args[1]};
+    const std::filesystem::path path{ args[1] };
     std::ifstream in(path);
     if (!in) {
         std::cerr << "Could not open input file: " << path << '\n';
@@ -38,12 +37,12 @@ auto main(int argc, char* argv[]) -> int {
     tokens.fill();
 
     vhdlParser parser(&tokens);
-    auto* tree = parser.design_file();
+    auto *tree = parser.design_file();
 
     //--- AST construction pipeline ---
     ast::DesignFile root;
     builder::ASTBuilder builder(root.units);
-    
+
     builder::Translator translator(builder, tokens);
 
     builder::Visitor visitor(translator);

@@ -1,12 +1,22 @@
 GRAMMARS := grammars/vhdl.g4
 GENERATED := build/generated/vhdlLexer.cpp build/generated/vhdlParser.cpp
-SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp') $(GENERATED)
+EXCLUDES := src/builder/adapter
+EXCLUDE_EXPR := $(foreach d,$(EXCLUDES),-path '$(d)' -prune -o)
+SRCS := $(shell find ./ src tests \( $(EXCLUDE_EXPR) -false \) -o -type f \( -name '*.cpp' -o -name '*.hpp' \))
+SRCS_CMAKE := $(shell find -name 'CMakeLists.txt')
 TARGET := build/Debug/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.stamp
 ANTLR_STAMP := build/.antlr.stamp
 BUILD_STAMP := build/.build.stamp
 
+# Flags for clang-tidy
+LINT_COMMON_FLAGS = -p build/Release/
+LINT_TIDY_FLAGS = --warnings-as-errors='*'
+
 all: $(TARGET)
+
+print-SRCS:
+	@echo $(SRCS)
 
 # -----------------------------
 # Build rules
@@ -54,5 +64,38 @@ test: $(BUILD_STAMP)
 # -----------------------------
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
+
+check-format:
+	@echo "Checking code formatting..."
+	@if clang-format --dry-run --Werror $(SRCS) && gersemi --check $(SRCS_CMAKE); then \
+		echo "✓ All files are properly formatted"; \
+	else \
+		exit 1; \
+	fi
+
+format:
+	@echo "Formatting code..."
+	@clang-format -i $(SRCS)
+	@gersemi -i $(SRCS_CMAKE)
+	@echo "✓ Code formatting complete"
+
+lint: build
+	@echo "Running clang-tidy..."
+	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SOURCES_CPP)
+	@echo "✓ Linting complete"
+
+sort-dictionary:
+	@echo "Sorting dictionary..."
+	@tr '[:upper:]' '[:lower:]' < .cspell_ignored | sort -f -u -o .cspell_ignored
+	@echo "✓ Sorted and converted .cspell_ignored to lowercase with unique entries"
+
+cleanup-dictionary:
+	@echo "Cleaning up unused words from .cspell_ignored..."
+	@.github/scripts/cleanup-cspell-ignored.sh
+
+check-cspell-ignored:
+	@echo "Checking for unused words in .cspell_ignored..."
+	@.github/scripts/check-cspell-ignored.sh
+	@echo "✓ Cspell ignored file check complete"
 
 .PHONY: all run clean conan test

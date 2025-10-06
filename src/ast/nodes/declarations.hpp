@@ -16,17 +16,18 @@ struct GenericParam : Node
     void accept(ASTVisitor &v) const override { v.visit(*this); }
 };
 
-struct Range : Node {
-    std::string left_expr;   // e.g. "DATA_WIDTH - 1"
-    std::string direction;   // "downto" or "to"
-    std::string right_expr;  // e.g. "0"
+struct Range : Node
+{
+    std::string left_expr;  // e.g. "DATA_WIDTH - 1"
+    std::string direction;  // "downto" or "to"
+    std::string right_expr; // e.g. "0"
 
     void accept(ASTVisitor &v) const override { v.visit(*this); }
 };
 
 struct Port : Node
 {
-    std::string mode{}, type{}; 
+    std::string mode{}, type{};
     std::vector<std::string> names{};
     std::vector<std::unique_ptr<ast::Range>> constraints{};
     std::optional<std::string> init{};

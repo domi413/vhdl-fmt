@@ -9,14 +9,10 @@ void Visitor::visitEntity_declaration(vhdlParser::Entity_declarationContext *ctx
     auto &entity = translator.makeEntity(ctx);
     if (auto *header = ctx->entity_header()) {
         // GENERICS
-        translator.into(entity.generics, [&] {
-            dispatch(header->generic_clause());
-        });
+        translator.into(entity.generics, [&] { dispatch(header->generic_clause()); });
 
         // PORTS
-        translator.into(entity.ports, [&] {
-            dispatch(header->port_clause());
-        });
+        translator.into(entity.ports, [&] { dispatch(header->port_clause()); });
     }
 }
 
@@ -42,9 +38,7 @@ void Visitor::visitPort_clause(vhdlParser::Port_clauseContext *ctx)
             auto &port = translator.makeSignalPort(ipdecl);
             if (auto *stype = ipdecl->subtype_indication()) {
                 if (auto *con = stype->constraint()) {
-                    translator.into(port.constraints, [&] {
-                        dispatch(con);
-                    });
+                    translator.into(port.constraints, [&] { dispatch(con); });
                 }
             }
         }
