@@ -1,10 +1,13 @@
 #include "translator.hpp"
 
+#include "ParserRuleContext.h"
 #include "Token.h"
+#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
+#include <cstddef>
 #include <vector>
 
 namespace builder {
