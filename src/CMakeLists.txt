@@ -5,7 +5,9 @@ find_package(spdlog REQUIRED)
 
 add_executable(
     vhdl_formatter
-    main.cpp
+    cli/main.cpp
+    cli/argument_parser.cpp
+    cli/config_reader.cpp
     builder/visitor.cpp
     builder/translator.cpp
     ../build/generated/vhdlLexer.cpp
@@ -39,7 +41,6 @@ target_compile_options(
         -Werror
         -Wextra
         -Wformat=2
-        # -Wlifetime # Not available yet
         -Wmisleading-indentation
         -Wnon-virtual-dtor
         -Wnull-dereference

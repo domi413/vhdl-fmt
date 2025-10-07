@@ -1,7 +1,7 @@
 #ifndef CLI_CONFIG_READER_HPP
 #define CLI_CONFIG_READER_HPP
 
-#include "Config.hpp"
+#include "config.hpp"
 
 #include <expected>
 #include <filesystem>

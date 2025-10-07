@@ -1,6 +1,6 @@
-#include "ConfigReader.hpp"
+#include "config_reader.hpp"
 
-#include "Config.hpp"
+#include "config.hpp"
 
 #include <cstdint>
 #include <exception>
