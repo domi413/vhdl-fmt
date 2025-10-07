@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <concepts>
+#include <memory>
 #include <vector>
 
 namespace builder {
