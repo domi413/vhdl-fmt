@@ -1,5 +1,5 @@
-#include "ArgumentParser.hpp"
-#include "ConfigReader.hpp"
+#include "argument_parser.hpp"
+#include "config_reader.hpp"
 
 #include <cstdlib>
 #include <exception>

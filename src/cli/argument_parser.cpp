@@ -61,17 +61,17 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
       });
 
     try {
-        std::vector<std::string> arguments;
-        arguments.reserve(args.size());
+        std::vector<std::string> c_args;
+        c_args.reserve(args.size());
 
         // NOTE: This loop is required because `parse_args()` expects a c-style array.
         for (const auto *arg : args) {
             if (arg != nullptr) {
-                arguments.emplace_back(arg);
+                c_args.emplace_back(arg);
             }
         }
 
-        program.parse_args(arguments);
+        program.parse_args(c_args);
 
     } catch (const std::exception &err) {
         std::cerr << "Error parsing arguments: " << err.what() << '\n';
