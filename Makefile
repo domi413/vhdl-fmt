@@ -1,68 +1,44 @@
-GRAMMARS := grammars/vhdl.g4
-GENERATED := build/generated/vhdlLexer.cpp build/generated/vhdlParser.cpp
-SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
-SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
-TARGET := build/Debug/bin/vhdl_formatter
-CONAN_STAMP := build/.conan.stamp
-ANTLR_STAMP := build/.antlr.stamp
-BUILD_STAMP := build/.build.stamp
+# Default preset, override with `make BUILD_TYPE=Release`
+BUILD_TYPE ?= Debug
+CMAKE_PRESET := conan-$(shell echo $(BUILD_TYPE) | tr A-Z a-z)
 
-# Flags for clang-tidy
-LINT_COMMON_FLAGS = -p build/Debug/generators/
-LINT_TIDY_FLAGS = --warnings-as-errors='*'
+TARGET := build/$(BUILD_TYPE)/bin/vhdl_formatter
+CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
+BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 
-all: $(TARGET)
+all: $(BUILD_STAMP)
 
-print-SRCS:
-	@echo $(SRCS)
-
-# -----------------------------
-# Build rules
-# -----------------------------
-$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP) $(ANTLR_STAMP)
-	@echo "Building project..."
-	@cmake --preset conan-debug
-	@cmake --build --preset conan-debug
+$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
+	@echo "Building project ($(BUILD_TYPE))..."
+	@cmake --preset $(CMAKE_PRESET)
+	@cmake --build --preset $(CMAKE_PRESET)
 	@touch $@
 	@echo "Build complete."
 
-$(TARGET): $(BUILD_STAMP)
-
-$(ANTLR_STAMP): $(GRAMMARS) $(CONAN_STAMP)
-	@echo "Generating ANTLR4 sources..."
-	@bash -c '. build/Debug/generators/conanrun.sh && \
-	cd grammars && \
-	antlr4 -Dlanguage=Cpp vhdl.g4 -lib . -o ../build/generated/ -no-listener -visitor'
-	@touch $@
-	@echo "Generation complete."
-
-$(GENERATED): $(ANTLR_STAMP)
-
 $(CONAN_STAMP): conanfile.txt
-	@echo "Running Conan..."
-	@CC=clang CXX=clang++ conan install . \
+	@echo "Running Conan ($(BUILD_TYPE))..."
+	@conan install . \
+		-pr=clang.profile \
 		--build=missing \
-		-pr:h=conan_profiles/ninja_debug.profile \
-		-s:h build_type=Debug
-	@touch $(CONAN_STAMP)
+		-s build_type=$(BUILD_TYPE)
+	@touch $@
 
 conan: $(CONAN_STAMP)
 
-# -----------------------------
-# Run & Test targets
-# -----------------------------
 run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
-	@ctest --test-dir build/Debug --output-on-failure
+	@ctest --preset $(CMAKE_PRESET)
 
-# -----------------------------
-# Cleanup
-# -----------------------------
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
 
+.PHONY: all run clean conan test
+
+# -----------------------------
+# Utility targets
+# -----------------------------
 check-format:
 	@echo "Checking code formatting..."
 	@if clang-format --dry-run --Werror $(SRCS) && gersemi --check $(SRCS_CMAKE); then \
@@ -77,7 +53,7 @@ format:
 	@gersemi -i $(SRCS_CMAKE)
 	@echo "✓ Code formatting complete"
 
-lint: build
+lint:
 	@echo "Running clang-tidy..."
 	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SRCS)
 	@echo "✓ Linting complete"
@@ -95,5 +71,3 @@ check-cspell-ignored:
 	@echo "Checking for unused words in .cspell_ignored..."
 	@.github/scripts/check-cspell-ignored.sh
 	@echo "✓ Cspell ignored file check complete"
-
-.PHONY: all run clean conan test
