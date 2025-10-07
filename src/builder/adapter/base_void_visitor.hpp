@@ -7,6 +7,7 @@
 #include "void_visitor.hpp"
 
 namespace builder::adapter {
+
 class BaseVoidVisitor : public VoidVisitor
 {
   protected:
@@ -57,6 +58,7 @@ class BaseVoidVisitor : public VoidVisitor
     void visitAssociationList(vhdlParser::Association_listContext *context) override { walk(context); }
     void visitAttributeDeclaration(vhdlParser::Attribute_declarationContext *context) override { walk(context); }
     void visitAttributeDesignator(vhdlParser::Attribute_designatorContext *context) override { walk(context); }
+    void visitAttributeNamePart(vhdlParser::Attribute_name_partContext *context) override { walk(context); }
     void visitAttributeSpecification(vhdlParser::Attribute_specificationContext *context) override { walk(context); }
     void visitBaseUnitDeclaration(vhdlParser::Base_unit_declarationContext *context) override { walk(context); }
     void visitBindingIndication(vhdlParser::Binding_indicationContext *context) override { walk(context); }
@@ -129,6 +131,7 @@ class BaseVoidVisitor : public VoidVisitor
     void visitEnumerationLiteral(vhdlParser::Enumeration_literalContext *context) override { walk(context); }
     void visitEnumerationTypeDefinition(vhdlParser::Enumeration_type_definitionContext *context) override { walk(context); }
     void visitExitStatement(vhdlParser::Exit_statementContext *context) override { walk(context); }
+    void visitExplicitRange(vhdlParser::Explicit_rangeContext *context) override { walk(context); }
     void visitExpression(vhdlParser::ExpressionContext *context) override { walk(context); }
     void visitFactor(vhdlParser::FactorContext *context) override { walk(context); }
     void visitFileDeclaration(vhdlParser::File_declarationContext *context) override { walk(context); }
@@ -138,6 +141,8 @@ class BaseVoidVisitor : public VoidVisitor
     void visitFormalParameterList(vhdlParser::Formal_parameter_listContext *context) override { walk(context); }
     void visitFormalPart(vhdlParser::Formal_partContext *context) override { walk(context); }
     void visitFreeQuantityDeclaration(vhdlParser::Free_quantity_declarationContext *context) override { walk(context); }
+    void visitFunctionCallOrIndexedNamePart(vhdlParser::Function_call_or_indexed_name_partContext *context) override { walk(context); }
+    void visitFunctionSpecification(vhdlParser::Function_specificationContext *context) override { walk(context); }
     void visitGenerateStatement(vhdlParser::Generate_statementContext *context) override { walk(context); }
     void visitGenerationScheme(vhdlParser::Generation_schemeContext *context) override { walk(context); }
     void visitGenericClause(vhdlParser::Generic_clauseContext *context) override { walk(context); }
@@ -160,12 +165,12 @@ class BaseVoidVisitor : public VoidVisitor
     void visitInterfaceDeclaration(vhdlParser::Interface_declarationContext *context) override { walk(context); }
     void visitInterfaceElement(vhdlParser::Interface_elementContext *context) override { walk(context); }
     void visitInterfaceFileDeclaration(vhdlParser::Interface_file_declarationContext *context) override { walk(context); }
-    void visitInterfaceSignalList(vhdlParser::Interface_signal_listContext *context) override { walk(context); }
-    void visitInterfacePortList(vhdlParser::Interface_port_listContext *context) override { walk(context); }
     void visitInterfaceList(vhdlParser::Interface_listContext *context) override { walk(context); }
-    void visitInterfaceQuantityDeclaration(vhdlParser::Interface_quantity_declarationContext *context) override { walk(context); }
     void visitInterfacePortDeclaration(vhdlParser::Interface_port_declarationContext *context) override { walk(context); }
+    void visitInterfacePortList(vhdlParser::Interface_port_listContext *context) override { walk(context); }
+    void visitInterfaceQuantityDeclaration(vhdlParser::Interface_quantity_declarationContext *context) override { walk(context); }
     void visitInterfaceSignalDeclaration(vhdlParser::Interface_signal_declarationContext *context) override { walk(context); }
+    void visitInterfaceSignalList(vhdlParser::Interface_signal_listContext *context) override { walk(context); }
     void visitInterfaceTerminalDeclaration(vhdlParser::Interface_terminal_declarationContext *context) override { walk(context); }
     void visitInterfaceVariableDeclaration(vhdlParser::Interface_variable_declarationContext *context) override { walk(context); }
     void visitIterationScheme(vhdlParser::Iteration_schemeContext *context) override { walk(context); }
@@ -177,15 +182,9 @@ class BaseVoidVisitor : public VoidVisitor
     void visitLogicalNameList(vhdlParser::Logical_name_listContext *context) override { walk(context); }
     void visitLogicalOperator(vhdlParser::Logical_operatorContext *context) override { walk(context); }
     void visitLoopStatement(vhdlParser::Loop_statementContext *context) override { walk(context); }
-    void visitSignalMode(vhdlParser::Signal_modeContext *context) override { walk(context); }
     void visitMultiplyingOperator(vhdlParser::Multiplying_operatorContext *context) override { walk(context); }
     void visitName(vhdlParser::NameContext *context) override { walk(context); }
     void visitNamePart(vhdlParser::Name_partContext *context) override { walk(context); }
-    void visitSelectedName(vhdlParser::Selected_nameContext *context) override { walk(context); }
-    void visitSelectedNamePart(vhdlParser::Selected_name_partContext *context) override { walk(context); }
-    void visitFunctionCallOrIndexedNamePart(vhdlParser::Function_call_or_indexed_name_partContext *context) override { walk(context); }
-    void visitSliceNamePart(vhdlParser::Slice_name_partContext *context) override { walk(context); }
-    void visitAttributeNamePart(vhdlParser::Attribute_name_partContext *context) override { walk(context); }
     void visitNatureDeclaration(vhdlParser::Nature_declarationContext *context) override { walk(context); }
     void visitNatureDefinition(vhdlParser::Nature_definitionContext *context) override { walk(context); }
     void visitNatureElementDeclaration(vhdlParser::Nature_element_declarationContext *context) override { walk(context); }
@@ -212,6 +211,7 @@ class BaseVoidVisitor : public VoidVisitor
     void visitProceduralStatementPart(vhdlParser::Procedural_statement_partContext *context) override { walk(context); }
     void visitProcedureCall(vhdlParser::Procedure_callContext *context) override { walk(context); }
     void visitProcedureCallStatement(vhdlParser::Procedure_call_statementContext *context) override { walk(context); }
+    void visitProcedureSpecification(vhdlParser::Procedure_specificationContext *context) override { walk(context); }
     void visitProcessDeclarativeItem(vhdlParser::Process_declarative_itemContext *context) override { walk(context); }
     void visitProcessDeclarativePart(vhdlParser::Process_declarative_partContext *context) override { walk(context); }
     void visitProcessStatement(vhdlParser::Process_statementContext *context) override { walk(context); }
@@ -220,9 +220,8 @@ class BaseVoidVisitor : public VoidVisitor
     void visitQuantityDeclaration(vhdlParser::Quantity_declarationContext *context) override { walk(context); }
     void visitQuantityList(vhdlParser::Quantity_listContext *context) override { walk(context); }
     void visitQuantitySpecification(vhdlParser::Quantity_specificationContext *context) override { walk(context); }
-    void visitRangeDecl(vhdlParser::Range_declContext *context) override { walk(context); }
-    void visitExplicitRange(vhdlParser::Explicit_rangeContext *context) override { walk(context); }
     void visitRangeConstraint(vhdlParser::Range_constraintContext *context) override { walk(context); }
+    void visitRangeDecl(vhdlParser::Range_declContext *context) override { walk(context); }
     void visitRecordNatureDefinition(vhdlParser::Record_nature_definitionContext *context) override { walk(context); }
     void visitRecordTypeDefinition(vhdlParser::Record_type_definitionContext *context) override { walk(context); }
     void visitRelation(vhdlParser::RelationContext *context) override { walk(context); }
@@ -233,6 +232,8 @@ class BaseVoidVisitor : public VoidVisitor
     void visitScalarTypeDefinition(vhdlParser::Scalar_type_definitionContext *context) override { walk(context); }
     void visitSecondaryUnit(vhdlParser::Secondary_unitContext *context) override { walk(context); }
     void visitSecondaryUnitDeclaration(vhdlParser::Secondary_unit_declarationContext *context) override { walk(context); }
+    void visitSelectedName(vhdlParser::Selected_nameContext *context) override { walk(context); }
+    void visitSelectedNamePart(vhdlParser::Selected_name_partContext *context) override { walk(context); }
     void visitSelectedSignalAssignment(vhdlParser::Selected_signal_assignmentContext *context) override { walk(context); }
     void visitSelectedWaveforms(vhdlParser::Selected_waveformsContext *context) override { walk(context); }
     void visitSensitivityClause(vhdlParser::Sensitivity_clauseContext *context) override { walk(context); }
@@ -245,6 +246,7 @@ class BaseVoidVisitor : public VoidVisitor
     void visitSignalDeclaration(vhdlParser::Signal_declarationContext *context) override { walk(context); }
     void visitSignalKind(vhdlParser::Signal_kindContext *context) override { walk(context); }
     void visitSignalList(vhdlParser::Signal_listContext *context) override { walk(context); }
+    void visitSignalMode(vhdlParser::Signal_modeContext *context) override { walk(context); }
     void visitSignature(vhdlParser::SignatureContext *context) override { walk(context); }
     void visitSimpleExpression(vhdlParser::Simple_expressionContext *context) override { walk(context); }
     void visitSimpleSimultaneousStatement(vhdlParser::Simple_simultaneous_statementContext *context) override { walk(context); }
@@ -254,6 +256,7 @@ class BaseVoidVisitor : public VoidVisitor
     void visitSimultaneousProceduralStatement(vhdlParser::Simultaneous_procedural_statementContext *context) override { walk(context); }
     void visitSimultaneousStatement(vhdlParser::Simultaneous_statementContext *context) override { walk(context); }
     void visitSimultaneousStatementPart(vhdlParser::Simultaneous_statement_partContext *context) override { walk(context); }
+    void visitSliceNamePart(vhdlParser::Slice_name_partContext *context) override { walk(context); }
     void visitSourceAspect(vhdlParser::Source_aspectContext *context) override { walk(context); }
     void visitSourceQuantityDeclaration(vhdlParser::Source_quantity_declarationContext *context) override { walk(context); }
     void visitStepLimitSpecification(vhdlParser::Step_limit_specificationContext *context) override { walk(context); }
@@ -265,8 +268,6 @@ class BaseVoidVisitor : public VoidVisitor
     void visitSubprogramDeclarativePart(vhdlParser::Subprogram_declarative_partContext *context) override { walk(context); }
     void visitSubprogramKind(vhdlParser::Subprogram_kindContext *context) override { walk(context); }
     void visitSubprogramSpecification(vhdlParser::Subprogram_specificationContext *context) override { walk(context); }
-    void visitProcedureSpecification(vhdlParser::Procedure_specificationContext *context) override { walk(context); }
-    void visitFunctionSpecification(vhdlParser::Function_specificationContext *context) override { walk(context); }
     void visitSubprogramStatementPart(vhdlParser::Subprogram_statement_partContext *context) override { walk(context); }
     void visitSubtypeDeclaration(vhdlParser::Subtype_declarationContext *context) override { walk(context); }
     void visitSubtypeIndication(vhdlParser::Subtype_indicationContext *context) override { walk(context); }
@@ -289,6 +290,7 @@ class BaseVoidVisitor : public VoidVisitor
     void visitWaveform(vhdlParser::WaveformContext *context) override { walk(context); }
     void visitWaveformElement(vhdlParser::Waveform_elementContext *context) override { walk(context); }
 };
+
 } // namespace builder::adapter
 
 #endif /* BUILDER_ADAPTER_BASE_VOID_VISITOR_HPP */

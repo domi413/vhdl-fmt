@@ -8,6 +8,7 @@
 #include <any>
 
 namespace builder::adapter {
+
 class AntlrVoidAdapter : public vhdlBaseVisitor
 {
 
@@ -1552,6 +1553,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 };
+
 } // namespace builder::adapter
 
 #endif /* BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP */

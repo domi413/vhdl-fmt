@@ -4,6 +4,7 @@
 #include "vhdlParser.h"
 
 namespace builder::adapter {
+
 class VoidVisitor
 {
   public:
@@ -38,6 +39,7 @@ class VoidVisitor
     virtual void visitAssociationList(vhdlParser::Association_listContext *context) = 0;
     virtual void visitAttributeDeclaration(vhdlParser::Attribute_declarationContext *context) = 0;
     virtual void visitAttributeDesignator(vhdlParser::Attribute_designatorContext *context) = 0;
+    virtual void visitAttributeNamePart(vhdlParser::Attribute_name_partContext *context) = 0;
     virtual void visitAttributeSpecification(vhdlParser::Attribute_specificationContext *context) = 0;
     virtual void visitBaseUnitDeclaration(vhdlParser::Base_unit_declarationContext *context) = 0;
     virtual void visitBindingIndication(vhdlParser::Binding_indicationContext *context) = 0;
@@ -110,6 +112,7 @@ class VoidVisitor
     virtual void visitEnumerationLiteral(vhdlParser::Enumeration_literalContext *context) = 0;
     virtual void visitEnumerationTypeDefinition(vhdlParser::Enumeration_type_definitionContext *context) = 0;
     virtual void visitExitStatement(vhdlParser::Exit_statementContext *context) = 0;
+    virtual void visitExplicitRange(vhdlParser::Explicit_rangeContext *context) = 0;
     virtual void visitExpression(vhdlParser::ExpressionContext *context) = 0;
     virtual void visitFactor(vhdlParser::FactorContext *context) = 0;
     virtual void visitFileDeclaration(vhdlParser::File_declarationContext *context) = 0;
@@ -119,6 +122,8 @@ class VoidVisitor
     virtual void visitFormalParameterList(vhdlParser::Formal_parameter_listContext *context) = 0;
     virtual void visitFormalPart(vhdlParser::Formal_partContext *context) = 0;
     virtual void visitFreeQuantityDeclaration(vhdlParser::Free_quantity_declarationContext *context) = 0;
+    virtual void visitFunctionCallOrIndexedNamePart(vhdlParser::Function_call_or_indexed_name_partContext *context) = 0;
+    virtual void visitFunctionSpecification(vhdlParser::Function_specificationContext *context) = 0;
     virtual void visitGenerateStatement(vhdlParser::Generate_statementContext *context) = 0;
     virtual void visitGenerationScheme(vhdlParser::Generation_schemeContext *context) = 0;
     virtual void visitGenericClause(vhdlParser::Generic_clauseContext *context) = 0;
@@ -141,12 +146,12 @@ class VoidVisitor
     virtual void visitInterfaceDeclaration(vhdlParser::Interface_declarationContext *context) = 0;
     virtual void visitInterfaceElement(vhdlParser::Interface_elementContext *context) = 0;
     virtual void visitInterfaceFileDeclaration(vhdlParser::Interface_file_declarationContext *context) = 0;
-    virtual void visitInterfaceSignalList(vhdlParser::Interface_signal_listContext *context) = 0;
-    virtual void visitInterfacePortList(vhdlParser::Interface_port_listContext *context) = 0;
     virtual void visitInterfaceList(vhdlParser::Interface_listContext *context) = 0;
-    virtual void visitInterfaceQuantityDeclaration(vhdlParser::Interface_quantity_declarationContext *context) = 0;
     virtual void visitInterfacePortDeclaration(vhdlParser::Interface_port_declarationContext *context) = 0;
+    virtual void visitInterfacePortList(vhdlParser::Interface_port_listContext *context) = 0;
+    virtual void visitInterfaceQuantityDeclaration(vhdlParser::Interface_quantity_declarationContext *context) = 0;
     virtual void visitInterfaceSignalDeclaration(vhdlParser::Interface_signal_declarationContext *context) = 0;
+    virtual void visitInterfaceSignalList(vhdlParser::Interface_signal_listContext *context) = 0;
     virtual void visitInterfaceTerminalDeclaration(vhdlParser::Interface_terminal_declarationContext *context) = 0;
     virtual void visitInterfaceVariableDeclaration(vhdlParser::Interface_variable_declarationContext *context) = 0;
     virtual void visitIterationScheme(vhdlParser::Iteration_schemeContext *context) = 0;
@@ -158,15 +163,9 @@ class VoidVisitor
     virtual void visitLogicalNameList(vhdlParser::Logical_name_listContext *context) = 0;
     virtual void visitLogicalOperator(vhdlParser::Logical_operatorContext *context) = 0;
     virtual void visitLoopStatement(vhdlParser::Loop_statementContext *context) = 0;
-    virtual void visitSignalMode(vhdlParser::Signal_modeContext *context) = 0;
     virtual void visitMultiplyingOperator(vhdlParser::Multiplying_operatorContext *context) = 0;
     virtual void visitName(vhdlParser::NameContext *context) = 0;
     virtual void visitNamePart(vhdlParser::Name_partContext *context) = 0;
-    virtual void visitSelectedName(vhdlParser::Selected_nameContext *context) = 0;
-    virtual void visitSelectedNamePart(vhdlParser::Selected_name_partContext *context) = 0;
-    virtual void visitFunctionCallOrIndexedNamePart(vhdlParser::Function_call_or_indexed_name_partContext *context) = 0;
-    virtual void visitSliceNamePart(vhdlParser::Slice_name_partContext *context) = 0;
-    virtual void visitAttributeNamePart(vhdlParser::Attribute_name_partContext *context) = 0;
     virtual void visitNatureDeclaration(vhdlParser::Nature_declarationContext *context) = 0;
     virtual void visitNatureDefinition(vhdlParser::Nature_definitionContext *context) = 0;
     virtual void visitNatureElementDeclaration(vhdlParser::Nature_element_declarationContext *context) = 0;
@@ -193,6 +192,7 @@ class VoidVisitor
     virtual void visitProceduralStatementPart(vhdlParser::Procedural_statement_partContext *context) = 0;
     virtual void visitProcedureCall(vhdlParser::Procedure_callContext *context) = 0;
     virtual void visitProcedureCallStatement(vhdlParser::Procedure_call_statementContext *context) = 0;
+    virtual void visitProcedureSpecification(vhdlParser::Procedure_specificationContext *context) = 0;
     virtual void visitProcessDeclarativeItem(vhdlParser::Process_declarative_itemContext *context) = 0;
     virtual void visitProcessDeclarativePart(vhdlParser::Process_declarative_partContext *context) = 0;
     virtual void visitProcessStatement(vhdlParser::Process_statementContext *context) = 0;
@@ -201,9 +201,8 @@ class VoidVisitor
     virtual void visitQuantityDeclaration(vhdlParser::Quantity_declarationContext *context) = 0;
     virtual void visitQuantityList(vhdlParser::Quantity_listContext *context) = 0;
     virtual void visitQuantitySpecification(vhdlParser::Quantity_specificationContext *context) = 0;
-    virtual void visitRangeDecl(vhdlParser::Range_declContext *context) = 0;
-    virtual void visitExplicitRange(vhdlParser::Explicit_rangeContext *context) = 0;
     virtual void visitRangeConstraint(vhdlParser::Range_constraintContext *context) = 0;
+    virtual void visitRangeDecl(vhdlParser::Range_declContext *context) = 0;
     virtual void visitRecordNatureDefinition(vhdlParser::Record_nature_definitionContext *context) = 0;
     virtual void visitRecordTypeDefinition(vhdlParser::Record_type_definitionContext *context) = 0;
     virtual void visitRelation(vhdlParser::RelationContext *context) = 0;
@@ -214,6 +213,8 @@ class VoidVisitor
     virtual void visitScalarTypeDefinition(vhdlParser::Scalar_type_definitionContext *context) = 0;
     virtual void visitSecondaryUnit(vhdlParser::Secondary_unitContext *context) = 0;
     virtual void visitSecondaryUnitDeclaration(vhdlParser::Secondary_unit_declarationContext *context) = 0;
+    virtual void visitSelectedName(vhdlParser::Selected_nameContext *context) = 0;
+    virtual void visitSelectedNamePart(vhdlParser::Selected_name_partContext *context) = 0;
     virtual void visitSelectedSignalAssignment(vhdlParser::Selected_signal_assignmentContext *context) = 0;
     virtual void visitSelectedWaveforms(vhdlParser::Selected_waveformsContext *context) = 0;
     virtual void visitSensitivityClause(vhdlParser::Sensitivity_clauseContext *context) = 0;
@@ -226,6 +227,7 @@ class VoidVisitor
     virtual void visitSignalDeclaration(vhdlParser::Signal_declarationContext *context) = 0;
     virtual void visitSignalKind(vhdlParser::Signal_kindContext *context) = 0;
     virtual void visitSignalList(vhdlParser::Signal_listContext *context) = 0;
+    virtual void visitSignalMode(vhdlParser::Signal_modeContext *context) = 0;
     virtual void visitSignature(vhdlParser::SignatureContext *context) = 0;
     virtual void visitSimpleExpression(vhdlParser::Simple_expressionContext *context) = 0;
     virtual void visitSimpleSimultaneousStatement(vhdlParser::Simple_simultaneous_statementContext *context) = 0;
@@ -235,6 +237,7 @@ class VoidVisitor
     virtual void visitSimultaneousProceduralStatement(vhdlParser::Simultaneous_procedural_statementContext *context) = 0;
     virtual void visitSimultaneousStatement(vhdlParser::Simultaneous_statementContext *context) = 0;
     virtual void visitSimultaneousStatementPart(vhdlParser::Simultaneous_statement_partContext *context) = 0;
+    virtual void visitSliceNamePart(vhdlParser::Slice_name_partContext *context) = 0;
     virtual void visitSourceAspect(vhdlParser::Source_aspectContext *context) = 0;
     virtual void visitSourceQuantityDeclaration(vhdlParser::Source_quantity_declarationContext *context) = 0;
     virtual void visitStepLimitSpecification(vhdlParser::Step_limit_specificationContext *context) = 0;
@@ -246,8 +249,6 @@ class VoidVisitor
     virtual void visitSubprogramDeclarativePart(vhdlParser::Subprogram_declarative_partContext *context) = 0;
     virtual void visitSubprogramKind(vhdlParser::Subprogram_kindContext *context) = 0;
     virtual void visitSubprogramSpecification(vhdlParser::Subprogram_specificationContext *context) = 0;
-    virtual void visitProcedureSpecification(vhdlParser::Procedure_specificationContext *context) = 0;
-    virtual void visitFunctionSpecification(vhdlParser::Function_specificationContext *context) = 0;
     virtual void visitSubprogramStatementPart(vhdlParser::Subprogram_statement_partContext *context) = 0;
     virtual void visitSubtypeDeclaration(vhdlParser::Subtype_declarationContext *context) = 0;
     virtual void visitSubtypeIndication(vhdlParser::Subtype_indicationContext *context) = 0;
@@ -270,6 +271,7 @@ class VoidVisitor
     virtual void visitWaveform(vhdlParser::WaveformContext *context) = 0;
     virtual void visitWaveformElement(vhdlParser::Waveform_elementContext *context) = 0;
 };
+
 } // namespace builder::adapter
 
 #endif /* BUILDER_ADAPTER_VOID_VISITOR_HPP */
