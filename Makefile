@@ -34,73 +34,6 @@ run: $(BUILD_STAMP)
 test: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET)
 
-$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
-	@echo "Building project ($(BUILD_TYPE))..."
-	@cmake --preset $(CMAKE_PRESET)
-	@cmake --build --preset $(CMAKE_PRESET)
-	@touch $@
-	@echo "Build complete."
-
-$(CONAN_STAMP): conanfile.txt
-	@echo "Running Conan ($(BUILD_TYPE))..."
-	@conan install . \
-		-pr=clang.profile \
-		--build=missing \
-		-s build_type=$(BUILD_TYPE)
-	@touch $@
-
-conan: $(CONAN_STAMP)
-
-run: $(BUILD_STAMP)
-	@./$(TARGET) ./tests/data/simple.vhdl
-
-test: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET)
-
-# -----------------------------
-# Build rules
-# -----------------------------
-$(BUILD_STAMP): $(SRCS) CMakeLists.txt $(CONAN_STAMP) $(ANTLR_STAMP)
-	@echo "Building project..."
-	@cmake --preset conan-debug
-	@cmake --build --preset conan-debug
-	@touch $@
-	@echo "Build complete."
-
-$(TARGET): $(BUILD_STAMP)
-
-$(ANTLR_STAMP): $(GRAMMARS) $(CONAN_STAMP)
-	@echo "Generating ANTLR4 sources..."
-	@bash -c '. build/Debug/generators/conanrun.sh && \
-	cd grammars && \
-	antlr4 -Dlanguage=Cpp vhdl.g4 -lib . -o ../build/generated/ -no-listener -visitor'
-	@touch $@
-	@echo "Generation complete."
-
-$(GENERATED): $(ANTLR_STAMP)
-
-$(CONAN_STAMP): conanfile.txt
-	@echo "Running Conan..."
-	@CC=clang CXX=clang++ conan install . \
-		--build=missing \
-		-pr:h=conan_profiles/ninja_debug.profile \
-		-s:h build_type=Debug
-	@touch $(CONAN_STAMP)
-
-conan: $(CONAN_STAMP)
-
-# -----------------------------
-# Run & Test targets
-# -----------------------------
-run: $(BUILD_STAMP)
-	@./$(TARGET) ./tests/data/simple.vhdl
-
-test: $(BUILD_STAMP)
-	@ctest --test-dir build/Debug --output-on-failure
-
-# -----------------------------
-# Cleanup
-# -----------------------------
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
 
@@ -153,5 +86,3 @@ check-cspell-ignored:
 	@echo "Checking for unused words in .cspell_ignored..."
 	@.github/scripts/check-cspell-ignored.sh
 	@echo "✓ Cspell ignored file check complete"
-
-.PHONY: all run clean conan test
