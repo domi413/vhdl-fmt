@@ -42,8 +42,8 @@ clean:
 # -----------------------------
 # Utility targets
 # -----------------------------
-LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/
-LINT_TIDY_FLAGS = --warnings-as-errors='*'
+LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
+LINT_TIDY_FLAGS = --warnings-as-errors='*' -header-filter=.*
 
 check-format:
 	@echo "Checking code formatting..."

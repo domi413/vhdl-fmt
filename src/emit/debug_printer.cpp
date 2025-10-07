@@ -4,6 +4,7 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <sstream>
 #include <string>
