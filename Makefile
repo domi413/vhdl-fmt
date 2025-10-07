@@ -1,7 +1,7 @@
 GRAMMARS := grammars/vhdl.g4
 GENERATED := build/generated/vhdlLexer.cpp build/generated/vhdlParser.cpp
 SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
-SRCS_CMAKE := $(shell find -name 'CMakeLists.txt')
+SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
 TARGET := build/Debug/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.stamp
 ANTLR_STAMP := build/.antlr.stamp
@@ -19,7 +19,7 @@ print-SRCS:
 # -----------------------------
 # Build rules
 # -----------------------------
-$(BUILD_STAMP): $(SRCS) CMakeLists.txt $(CONAN_STAMP) $(ANTLR_STAMP)
+$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP) $(ANTLR_STAMP)
 	@echo "Building project..."
 	@cmake --preset conan-debug
 	@cmake --build --preset conan-debug
