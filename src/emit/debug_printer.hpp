@@ -14,7 +14,7 @@
 
 namespace emit {
 
-struct DebugPrinter : ast::ASTVisitor
+struct DebugPrinter : ast::Visitor
 {
     void printIndent() const
     {

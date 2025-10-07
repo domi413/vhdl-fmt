@@ -39,7 +39,7 @@ struct Node
         std::vector<Comment> trailing;
     };
 
-    virtual void accept(ASTVisitor &v) const = 0;
+    virtual void accept(Visitor &v) const = 0;
 
     auto getComments() -> NodeComments & { return comments.emplace(); }
     [[nodiscard]] auto tryGetComments() const -> const std::optional<NodeComments> &
