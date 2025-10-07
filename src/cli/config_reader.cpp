@@ -124,24 +124,15 @@ auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
           "Config file is not a valid yaml file or could not be correctly loaded.");
     }
 
-    const Config default_config{};
-
-    auto indent_style = default_config.getIndentStyle();
-    auto eol = default_config.getEol();
-    auto line_config = default_config.getLineConfig();
-    auto port_map = default_config.getPortMapConfig();
-    auto declarations = default_config.getDeclarationConfig();
-    auto casing = default_config.getCasingConfig();
-
     try {
-        line_config = readLineconfig(root_node, default_config.getLineConfig());
-        indent_style = readIndentationStyle(root_node, default_config.getIndentStyle());
-        eol = readEndOfLine(root_node, default_config.getEol());
-        port_map = readPortMapConfig(root_node, default_config.getPortMapConfig());
-        declarations = readDeclarationConfig(root_node, default_config.getDeclarationConfig());
-        casing = readCasingConfig(root_node, default_config.getCasingConfig());
+        Config::line_config = readLineconfig(root_node, default_config.getLineConfig());
+        Config::indent_style = readIndentationStyle(root_node, default_config.getIndentStyle());
+        Config::eol = readEndOfLine(root_node, default_config.getEol());
+        Config::port_map = readPortMapConfig(root_node, default_config.getPortMapConfig());
+        Config::declarations
+          = readDeclarationConfig(root_node, default_config.getDeclarationConfig());
+        Config::casing = readCasingConfig(root_node, default_config.getCasingConfig());
 
-        return Config{ indent_style, eol, line_config, port_map, declarations, casing };
     } catch (const std::exception &e) {
         return std::unexpected{ ConfigReadError{ std::string("Config parsing failed: ")
                                                  + e.what() } };

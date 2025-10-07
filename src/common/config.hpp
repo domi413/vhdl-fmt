@@ -58,89 +58,48 @@ struct CasingConfig final
     CaseStyle identifiers{ CaseStyle::LOWER };
 };
 
+namespace helper {
+
+static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
+static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
+
+static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
+static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
+
+static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
+static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
+
+/// Validate line configuration
+inline auto validateLineConfig(const struct LineConfig &cfg) -> void
+{
+    if (cfg.line_length < MIN_LINE_LENGTH || cfg.line_length > MAX_LINE_LENGTH) {
+        const std::string msg = "Line length must be between " + std::to_string(MIN_LINE_LENGTH)
+                              + " and " + std::to_string(MAX_LINE_LENGTH) + ".";
+        throw std::invalid_argument(msg);
+    }
+
+    if (cfg.indent_size < MIN_INDENT_SIZE || cfg.indent_size > MAX_INDENT_SIZE) {
+        const std::string msg = "Indent size must be between " + std::to_string(MIN_INDENT_SIZE)
+                              + " and " + std::to_string(MAX_INDENT_SIZE) + ".";
+        throw std::invalid_argument(msg);
+    }
+}
+
+} // namespace helper
+
 struct Config final
 {
-
-  public:
-    Config() { validate(); }
-
-    Config(IndentationStyle indent_style,
-           EndOfLine eol,
-           LineConfig line_config,
-           PortMapConfig port_map,
-           DeclarationConfig declarations,
-           CasingConfig casing) :
-      line_config(line_config),
-      indent_style(indent_style),
-      eol(eol),
-      port_map(port_map),
-      declarations(declarations),
-      casing(casing)
-    {
-        validate();
-    }
-
-    /// Returns the line configuration
-    [[nodiscard]] auto getLineConfig() const noexcept -> const LineConfig & { return line_config; }
-
-    /// Returns the indentation style
-    [[nodiscard]] auto getIndentStyle() const noexcept -> IndentationStyle { return indent_style; }
-
-    /// Returns the end of line sequence
-    [[nodiscard]] auto getEol() const noexcept -> EndOfLine { return eol; }
-
-    /// Returns the port map configuration
-    [[nodiscard]] auto getPortMapConfig() const noexcept -> const PortMapConfig &
-    {
-        return port_map;
-    }
-
-    /// Returns the declaration configuration
-    [[nodiscard]] auto getDeclarationConfig() const noexcept -> const DeclarationConfig &
-    {
-        return declarations;
-    }
-
-    /// Returns the casing configuration
-    [[nodiscard]] auto getCasingConfig() const noexcept -> const CasingConfig & { return casing; }
-
-  private:
-    static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
-    static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
-
-    static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
-    static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
-
-    static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
-    static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
-
-    /// Validates the configuration
-    auto validate() const -> void
-    {
-        if (this->line_config.line_length < MIN_LINE_LENGTH
-            || this->line_config.line_length > MAX_LINE_LENGTH) {
-            const std::string msg = "Line length must be between " + std::to_string(MIN_LINE_LENGTH)
-                                  + " and " + std::to_string(MAX_LINE_LENGTH) + ".";
-
-            throw std::invalid_argument(msg);
-        }
-
-        if (this->line_config.indent_size < MIN_INDENT_SIZE
-            || this->line_config.indent_size > MAX_INDENT_SIZE) {
-            const std::string msg = "Indent size must be between " + std::to_string(MIN_INDENT_SIZE)
-                                  + " and " + std::to_string(MAX_INDENT_SIZE) + ".";
-
-            throw std::invalid_argument(msg);
-        }
-    }
-
-    LineConfig line_config{ .line_length = DEFAULT_LINE_LENGTH,
-                            .indent_size = DEFAULT_INDENT_SIZE };
+    // INFO: Public members since its a POD struct
+    // ---
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+    LineConfig line_config{ .line_length = config_details::DEFAULT_LINE_LENGTH,
+                            .indent_size = config_details::DEFAULT_INDENT_SIZE };
     IndentationStyle indent_style{ IndentationStyle::SPACES };
     EndOfLine eol{ EndOfLine::AUTO };
     PortMapConfig port_map;
     DeclarationConfig declarations;
     CasingConfig casing;
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 
 } // namespace common
