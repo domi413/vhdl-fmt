@@ -1,0 +1,16 @@
+[requires]
+antlr4-cppruntime/4.13.2
+argparse/3.2
+catch2/3.11.0
+fmt/11.2.0
+spdlog/1.15.3
+
+[tool_requires]
+antlr4/4.13.1
+
+[generators]
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout

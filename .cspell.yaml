@@ -1,0 +1,19 @@
+$schema: https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json
+version: "0.2"
+
+dictionaryDefinitions:
+  - name: project-words
+    path: .cspell_ignored
+
+dictionaries:
+  - cpp
+  - en_US
+  - project-words
+
+ignorePaths:
+  - "build/"
+  - "example/"
+  - "grammars/"
+  - "LICENSE"
+  - "clang.profile"
+  - ".*"
