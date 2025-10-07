@@ -12,8 +12,8 @@ struct DebugPrinter : ast::Visitor
 {
     void printIndent() const;
     void printNode(const ast::Node &n,
-                   const std::string &extra = {},
-                   const std::string &name_override = {}) const;
+                   const std::string &extra,
+                   const std::string &name_override) const;
 
     // ---- Node visitors ----
     void visit(const ast::DesignFile &df) override;

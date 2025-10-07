@@ -43,7 +43,21 @@ clean:
 # Utility targets
 # -----------------------------
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
-LINT_TIDY_FLAGS = --warnings-as-errors='*' -header-filter=.*
+LINT_TIDY_FLAGS = --warnings-as-errors='*'
+LINT_CPUS ?= $(shell nproc)
+
+lint:
+	@echo "Running clang-tidy on source files..."
+	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
+	run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SRCS)
+
+	@echo "Running clang-tidy on headers..."
+	@find src tests \( -path '*/build/*' -o -path '*/generated/*' -o -path '*/generators/*' -o -path '*/external/*' \) -prune \
+		-o -type f \( -name '*.hpp' -o -name '*.h' \) -print | \
+		xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
+
+	@echo "✓ Linting complete"
+
 
 check-format:
 	@echo "Checking code formatting..."
@@ -58,12 +72,6 @@ format:
 	@clang-format -i $(SRCS)
 	@gersemi -i $(SRCS_CMAKE)
 	@echo "✓ Code formatting complete"
-
-lint:
-	@echo "Running clang-tidy..."
-	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
-	run-clang-tidy $(LINT_COMMON_FLAGS) $(SRCS)
-	@echo "✓ Linting complete"
 
 sort-dictionary:
 	@echo "Sorting dictionary..."

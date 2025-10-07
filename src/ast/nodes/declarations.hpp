@@ -11,9 +11,9 @@ namespace ast {
 
 struct GenericParam : Node
 {
-    std::string type{};
-    std::vector<std::string> names{};
-    std::optional<std::string> init{};
+    std::string type;
+    std::vector<std::string> names;
+    std::optional<std::string> init;
 
     void accept(Visitor &v) const override { v.visit(*this); }
 };
@@ -29,19 +29,19 @@ struct Range : Node
 
 struct Port : Node
 {
-    std::string mode{}, type{};
-    std::vector<std::string> names{};
-    std::vector<std::unique_ptr<ast::Range>> constraints{};
-    std::optional<std::string> init{};
+    std::string mode, type;
+    std::vector<std::string> names;
+    std::vector<std::unique_ptr<ast::Range>> constraints;
+    std::optional<std::string> init;
 
     void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 struct Entity : Node
 {
-    std::string name{};
-    std::vector<std::unique_ptr<Port>> ports{};
-    std::vector<std::unique_ptr<GenericParam>> generics{};
+    std::string name;
+    std::vector<std::unique_ptr<Port>> ports;
+    std::vector<std::unique_ptr<GenericParam>> generics;
     void accept(Visitor &v) const override { v.visit(*this); }
 };
 

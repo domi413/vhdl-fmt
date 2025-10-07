@@ -2,11 +2,13 @@
 #define BUILDER_TRANSLATOR_HPP
 
 #include "CommonTokenStream.h"
+#include "ParserRuleContext.h"
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "vhdlParser.h"
 
+#include <cstddef>
 #include <unordered_set>
 
 namespace builder {
