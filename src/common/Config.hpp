@@ -58,15 +58,12 @@ struct CasingConfig final
     CaseStyle identifiers{ CaseStyle::LOWER };
 };
 
-/// Main configuration structure
 struct Config final
 {
 
   public:
-    // Default constructor uses default member initializers
     Config() { validate(); }
 
-    // Explicit constructor to fully initialize
     Config(IndentationStyle indent_style,
            EndOfLine eol,
            LineConfig line_config,

@@ -111,7 +111,7 @@ auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
 
     if (!root_node.IsMap()) {
         throw std::runtime_error(
-          "Config file is not a valid map or could not be correctly loaded.");
+          "Config file is not a valid yaml file or could not be correctly loaded.");
     }
 
     const Config default_config{};
