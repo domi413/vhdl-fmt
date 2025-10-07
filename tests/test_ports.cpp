@@ -17,7 +17,7 @@
 namespace {
 auto loadVhdl(const std::string &filename) -> std::string
 {
-    std::ifstream file(filename);
+    const std::ifstream file(filename);
     REQUIRE(file.is_open());
     std::stringstream buffer;
     buffer << file.rdbuf();

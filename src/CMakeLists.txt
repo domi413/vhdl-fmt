@@ -9,7 +9,8 @@ add_subdirectory(emit)
 # Main executable
 add_executable(vhdl_formatter main.cpp)
 
-target_link_libraries(vhdl_formatter
+target_link_libraries(
+    vhdl_formatter
     PRIVATE
         ast
         builder
@@ -20,9 +21,16 @@ target_link_libraries(vhdl_formatter
         spdlog::spdlog
 )
 
-target_compile_options(vhdl_formatter PRIVATE
-    -O3
-    -Wall -Wextra -Wpedantic
-    -Wconversion -Wshadow -Werror
-    -Wold-style-cast -Wnon-virtual-dtor
+target_compile_options(
+    vhdl_formatter
+    PRIVATE
+        -O3
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wconversion
+        -Wshadow
+        -Werror
+        -Wold-style-cast
+        -Wnon-virtual-dtor
 )
