@@ -5,9 +5,15 @@ gersemi
 subnature
 vhdl
 wconversion
+wdouble
 werror
 wextra
+wmisleading
 wnon
+wnull
+woverloaded
 wped
 wpedantic
 wshadow
+wsign
+wunused
