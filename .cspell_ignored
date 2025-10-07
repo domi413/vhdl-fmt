@@ -1,12 +1,13 @@
+antlr
 antlr4
-clangd
+conanfile
 gersemi
+subnature
 vhdl
 wconversion
 wdouble
 werror
 wextra
-wlifetime
 wmisleading
 wnon
 wnull

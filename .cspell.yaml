@@ -13,5 +13,7 @@ dictionaries:
 ignorePaths:
   - "build/"
   - "example/"
-  - "grammar/"
+  - "grammars/"
+  - "LICENSE"
+  - "clang.profile"
   - ".*"

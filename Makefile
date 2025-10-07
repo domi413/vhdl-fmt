@@ -1,36 +1,67 @@
-.PHONY: all clean run lint format check-format install
+# Default preset, override with `make BUILD_TYPE=Release`
+BUILD_TYPE ?= Debug
+CMAKE_PRESET := conan-$(shell echo $(BUILD_TYPE) | tr A-Z a-z)
 
-SOURCES_CPP = $(shell find . -name "*.cpp" -o -name "*.hpp")
-SOURCES_CMake = $(shell find . -name "CMakeLists.txt")
+TARGET := build/$(BUILD_TYPE)/bin/vhdl_formatter
+CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
+BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 
-all: clean build
+SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
+SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
 
-build:
-	@echo "Setting up Conan profile..."
-	@conan profile detect --force 2>/dev/null || true
-	@echo "Installing Conan dependencies..."
-	@conan install . --build=missing -s compiler.cppstd=23
-	@echo "Configuring and building with Conan..."
-	@cmake --preset=conan
-	@cmake --build build/Release
-	@echo "Creating symlink for clangd..."
-	@ln -sf build/Release/compile_commands.json .
+all: $(BUILD_STAMP)
+
+$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
+	@echo "Building project ($(BUILD_TYPE))..."
+	@cmake --preset $(CMAKE_PRESET)
+	@cmake --build --preset $(CMAKE_PRESET)
+	@touch $@
+	@echo "Build complete."
+
+$(CONAN_STAMP): conanfile.txt
+	@echo "Running Conan ($(BUILD_TYPE))..."
+	@conan install . \
+		-pr=clang.profile \
+		--build=missing \
+		-s build_type=$(BUILD_TYPE)
+	@touch $@
+
+conan: $(CONAN_STAMP)
+
+run: $(BUILD_STAMP)
+	@./$(TARGET) ./tests/data/simple.vhdl
+
+test: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET)
 
 clean:
-	@echo "Removing build directory..."
-	@rm -rf build/
+	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
 
-run: build
-	@echo "Running the VHDL parser..."
-	@./build/Release/vhdl_parser
+.PHONY: all run clean conan test
 
-# debug: build
-# 	@echo "Running the VHDL parser in debug mode..."
-# 	@gdb ./build/Release/vhdl_parser
+# -----------------------------
+# Utility targets
+# -----------------------------
+LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
+LINT_TIDY_FLAGS = --warnings-as-errors='*'
+LINT_CPUS ?= $(shell nproc)
+
+lint:
+	@echo "Running clang-tidy on source files..."
+	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
+	run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SRCS)
+
+	@echo "Running clang-tidy on headers..."
+	@find src tests \( -path '*/build/*' -o -path '*/generated/*' -o -path '*/generators/*' -o -path '*/external/*' \) -prune \
+		-o -type f \( -name '*.hpp' -o -name '*.h' \) -print | \
+		xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
+
+	@echo "✓ Linting complete"
+
 
 check-format:
 	@echo "Checking code formatting..."
-	@if clang-format --dry-run --Werror $(SOURCES_CPP) && gersemi --check $(SOURCES_CMake); then \
+	@if clang-format --dry-run --Werror $(SRCS) && gersemi --check $(SRCS_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
@@ -38,18 +69,9 @@ check-format:
 
 format:
 	@echo "Formatting code..."
-	@clang-format -i $(SOURCES_CPP)
-	@gersemi -i $(SOURCES_CMake)
+	@clang-format -i $(SRCS)
+	@gersemi -i $(SRCS_CMAKE)
 	@echo "✓ Code formatting complete"
-
-# Flags for clang-tidy
-LINT_COMMON_FLAGS = -p build/Release/
-LINT_TIDY_FLAGS = --warnings-as-errors='*'
-
-lint: build
-	@echo "Running clang-tidy..."
-	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SOURCES_CPP)
-	@echo "✓ Linting complete"
 
 sort-dictionary:
 	@echo "Sorting dictionary..."

@@ -1,10 +1,14 @@
 ---
+WarningsAsErrors: "*"
+UseColor: true
+FormatStyle: file
+
 Checks: >
   *,
   -altera-*,
   -llvmlibc-*,
-  -concurrency-mt-unsafe,
   -fuchsia-default-arguments-calls,
+  -fuchsia-overloaded-operator,
   -fuchsia-trailing-return,
   -llvm-header-guard,
   -readability-identifier-length,
@@ -60,6 +64,3 @@ CheckOptions:
     value: "lower_case"
   - key: readability-identifier-naming.MemberCase
     value: "lower_case"
-
-HeaderFilterRegex: ".*"
-FormatStyle: file

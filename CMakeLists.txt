@@ -1,76 +1,72 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.30)
+project(vhdl_fmt VERSION 0.1.0 DESCRIPTION "A VHDL formatter" LANGUAGES CXX)
 
-# ==================================================================
-# Project Definition
-# ==================================================================
-
-project(vhdl_parser VERSION 0.1.0 DESCRIPTION "A VHDL parser" LANGUAGES CXX)
-
-set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# ==================================================================
-# Dependencies
-# ==================================================================
+message(STATUS "Building ${PROJECT_NAME} ${PROJECT_VERSION}")
 
-find_package(spdlog REQUIRED)
-find_package(Catch2 REQUIRED)
+find_package(antlr4-runtime CONFIG REQUIRED)
 find_package(argparse REQUIRED)
-find_package(antlr4-runtime REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(Catch2 CONFIG REQUIRED)
 
-# ==================================================================
-# Main Executable
-# ==================================================================
+# --------------------------------------------------------------------
+# ANTLR Generation
+# --------------------------------------------------------------------
+set(GRAMMAR_FILE ${CMAKE_SOURCE_DIR}/grammars/vhdl.g4)
+set(GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 
-target_link_libraries(
-    vhdl_parser
-    PRIVATE spdlog::spdlog argparse::argparse antlr4_static
+find_program(ANTLR4_EXECUTABLE antlr4 REQUIRED)
+
+# Tell CMake how to generate these sources
+add_custom_command(
+    OUTPUT
+        ${GENERATED_DIR}/vhdlLexer.cpp
+        ${GENERATED_DIR}/vhdlParser.cpp
+    COMMAND
+        ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
+    COMMAND
+        ${ANTLR4_EXECUTABLE} -Dlanguage=Cpp ${GRAMMAR_FILE}
+            -lib ${CMAKE_SOURCE_DIR}/grammars
+            -o ${GENERATED_DIR}
+            -no-listener -visitor
+    DEPENDS ${GRAMMAR_FILE}
+    COMMENT "Generating VHDL lexer and parser using ANTLR4"
+    VERBATIM
 )
 
-# ==================================================================
-# Compiler Flags
-# ==================================================================
-
-target_compile_options(
-    vhdl_parser
-    PRIVATE
-        # Optimization
-        -O3
-        # Warnings
-        -Wall
-        -Wcast-align
-        -Wconversion
-        -Wdouble-promotion
-        -Werror
-        -Wextra
-        -Wformat=2
-        # -Wlifetime # Not available yet
-        -Wmisleading-indentation
-        -Wnon-virtual-dtor
-        -Wnull-dereference
-        -Wold-style-cast
-        -Woverloaded-virtual
-        -Wpedantic
-        -Wshadow
-        -Wsign-conversion
-        -Wunused
+# Group that rule into an explicit target
+add_custom_target(generate_vhdl_parser
+    DEPENDS
+        ${GENERATED_DIR}/vhdlLexer.cpp
+        ${GENERATED_DIR}/vhdlParser.cpp
 )
 
-# ==================================================================
-# Build Info
-# ==================================================================
-
-message(STATUS "VHDL Parser:")
-message(STATUS "  Version: ${PROJECT_VERSION}")
-message(STATUS "  Build: ${CMAKE_BUILD_TYPE}")
-message(
-    STATUS
-    "  Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+# Create the library directly from the *expected* generated files,
+# not from a GLOB that runs before generation.
+add_library(vhdl_generated STATIC
+    ${GENERATED_DIR}/vhdlLexer.cpp
+    ${GENERATED_DIR}/vhdlParser.cpp
 )
-message(STATUS "  Standard: C++${CMAKE_CXX_STANDARD}")
+
+# Make sure ANTLR runs before building this library
+add_dependencies(vhdl_generated generate_vhdl_parser)
+
+target_include_directories(vhdl_generated PUBLIC ${GENERATED_DIR})
+target_link_libraries(vhdl_generated PUBLIC antlr4_static)
+
+# --------------------------------------------------------------------
+# Project subdirs
+# --------------------------------------------------------------------
+add_subdirectory(src)
+add_subdirectory(tests)
+
+enable_testing()
