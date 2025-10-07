@@ -14,7 +14,7 @@ namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    for (int i = 0; i < indent; ++i) {
+    for (int i{ 0 }; i < indent; ++i) {
         std::cout << "  ";
     }
 }
@@ -90,7 +90,7 @@ void DebugPrinter::visit(const ast::Port &p)
     std::ostringstream oss;
 
     // Names
-    for (std::size_t i = 0; i < p.names.size(); ++i) {
+    for (std::size_t i{ 0 }; i < p.names.size(); ++i) {
         if (i > 0) {
             oss << ", ";
         }

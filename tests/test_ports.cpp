@@ -28,7 +28,7 @@ auto loadVhdl(const std::string &filename) -> std::string
 TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 {
     // --- Input VHDL ---
-    const std::string vhdl_code = loadVhdl(std::string(TEST_DATA_DIR) + "/ports.vhdl");
+    const std::string vhdl_code{ loadVhdl(std::string(TEST_DATA_DIR) + "/ports.vhdl") };
 
     // --- Setup ANTLR ---
     antlr4::ANTLRInputStream input(vhdl_code);
@@ -37,7 +37,7 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
     vhdlParser parser(&tokens);
 
     // Parse a design file
-    auto *tree = parser.design_file();
+    auto *tree{ parser.design_file() };
 
     // --- Build AST ---
     ast::DesignFile design;
@@ -49,7 +49,7 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
 
     // --- Verify AST ---
     REQUIRE(design.units.size() == 1);
-    auto *entity = dynamic_cast<ast::Entity *>(design.units[0].get());
+    auto *entity{ dynamic_cast<ast::Entity *>(design.units[0].get()) };
     REQUIRE(entity != nullptr);
     REQUIRE(entity->name == "MyEntity");
 

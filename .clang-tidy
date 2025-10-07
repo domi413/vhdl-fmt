@@ -1,4 +1,8 @@
 ---
+WarningsAsErrors: "*"
+UseColor: true
+FormatStyle: file
+
 Checks: >
   *,
   -altera-*,
@@ -60,5 +64,3 @@ CheckOptions:
     value: "lower_case"
   - key: readability-identifier-naming.MemberCase
     value: "lower_case"
-
-FormatStyle: file

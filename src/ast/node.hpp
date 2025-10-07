@@ -20,8 +20,8 @@ struct Comment
 
     std::string text;
     Kind kind;
-    int line = 0;
-    bool is_inline = false;
+    int line{ 0 };
+    bool is_inline{ false };
 };
 
 struct Node

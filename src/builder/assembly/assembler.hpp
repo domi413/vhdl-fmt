@@ -7,7 +7,6 @@
 
 #include <cassert>
 #include <concepts>
-#include <memory>
 #include <vector>
 
 namespace builder {
@@ -51,7 +50,7 @@ struct Assembler
         static_assert(std::derived_from<T, Node>, "T must derive from ast::Node");
         assert(!sinks.empty() && "No active sink");
 
-        auto node = std::make_unique<T>(std::forward<Args>(args)...);
+        auto node{ std::make_unique<T>(std::forward<Args>(args)...) };
         T &ref = *node;
         sinks.back()->push(std::move(node));
         return ref;
