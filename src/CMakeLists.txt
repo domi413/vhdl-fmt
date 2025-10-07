@@ -26,11 +26,19 @@ target_compile_options(
     PRIVATE
         -O3
         -Wall
-        -Wextra
-        -Wpedantic
+        -Wcast-align
         -Wconversion
-        -Wshadow
+        -Wdouble-promotion
         -Werror
-        -Wold-style-cast
+        -Wextra
+        -Wformat=2
+        -Wmisleading-indentation
         -Wnon-virtual-dtor
+        -Wnull-dereference
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpedantic
+        -Wshadow
+        -Wsign-conversion
+        -Wunused
 )
