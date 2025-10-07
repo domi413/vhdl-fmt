@@ -9,6 +9,9 @@ yaml-cpp/0.8.0
 [tool_requires]
 antlr4/4.13.1
 
+[tool_requires]
+antlr4/4.13.1
+
 [generators]
 CMakeDeps
 CMakeToolchain

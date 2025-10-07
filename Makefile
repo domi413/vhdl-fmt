@@ -34,6 +34,29 @@ run: $(BUILD_STAMP)
 test: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET)
 
+$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
+	@echo "Building project ($(BUILD_TYPE))..."
+	@cmake --preset $(CMAKE_PRESET)
+	@cmake --build --preset $(CMAKE_PRESET)
+	@touch $@
+	@echo "Build complete."
+
+$(CONAN_STAMP): conanfile.txt
+	@echo "Running Conan ($(BUILD_TYPE))..."
+	@conan install . \
+		-pr=clang.profile \
+		--build=missing \
+		-s build_type=$(BUILD_TYPE)
+	@touch $@
+
+conan: $(CONAN_STAMP)
+
+run: $(BUILD_STAMP)
+	@./$(TARGET) ./tests/data/simple.vhdl
+
+test: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET)
+
 # -----------------------------
 # Build rules
 # -----------------------------

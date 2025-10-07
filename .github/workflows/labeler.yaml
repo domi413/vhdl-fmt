@@ -23,7 +23,7 @@ jobs:
               '^build':    'build',
               '^chore':    'chore',
               '^ci':       'pipeline',
-              '^doc':      'documentation',
+              '^docs':     'documentation',
               '^feat':     'feature',
               '^fix':      'fix',
               '^perf':     'performance',
