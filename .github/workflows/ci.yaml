@@ -140,7 +140,7 @@ jobs:
         run: conan profile detect --force
 
       - name: Build
-        run: make build
+        run: make
 
       - name: Check formatting
         run: make check-format
@@ -148,5 +148,5 @@ jobs:
       - name: Run lint
         run: make lint
 
-      # - name: Run tests
-      #   run: make test
+      - name: Run tests
+        run: make test
