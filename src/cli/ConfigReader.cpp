@@ -3,6 +3,7 @@
 #include "Config.hpp"
 
 #include <cstdint>
+#include <exception>
 #include <expected>
 #include <filesystem>
 #include <stdexcept>
@@ -22,6 +23,12 @@ using PortMapMember = bool PortMapConfig::*;
 using DeclarationMember = bool DeclarationConfig::*;
 using CaseStyleMember = CaseStyle CasingConfig::*;
 
+// INFO: The following rules are suppressed because clang-tidy expects the map to be marked as
+// `constexpr`, which is not possible. A singleton pattern could be used to avoid the warning,
+// but redcues readability and doesn't have a relevant benefit.
+// ---
+// NOLINTBEGIN(fuchsia-statically-constructed-objects)
+// NOLINTBEGIN(cert-err58-cpp)
 const std::unordered_map<std::string_view, LineConfigMember> LINE_CONFIG_ASSIGNMENTS_MAP = {
     { "line_length", &LineConfig::line_length },
     { "indent_size", &LineConfig::indent_size },
@@ -58,6 +65,8 @@ const std::unordered_map<std::string_view, CaseStyleMember> CASING_ASSIGNMENTS_M
     { "constants",   &CasingConfig::constants   },
     { "identifiers", &CasingConfig::identifiers },
 };
+// NOLINTEND(cert-err58-cpp)
+// NOLINTEND(fuchsia-statically-constructed-objects)
 
 /// Checks if a node exists and is not null
 constexpr auto IS_VALID = [](const YAML::Node &node) -> bool { return node && !node.IsNull(); };

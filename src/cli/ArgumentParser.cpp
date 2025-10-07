@@ -3,6 +3,7 @@
 #include "version.hpp"
 
 #include <argparse/argparse.hpp>
+#include <exception>
 #include <filesystem>
 #include <iostream>
 #include <span>
