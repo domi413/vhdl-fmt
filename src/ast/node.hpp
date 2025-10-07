@@ -44,7 +44,7 @@ struct Node
     auto getComments() -> NodeComments & { return comments.emplace(); }
     [[nodiscard]] auto tryGetComments() const -> const std::optional<NodeComments> &
     {
-        return comments;
+        return this->comments;
     }
 
   private:

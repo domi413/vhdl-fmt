@@ -28,8 +28,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitAccess_type_definition(vhdlParser::Access_type_definitionContext *context)
-      -> std::any override
+    auto visitAccess_type_definition(vhdlParser::Access_type_definitionContext *context) -> std::any override
     {
         impl.visitAccessTypeDefinition(context);
         return {};
@@ -47,8 +46,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitActual_parameter_part(vhdlParser::Actual_parameter_partContext *context)
-      -> std::any override
+    auto visitActual_parameter_part(vhdlParser::Actual_parameter_partContext *context) -> std::any override
     {
         impl.visitActualParameterPart(context);
         return {};
@@ -102,36 +100,31 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitArchitecture_declarative_part(
-      vhdlParser::Architecture_declarative_partContext *context) -> std::any override
+    auto visitArchitecture_declarative_part(vhdlParser::Architecture_declarative_partContext *context) -> std::any override
     {
         impl.visitArchitectureDeclarativePart(context);
         return {};
     }
 
-    auto visitArchitecture_statement(vhdlParser::Architecture_statementContext *context)
-      -> std::any override
+    auto visitArchitecture_statement(vhdlParser::Architecture_statementContext *context) -> std::any override
     {
         impl.visitArchitectureStatement(context);
         return {};
     }
 
-    auto visitArchitecture_statement_part(vhdlParser::Architecture_statement_partContext *context)
-      -> std::any override
+    auto visitArchitecture_statement_part(vhdlParser::Architecture_statement_partContext *context) -> std::any override
     {
         impl.visitArchitectureStatementPart(context);
         return {};
     }
 
-    auto visitArray_nature_definition(vhdlParser::Array_nature_definitionContext *context)
-      -> std::any override
+    auto visitArray_nature_definition(vhdlParser::Array_nature_definitionContext *context) -> std::any override
     {
         impl.visitArrayNatureDefinition(context);
         return {};
     }
 
-    auto visitArray_type_definition(vhdlParser::Array_type_definitionContext *context)
-      -> std::any override
+    auto visitArray_type_definition(vhdlParser::Array_type_definitionContext *context) -> std::any override
     {
         impl.visitArrayTypeDefinition(context);
         return {};
@@ -143,15 +136,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitAssertion_statement(vhdlParser::Assertion_statementContext *context)
-      -> std::any override
+    auto visitAssertion_statement(vhdlParser::Assertion_statementContext *context) -> std::any override
     {
         impl.visitAssertionStatement(context);
         return {};
     }
 
-    auto visitAssociation_element(vhdlParser::Association_elementContext *context)
-      -> std::any override
+    auto visitAssociation_element(vhdlParser::Association_elementContext *context) -> std::any override
     {
         impl.visitAssociationElement(context);
         return {};
@@ -163,57 +154,49 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitAttribute_declaration(vhdlParser::Attribute_declarationContext *context)
-      -> std::any override
+    auto visitAttribute_declaration(vhdlParser::Attribute_declarationContext *context) -> std::any override
     {
         impl.visitAttributeDeclaration(context);
         return {};
     }
 
-    auto visitAttribute_designator(vhdlParser::Attribute_designatorContext *context)
-      -> std::any override
+    auto visitAttribute_designator(vhdlParser::Attribute_designatorContext *context) -> std::any override
     {
         impl.visitAttributeDesignator(context);
         return {};
     }
 
-    auto visitAttribute_specification(vhdlParser::Attribute_specificationContext *context)
-      -> std::any override
+    auto visitAttribute_specification(vhdlParser::Attribute_specificationContext *context) -> std::any override
     {
         impl.visitAttributeSpecification(context);
         return {};
     }
 
-    auto visitBase_unit_declaration(vhdlParser::Base_unit_declarationContext *context)
-      -> std::any override
+    auto visitBase_unit_declaration(vhdlParser::Base_unit_declarationContext *context) -> std::any override
     {
         impl.visitBaseUnitDeclaration(context);
         return {};
     }
 
-    auto visitBinding_indication(vhdlParser::Binding_indicationContext *context)
-      -> std::any override
+    auto visitBinding_indication(vhdlParser::Binding_indicationContext *context) -> std::any override
     {
         impl.visitBindingIndication(context);
         return {};
     }
 
-    auto visitBlock_configuration(vhdlParser::Block_configurationContext *context)
-      -> std::any override
+    auto visitBlock_configuration(vhdlParser::Block_configurationContext *context) -> std::any override
     {
         impl.visitBlockConfiguration(context);
         return {};
     }
 
-    auto visitBlock_declarative_item(vhdlParser::Block_declarative_itemContext *context)
-      -> std::any override
+    auto visitBlock_declarative_item(vhdlParser::Block_declarative_itemContext *context) -> std::any override
     {
         impl.visitBlockDeclarativeItem(context);
         return {};
     }
 
-    auto visitBlock_declarative_part(vhdlParser::Block_declarative_partContext *context)
-      -> std::any override
+    auto visitBlock_declarative_part(vhdlParser::Block_declarative_partContext *context) -> std::any override
     {
         impl.visitBlockDeclarativePart(context);
         return {};
@@ -225,8 +208,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitBlock_specification(vhdlParser::Block_specificationContext *context)
-      -> std::any override
+    auto visitBlock_specification(vhdlParser::Block_specificationContext *context) -> std::any override
     {
         impl.visitBlockSpecification(context);
         return {};
@@ -238,15 +220,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitBlock_statement_part(vhdlParser::Block_statement_partContext *context)
-      -> std::any override
+    auto visitBlock_statement_part(vhdlParser::Block_statement_partContext *context) -> std::any override
     {
         impl.visitBlockStatementPart(context);
         return {};
     }
 
-    auto visitBranch_quantity_declaration(vhdlParser::Branch_quantity_declarationContext *context)
-      -> std::any override
+    auto visitBranch_quantity_declaration(vhdlParser::Branch_quantity_declarationContext *context) -> std::any override
     {
         impl.visitBranchQuantityDeclaration(context);
         return {};
@@ -264,8 +244,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitBreak_selector_clause(vhdlParser::Break_selector_clauseContext *context)
-      -> std::any override
+    auto visitBreak_selector_clause(vhdlParser::Break_selector_clauseContext *context) -> std::any override
     {
         impl.visitBreakSelectorClause(context);
         return {};
@@ -283,8 +262,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitCase_statement_alternative(vhdlParser::Case_statement_alternativeContext *context)
-      -> std::any override
+    auto visitCase_statement_alternative(vhdlParser::Case_statement_alternativeContext *context) -> std::any override
     {
         impl.visitCaseStatementAlternative(context);
         return {};
@@ -302,71 +280,61 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitComponent_configuration(vhdlParser::Component_configurationContext *context)
-      -> std::any override
+    auto visitComponent_configuration(vhdlParser::Component_configurationContext *context) -> std::any override
     {
         impl.visitComponentConfiguration(context);
         return {};
     }
 
-    auto visitComponent_declaration(vhdlParser::Component_declarationContext *context)
-      -> std::any override
+    auto visitComponent_declaration(vhdlParser::Component_declarationContext *context) -> std::any override
     {
         impl.visitComponentDeclaration(context);
         return {};
     }
 
-    auto visitComponent_instantiation_statement(
-      vhdlParser::Component_instantiation_statementContext *context) -> std::any override
+    auto visitComponent_instantiation_statement(vhdlParser::Component_instantiation_statementContext *context) -> std::any override
     {
         impl.visitComponentInstantiationStatement(context);
         return {};
     }
 
-    auto visitComponent_specification(vhdlParser::Component_specificationContext *context)
-      -> std::any override
+    auto visitComponent_specification(vhdlParser::Component_specificationContext *context) -> std::any override
     {
         impl.visitComponentSpecification(context);
         return {};
     }
 
-    auto visitComposite_nature_definition(vhdlParser::Composite_nature_definitionContext *context)
-      -> std::any override
+    auto visitComposite_nature_definition(vhdlParser::Composite_nature_definitionContext *context) -> std::any override
     {
         impl.visitCompositeNatureDefinition(context);
         return {};
     }
 
-    auto visitComposite_type_definition(vhdlParser::Composite_type_definitionContext *context)
-      -> std::any override
+    auto visitComposite_type_definition(vhdlParser::Composite_type_definitionContext *context) -> std::any override
     {
         impl.visitCompositeTypeDefinition(context);
         return {};
     }
 
-    auto visitConcurrent_assertion_statement(
-      vhdlParser::Concurrent_assertion_statementContext *context) -> std::any override
+    auto visitConcurrent_assertion_statement(vhdlParser::Concurrent_assertion_statementContext *context) -> std::any override
     {
         impl.visitConcurrentAssertionStatement(context);
         return {};
     }
 
-    auto visitConcurrent_break_statement(vhdlParser::Concurrent_break_statementContext *context)
-      -> std::any override
+    auto visitConcurrent_break_statement(vhdlParser::Concurrent_break_statementContext *context) -> std::any override
     {
         impl.visitConcurrentBreakStatement(context);
         return {};
     }
 
-    auto visitConcurrent_procedure_call_statement(
-      vhdlParser::Concurrent_procedure_call_statementContext *context) -> std::any override
+    auto visitConcurrent_procedure_call_statement(vhdlParser::Concurrent_procedure_call_statementContext *context) -> std::any override
     {
         impl.visitConcurrentProcedureCallStatement(context);
         return {};
     }
 
-    auto visitConcurrent_signal_assignment_statement(
-      vhdlParser::Concurrent_signal_assignment_statementContext *context) -> std::any override
+    auto visitConcurrent_signal_assignment_statement(vhdlParser::Concurrent_signal_assignment_statementContext *context) -> std::any override
     {
         impl.visitConcurrentSignalAssignmentStatement(context);
         return {};
@@ -384,71 +352,61 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitConditional_signal_assignment(
-      vhdlParser::Conditional_signal_assignmentContext *context) -> std::any override
+    auto visitConditional_signal_assignment(vhdlParser::Conditional_signal_assignmentContext *context) -> std::any override
     {
         impl.visitConditionalSignalAssignment(context);
         return {};
     }
 
-    auto visitConditional_waveforms(vhdlParser::Conditional_waveformsContext *context)
-      -> std::any override
+    auto visitConditional_waveforms(vhdlParser::Conditional_waveformsContext *context) -> std::any override
     {
         impl.visitConditionalWaveforms(context);
         return {};
     }
 
-    auto visitConfiguration_declaration(vhdlParser::Configuration_declarationContext *context)
-      -> std::any override
+    auto visitConfiguration_declaration(vhdlParser::Configuration_declarationContext *context) -> std::any override
     {
         impl.visitConfigurationDeclaration(context);
         return {};
     }
 
-    auto visitConfiguration_declarative_item(
-      vhdlParser::Configuration_declarative_itemContext *context) -> std::any override
+    auto visitConfiguration_declarative_item(vhdlParser::Configuration_declarative_itemContext *context) -> std::any override
     {
         impl.visitConfigurationDeclarativeItem(context);
         return {};
     }
 
-    auto visitConfiguration_declarative_part(
-      vhdlParser::Configuration_declarative_partContext *context) -> std::any override
+    auto visitConfiguration_declarative_part(vhdlParser::Configuration_declarative_partContext *context) -> std::any override
     {
         impl.visitConfigurationDeclarativePart(context);
         return {};
     }
 
-    auto visitConfiguration_item(vhdlParser::Configuration_itemContext *context)
-      -> std::any override
+    auto visitConfiguration_item(vhdlParser::Configuration_itemContext *context) -> std::any override
     {
         impl.visitConfigurationItem(context);
         return {};
     }
 
-    auto visitConfiguration_specification(vhdlParser::Configuration_specificationContext *context)
-      -> std::any override
+    auto visitConfiguration_specification(vhdlParser::Configuration_specificationContext *context) -> std::any override
     {
         impl.visitConfigurationSpecification(context);
         return {};
     }
 
-    auto visitConstant_declaration(vhdlParser::Constant_declarationContext *context)
-      -> std::any override
+    auto visitConstant_declaration(vhdlParser::Constant_declarationContext *context) -> std::any override
     {
         impl.visitConstantDeclaration(context);
         return {};
     }
 
-    auto visitConstrained_array_definition(vhdlParser::Constrained_array_definitionContext *context)
-      -> std::any override
+    auto visitConstrained_array_definition(vhdlParser::Constrained_array_definitionContext *context) -> std::any override
     {
         impl.visitConstrainedArrayDefinition(context);
         return {};
     }
 
-    auto visitConstrained_nature_definition(
-      vhdlParser::Constrained_nature_definitionContext *context) -> std::any override
+    auto visitConstrained_nature_definition(vhdlParser::Constrained_nature_definitionContext *context) -> std::any override
     {
         impl.visitConstrainedNatureDefinition(context);
         return {};
@@ -502,8 +460,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitDisconnection_specification(vhdlParser::Disconnection_specificationContext *context)
-      -> std::any override
+    auto visitDisconnection_specification(vhdlParser::Disconnection_specificationContext *context) -> std::any override
     {
         impl.visitDisconnectionSpecification(context);
         return {};
@@ -515,29 +472,25 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitElement_association(vhdlParser::Element_associationContext *context)
-      -> std::any override
+    auto visitElement_association(vhdlParser::Element_associationContext *context) -> std::any override
     {
         impl.visitElementAssociation(context);
         return {};
     }
 
-    auto visitElement_declaration(vhdlParser::Element_declarationContext *context)
-      -> std::any override
+    auto visitElement_declaration(vhdlParser::Element_declarationContext *context) -> std::any override
     {
         impl.visitElementDeclaration(context);
         return {};
     }
 
-    auto visitElement_subnature_definition(vhdlParser::Element_subnature_definitionContext *context)
-      -> std::any override
+    auto visitElement_subnature_definition(vhdlParser::Element_subnature_definitionContext *context) -> std::any override
     {
         impl.visitElementSubnatureDefinition(context);
         return {};
     }
 
-    auto visitElement_subtype_definition(vhdlParser::Element_subtype_definitionContext *context)
-      -> std::any override
+    auto visitElement_subtype_definition(vhdlParser::Element_subtype_definitionContext *context) -> std::any override
     {
         impl.visitElementSubtypeDefinition(context);
         return {};
@@ -555,36 +508,31 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitEntity_class_entry(vhdlParser::Entity_class_entryContext *context)
-      -> std::any override
+    auto visitEntity_class_entry(vhdlParser::Entity_class_entryContext *context) -> std::any override
     {
         impl.visitEntityClassEntry(context);
         return {};
     }
 
-    auto visitEntity_class_entry_list(vhdlParser::Entity_class_entry_listContext *context)
-      -> std::any override
+    auto visitEntity_class_entry_list(vhdlParser::Entity_class_entry_listContext *context) -> std::any override
     {
         impl.visitEntityClassEntryList(context);
         return {};
     }
 
-    auto visitEntity_declaration(vhdlParser::Entity_declarationContext *context)
-      -> std::any override
+    auto visitEntity_declaration(vhdlParser::Entity_declarationContext *context) -> std::any override
     {
         impl.visitEntityDeclaration(context);
         return {};
     }
 
-    auto visitEntity_declarative_item(vhdlParser::Entity_declarative_itemContext *context)
-      -> std::any override
+    auto visitEntity_declarative_item(vhdlParser::Entity_declarative_itemContext *context) -> std::any override
     {
         impl.visitEntityDeclarativeItem(context);
         return {};
     }
 
-    auto visitEntity_declarative_part(vhdlParser::Entity_declarative_partContext *context)
-      -> std::any override
+    auto visitEntity_declarative_part(vhdlParser::Entity_declarative_partContext *context) -> std::any override
     {
         impl.visitEntityDeclarativePart(context);
         return {};
@@ -608,8 +556,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitEntity_specification(vhdlParser::Entity_specificationContext *context)
-      -> std::any override
+    auto visitEntity_specification(vhdlParser::Entity_specificationContext *context) -> std::any override
     {
         impl.visitEntitySpecification(context);
         return {};
@@ -621,8 +568,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitEntity_statement_part(vhdlParser::Entity_statement_partContext *context)
-      -> std::any override
+    auto visitEntity_statement_part(vhdlParser::Entity_statement_partContext *context) -> std::any override
     {
         impl.visitEntityStatementPart(context);
         return {};
@@ -634,15 +580,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitEnumeration_literal(vhdlParser::Enumeration_literalContext *context)
-      -> std::any override
+    auto visitEnumeration_literal(vhdlParser::Enumeration_literalContext *context) -> std::any override
     {
         impl.visitEnumerationLiteral(context);
         return {};
     }
 
-    auto visitEnumeration_type_definition(vhdlParser::Enumeration_type_definitionContext *context)
-      -> std::any override
+    auto visitEnumeration_type_definition(vhdlParser::Enumeration_type_definitionContext *context) -> std::any override
     {
         impl.visitEnumerationTypeDefinition(context);
         return {};
@@ -678,22 +622,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitFile_open_information(vhdlParser::File_open_informationContext *context)
-      -> std::any override
+    auto visitFile_open_information(vhdlParser::File_open_informationContext *context) -> std::any override
     {
         impl.visitFileOpenInformation(context);
         return {};
     }
 
-    auto visitFile_type_definition(vhdlParser::File_type_definitionContext *context)
-      -> std::any override
+    auto visitFile_type_definition(vhdlParser::File_type_definitionContext *context) -> std::any override
     {
         impl.visitFileTypeDefinition(context);
         return {};
     }
 
-    auto visitFormal_parameter_list(vhdlParser::Formal_parameter_listContext *context)
-      -> std::any override
+    auto visitFormal_parameter_list(vhdlParser::Formal_parameter_listContext *context) -> std::any override
     {
         impl.visitFormalParameterList(context);
         return {};
@@ -705,15 +646,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitFree_quantity_declaration(vhdlParser::Free_quantity_declarationContext *context)
-      -> std::any override
+    auto visitFree_quantity_declaration(vhdlParser::Free_quantity_declarationContext *context) -> std::any override
     {
         impl.visitFreeQuantityDeclaration(context);
         return {};
     }
 
-    auto visitGenerate_statement(vhdlParser::Generate_statementContext *context)
-      -> std::any override
+    auto visitGenerate_statement(vhdlParser::Generate_statementContext *context) -> std::any override
     {
         impl.visitGenerateStatement(context);
         return {};
@@ -737,8 +676,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitGeneric_map_aspect(vhdlParser::Generic_map_aspectContext *context)
-      -> std::any override
+    auto visitGeneric_map_aspect(vhdlParser::Generic_map_aspectContext *context) -> std::any override
     {
         impl.visitGenericMapAspect(context);
         return {};
@@ -750,8 +688,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitGroup_constituent_list(vhdlParser::Group_constituent_listContext *context)
-      -> std::any override
+    auto visitGroup_constituent_list(vhdlParser::Group_constituent_listContext *context) -> std::any override
     {
         impl.visitGroupConstituentList(context);
         return {};
@@ -763,15 +700,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitGroup_template_declaration(vhdlParser::Group_template_declarationContext *context)
-      -> std::any override
+    auto visitGroup_template_declaration(vhdlParser::Group_template_declarationContext *context) -> std::any override
     {
         impl.visitGroupTemplateDeclaration(context);
         return {};
     }
 
-    auto visitGuarded_signal_specification(vhdlParser::Guarded_signal_specificationContext *context)
-      -> std::any override
+    auto visitGuarded_signal_specification(vhdlParser::Guarded_signal_specificationContext *context) -> std::any override
     {
         impl.visitGuardedSignalSpecification(context);
         return {};
@@ -801,15 +736,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitIndex_specification(vhdlParser::Index_specificationContext *context)
-      -> std::any override
+    auto visitIndex_specification(vhdlParser::Index_specificationContext *context) -> std::any override
     {
         impl.visitIndexSpecification(context);
         return {};
     }
 
-    auto visitIndex_subtype_definition(vhdlParser::Index_subtype_definitionContext *context)
-      -> std::any override
+    auto visitIndex_subtype_definition(vhdlParser::Index_subtype_definitionContext *context) -> std::any override
     {
         impl.visitIndexSubtypeDefinition(context);
         return {};
@@ -821,22 +754,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitInstantiation_list(vhdlParser::Instantiation_listContext *context)
-      -> std::any override
+    auto visitInstantiation_list(vhdlParser::Instantiation_listContext *context) -> std::any override
     {
         impl.visitInstantiationList(context);
         return {};
     }
 
-    auto visitInterface_constant_declaration(
-      vhdlParser::Interface_constant_declarationContext *context) -> std::any override
+    auto visitInterface_constant_declaration(vhdlParser::Interface_constant_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceConstantDeclaration(context);
         return {};
     }
 
-    auto visitInterface_declaration(vhdlParser::Interface_declarationContext *context)
-      -> std::any override
+    auto visitInterface_declaration(vhdlParser::Interface_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceDeclaration(context);
         return {};
@@ -848,22 +778,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitInterface_file_declaration(vhdlParser::Interface_file_declarationContext *context)
-      -> std::any override
+    auto visitInterface_file_declaration(vhdlParser::Interface_file_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceFileDeclaration(context);
         return {};
     }
 
-    auto visitInterface_signal_list(vhdlParser::Interface_signal_listContext *context)
-      -> std::any override
+    auto visitInterface_signal_list(vhdlParser::Interface_signal_listContext *context) -> std::any override
     {
         impl.visitInterfaceSignalList(context);
         return {};
     }
 
-    auto visitInterface_port_list(vhdlParser::Interface_port_listContext *context)
-      -> std::any override
+    auto visitInterface_port_list(vhdlParser::Interface_port_listContext *context) -> std::any override
     {
         impl.visitInterfacePortList(context);
         return {};
@@ -875,36 +802,31 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitInterface_quantity_declaration(
-      vhdlParser::Interface_quantity_declarationContext *context) -> std::any override
+    auto visitInterface_quantity_declaration(vhdlParser::Interface_quantity_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceQuantityDeclaration(context);
         return {};
     }
 
-    auto visitInterface_port_declaration(vhdlParser::Interface_port_declarationContext *context)
-      -> std::any override
+    auto visitInterface_port_declaration(vhdlParser::Interface_port_declarationContext *context) -> std::any override
     {
         impl.visitInterfacePortDeclaration(context);
         return {};
     }
 
-    auto visitInterface_signal_declaration(vhdlParser::Interface_signal_declarationContext *context)
-      -> std::any override
+    auto visitInterface_signal_declaration(vhdlParser::Interface_signal_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceSignalDeclaration(context);
         return {};
     }
 
-    auto visitInterface_terminal_declaration(
-      vhdlParser::Interface_terminal_declarationContext *context) -> std::any override
+    auto visitInterface_terminal_declaration(vhdlParser::Interface_terminal_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceTerminalDeclaration(context);
         return {};
     }
 
-    auto visitInterface_variable_declaration(
-      vhdlParser::Interface_variable_declarationContext *context) -> std::any override
+    auto visitInterface_variable_declaration(vhdlParser::Interface_variable_declarationContext *context) -> std::any override
     {
         impl.visitInterfaceVariableDeclaration(context);
         return {};
@@ -970,8 +892,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitMultiplying_operator(vhdlParser::Multiplying_operatorContext *context)
-      -> std::any override
+    auto visitMultiplying_operator(vhdlParser::Multiplying_operatorContext *context) -> std::any override
     {
         impl.visitMultiplyingOperator(context);
         return {};
@@ -995,15 +916,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSelected_name_part(vhdlParser::Selected_name_partContext *context)
-      -> std::any override
+    auto visitSelected_name_part(vhdlParser::Selected_name_partContext *context) -> std::any override
     {
         impl.visitSelectedNamePart(context);
         return {};
     }
 
-    auto visitFunction_call_or_indexed_name_part(
-      vhdlParser::Function_call_or_indexed_name_partContext *context) -> std::any override
+    auto visitFunction_call_or_indexed_name_part(vhdlParser::Function_call_or_indexed_name_partContext *context) -> std::any override
     {
         impl.visitFunctionCallOrIndexedNamePart(context);
         return {};
@@ -1015,15 +934,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitAttribute_name_part(vhdlParser::Attribute_name_partContext *context)
-      -> std::any override
+    auto visitAttribute_name_part(vhdlParser::Attribute_name_partContext *context) -> std::any override
     {
         impl.visitAttributeNamePart(context);
         return {};
     }
 
-    auto visitNature_declaration(vhdlParser::Nature_declarationContext *context)
-      -> std::any override
+    auto visitNature_declaration(vhdlParser::Nature_declarationContext *context) -> std::any override
     {
         impl.visitNatureDeclaration(context);
         return {};
@@ -1035,8 +952,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitNature_element_declaration(vhdlParser::Nature_element_declarationContext *context)
-      -> std::any override
+    auto visitNature_element_declaration(vhdlParser::Nature_element_declarationContext *context) -> std::any override
     {
         impl.visitNatureElementDeclaration(context);
         return {};
@@ -1054,8 +970,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitObject_declaration(vhdlParser::Object_declarationContext *context)
-      -> std::any override
+    auto visitObject_declaration(vhdlParser::Object_declarationContext *context) -> std::any override
     {
         impl.visitObjectDeclaration(context);
         return {};
@@ -1073,43 +988,37 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitPackage_body_declarative_item(
-      vhdlParser::Package_body_declarative_itemContext *context) -> std::any override
+    auto visitPackage_body_declarative_item(vhdlParser::Package_body_declarative_itemContext *context) -> std::any override
     {
         impl.visitPackageBodyDeclarativeItem(context);
         return {};
     }
 
-    auto visitPackage_body_declarative_part(
-      vhdlParser::Package_body_declarative_partContext *context) -> std::any override
+    auto visitPackage_body_declarative_part(vhdlParser::Package_body_declarative_partContext *context) -> std::any override
     {
         impl.visitPackageBodyDeclarativePart(context);
         return {};
     }
 
-    auto visitPackage_declaration(vhdlParser::Package_declarationContext *context)
-      -> std::any override
+    auto visitPackage_declaration(vhdlParser::Package_declarationContext *context) -> std::any override
     {
         impl.visitPackageDeclaration(context);
         return {};
     }
 
-    auto visitPackage_declarative_item(vhdlParser::Package_declarative_itemContext *context)
-      -> std::any override
+    auto visitPackage_declarative_item(vhdlParser::Package_declarative_itemContext *context) -> std::any override
     {
         impl.visitPackageDeclarativeItem(context);
         return {};
     }
 
-    auto visitPackage_declarative_part(vhdlParser::Package_declarative_partContext *context)
-      -> std::any override
+    auto visitPackage_declarative_part(vhdlParser::Package_declarative_partContext *context) -> std::any override
     {
         impl.visitPackageDeclarativePart(context);
         return {};
     }
 
-    auto visitParameter_specification(vhdlParser::Parameter_specificationContext *context)
-      -> std::any override
+    auto visitParameter_specification(vhdlParser::Parameter_specificationContext *context) -> std::any override
     {
         impl.visitParameterSpecification(context);
         return {};
@@ -1121,8 +1030,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitPhysical_type_definition(vhdlParser::Physical_type_definitionContext *context)
-      -> std::any override
+    auto visitPhysical_type_definition(vhdlParser::Physical_type_definitionContext *context) -> std::any override
     {
         impl.visitPhysicalTypeDefinition(context);
         return {};
@@ -1158,22 +1066,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitProcedural_declarative_item(vhdlParser::Procedural_declarative_itemContext *context)
-      -> std::any override
+    auto visitProcedural_declarative_item(vhdlParser::Procedural_declarative_itemContext *context) -> std::any override
     {
         impl.visitProceduralDeclarativeItem(context);
         return {};
     }
 
-    auto visitProcedural_declarative_part(vhdlParser::Procedural_declarative_partContext *context)
-      -> std::any override
+    auto visitProcedural_declarative_part(vhdlParser::Procedural_declarative_partContext *context) -> std::any override
     {
         impl.visitProceduralDeclarativePart(context);
         return {};
     }
 
-    auto visitProcedural_statement_part(vhdlParser::Procedural_statement_partContext *context)
-      -> std::any override
+    auto visitProcedural_statement_part(vhdlParser::Procedural_statement_partContext *context) -> std::any override
     {
         impl.visitProceduralStatementPart(context);
         return {};
@@ -1185,22 +1090,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitProcedure_call_statement(vhdlParser::Procedure_call_statementContext *context)
-      -> std::any override
+    auto visitProcedure_call_statement(vhdlParser::Procedure_call_statementContext *context) -> std::any override
     {
         impl.visitProcedureCallStatement(context);
         return {};
     }
 
-    auto visitProcess_declarative_item(vhdlParser::Process_declarative_itemContext *context)
-      -> std::any override
+    auto visitProcess_declarative_item(vhdlParser::Process_declarative_itemContext *context) -> std::any override
     {
         impl.visitProcessDeclarativeItem(context);
         return {};
     }
 
-    auto visitProcess_declarative_part(vhdlParser::Process_declarative_partContext *context)
-      -> std::any override
+    auto visitProcess_declarative_part(vhdlParser::Process_declarative_partContext *context) -> std::any override
     {
         impl.visitProcessDeclarativePart(context);
         return {};
@@ -1212,22 +1114,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitProcess_statement_part(vhdlParser::Process_statement_partContext *context)
-      -> std::any override
+    auto visitProcess_statement_part(vhdlParser::Process_statement_partContext *context) -> std::any override
     {
         impl.visitProcessStatementPart(context);
         return {};
     }
 
-    auto visitQualified_expression(vhdlParser::Qualified_expressionContext *context)
-      -> std::any override
+    auto visitQualified_expression(vhdlParser::Qualified_expressionContext *context) -> std::any override
     {
         impl.visitQualifiedExpression(context);
         return {};
     }
 
-    auto visitQuantity_declaration(vhdlParser::Quantity_declarationContext *context)
-      -> std::any override
+    auto visitQuantity_declaration(vhdlParser::Quantity_declarationContext *context) -> std::any override
     {
         impl.visitQuantityDeclaration(context);
         return {};
@@ -1239,8 +1138,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitQuantity_specification(vhdlParser::Quantity_specificationContext *context)
-      -> std::any override
+    auto visitQuantity_specification(vhdlParser::Quantity_specificationContext *context) -> std::any override
     {
         impl.visitQuantitySpecification(context);
         return {};
@@ -1264,15 +1162,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitRecord_nature_definition(vhdlParser::Record_nature_definitionContext *context)
-      -> std::any override
+    auto visitRecord_nature_definition(vhdlParser::Record_nature_definitionContext *context) -> std::any override
     {
         impl.visitRecordNatureDefinition(context);
         return {};
     }
 
-    auto visitRecord_type_definition(vhdlParser::Record_type_definitionContext *context)
-      -> std::any override
+    auto visitRecord_type_definition(vhdlParser::Record_type_definitionContext *context) -> std::any override
     {
         impl.visitRecordTypeDefinition(context);
         return {};
@@ -1284,8 +1180,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitRelational_operator(vhdlParser::Relational_operatorContext *context)
-      -> std::any override
+    auto visitRelational_operator(vhdlParser::Relational_operatorContext *context) -> std::any override
     {
         impl.visitRelationalOperator(context);
         return {};
@@ -1303,15 +1198,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitScalar_nature_definition(vhdlParser::Scalar_nature_definitionContext *context)
-      -> std::any override
+    auto visitScalar_nature_definition(vhdlParser::Scalar_nature_definitionContext *context) -> std::any override
     {
         impl.visitScalarNatureDefinition(context);
         return {};
     }
 
-    auto visitScalar_type_definition(vhdlParser::Scalar_type_definitionContext *context)
-      -> std::any override
+    auto visitScalar_type_definition(vhdlParser::Scalar_type_definitionContext *context) -> std::any override
     {
         impl.visitScalarTypeDefinition(context);
         return {};
@@ -1323,29 +1216,25 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSecondary_unit_declaration(vhdlParser::Secondary_unit_declarationContext *context)
-      -> std::any override
+    auto visitSecondary_unit_declaration(vhdlParser::Secondary_unit_declarationContext *context) -> std::any override
     {
         impl.visitSecondaryUnitDeclaration(context);
         return {};
     }
 
-    auto visitSelected_signal_assignment(vhdlParser::Selected_signal_assignmentContext *context)
-      -> std::any override
+    auto visitSelected_signal_assignment(vhdlParser::Selected_signal_assignmentContext *context) -> std::any override
     {
         impl.visitSelectedSignalAssignment(context);
         return {};
     }
 
-    auto visitSelected_waveforms(vhdlParser::Selected_waveformsContext *context)
-      -> std::any override
+    auto visitSelected_waveforms(vhdlParser::Selected_waveformsContext *context) -> std::any override
     {
         impl.visitSelectedWaveforms(context);
         return {};
     }
 
-    auto visitSensitivity_clause(vhdlParser::Sensitivity_clauseContext *context)
-      -> std::any override
+    auto visitSensitivity_clause(vhdlParser::Sensitivity_clauseContext *context) -> std::any override
     {
         impl.visitSensitivityClause(context);
         return {};
@@ -1357,15 +1246,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSequence_of_statements(vhdlParser::Sequence_of_statementsContext *context)
-      -> std::any override
+    auto visitSequence_of_statements(vhdlParser::Sequence_of_statementsContext *context) -> std::any override
     {
         impl.visitSequenceOfStatements(context);
         return {};
     }
 
-    auto visitSequential_statement(vhdlParser::Sequential_statementContext *context)
-      -> std::any override
+    auto visitSequential_statement(vhdlParser::Sequential_statementContext *context) -> std::any override
     {
         impl.visitSequentialStatement(context);
         return {};
@@ -1383,15 +1270,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSignal_assignment_statement(vhdlParser::Signal_assignment_statementContext *context)
-      -> std::any override
+    auto visitSignal_assignment_statement(vhdlParser::Signal_assignment_statementContext *context) -> std::any override
     {
         impl.visitSignalAssignmentStatement(context);
         return {};
     }
 
-    auto visitSignal_declaration(vhdlParser::Signal_declarationContext *context)
-      -> std::any override
+    auto visitSignal_declaration(vhdlParser::Signal_declarationContext *context) -> std::any override
     {
         impl.visitSignalDeclaration(context);
         return {};
@@ -1421,50 +1306,43 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSimple_simultaneous_statement(
-      vhdlParser::Simple_simultaneous_statementContext *context) -> std::any override
+    auto visitSimple_simultaneous_statement(vhdlParser::Simple_simultaneous_statementContext *context) -> std::any override
     {
         impl.visitSimpleSimultaneousStatement(context);
         return {};
     }
 
-    auto visitSimultaneous_alternative(vhdlParser::Simultaneous_alternativeContext *context)
-      -> std::any override
+    auto visitSimultaneous_alternative(vhdlParser::Simultaneous_alternativeContext *context) -> std::any override
     {
         impl.visitSimultaneousAlternative(context);
         return {};
     }
 
-    auto visitSimultaneous_case_statement(vhdlParser::Simultaneous_case_statementContext *context)
-      -> std::any override
+    auto visitSimultaneous_case_statement(vhdlParser::Simultaneous_case_statementContext *context) -> std::any override
     {
         impl.visitSimultaneousCaseStatement(context);
         return {};
     }
 
-    auto visitSimultaneous_if_statement(vhdlParser::Simultaneous_if_statementContext *context)
-      -> std::any override
+    auto visitSimultaneous_if_statement(vhdlParser::Simultaneous_if_statementContext *context) -> std::any override
     {
         impl.visitSimultaneousIfStatement(context);
         return {};
     }
 
-    auto visitSimultaneous_procedural_statement(
-      vhdlParser::Simultaneous_procedural_statementContext *context) -> std::any override
+    auto visitSimultaneous_procedural_statement(vhdlParser::Simultaneous_procedural_statementContext *context) -> std::any override
     {
         impl.visitSimultaneousProceduralStatement(context);
         return {};
     }
 
-    auto visitSimultaneous_statement(vhdlParser::Simultaneous_statementContext *context)
-      -> std::any override
+    auto visitSimultaneous_statement(vhdlParser::Simultaneous_statementContext *context) -> std::any override
     {
         impl.visitSimultaneousStatement(context);
         return {};
     }
 
-    auto visitSimultaneous_statement_part(vhdlParser::Simultaneous_statement_partContext *context)
-      -> std::any override
+    auto visitSimultaneous_statement_part(vhdlParser::Simultaneous_statement_partContext *context) -> std::any override
     {
         impl.visitSimultaneousStatementPart(context);
         return {};
@@ -1476,29 +1354,25 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSource_quantity_declaration(vhdlParser::Source_quantity_declarationContext *context)
-      -> std::any override
+    auto visitSource_quantity_declaration(vhdlParser::Source_quantity_declarationContext *context) -> std::any override
     {
         impl.visitSourceQuantityDeclaration(context);
         return {};
     }
 
-    auto visitStep_limit_specification(vhdlParser::Step_limit_specificationContext *context)
-      -> std::any override
+    auto visitStep_limit_specification(vhdlParser::Step_limit_specificationContext *context) -> std::any override
     {
         impl.visitStepLimitSpecification(context);
         return {};
     }
 
-    auto visitSubnature_declaration(vhdlParser::Subnature_declarationContext *context)
-      -> std::any override
+    auto visitSubnature_declaration(vhdlParser::Subnature_declarationContext *context) -> std::any override
     {
         impl.visitSubnatureDeclaration(context);
         return {};
     }
 
-    auto visitSubnature_indication(vhdlParser::Subnature_indicationContext *context)
-      -> std::any override
+    auto visitSubnature_indication(vhdlParser::Subnature_indicationContext *context) -> std::any override
     {
         impl.visitSubnatureIndication(context);
         return {};
@@ -1510,22 +1384,19 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSubprogram_declaration(vhdlParser::Subprogram_declarationContext *context)
-      -> std::any override
+    auto visitSubprogram_declaration(vhdlParser::Subprogram_declarationContext *context) -> std::any override
     {
         impl.visitSubprogramDeclaration(context);
         return {};
     }
 
-    auto visitSubprogram_declarative_item(vhdlParser::Subprogram_declarative_itemContext *context)
-      -> std::any override
+    auto visitSubprogram_declarative_item(vhdlParser::Subprogram_declarative_itemContext *context) -> std::any override
     {
         impl.visitSubprogramDeclarativeItem(context);
         return {};
     }
 
-    auto visitSubprogram_declarative_part(vhdlParser::Subprogram_declarative_partContext *context)
-      -> std::any override
+    auto visitSubprogram_declarative_part(vhdlParser::Subprogram_declarative_partContext *context) -> std::any override
     {
         impl.visitSubprogramDeclarativePart(context);
         return {};
@@ -1537,43 +1408,37 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitSubprogram_specification(vhdlParser::Subprogram_specificationContext *context)
-      -> std::any override
+    auto visitSubprogram_specification(vhdlParser::Subprogram_specificationContext *context) -> std::any override
     {
         impl.visitSubprogramSpecification(context);
         return {};
     }
 
-    auto visitProcedure_specification(vhdlParser::Procedure_specificationContext *context)
-      -> std::any override
+    auto visitProcedure_specification(vhdlParser::Procedure_specificationContext *context) -> std::any override
     {
         impl.visitProcedureSpecification(context);
         return {};
     }
 
-    auto visitFunction_specification(vhdlParser::Function_specificationContext *context)
-      -> std::any override
+    auto visitFunction_specification(vhdlParser::Function_specificationContext *context) -> std::any override
     {
         impl.visitFunctionSpecification(context);
         return {};
     }
 
-    auto visitSubprogram_statement_part(vhdlParser::Subprogram_statement_partContext *context)
-      -> std::any override
+    auto visitSubprogram_statement_part(vhdlParser::Subprogram_statement_partContext *context) -> std::any override
     {
         impl.visitSubprogramStatementPart(context);
         return {};
     }
 
-    auto visitSubtype_declaration(vhdlParser::Subtype_declarationContext *context)
-      -> std::any override
+    auto visitSubtype_declaration(vhdlParser::Subtype_declarationContext *context) -> std::any override
     {
         impl.visitSubtypeDeclaration(context);
         return {};
     }
 
-    auto visitSubtype_indication(vhdlParser::Subtype_indicationContext *context)
-      -> std::any override
+    auto visitSubtype_indication(vhdlParser::Subtype_indicationContext *context) -> std::any override
     {
         impl.visitSubtypeIndication(context);
         return {};
@@ -1603,8 +1468,7 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitTerminal_declaration(vhdlParser::Terminal_declarationContext *context)
-      -> std::any override
+    auto visitTerminal_declaration(vhdlParser::Terminal_declarationContext *context) -> std::any override
     {
         impl.visitTerminalDeclaration(context);
         return {};
@@ -1640,15 +1504,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitUnconstrained_array_definition(
-      vhdlParser::Unconstrained_array_definitionContext *context) -> std::any override
+    auto visitUnconstrained_array_definition(vhdlParser::Unconstrained_array_definitionContext *context) -> std::any override
     {
         impl.visitUnconstrainedArrayDefinition(context);
         return {};
     }
 
-    auto visitUnconstrained_nature_definition(
-      vhdlParser::Unconstrained_nature_definitionContext *context) -> std::any override
+    auto visitUnconstrained_nature_definition(vhdlParser::Unconstrained_nature_definitionContext *context) -> std::any override
     {
         impl.visitUnconstrainedNatureDefinition(context);
         return {};
@@ -1660,15 +1522,13 @@ class AntlrVoidAdapter : public vhdlBaseVisitor
         return {};
     }
 
-    auto visitVariable_assignment_statement(
-      vhdlParser::Variable_assignment_statementContext *context) -> std::any override
+    auto visitVariable_assignment_statement(vhdlParser::Variable_assignment_statementContext *context) -> std::any override
     {
         impl.visitVariableAssignmentStatement(context);
         return {};
     }
 
-    auto visitVariable_declaration(vhdlParser::Variable_declarationContext *context)
-      -> std::any override
+    auto visitVariable_declaration(vhdlParser::Variable_declarationContext *context) -> std::any override
     {
         impl.visitVariableDeclaration(context);
         return {};
