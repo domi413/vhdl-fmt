@@ -14,7 +14,7 @@
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/parse.h>
 
-namespace vhdl_fmt {
+namespace cli {
 
 namespace {
 
@@ -251,4 +251,4 @@ auto ConfigReader::readCasingConfig(const YAML::Node &root_node, const CasingCon
     return casing;
 }
 
-} // namespace vhdl_fmt
+} // namespace cli

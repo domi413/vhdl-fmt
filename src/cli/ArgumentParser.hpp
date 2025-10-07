@@ -1,10 +1,10 @@
-#ifndef VHDL_FMT_ARGUMENT_PARSER_HPP
-#define VHDL_FMT_ARGUMENT_PARSER_HPP
+#ifndef CLI_ARGUMENT_PARSER_HPP
+#define CLI_ARGUMENT_PARSER_HPP
 
 #include <filesystem>
 #include <span>
 
-namespace vhdl_fmt {
+namespace cli {
 
 class ArgumentParser final
 {
@@ -22,6 +22,6 @@ class ArgumentParser final
     std::filesystem::path config_file_path = std::filesystem::current_path();
 };
 
-} // namespace vhdl_fmt
+} // namespace cli
 
 #endif

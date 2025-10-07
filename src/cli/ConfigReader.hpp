@@ -1,3 +1,6 @@
+#ifndef CLI_CONFIG_READER_HPP
+#define CLI_CONFIG_READER_HPP
+
 #include "Config.hpp"
 
 #include <expected>
@@ -6,7 +9,7 @@
 #include <utility>
 #include <yaml-cpp/node/node.h>
 
-namespace vhdl_fmt {
+namespace cli {
 
 /// Custom error type for config file reading
 struct ConfigReadError final
@@ -54,4 +57,6 @@ class ConfigReader final
     std::filesystem::path config_file_path;
 };
 
-} // namespace vhdl_fmt
+} // namespace cli
+
+#endif

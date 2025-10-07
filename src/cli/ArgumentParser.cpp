@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace vhdl_fmt {
+namespace cli {
 
 ArgumentParser::ArgumentParser(std::span<char *> args)
 {
@@ -80,4 +80,4 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
     }
 }
 
-} // namespace vhdl_fmt
+} // namespace cli

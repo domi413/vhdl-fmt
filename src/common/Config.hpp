@@ -1,11 +1,11 @@
-#ifndef VHDL_FMT_CONFIG_HPP
-#define VHDL_FMT_CONFIG_HPP
+#ifndef COMMON_CONFIG_HPP
+#define COMMON_CONFIG_HPP
 
 #include <cstdint>
 #include <stdexcept>
 #include <string>
 
-namespace vhdl_fmt {
+namespace common {
 
 /// General configuration for line wrapping and indentation
 struct LineConfig final
@@ -143,6 +143,6 @@ struct Config final
     CasingConfig casing;
 };
 
-} // namespace vhdl_fmt
+} // namespace common
 
 #endif

@@ -1,9 +1,9 @@
-#ifndef VHDL_FMT_VERSION_HPP
-#define VHDL_FMT_VERSION_HPP
+#ifndef COMMON_VERSION_HPP
+#define COMMON_VERSION_HPP
 
 #include <string_view>
 
-namespace vhdl_fmt {
+namespace common {
 
 /// Program version
 constexpr std::string_view PROJECT_VERSION = "@PROJECT_VERSION@";
@@ -11,6 +11,6 @@ constexpr std::string_view PROJECT_VERSION = "@PROJECT_VERSION@";
 /// Program name
 constexpr std::string_view PROJECT_NAME = "@PROJECT_NAME@";
 
-} // namespace vhdl_fmt
+} // namespace common
 
 #endif
