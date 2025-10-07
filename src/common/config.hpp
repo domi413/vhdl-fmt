@@ -92,8 +92,8 @@ struct Config final
     // INFO: Public members since its a POD struct
     // ---
     // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-    LineConfig line_config{ .line_length = config_details::DEFAULT_LINE_LENGTH,
-                            .indent_size = config_details::DEFAULT_INDENT_SIZE };
+    LineConfig line_config{ .line_length = helper::DEFAULT_LINE_LENGTH,
+                            .indent_size = helper::DEFAULT_INDENT_SIZE };
     IndentationStyle indent_style{ IndentationStyle::SPACES };
     EndOfLine eol{ EndOfLine::AUTO };
     PortMapConfig port_map;

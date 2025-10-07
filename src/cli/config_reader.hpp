@@ -3,10 +3,8 @@
 
 #include "config.hpp"
 
-#include <expected>
 #include <filesystem>
 #include <string>
-#include <utility>
 #include <yaml-cpp/node/node.h>
 
 namespace cli {
