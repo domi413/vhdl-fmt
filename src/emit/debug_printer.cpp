@@ -14,7 +14,7 @@ namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    for (int i{ 0 }; i < indent; ++i) {
+    for (int i{ 0 }; i < this->indent; ++i) {
         std::cout << "  ";
     }
 }
@@ -42,17 +42,17 @@ void DebugPrinter::printNode(const ast::Node &n,
 void DebugPrinter::visit(const ast::DesignFile &df)
 {
     printNode(df, {}, "DesignFile");
-    ++indent;
+    ++this->indent;
     for (const auto &u : df.units) {
         u->accept(*this);
     }
-    --indent;
+    --this->indent;
 }
 
 void DebugPrinter::visit(const ast::Entity &e)
 {
     printNode(e, e.name, "Entity");
-    ++indent;
+    ++this->indent;
 
     // Print generics first
     for (const auto &g : e.generics) {
@@ -64,7 +64,7 @@ void DebugPrinter::visit(const ast::Entity &e)
         p->accept(*this);
     }
 
-    --indent;
+    --this->indent;
 }
 
 void DebugPrinter::visit(const ast::GenericParam &g)
@@ -110,11 +110,11 @@ void DebugPrinter::visit(const ast::Port &p)
 
     printNode(p, oss.str(), "Port");
 
-    ++indent;
+    ++this->indent;
     for (const auto &r : p.constraints) {
         r->accept(*this);
     }
-    --indent;
+    --this->indent;
 }
 
 void DebugPrinter::visit(const ast::Range &r)

@@ -6,7 +6,7 @@ namespace builder {
 
 void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 {
-    auto &entity{ translator.makeEntity(ctx) };
+    const auto &entity{ translator.makeEntity(ctx) };
     if (auto *header = ctx->entity_header()) {
         // GENERICS
         translator.into(entity.generics, [&] -> void { dispatch(header->generic_clause()); });
@@ -35,7 +35,7 @@ void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
     }
     if (auto *i_p_list = p_list->interface_port_list()) {
         for (auto *i_p_decl : i_p_list->interface_port_declaration()) {
-            auto &port = translator.makeSignalPort(i_p_decl);
+            const auto &port = translator.makeSignalPort(i_p_decl);
             if (auto *s_type = i_p_decl->subtype_indication()) {
                 if (auto *con = s_type->constraint()) {
                     translator.into(port.constraints, [&] -> void { dispatch(con); });

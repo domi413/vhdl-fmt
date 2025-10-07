@@ -39,7 +39,7 @@ struct SinkImpl : ISink
     {
         auto *casted{ dynamic_cast<T *>(n.release()) };
         assert(casted && "Wrong node type pushed into sink!");
-        vec.emplace_back(casted);
+        this->vec.emplace_back(casted);
     }
 
   private:
