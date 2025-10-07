@@ -1,11 +1,6 @@
 antlr
 antlr4
-clangd
-domi
-gersemi
-nodiscard
 conanfile
-conanrun
 gersemi
 subnature
 vhdl
@@ -13,7 +8,6 @@ wconversion
 wdouble
 werror
 wextra
-wlifetime
 wmisleading
 wnon
 wnull

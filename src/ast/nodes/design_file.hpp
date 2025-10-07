@@ -10,7 +10,7 @@ namespace ast {
 struct DesignFile : Node
 {
     std::vector<std::unique_ptr<Node>> units;
-    void accept(ASTVisitor &v) const override { v.visit(*this); }
+    void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 } // namespace ast

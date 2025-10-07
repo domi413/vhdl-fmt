@@ -20,8 +20,8 @@ struct Comment
 
     std::string text;
     Kind kind;
-    int line = 0;
-    bool is_inline = false;
+    int line{ 0 };
+    bool is_inline{ false };
 };
 
 struct Node
@@ -39,12 +39,12 @@ struct Node
         std::vector<Comment> trailing;
     };
 
-    virtual void accept(ASTVisitor &v) const = 0;
+    virtual void accept(Visitor &v) const = 0;
 
     auto getComments() -> NodeComments & { return comments.emplace(); }
     [[nodiscard]] auto tryGetComments() const -> const std::optional<NodeComments> &
     {
-        return comments;
+        return this->comments;
     }
 
   private:

@@ -11,11 +11,11 @@ namespace ast {
 
 struct GenericParam : Node
 {
-    std::string type{};
-    std::vector<std::string> names{};
-    std::optional<std::string> init{};
+    std::string type;
+    std::vector<std::string> names;
+    std::optional<std::string> init;
 
-    void accept(ASTVisitor &v) const override { v.visit(*this); }
+    void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 struct Range : Node
@@ -24,25 +24,25 @@ struct Range : Node
     std::string direction;  // "downto" or "to"
     std::string right_expr; // e.g. "0"
 
-    void accept(ASTVisitor &v) const override { v.visit(*this); }
+    void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 struct Port : Node
 {
-    std::string mode{}, type{};
-    std::vector<std::string> names{};
-    std::vector<std::unique_ptr<ast::Range>> constraints{};
-    std::optional<std::string> init{};
+    std::string mode, type;
+    std::vector<std::string> names;
+    std::vector<std::unique_ptr<ast::Range>> constraints;
+    std::optional<std::string> init;
 
-    void accept(ASTVisitor &v) const override { v.visit(*this); }
+    void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 struct Entity : Node
 {
-    std::string name{};
-    std::vector<std::unique_ptr<Port>> ports{};
-    std::vector<std::unique_ptr<GenericParam>> generics{};
-    void accept(ASTVisitor &v) const override { v.visit(*this); }
+    std::string name;
+    std::vector<std::unique_ptr<Port>> ports;
+    std::vector<std::unique_ptr<GenericParam>> generics;
+    void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 } // namespace ast

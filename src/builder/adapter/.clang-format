@@ -1,6 +1,6 @@
 ---
 AlignAfterOpenBracket: Align
-AlignArrayOfStructures: Left
+AlignArrayOfStructures: Right
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
 AllowShortLoopsOnASingleLine: true
@@ -9,8 +9,9 @@ BasedOnStyle: Mozilla
 BinPackParameters: false
 BreakAfterReturnType: None
 BreakBeforeBinaryOperators: true
+BreakBinaryOperations: OnePerLine
 BreakConstructorInitializers: AfterColon
-ColumnLimit: 100
+ColumnLimit: 200
 FixNamespaceComments: true
 IncludeBlocks: Regroup
 IndentPPDirectives: BeforeHash

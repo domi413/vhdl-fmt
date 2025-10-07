@@ -22,6 +22,8 @@ namespace builder {
  */
 class Visitor : public adapter::BaseVoidVisitor
 {
+    Translator &translator;
+
   public:
     explicit Visitor(Translator &t) : translator(t) {};
 
@@ -37,9 +39,6 @@ class Visitor : public adapter::BaseVoidVisitor
     void visitGenericClause(vhdlParser::Generic_clauseContext *ctx) override;
     void visitPortClause(vhdlParser::Port_clauseContext *ctx) override;
     void visitConstraint(vhdlParser::ConstraintContext *ctx) override;
-
-  private:
-    Translator &translator;
 };
 
 } // namespace builder

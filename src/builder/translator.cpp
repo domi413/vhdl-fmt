@@ -1,17 +1,20 @@
 #include "translator.hpp"
 
+#include "ParserRuleContext.h"
 #include "Token.h"
+#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
+#include <cstddef>
 #include <vector>
 
 namespace builder {
 
 auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &
 {
-    auto &entity = spawn<ast::Entity>(ctx);
+    auto &entity{ spawn<ast::Entity>(ctx) };
     entity.name = ctx->identifier(0)->getText();
     return entity;
 }
@@ -73,15 +76,16 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
         return;
     }
     auto &cm = node.getComments();
-    auto kind = [](const antlr4::Token *t) {
+    auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
         return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::line
                                                   : ast::Comment::Kind::block;
     };
-    auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
+    const auto push
+      = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) -> void {
         if (!t) {
             return;
         }
-        const std::size_t idx = t->getTokenIndex();
+        const std::size_t idx{ t->getTokenIndex() };
         if (consumed_comment_token_indices.contains(idx)) {
             return;
         }

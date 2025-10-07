@@ -9,15 +9,23 @@ struct GenericParam;
 struct Range;
 struct Port;
 
-struct ASTVisitor
+/**
+ * @brief Interface used to traverse semantic context (AST nodes).
+ *
+ * The `ASTVisitor` walks the tree produced by the builder layer.
+ *
+ * Responsibilities:
+ *  - Traverse semantic context (AST nodes)
+ */
+struct Visitor
 {
-    ASTVisitor() = default;
-    virtual ~ASTVisitor() = default;
+    Visitor() = default;
+    virtual ~Visitor() = default;
 
-    ASTVisitor(const ASTVisitor &) = delete;
-    auto operator=(const ASTVisitor &) -> ASTVisitor & = delete;
-    ASTVisitor(ASTVisitor &&) = delete;
-    auto operator=(ASTVisitor &&) -> ASTVisitor & = delete;
+    Visitor(const Visitor &) = delete;
+    auto operator=(const Visitor &) -> Visitor & = delete;
+    Visitor(Visitor &&) = delete;
+    auto operator=(Visitor &&) -> Visitor & = delete;
 
     // ---- Root ----
     virtual void visit(const DesignFile &) = 0;

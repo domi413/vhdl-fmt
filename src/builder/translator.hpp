@@ -58,7 +58,7 @@ class Translator
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
-        auto &node = builder.spawn<T>();
+        auto &node{ builder.spawn<T>() };
         attachComments(node, ctx);
         return node;
     }

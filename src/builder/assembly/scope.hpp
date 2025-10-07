@@ -17,10 +17,10 @@ struct SlotGuard
     {
         using Elem = typename std::remove_cvref_t<Vec>::value_type;
         using NodeT = typename Elem::element_type;
-        sinks.push_back(std::make_unique<SinkImpl<NodeT>>(vec));
+        this->sinks.push_back(std::make_unique<SinkImpl<NodeT>>(vec));
     }
 
-    ~SlotGuard() noexcept { sinks.pop_back(); }
+    ~SlotGuard() noexcept { this->sinks.pop_back(); }
 
     SlotGuard(const SlotGuard &) = delete;
     auto operator=(const SlotGuard &) -> SlotGuard & = delete;

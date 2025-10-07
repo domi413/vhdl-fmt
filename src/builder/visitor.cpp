@@ -6,19 +6,19 @@ namespace builder {
 
 void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 {
-    auto &entity = translator.makeEntity(ctx);
+    auto &entity{ translator.makeEntity(ctx) };
     if (auto *header = ctx->entity_header()) {
         // GENERICS
-        translator.into(entity.generics, [&] { dispatch(header->generic_clause()); });
+        translator.into(entity.generics, [&] -> void { dispatch(header->generic_clause()); });
 
         // PORTS
-        translator.into(entity.ports, [&] { dispatch(header->port_clause()); });
+        translator.into(entity.ports, [&] -> void { dispatch(header->port_clause()); });
     }
 }
 
 void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
-    auto *g_list = ctx->generic_list();
+    auto *g_list{ ctx->generic_list() };
     if (g_list == nullptr) {
         return;
     }
@@ -29,7 +29,7 @@ void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 
 void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
 {
-    auto *p_list = ctx->port_list();
+    auto *p_list{ ctx->port_list() };
     if (p_list == nullptr) {
         return;
     }
@@ -38,7 +38,7 @@ void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
             auto &port = translator.makeSignalPort(i_p_decl);
             if (auto *s_type = i_p_decl->subtype_indication()) {
                 if (auto *con = s_type->constraint()) {
-                    translator.into(port.constraints, [&] { dispatch(con); });
+                    translator.into(port.constraints, [&] -> void { dispatch(con); });
                 }
             }
         }

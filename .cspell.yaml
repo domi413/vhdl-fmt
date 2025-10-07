@@ -16,4 +16,5 @@ ignorePaths:
   - "example/"
   - "grammars/"
   - "LICENSE"
+  - "clang.profile"
   - ".*"
