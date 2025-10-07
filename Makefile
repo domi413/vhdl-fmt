@@ -6,6 +6,9 @@ TARGET := build/$(BUILD_TYPE)/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
 BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 
+SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
+SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
+
 all: $(BUILD_STAMP)
 
 $(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
@@ -39,6 +42,9 @@ clean:
 # -----------------------------
 # Utility targets
 # -----------------------------
+LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/
+LINT_TIDY_FLAGS = --warnings-as-errors='*'
+
 check-format:
 	@echo "Checking code formatting..."
 	@if clang-format --dry-run --Werror $(SRCS) && gersemi --check $(SRCS_CMAKE); then \
@@ -55,7 +61,8 @@ format:
 
 lint:
 	@echo "Running clang-tidy..."
-	@clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) $(SRCS)
+	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
+	run-clang-tidy $(LINT_COMMON_FLAGS) $(SRCS)
 	@echo "✓ Linting complete"
 
 sort-dictionary:
