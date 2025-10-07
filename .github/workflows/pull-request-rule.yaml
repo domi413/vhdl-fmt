@@ -30,8 +30,8 @@ jobs:
             build
             chore
             ci
-            doc
-           	feat
+            docs
+            feat
             fix
             perf
             refactor
