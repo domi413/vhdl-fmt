@@ -1,54 +1,19 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 4.0.0)
 
 # ==================================================================
 # Project Definition
 # ==================================================================
 
-project(vhdl_fmt VERSION 0.1.0 DESCRIPTION "A VHDL parser" LANGUAGES CXX)
+project(vhdl_fmt VERSION 0.1.0 DESCRIPTION "A VHDL formatter" LANGUAGES CXX)
 
-set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE
-        "Release"
-        CACHE STRING
-        "Choose the type of build."
-        FORCE
-    )
-endif()
-
-# ==================================================================
-# Global Compiler Flags
-# ==================================================================
-
-add_library(vhdl_fmt_options INTERFACE)
-target_compile_options(
-    vhdl_fmt_options
-    INTERFACE
-        # Optimization
-        -O3
-        # Warnings
-        -Wall
-        -Wcast-align
-        -Wconversion
-        -Wdouble-promotion
-        -Werror
-        -Wextra
-        -Wformat=2
-        -Wmisleading-indentation
-        -Wnon-virtual-dtor
-        -Wnull-dereference
-        -Wold-style-cast
-        -Woverloaded-virtual
-        -Wpedantic
-        -Wshadow
-        -Wsign-conversion
-        -Wunused
-)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # ==================================================================
 # Dependencies
@@ -81,3 +46,8 @@ message(
     "  Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
 )
 message(STATUS "  Standard: C++${CMAKE_CXX_STANDARD}")
+
+include(CTest)
+enable_testing()
+add_subdirectory(src)
+add_subdirectory(tests)

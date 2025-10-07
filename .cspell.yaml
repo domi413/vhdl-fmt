@@ -12,6 +12,8 @@ dictionaries:
 
 ignorePaths:
   - "build/"
+  - "conan_profiles/"
   - "example/"
-  - "grammar/"
+  - "grammars/"
+  - "LICENSE"
   - ".*"
