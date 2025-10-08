@@ -123,6 +123,7 @@ jobs:
               git \
               make \
               ninja \
+              python \
               uv \
 
           # Create venv and install python packages
