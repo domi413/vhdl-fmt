@@ -7,7 +7,7 @@ CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
 BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 
 SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
-SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
+SRCS_CMAKE := $(shell find src tests . -maxdepth 1 -name 'CMakeLists.txt')
 
 ifeq ($(wildcard venv/bin),venv/bin)
 	VENV_BIN := venv/bin/
