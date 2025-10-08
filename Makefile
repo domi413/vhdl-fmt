@@ -9,6 +9,12 @@ BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
 SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
 
+ifeq ($(wildcard venv/bin),venv/bin)
+	VENV_BIN := venv/bin/
+else
+	VENV_BIN :=
+endif
+
 all: $(BUILD_STAMP)
 
 $(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
@@ -20,7 +26,7 @@ $(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
 
 $(CONAN_STAMP): conanfile.txt
 	@echo "Running Conan ($(BUILD_TYPE))..."
-	@conan install . \
+	@$(VENV_BIN)conan install . \
 		-pr=clang.profile \
 		--build=missing \
 		-s build_type=$(BUILD_TYPE)
