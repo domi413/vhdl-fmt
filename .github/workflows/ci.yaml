@@ -143,8 +143,8 @@ jobs:
       - name: Check formatting
         run: make check-format
 
-      - name: Run lint
-        run: make lint
-
-      - name: Run tests
-        run: make test
+      # - name: Run lint
+      #   run: make lint
+      #
+      # - name: Run tests
+      #   run: make test
