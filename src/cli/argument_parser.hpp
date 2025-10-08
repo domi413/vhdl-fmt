@@ -13,7 +13,8 @@ class ArgumentParser final
     explicit ArgumentParser(std::span<char *> args);
 
     /// Returns the path to the config file
-    [[nodiscard]] auto getConfigPath() const -> const std::filesystem::path &;
+    [[nodiscard]]
+    auto getConfigPath() const -> const std::filesystem::path &;
 
   private:
     /// Parses and processes the cli arguments

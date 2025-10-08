@@ -126,7 +126,8 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
 
     try {
         common::Config::line_config = readLineconfig(root_node, default_config.getLineConfig());
-        common::Config::indent_style = readIndentationStyle(root_node, default_config.getIndentStyle());
+        common::Config::indent_style
+          = readIndentationStyle(root_node, default_config.getIndentStyle());
         common::Config::eol = readEndOfLine(root_node, default_config.getEol());
         common::Config::port_map = readPortMapConfig(root_node, default_config.getPortMapConfig());
         common::Config::declarations
@@ -158,7 +159,8 @@ auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::Lin
 }
 
 auto ConfigReader::readIndentationStyle(const YAML::Node &root_node,
-                                        const common::IndentationStyle &defaults) -> common::IndentationStyle
+                                        const common::IndentationStyle &defaults)
+  -> common::IndentationStyle
 {
     auto indent_style = defaults;
 
@@ -185,8 +187,8 @@ auto ConfigReader::readEndOfLine(const YAML::Node &root_node, const common::EndO
     return eol;
 }
 
-auto ConfigReader::readPortMapConfig(const YAML::Node &root_node, const common::PortMapConfig &defaults)
-  -> common::PortMapConfig
+auto ConfigReader::readPortMapConfig(const YAML::Node &root_node,
+                                     const common::PortMapConfig &defaults) -> common::PortMapConfig
 {
     auto port_map = defaults;
 
@@ -204,7 +206,8 @@ auto ConfigReader::readPortMapConfig(const YAML::Node &root_node, const common::
 }
 
 auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
-                                         const common::DeclarationConfig &defaults) -> common::DeclarationConfig
+                                         const common::DeclarationConfig &defaults)
+  -> common::DeclarationConfig
 {
     auto declarations = defaults;
 
@@ -223,8 +226,8 @@ auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
     return declarations;
 }
 
-auto ConfigReader::readCasingConfig(const YAML::Node &root_node, const common::CasingConfig &defaults)
-  -> common::CasingConfig
+auto ConfigReader::readCasingConfig(const YAML::Node &root_node,
+                                    const common::CasingConfig &defaults) -> common::CasingConfig
 {
     auto casing = defaults;
 

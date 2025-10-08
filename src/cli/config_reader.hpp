@@ -28,30 +28,36 @@ class ConfigReader final
 
   private:
     /// Reads the line config options
-    [[nodiscard]] static auto readLineconfig(const YAML::Node &root_node,
-                                             const common::LineConfig &defaults) -> common::LineConfig;
+    [[nodiscard]]
+    static auto readLineconfig(const YAML::Node &root_node, const common::LineConfig &defaults)
+      -> common::LineConfig;
 
     /// Reads the indentation style options
-    [[nodiscard]] static auto readIndentationStyle(const YAML::Node &root_node,
-                                                   const common::IndentationStyle &defaults)
+    [[nodiscard]]
+    static auto readIndentationStyle(const YAML::Node &root_node,
+                                     const common::IndentationStyle &defaults)
       -> common::IndentationStyle;
 
     /// Reads the end of line options
-    [[nodiscard]] static auto readEndOfLine(const YAML::Node &root_node, const common::EndOfLine &defaults)
+    [[nodiscard]]
+    static auto readEndOfLine(const YAML::Node &root_node, const common::EndOfLine &defaults)
       -> common::EndOfLine;
 
     /// Reads the port map options
-    [[nodiscard]] static auto readPortMapConfig(const YAML::Node &root_node,
-                                                const common::PortMapConfig &defaults) -> common::PortMapConfig;
+    [[nodiscard]]
+    static auto readPortMapConfig(const YAML::Node &root_node,
+                                  const common::PortMapConfig &defaults) -> common::PortMapConfig;
 
     /// Reads the declaration options
-    [[nodiscard]] static auto readDeclarationConfig(const YAML::Node &root_node,
-                                                    const common::DeclarationConfig &defaults)
+    [[nodiscard]]
+    static auto readDeclarationConfig(const YAML::Node &root_node,
+                                      const common::DeclarationConfig &defaults)
       -> common::DeclarationConfig;
 
     /// Reads the casing options
-    [[nodiscard]] static auto readCasingConfig(const YAML::Node &root_node,
-                                               const common::CasingConfig &defaults) -> common::CasingConfig;
+    [[nodiscard]]
+    static auto readCasingConfig(const YAML::Node &root_node, const common::CasingConfig &defaults)
+      -> common::CasingConfig;
 
     std::filesystem::path config_file_path;
 };
