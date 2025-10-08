@@ -132,7 +132,9 @@ jobs:
           uv pip install conan gersemi
 
       - name: Setup Conan profile
-        run: conan profile detect --force
+        run: |
+          source venv/bin/activate
+          conan profile detect --force
 
       - name: Build
         run: make
