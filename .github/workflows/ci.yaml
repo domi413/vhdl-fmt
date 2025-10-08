@@ -140,10 +140,14 @@ jobs:
         run: make
 
       - name: Check formatting
-        run: make check-format
+        run: |
+          source venv/bin/activate
+          make check-format
 
       - name: Run lint
-        run: make lint
+        run: |
+          source venv/bin/activate
+          make lint
 
       - name: Run tests
         run: make test
