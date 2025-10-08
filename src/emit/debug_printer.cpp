@@ -4,6 +4,7 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 
+#include <cstddef>
 #include <iostream>
 #include <ranges>
 #include <sstream>
@@ -14,7 +15,7 @@ namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    std::cout << std::string(this->indent, ' ');
+    std::cout << std::string(static_cast<std::size_t>(this->indent * 2), ' ');
 }
 
 void DebugPrinter::printNode(const ast::Node &n,
@@ -88,7 +89,7 @@ void DebugPrinter::visit(const ast::Port &p)
     std::ostringstream oss;
 
     // Names
-    for (const auto &&[i, name] : p.names | std::views::enumerate) {
+    for (const auto &[i, name] : p.names | std::views::enumerate) {
         if (i > 0) {
             oss << ", ";
         }
