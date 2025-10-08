@@ -4,6 +4,7 @@
 #include "ast/node.hpp"
 #include "ast/visitor.hpp"
 
+#include <cstdint>
 #include <string>
 
 namespace emit {
