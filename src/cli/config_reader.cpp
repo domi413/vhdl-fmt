@@ -1,6 +1,6 @@
 #include "config_reader.hpp"
 
-#include "config.hpp"
+#include "common/config.hpp"
 
 #include <cstdint>
 #include <exception>
@@ -18,10 +18,10 @@ namespace cli {
 
 namespace {
 
-using LineConfigMember = std::uint8_t LineConfig::*;
-using PortMapMember = bool PortMapConfig::*;
-using DeclarationMember = bool DeclarationConfig::*;
-using CaseStyleMember = CaseStyle CasingConfig::*;
+using LineConfigMember = std::uint8_t common::LineConfig::*;
+using PortMapMember = bool common::PortMapConfig::*;
+using DeclarationMember = bool common::DeclarationConfig::*;
+using CaseStyleMember = common::CaseStyle common::CasingConfig::*;
 
 // INFO: The following rules are suppressed because clang-tidy expects the map to be marked as
 // `constexpr`, which is not possible. A singleton pattern could be used to avoid the warning,
@@ -30,40 +30,40 @@ using CaseStyleMember = CaseStyle CasingConfig::*;
 // NOLINTBEGIN(fuchsia-statically-constructed-objects)
 // NOLINTBEGIN(cert-err58-cpp)
 const std::unordered_map<std::string_view, LineConfigMember> LINE_CONFIG_ASSIGNMENTS_MAP = {
-    { "line_length", &LineConfig::line_length },
-    { "indent_size", &LineConfig::indent_size },
+    { "line_length", &common::LineConfig::line_length },
+    { "indent_size", &common::LineConfig::indent_size },
 };
 
-const std::unordered_map<std::string_view, IndentationStyle> INDENTATION_STYLE_MAP = {
-    { "spaces", IndentationStyle::SPACES },
-    { "tabs",   IndentationStyle::TABS   },
+const std::unordered_map<std::string_view, common::IndentationStyle> INDENTATION_STYLE_MAP = {
+    { "spaces", common::IndentationStyle::SPACES },
+    { "tabs",   common::IndentationStyle::TABS   },
 };
 
-const std::unordered_map<std::string_view, EndOfLine> EOL_STYLE_MAP = {
-    { "auto", EndOfLine::AUTO },
-    { "crlf", EndOfLine::CRLF },
-    { "lf",   EndOfLine::LF   },
+const std::unordered_map<std::string_view, common::EndOfLine> EOL_STYLE_MAP = {
+    { "auto", common::EndOfLine::AUTO },
+    { "crlf", common::EndOfLine::CRLF },
+    { "lf",   common::EndOfLine::LF   },
 };
 
-const std::unordered_map<std::string_view, CaseStyle> CASE_STYLE_MAP = {
-    { "lower_case", CaseStyle::LOWER },
-    { "UPPER_CASE", CaseStyle::UPPER },
+const std::unordered_map<std::string_view, common::CaseStyle> CASE_STYLE_MAP = {
+    { "lower_case", common::CaseStyle::LOWER },
+    { "UPPER_CASE", common::CaseStyle::UPPER },
 };
 
 const std::unordered_map<std::string_view, PortMapMember> PORT_MAP_ASSIGNMENTS_MAP = {
-    { "align_signals", &PortMapConfig::align_signals },
+    { "align_signals", &common::PortMapConfig::align_signals },
 };
 
 const std::unordered_map<std::string_view, DeclarationMember> DECLARATION_ASSIGNMENTS_MAP = {
-    { "align_colons",         &DeclarationConfig::align_colons         },
-    { "align_types",          &DeclarationConfig::align_types          },
-    { "align_initialization", &DeclarationConfig::align_initialization },
+    { "align_colons",         &common::DeclarationConfig::align_colons         },
+    { "align_types",          &common::DeclarationConfig::align_types          },
+    { "align_initialization", &common::DeclarationConfig::align_initialization },
 };
 
 const std::unordered_map<std::string_view, CaseStyleMember> CASING_ASSIGNMENTS_MAP = {
-    { "keywords",    &CasingConfig::keywords    },
-    { "constants",   &CasingConfig::constants   },
-    { "identifiers", &CasingConfig::identifiers },
+    { "keywords",    &common::CasingConfig::keywords    },
+    { "constants",   &common::CasingConfig::constants   },
+    { "identifiers", &common::CasingConfig::identifiers },
 };
 // NOLINTEND(cert-err58-cpp)
 // NOLINTEND(fuchsia-statically-constructed-objects)
@@ -102,10 +102,10 @@ auto parseScalar(const YAML::Node &node, std::string_view name) -> T
 
 } // namespace
 
-auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
+auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadError>
 {
     if (!std::filesystem::exists(this->config_file_path)) {
-        return Config{};
+        return common::Config{};
     }
 
     YAML::Node root_node{};
@@ -125,13 +125,13 @@ auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
     }
 
     try {
-        Config::line_config = readLineconfig(root_node, default_config.getLineConfig());
-        Config::indent_style = readIndentationStyle(root_node, default_config.getIndentStyle());
-        Config::eol = readEndOfLine(root_node, default_config.getEol());
-        Config::port_map = readPortMapConfig(root_node, default_config.getPortMapConfig());
-        Config::declarations
+        common::Config::line_config = readLineconfig(root_node, default_config.getLineConfig());
+        common::Config::indent_style = readIndentationStyle(root_node, default_config.getIndentStyle());
+        common::Config::eol = readEndOfLine(root_node, default_config.getEol());
+        common::Config::port_map = readPortMapConfig(root_node, default_config.getPortMapConfig());
+        common::Config::declarations
           = readDeclarationConfig(root_node, default_config.getDeclarationConfig());
-        Config::casing = readCasingConfig(root_node, default_config.getCasingConfig());
+        common::Config::casing = readCasingConfig(root_node, default_config.getCasingConfig());
 
     } catch (const std::exception &e) {
         return std::unexpected{ ConfigReadError{ std::string("Config parsing failed: ")
@@ -139,8 +139,8 @@ auto ConfigReader::readConfigFile() -> std::expected<Config, ConfigReadError>
     }
 }
 
-auto ConfigReader::readLineconfig(const YAML::Node &root_node, const LineConfig &defaults)
-  -> LineConfig
+auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::LineConfig &defaults)
+  -> common::LineConfig
 {
     auto line_config = defaults;
 
@@ -158,7 +158,7 @@ auto ConfigReader::readLineconfig(const YAML::Node &root_node, const LineConfig 
 }
 
 auto ConfigReader::readIndentationStyle(const YAML::Node &root_node,
-                                        const IndentationStyle &defaults) -> IndentationStyle
+                                        const common::IndentationStyle &defaults) -> common::IndentationStyle
 {
     auto indent_style = defaults;
 
@@ -172,8 +172,8 @@ auto ConfigReader::readIndentationStyle(const YAML::Node &root_node,
     return indent_style;
 }
 
-auto ConfigReader::readEndOfLine(const YAML::Node &root_node, const EndOfLine &defaults)
-  -> EndOfLine
+auto ConfigReader::readEndOfLine(const YAML::Node &root_node, const common::EndOfLine &defaults)
+  -> common::EndOfLine
 {
     auto eol = defaults;
 
@@ -185,8 +185,8 @@ auto ConfigReader::readEndOfLine(const YAML::Node &root_node, const EndOfLine &d
     return eol;
 }
 
-auto ConfigReader::readPortMapConfig(const YAML::Node &root_node, const PortMapConfig &defaults)
-  -> PortMapConfig
+auto ConfigReader::readPortMapConfig(const YAML::Node &root_node, const common::PortMapConfig &defaults)
+  -> common::PortMapConfig
 {
     auto port_map = defaults;
 
@@ -204,7 +204,7 @@ auto ConfigReader::readPortMapConfig(const YAML::Node &root_node, const PortMapC
 }
 
 auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
-                                         const DeclarationConfig &defaults) -> DeclarationConfig
+                                         const common::DeclarationConfig &defaults) -> common::DeclarationConfig
 {
     auto declarations = defaults;
 
@@ -223,8 +223,8 @@ auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
     return declarations;
 }
 
-auto ConfigReader::readCasingConfig(const YAML::Node &root_node, const CasingConfig &defaults)
-  -> CasingConfig
+auto ConfigReader::readCasingConfig(const YAML::Node &root_node, const common::CasingConfig &defaults)
+  -> common::CasingConfig
 {
     auto casing = defaults;
 
