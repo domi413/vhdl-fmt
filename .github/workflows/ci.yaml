@@ -96,8 +96,9 @@ jobs:
             arch-deps-${{ runner.os }}-v1
             arch-deps-${{ runner.os }}-
 
-      - name: Cache Conan packages
+      - name: Cache Conan packages (RESTORE)
         uses: actions/cache@v4
+        id: cache-conan
         with:
           path: /github/home/.conan2
           key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
@@ -105,8 +106,9 @@ jobs:
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
-      - name: Cache uv packages
+      - name: Cache uv packages (RESTORE)
         uses: actions/cache@v4
+        id: cache-uv
         with:
           path: /github/home/.local/share/uv/
           key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
@@ -123,12 +125,9 @@ jobs:
               git \
               make \
               ninja \
-              uv \
-
+              uv
           # Create venv and install python packages
           uv venv venv
-          source venv/bin/activate
-
           uv pip install conan gersemi
 
       - name: Setup Conan profile
@@ -138,6 +137,22 @@ jobs:
 
       - name: Build
         run: make
+        id: build_step
+
+      # Save cache
+      - name: Cache Conan packages (SAVE)
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+        if: ${{ success() && steps.build_step.outcome == 'success' && steps.cache-conan.outputs.cache-hit != 'true' }}
+
+      - name: Cache uv packages (SAVE)
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/uv/
+          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+        if: ${{ success() && steps.build_step.outcome == 'success' && steps.cache-uv.outputs.cache-hit != 'true' }}
 
       - name: Check formatting
         run: |
