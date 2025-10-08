@@ -148,14 +148,14 @@ jobs:
         with:
           path: /github/home/.conan2
           key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
-        if: ${{ success() && steps.build_step.outcome == 'success' && steps.cache-conan.outputs.cache-hit != 'true' }}
+        if: ${{ success() && steps.cache-conan.outputs.cache-hit != 'true' }}
 
       - name: Cache uv packages (SAVE)
         uses: actions/cache@v4
         with:
           path: /github/home/.local/share/uv/
           key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
-        if: ${{ success() && steps.build_step.outcome == 'success' && steps.cache-uv.outputs.cache-hit != 'true' }}
+        if: ${{ success() && steps.cache-uv.outputs.cache-hit != 'true' }}
 
       - name: Check formatting
         run: |
