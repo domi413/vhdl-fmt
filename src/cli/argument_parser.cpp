@@ -1,6 +1,6 @@
 #include "argument_parser.hpp"
 
-#include "version.hpp"
+// #include "version.hpp"
 
 #include <argparse/argparse.hpp>
 #include <exception>

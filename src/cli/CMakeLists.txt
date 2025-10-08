@@ -1,5 +1,7 @@
-file(GLOB_RECURSE BUILDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB_RECURSE CLI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-add_library(cli STATIC ${BUILDER_SOURCES})
+add_library(cli STATIC ${CLI_SOURCES})
 
-target_link_libraries(cli PUBLIC common vhdl_generated)
+add_executable(vhdl_formatter main.cpp)
+
+target_link_libraries(cli PRIVATE yaml-cpp::yaml-cpp vhdl_generated)
