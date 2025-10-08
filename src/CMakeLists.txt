@@ -7,6 +7,9 @@ add_subdirectory(cli)
 add_subdirectory(builder)
 add_subdirectory(emit)
 
+# Main executable
+add_executable(vhdl_formatter main.cpp)
+
 target_link_libraries(
     vhdl_formatter
     PRIVATE
