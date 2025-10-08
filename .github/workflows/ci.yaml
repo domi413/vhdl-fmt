@@ -74,7 +74,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: Build, Lint, Format Check and Test
-    timeout-minutes: 20
+    timeout-minutes: 10
     container:
       image: archlinux:base-devel
 
@@ -105,48 +105,49 @@ jobs:
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/uv/
+          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+          restore-keys: |
+            uv-cache-${{ runner.os }}-v1
+            uv-cache-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
-          # Install base packages
-          pacman -Sy --needed git base-devel --noconfirm
-
-          # Create a non-root user for AUR operations
-          useradd -m -G wheel -s /bin/bash aur
-          echo 'aur ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-          # Create cache directories
-          mkdir -p /home/aur/.cache/yay
-          chown -R aur:aur /home/aur
-
-          # Install yay
-          su - aur -c "
-            git clone https://aur.archlinux.org/yay.git
-            cd yay
-            makepkg -si --noconfirm
-          "
-
-          # Install packages
-          su - aur -c "
-            yay -Sy --noconfirm --needed \
+          pacman -Sy --needed --noconfirm \
+              base-devel \
               clang \
-              conan-bin \
               cmake \
+              git \
               make \
               ninja \
-              python-gersemi
-          "
+              uv \
+
+          # Create venv and install python packages
+          uv venv venv
+          source venv/bin/activate
+
+          uv pip install conan gersemi
 
       - name: Setup Conan profile
-        run: conan profile detect --force
+        run: |
+          source venv/bin/activate
+          conan profile detect --force
 
       - name: Build
         run: make
 
       - name: Check formatting
-        run: make check-format
+        run: |
+          source venv/bin/activate
+          make check-format
 
       - name: Run lint
-        run: make lint
+        run: |
+          source venv/bin/activate
+          make lint
 
       - name: Run tests
         run: make test

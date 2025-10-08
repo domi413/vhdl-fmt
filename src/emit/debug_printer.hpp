@@ -4,6 +4,7 @@
 #include "ast/node.hpp"
 #include "ast/visitor.hpp"
 
+#include <cstdint>
 #include <string>
 
 namespace emit {
@@ -23,7 +24,7 @@ struct DebugPrinter : ast::Visitor
     void visit(const ast::Range &r) override;
 
   private:
-    int indent{ 0 };
+    std::uint8_t indent{ 0 };
 };
 
 } // namespace emit
