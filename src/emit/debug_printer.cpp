@@ -4,7 +4,7 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 
-#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <ranges>
 #include <sstream>
@@ -15,7 +15,7 @@ namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    std::cout << std::string(static_cast<std::size_t>(this->indent * 2), ' ');
+    std::cout << std::string(static_cast<std::uint8_t>(this->indent * 2), ' ');
 }
 
 void DebugPrinter::printNode(const ast::Node &n,
