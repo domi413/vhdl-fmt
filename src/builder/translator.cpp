@@ -76,12 +76,11 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
         return;
     }
     auto &cm = node.getComments();
-    auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
+    const auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
         return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::LINE
                                                   : ast::Comment::Kind::BLOCK;
     };
-    const auto push
-      = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) -> void {
+    const auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
         if (!t) {
             return;
         }
