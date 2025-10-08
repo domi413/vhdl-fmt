@@ -117,7 +117,6 @@ jobs:
               uv \
 
           uv pip install conan gersemi
-          "
 
       - name: Setup Conan profile
         run: conan profile detect --force
