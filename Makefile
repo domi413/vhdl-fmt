@@ -55,7 +55,7 @@ LINT_CPUS ?= $(shell nproc)
 lint:
 	@echo "Running clang-tidy on source files..."
 	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
-	$(VENV_BIN)run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SRCS)
+	run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SRCS)
 
 	@echo "Running clang-tidy on headers..."
 	@find src tests \( -path '*/build/*' -o -path '*/generated/*' -o -path '*/generators/*' -o -path '*/external/*' \) -prune \
