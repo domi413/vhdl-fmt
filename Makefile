@@ -7,7 +7,13 @@ CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
 BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 
 SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
-SRCS_CMAKE := $(shell find src tests -name 'CMakeLists.txt')
+SRCS_CMAKE := $(shell find src tests . -maxdepth 1 -name 'CMakeLists.txt')
+
+ifeq ($(wildcard venv/bin),venv/bin)
+	VENV_BIN := venv/bin/
+else
+	VENV_BIN :=
+endif
 
 all: $(BUILD_STAMP)
 
@@ -20,7 +26,7 @@ $(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
 
 $(CONAN_STAMP): conanfile.txt
 	@echo "Running Conan ($(BUILD_TYPE))..."
-	@conan install . \
+	@$(VENV_BIN)conan install . \
 		-pr=clang.profile \
 		--build=missing \
 		-s build_type=$(BUILD_TYPE)
@@ -61,7 +67,7 @@ lint:
 
 check-format:
 	@echo "Checking code formatting..."
-	@if clang-format --dry-run --Werror $(SRCS) && gersemi --check $(SRCS_CMAKE); then \
+	@if clang-format --dry-run --Werror $(SRCS) && $(VENV_BIN)gersemi --check $(SRCS_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
@@ -70,7 +76,7 @@ check-format:
 format:
 	@echo "Formatting code..."
 	@clang-format -i $(SRCS)
-	@gersemi -i $(SRCS_CMAKE)
+	@$(VENV_BIN)gersemi -i $(SRCS_CMAKE)
 	@echo "✓ Code formatting complete"
 
 sort-dictionary:
