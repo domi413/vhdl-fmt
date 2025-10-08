@@ -24,4 +24,4 @@ class ArgumentParser final
 
 } // namespace cli
 
-#endif
+#endif /* CLI_ARGUMENT_PARSER_HPP */

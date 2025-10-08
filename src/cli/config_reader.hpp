@@ -57,4 +57,4 @@ class ConfigReader final
 
 } // namespace cli
 
-#endif
+#endif /* CLI_CONFIG_READER_HPP */
