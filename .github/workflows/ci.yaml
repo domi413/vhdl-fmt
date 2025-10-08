@@ -126,8 +126,11 @@ jobs:
               make \
               ninja \
               uv
+
           # Create venv and install python packages
           uv venv venv
+          source venv/bin/activate
+
           uv pip install conan gersemi
 
       - name: Setup Conan profile

@@ -66,7 +66,7 @@ lint:
 
 
 check-format:
-	@echo "Checking code formatting..."
+	@echo "Checkig code formatting..."
 	@if clang-format --dry-run --Werror $(SRCS) && $(VENV_BIN)gersemi --check $(SRCS_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
