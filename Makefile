@@ -67,7 +67,7 @@ lint:
 
 check-format:
 	@echo "Checking code formatting..."
-	@if clang-format --dry-run --Werror $(SRCS) && gersemi --check $(SRCS_CMAKE); then \
+	@if clang-format --dry-run --Werror $(SRCS) && $(VENV_BIN)gersemi --check $(SRCS_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
@@ -76,7 +76,7 @@ check-format:
 format:
 	@echo "Formatting code..."
 	@clang-format -i $(SRCS)
-	@gersemi -i $(SRCS_CMAKE)
+	@$(VENV_BIN)gersemi -i $(SRCS_CMAKE)
 	@echo "✓ Code formatting complete"
 
 sort-dictionary:
