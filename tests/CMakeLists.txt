@@ -4,7 +4,7 @@ add_executable(tests ${TEST_SOURCES})
 
 target_link_libraries(
     tests
-    PRIVATE Catch2::Catch2WithMain ast builder emit vhdl_generated
+    PRIVATE Catch2::Catch2WithMain ast builder common emit vhdl_generated
 )
 
 target_include_directories(

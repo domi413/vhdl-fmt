@@ -4,6 +4,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Submodules
 add_subdirectory(ast)
 add_subdirectory(builder)
+add_subdirectory(common)
 add_subdirectory(emit)
 
 # Main executable
@@ -14,6 +15,7 @@ target_link_libraries(
     PRIVATE
         ast
         builder
+        common
         emit
         vhdl_generated
         argparse::argparse
