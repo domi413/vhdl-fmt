@@ -8,9 +8,9 @@ namespace common {
 
 class Config
 {
-    int indent_width = 4;
-    bool use_tabs = false;
-    std::string line_ending = "lf";
+    int indent_width;
+    bool use_tabs;
+    std::string line_ending;
 
     // Private constructor, only `Config::Builder` can use
     Config(int indent_width, bool use_tabs, std::string line_ending) :
@@ -38,23 +38,26 @@ class Config::Builder
   public:
     auto setIndentWidth(int value) noexcept -> Builder &
     {
-        indent_width.emplace(value);
+        indent_width = value;
         return *this;
     }
     auto setUseTabs(bool value) noexcept -> Builder &
     {
-        use_tabs.emplace(value);
+        use_tabs = value;
         return *this;
     }
     auto setLineEnding(const std::string &value) noexcept -> Builder &
     {
-        line_ending.emplace(value);
+        line_ending = value;
         return *this;
     }
 
     [[nodiscard]] auto build() const -> Config
     {
-        return { indent_width.value(), use_tabs.value(), line_ending.value() };
+        // Use defaults if not set
+        return Config{ indent_width.value_or(4),
+                       use_tabs.value_or(false),
+                       line_ending.value_or("lf") };
     }
 
     void merge(const Builder &other);
