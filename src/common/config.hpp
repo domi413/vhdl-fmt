@@ -1,21 +1,17 @@
 #ifndef CONFIG_CONFIG_HPP
 #define CONFIG_CONFIG_HPP
 
+#include <optional>
 #include <string>
 
 namespace common {
 
 class Config
 {
-  public:
-    class Builder;
+    int indent_width = 4;
+    bool use_tabs = false;
+    std::string line_ending = "lf";
 
-    // Accessors
-    [[nodiscard]] auto indentWidth() const noexcept -> int { return indent_width; }
-    [[nodiscard]] auto useTabs() const noexcept -> bool { return use_tabs; }
-    [[nodiscard]] auto lineEnding() const noexcept -> const std::string & { return line_ending; }
-
-  private:
     // Private constructor, only `Config::Builder` can use
     Config(int indent_width, bool use_tabs, std::string line_ending) :
       indent_width(indent_width),
@@ -24,35 +20,42 @@ class Config
     {
     }
 
-    int indent_width;
-    bool use_tabs;
-    std::string line_ending;
+  public:
+    class Builder;
+
+    // Accessors
+    [[nodiscard]] auto indentWidth() const noexcept -> int { return indent_width; }
+    [[nodiscard]] auto useTabs() const noexcept -> bool { return use_tabs; }
+    [[nodiscard]] auto lineEnding() const noexcept -> const std::string & { return line_ending; }
 };
 
 class Config::Builder
 {
-    int indent_width = 4; 
-    bool use_tabs = false;
-    std::string line_ending = "lf";
+    std::optional<int> indent_width;
+    std::optional<bool> use_tabs;
+    std::optional<std::string> line_ending;
 
-    public:
+  public:
     auto setIndentWidth(int value) noexcept -> Builder &
     {
-        indent_width = value;
+        indent_width.emplace(value);
         return *this;
     }
     auto setUseTabs(bool value) noexcept -> Builder &
     {
-        use_tabs = value;
+        use_tabs.emplace(value);
         return *this;
     }
-    auto setLineEnding(std::string value) noexcept -> Builder &
+    auto setLineEnding(const std::string &value) noexcept -> Builder &
     {
-        line_ending = std::move(value);
+        line_ending.emplace(value);
         return *this;
     }
 
-    [[nodiscard]] auto build() const -> Config { return { indent_width, use_tabs, line_ending }; }
+    [[nodiscard]] auto build() const -> Config
+    {
+        return { indent_width.value(), use_tabs.value(), line_ending.value() };
+    }
 
     void merge(const Builder &other);
 };
