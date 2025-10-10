@@ -101,17 +101,26 @@ auto mapValueToConfig(const std::string_view style,
 
 auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadError>
 {
-    if (!std::filesystem::exists(config_file_path_)) {
-        if (config_file_path_ == std::filesystem::current_path()) {
+    if (!config_file_path_.has_value()) {
+        const auto default_path = std::filesystem::current_path() / "vhdl-fmt.yaml";
+
+        if (!std::filesystem::exists(default_path)) {
             return common::Config{};
         }
 
-        return std::unexpected{ ConfigReadError{ "Config file does not exist." } };
+        config_file_path_ = default_path;
+    }
+
+    const auto &path_to_read = config_file_path_.value();
+
+    if (!std::filesystem::exists(path_to_read)) {
+        return std::unexpected{ ConfigReadError{
+          "Config file does not exist at the defined location." } };
     }
 
     YAML::Node root_node{};
     try {
-        root_node = YAML::LoadFile(config_file_path_.string());
+        root_node = YAML::LoadFile(path_to_read.string());
     } catch (const YAML::BadFile &e) {
         return std::unexpected{ ConfigReadError{ std::string("Could not load config file: ")
                                                  + e.what() } };

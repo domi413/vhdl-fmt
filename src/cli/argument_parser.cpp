@@ -18,7 +18,7 @@ ArgumentParser::ArgumentParser(std::span<char *> args)
     this->parseArguments(args);
 }
 
-auto ArgumentParser::getConfigPath() const noexcept -> const std::filesystem::path &
+auto ArgumentParser::getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &
 {
     return config_file_path_;
 }
