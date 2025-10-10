@@ -80,7 +80,8 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
         return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::LINE
                                                   : ast::Comment::Kind::BLOCK;
     };
-    const auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
+    const auto push
+      = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) -> void {
         if (!t) {
             return;
         }
