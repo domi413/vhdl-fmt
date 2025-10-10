@@ -7,11 +7,16 @@
 
 namespace common {
 
-/// General configuration for line wrapping and indentation
-struct LineConfig final
+/// Line length
+struct LineLength final
 {
-    std::uint8_t line_length;
-    std::uint8_t indent_size;
+    std::uint8_t length;
+};
+
+/// Indentation size
+struct IndentSize final
+{
+    std::uint8_t size;
 };
 
 /// Indentation style used for formatting
@@ -58,48 +63,131 @@ struct CasingConfig final
     CaseStyle identifiers{ CaseStyle::LOWER };
 };
 
-namespace helper {
-
-static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
-static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
-
-static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
-static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
-
-static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
-static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
-
-/// Validate line configuration
-inline auto validateLineConfig(const struct LineConfig &cfg) -> void
+/// General configuration for line wrapping and indentation
+struct LineConfig final
 {
-    if (cfg.line_length < MIN_LINE_LENGTH || cfg.line_length > MAX_LINE_LENGTH) {
-        const std::string msg = "Line length must be between " + std::to_string(MIN_LINE_LENGTH)
-                              + " and " + std::to_string(MAX_LINE_LENGTH) + ".";
-        throw std::invalid_argument(msg);
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+    std::uint8_t line_length;
+    std::uint8_t indent_size;
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+    static auto create(const LineLength length, const IndentSize size) -> LineConfig
+    {
+        validateLineConfig(length, size);
+        return { length, size };
     }
 
-    if (cfg.indent_size < MIN_INDENT_SIZE || cfg.indent_size > MAX_INDENT_SIZE) {
-        const std::string msg = "Indent size must be between " + std::to_string(MIN_INDENT_SIZE)
-                              + " and " + std::to_string(MAX_INDENT_SIZE) + ".";
-        throw std::invalid_argument(msg);
+    static auto defaultConfig() -> LineConfig
+    {
+        static constexpr LineLength DEFAULT_LENGTH{ .length = DEFAULT_LINE_LENGTH };
+        static constexpr IndentSize DEFAULT_SIZE{ .size = DEFAULT_INDENT_SIZE };
+
+        return create(DEFAULT_LENGTH, DEFAULT_SIZE);
     }
-}
 
-} // namespace helper
+  private:
+    static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
+    static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
 
+    static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
+    static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
+
+    static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
+    static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
+
+    LineConfig(const LineLength length, const IndentSize size) :
+      line_length(length.length),
+      indent_size(size.size)
+    {
+    }
+
+    // TODO(domi): Mozilla style formats the constructor braces ugly
+
+    /// Validate line configuration
+    static auto validateLineConfig(const LineLength length, const IndentSize size) -> void
+    {
+        if (length.length < MIN_LINE_LENGTH || length.length > MAX_LINE_LENGTH) {
+            const std::string msg = "Line length must be between " + std::to_string(MIN_LINE_LENGTH)
+                                  + " and " + std::to_string(MAX_LINE_LENGTH) + ".";
+            throw std::invalid_argument(msg);
+        }
+
+        if (size.size < MIN_INDENT_SIZE || size.size > MAX_INDENT_SIZE) {
+            const std::string msg = "Indent size must be between " + std::to_string(MIN_INDENT_SIZE)
+                                  + " and " + std::to_string(MAX_INDENT_SIZE) + ".";
+            throw std::invalid_argument(msg);
+        }
+    }
+};
+
+// Holds the configuration from the config file
 struct Config final
 {
-    // INFO: Public members since its a POD struct
-    // ---
     // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-    LineConfig line_config{ .line_length = helper::DEFAULT_LINE_LENGTH,
-                            .indent_size = helper::DEFAULT_INDENT_SIZE };
+
+    LineConfig line_config{ LineConfig::defaultConfig() };
     IndentationStyle indent_style{ IndentationStyle::SPACES };
-    EndOfLine eol{ EndOfLine::AUTO };
-    PortMapConfig port_map;
-    DeclarationConfig declarations;
-    CasingConfig casing;
+    EndOfLine eol{ EndOfLine::LF };
+    PortMapConfig port_map{ true };
+    DeclarationConfig declarations{ .align_colons = true };
+    CasingConfig casing{ .keywords = CaseStyle::LOWER,
+                         .constants = CaseStyle::UPPER,
+                         .identifiers = CaseStyle::LOWER };
+
     // NOLINTEND(misc-non-private-member-variables-in-classes)
+
+    Config() = default;
+
+    /// Set the formatting line length
+    auto setLineConfig(const std::uint8_t line_length) & -> Config &
+    {
+        this->line_config = LineConfig::create(LineLength{ .length = line_length },
+                                               IndentSize{ .size = this->line_config.indent_size });
+        return *this;
+    }
+
+    /// Set the indentation size
+    auto setIndentionSize(const std::uint8_t indent_size) & -> Config &
+    {
+        this->line_config = LineConfig::create(
+          LineLength{ .length = this->line_config.line_length }, IndentSize{ .size = indent_size });
+        return *this;
+    }
+
+    /// Set the indentation style
+    auto setIndentationStyle(const IndentationStyle style) & noexcept -> Config &
+    {
+        this->indent_style = style;
+        return *this;
+    }
+
+    /// Set the end of line
+    auto setEndOfLine(const EndOfLine eol) & noexcept -> Config &
+    {
+        this->eol = eol;
+        return *this;
+    }
+
+    /// Set the port map configuration
+    auto setPortMapConfig(const PortMapConfig config) & noexcept -> Config &
+    {
+        this->port_map = config;
+        return *this;
+    }
+
+    /// Set the declaration configuration
+    auto setDeclarationConfig(const DeclarationConfig config) & noexcept -> Config &
+    {
+        this->declarations = config;
+        return *this;
+    }
+
+    /// Set the casing configuration
+    auto setCasingConfig(const CasingConfig config) & noexcept -> Config &
+    {
+        this->casing = config;
+        return *this;
+    }
 };
 
 } // namespace common
