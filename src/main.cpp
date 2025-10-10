@@ -29,8 +29,8 @@ auto main(int argc, char *argv[]) -> int
 
         const cli::ConfigReader config_reader{ argparser.getConfigPath() };
 
-        // Call the formatter and pass the config object
-        // formatter{ config_reader.readConfigFile() };
+        // Call the formatter and pass the flag status & config object
+        // formatter{ argparser.getFlags(), config_reader.readConfigFile() };
 
         /* NOTE: The following code is from the previous main function
 

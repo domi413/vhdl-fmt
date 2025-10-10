@@ -8,6 +8,7 @@
 #include <iostream>
 #include <span>
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 
 namespace cli {
@@ -17,9 +18,14 @@ ArgumentParser::ArgumentParser(std::span<char *> args)
     this->parseArguments(args);
 }
 
-auto ArgumentParser::getConfigPath() const -> const std::filesystem::path &
+auto ArgumentParser::getConfigPath() const noexcept -> const std::filesystem::path &
 {
     return config_file_path_;
+}
+
+auto ArgumentParser::getFlags() const noexcept -> const std::unordered_map<std::string_view, bool> &
+{
+    return used_flags_;
 }
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
@@ -72,6 +78,13 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
         }
 
         program.parse_args(c_args);
+
+        if (program.is_used("--write")) {
+            used_flags_.at("write") = true;
+        }
+        if (program.is_used("--check")) {
+            used_flags_.at("check") = true;
+        }
 
     } catch (const std::exception &err) {
         std::cerr << "Error parsing arguments: " << err.what() << '\n';
