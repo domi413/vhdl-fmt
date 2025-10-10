@@ -1,10 +1,9 @@
-#ifndef BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP
-#define BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP
+#ifndef BUILDER_ASSEMBLY_SCOPE_HPP
+#define BUILDER_ASSEMBLY_SCOPE_HPP
 
 #include "builder/assembly/sink.hpp"
 
 #include <memory>
-#include <type_traits>
 #include <vector>
 
 namespace builder {
@@ -15,8 +14,7 @@ struct SlotGuard
 {
     explicit SlotGuard(std::vector<std::unique_ptr<ISink>> &s, Vec &vec) : sinks(s)
     {
-        using Elem = typename std::remove_cvref_t<Vec>::value_type;
-        using NodeT = typename Elem::element_type;
+        using NodeT = typename Vec::value_type::element_type;
         this->sinks.push_back(std::make_unique<SinkImpl<NodeT>>(vec));
     }
 
@@ -33,4 +31,4 @@ struct SlotGuard
 
 } // namespace builder
 
-#endif /* BUILDER_ASSEMBLY_BUILDER_SCOPE_HPP */
+#endif /* BUILDER_ASSEMBLY_SCOPE_HPP */
