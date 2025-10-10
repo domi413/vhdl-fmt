@@ -49,13 +49,12 @@ clean:
 # Utility targets
 # -----------------------------
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
-LINT_TIDY_FLAGS = --warnings-as-errors='*'
+LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
 lint:
 	@echo "Running clang-tidy on source files..."
-	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
-	run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SRCS)
+	@run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SRCS)
 
 	@echo "Running clang-tidy on headers..."
 	@find src tests \( -path '*/build/*' -o -path '*/generated/*' -o -path '*/generators/*' -o -path '*/external/*' \) -prune \

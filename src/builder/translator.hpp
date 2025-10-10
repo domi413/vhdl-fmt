@@ -18,7 +18,7 @@ namespace builder {
  *
  * The `Translator` converts ANTLR CST nodes into AST representations.
  *
- * Responsibilities:
+ * **Responsibilities:**
  *  - Construct AST nodes from parser contexts
  *  - Attach comments and source metadata
  *  - Delegate structural operations to `Assembler`
@@ -36,7 +36,7 @@ class Translator
     Translator(Translator &&) = delete;
     auto operator=(Translator &&) -> Translator & = delete;
 
-    // ---- Scoped assembly helpers ----
+    // Scoped assembly helpers
     template<typename Vec, typename Fn>
     void into(Vec &vec, Fn &&fn)
     {
@@ -54,7 +54,7 @@ class Translator
     antlr4::CommonTokenStream &tokens;
     std::unordered_set<std::size_t> consumed_comment_token_indices;
 
-    // ---- Node creation and metadata helpers ----
+    // Node creation and comment helpers
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
@@ -66,7 +66,7 @@ class Translator
     void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
   public:
-    // ---- AST node constructors ----
+    // AST node constructors
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
     auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
       -> ast::GenericParam &;

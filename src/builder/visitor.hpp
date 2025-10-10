@@ -14,7 +14,7 @@ namespace builder {
  * The `Visitor` walks the parse tree produced by the ANTLR4 VHDL grammar
  * and delegates semantic node creation to `Translator`.
  *
- * Responsibilities:
+ * **Responsibilities:**
  *  - Traverse ANTLR contexts (CST nodes)
  *  - Route subtrees to the correct AST construction functions
  *  - Maintain traversal structure (e.g., visitEntity, visitPort)
@@ -33,8 +33,15 @@ class Visitor : public adapter::BaseVoidVisitor
     Visitor(Visitor &&) = delete;
     auto operator=(Visitor &&) -> Visitor & = delete;
 
+    /**
+     * @brief Continue recursive traversal.
+     *
+     * Calls the default `walk()` implementation for the given node,
+     * allowing derived visitors to resume walking after custom logic.
+     */
     void walk(antlr4::tree::ParseTree *ctx) { adapter::BaseVoidVisitor::walk(ctx); }
 
+    // Node Visitors
     void visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx) override;
     void visitGenericClause(vhdlParser::Generic_clauseContext *ctx) override;
     void visitPortClause(vhdlParser::Port_clauseContext *ctx) override;

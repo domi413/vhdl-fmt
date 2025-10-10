@@ -1,5 +1,5 @@
-#ifndef BUILDER_ASSEMBLY_BUILDER_SINK_HPP
-#define BUILDER_ASSEMBLY_BUILDER_SINK_HPP
+#ifndef BUILDER_ASSEMBLY_SINK_HPP
+#define BUILDER_ASSEMBLY_SINK_HPP
 
 #include "ast/node.hpp"
 
@@ -48,4 +48,4 @@ struct SinkImpl : ISink
 
 } // namespace builder
 
-#endif /* BUILDER_ASSEMBLY_BUILDER_SINK_HPP */
+#endif /* BUILDER_ASSEMBLY_SINK_HPP */
