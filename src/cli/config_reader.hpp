@@ -22,7 +22,7 @@ class ConfigReader final
   public:
     /// Constructs a ConfigReader instance
     explicit ConfigReader(std::filesystem::path config_file_path) :
-      config_file_path(std::move(config_file_path)) {};
+      config_file_path_(std::move(config_file_path)) {};
 
     /// Reads the config file and returns either a Config object or a ConfigReadError
     auto readConfigFile() -> std::expected<common::Config, ConfigReadError>;
@@ -60,7 +60,7 @@ class ConfigReader final
     static auto readCasingConfig(const YAML::Node &root_node, const common::CasingConfig &defaults)
       -> common::CasingConfig;
 
-    std::filesystem::path config_file_path;
+    std::filesystem::path config_file_path_;
 };
 
 } // namespace cli

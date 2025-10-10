@@ -19,7 +19,7 @@ ArgumentParser::ArgumentParser(std::span<char *> args)
 
 auto ArgumentParser::getConfigPath() const -> const std::filesystem::path &
 {
-    return this->config_file_path;
+    return config_file_path_;
 }
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
@@ -56,7 +56,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
               throw std::runtime_error("Configuration path is not a regular file: " + location);
           }
 
-          config_file_path = std::filesystem::canonical(config_path);
+          config_file_path_ = std::filesystem::canonical(config_path);
           return location;
       });
 

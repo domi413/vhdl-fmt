@@ -136,8 +136,6 @@ struct Config final
 
     // NOLINTEND(misc-non-private-member-variables-in-classes)
 
-    Config() = default;
-
     /// Set the formatting line length
     auto setLineConfig(const std::uint8_t line_length) & -> Config &
     {
@@ -192,4 +190,4 @@ struct Config final
 
 } // namespace common
 
-#endif
+#endif /* COMMON_CONFIG_HPP */

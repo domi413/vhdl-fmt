@@ -49,23 +49,22 @@ clean:
 # Utility targets
 # -----------------------------
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
-LINT_TIDY_FLAGS = --warnings-as-errors='*'
+LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
 lint:
 	@echo "Running clang-tidy on source files..."
-	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
-	run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SOURCES)
+	@run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SRCS)
 
 	@echo "Running clang-tidy on headers..."
-	@find src tests \( -path '*/build/*' -o -path '*/generated/*' -o -path '*/generators/*' -o -path '*/external/*' \) -prune \
-		-o -type f \( -name '*.hpp' -o -name '*.h' \) -print | \
-		xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
+	@echo "$(SOURCES)" | \
+	xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
 
 	@echo "✓ Linting complete"
 
 
 GERMESI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
+
 check-format:
 	@echo "Checking code formatting..."
 	@if clang-format --dry-run --Werror $(SOURCES) && $(VENV_BIN)gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \

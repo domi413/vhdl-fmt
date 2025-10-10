@@ -20,7 +20,7 @@ class ArgumentParser final
     /// Parses and processes the cli arguments
     auto parseArguments(std::span<char *> args) -> void;
 
-    std::filesystem::path config_file_path = std::filesystem::current_path();
+    std::filesystem::path config_file_path_ = std::filesystem::current_path();
 };
 
 } // namespace cli
