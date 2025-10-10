@@ -22,9 +22,6 @@ struct Port;
  */
 class Visitor
 {
-  protected:
-    void dispatch(Node &node);
-
   public:
     Visitor() = default;
     virtual ~Visitor() = default;

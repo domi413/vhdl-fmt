@@ -58,7 +58,7 @@ void DebugPrinter::visit(const ast::GenericParam &node)
     }
 
     info += " : " + node.type;
-    if (node.init) {
+    if (node.init.has_value()) {
         info += " := " + *node.init;
     }
 
