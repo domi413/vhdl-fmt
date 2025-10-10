@@ -12,7 +12,6 @@
 #include <string_view>
 #include <unordered_map>
 #include <yaml-cpp/exceptions.h>
-#include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/parse.h>
 
 namespace cli {
@@ -103,7 +102,11 @@ auto mapValueToConfig(const std::string_view style,
 auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadError>
 {
     if (!std::filesystem::exists(config_file_path_)) {
-        return common::Config{};
+        if (config_file_path_ == std::filesystem::current_path()) {
+            return common::Config{};
+        }
+
+        return std::unexpected{ ConfigReadError{ "Config file does not exist." } };
     }
 
     YAML::Node root_node{};
@@ -117,7 +120,7 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
                                                  + e.what() } };
     }
 
-    if (!root_node.IsMap()) {
+    if (!root_node.IsNull() && !root_node.IsMap()) {
         return std::unexpected{ ConfigReadError{
           "Config file is not a valid yaml file or could not be correctly loaded." } };
     }
