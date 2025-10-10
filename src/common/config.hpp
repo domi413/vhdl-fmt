@@ -2,6 +2,7 @@
 #define COMMON_CONFIG_HPP
 
 #include <cstdint>
+#include <format>
 #include <stdexcept>
 #include <string>
 
@@ -107,14 +108,14 @@ struct LineConfig final
     static auto validateLineConfig(const LineLength length, const IndentSize size) -> void
     {
         if (length.length < MIN_LINE_LENGTH || length.length > MAX_LINE_LENGTH) {
-            const std::string msg = "Line length must be between " + std::to_string(MIN_LINE_LENGTH)
-                                  + " and " + std::to_string(MAX_LINE_LENGTH) + ".";
+            const std::string msg = std::format(
+              "Line length must be between {} and {}", MIN_LINE_LENGTH, MAX_LINE_LENGTH);
             throw std::invalid_argument(msg);
         }
 
         if (size.size < MIN_INDENT_SIZE || size.size > MAX_INDENT_SIZE) {
-            const std::string msg = "Indent size must be between " + std::to_string(MIN_INDENT_SIZE)
-                                  + " and " + std::to_string(MAX_INDENT_SIZE) + ".";
+            const std::string msg = std::format(
+              "Indent size must be between {} and {}", MIN_INDENT_SIZE, MAX_INDENT_SIZE);
             throw std::invalid_argument(msg);
         }
     }

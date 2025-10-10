@@ -16,7 +16,7 @@ namespace cli {
 
 ArgumentParser::ArgumentParser(std::span<char *> args)
 {
-    this->parseArguments(args);
+    parseArguments(args);
 }
 
 auto ArgumentParser::getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &

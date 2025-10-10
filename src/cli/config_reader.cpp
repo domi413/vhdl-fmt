@@ -159,7 +159,7 @@ auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::Lin
 {
     auto line_config = defaults;
 
-    if (auto value = tryParseYaml<std::uint8_t>(root_node["line_length"], "line_length")) {
+    if (const auto value = tryParseYaml<std::uint8_t>(root_node["line_length"], "line_length")) {
         line_config.line_length = *value;
     }
 
@@ -192,7 +192,8 @@ auto ConfigReader::readEndOfLine(const YAML::Node &root_node, const common::EndO
 {
     auto eol = defaults;
 
-    if (auto style_str = tryParseYaml<std::string_view>(root_node["end_of_line"], "end_of_line")) {
+    if (const auto style_str
+        = tryParseYaml<std::string_view>(root_node["end_of_line"], "end_of_line")) {
         eol = mapValueToConfig(*style_str, EOL_STYLE_MAP, "end of line style");
     }
 
