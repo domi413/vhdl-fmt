@@ -22,7 +22,7 @@ concept AstNode = std::derived_from<T, ast::Node>;
  *  - Recursively walk the AST hierarchy.
  *  - Serve as a base for specialized visitors.
  */
-class BaseVisitor : Visitor
+class BaseVisitor : public Visitor
 {
   protected:
     /**
@@ -31,7 +31,7 @@ class BaseVisitor : Visitor
      * Safely invokes `accept()` on a node pointer, allowing
      * traversal of optional or nullable children.
      */
-    void dispatch(Node *node)
+    void dispatch(const Node *node)
     {
         if (node != nullptr) {
             node->accept(*this);
