@@ -10,7 +10,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-message(STATUS "Building ${PROJECT_NAME} ${PROJECT_VERSION}")
+message(STATUS "Project: ${PROJECT_NAME}")
+message(STATUS "  Version:  ${PROJECT_VERSION}")
+message(STATUS "  Build:    ${CMAKE_BUILD_TYPE}")
+message(
+    STATUS
+    "  Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}"
+)
+message(STATUS "  Standard: C++${CMAKE_CXX_STANDARD}")
 
 find_package(antlr4-runtime CONFIG REQUIRED)
 find_package(argparse REQUIRED)
@@ -29,12 +36,16 @@ find_program(ANTLR4_EXECUTABLE antlr4 REQUIRED)
 
 # Tell CMake how to generate these sources
 add_custom_command(
-    OUTPUT ${GENERATED_DIR}/vhdlLexer.cpp ${GENERATED_DIR}/vhdlParser.cpp
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
+    OUTPUT
+        ${GENERATED_DIR}/vhdlLexer.cpp
+        ${GENERATED_DIR}/vhdlParser.cpp
+    COMMAND
+        ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
     COMMAND
         ${ANTLR4_EXECUTABLE} -Dlanguage=Cpp ${GRAMMAR_FILE} -lib
         ${CMAKE_SOURCE_DIR}/grammars -o ${GENERATED_DIR} -no-listener -visitor
-    DEPENDS ${GRAMMAR_FILE}
+    DEPENDS
+        ${GRAMMAR_FILE}
     COMMENT "Generating VHDL lexer and parser using ANTLR4"
     VERBATIM
 )
@@ -42,7 +53,9 @@ add_custom_command(
 # Group that rule into an explicit target
 add_custom_target(
     generate_vhdl_parser
-    DEPENDS ${GENERATED_DIR}/vhdlLexer.cpp ${GENERATED_DIR}/vhdlParser.cpp
+    DEPENDS
+        ${GENERATED_DIR}/vhdlLexer.cpp
+        ${GENERATED_DIR}/vhdlParser.cpp
 )
 
 # Create the library directly from the *expected* generated files,
