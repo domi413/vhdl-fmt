@@ -1,6 +1,6 @@
 #include "argument_parser.hpp"
 
-// #include "version.hpp"
+#include "version.hpp"
 
 #include <argparse/argparse.hpp>
 #include <exception>
@@ -8,6 +8,7 @@
 #include <iostream>
 #include <span>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -30,8 +31,8 @@ auto ArgumentParser::getFlags() const noexcept -> const std::unordered_map<std::
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 {
-    // TODO(domi): After the `.in` file gets correctly generated, use PROJECT_NAME & PROJECT_VERSION
-    argparse::ArgumentParser program{ "vhdl-fmt", "1.0.0" };
+    argparse::ArgumentParser program{ std::string(common::PROJECT_NAME),
+                                      std::string(common::PROJECT_VERSION) };
 
     program.add_description("A VHDL formatter for beautifying and standardizing VHDL code.");
     program.add_epilog("For more information, visit the project "

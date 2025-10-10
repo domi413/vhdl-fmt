@@ -74,6 +74,21 @@ target_include_directories(vhdl_generated PUBLIC ${GENERATED_DIR})
 target_link_libraries(vhdl_generated PUBLIC antlr4_static)
 
 # --------------------------------------------------------------------
+# Version Header Generation
+# --------------------------------------------------------------------
+set(VERSION_IN_FILE "${CMAKE_SOURCE_DIR}/src/common/version.hpp.in")
+set(VERSION_OUT_FILE "${CMAKE_BINARY_DIR}/generated/version.hpp")
+
+# Ensure the output directory exists
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/generated")
+
+configure_file(
+    ${VERSION_IN_FILE}
+    ${VERSION_OUT_FILE}
+    @ONLY
+)
+
+# --------------------------------------------------------------------
 # Project subdirs
 # --------------------------------------------------------------------
 add_subdirectory(src)
