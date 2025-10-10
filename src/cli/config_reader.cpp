@@ -130,7 +130,7 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
         config.setLineConfig(line_cfg.line_length)
           .setIndentionSize(line_cfg.indent_size)
           .setIndentationStyle(readIndentationStyle(root_node, config.indent_style))
-          .setEndOfLine(readEndOfLine(root_node, config.eol))
+          .setEndOfLine(readEndOfLine(root_node, config.eol_format))
           .setPortMapConfig(readPortMapConfig(root_node, config.port_map))
           .setDeclarationConfig(readDeclarationConfig(root_node, config.declarations))
           .setCasingConfig(readCasingConfig(root_node, config.casing));

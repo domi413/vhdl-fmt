@@ -127,7 +127,7 @@ struct Config final
 
     LineConfig line_config{ LineConfig::defaultConfig() };
     IndentationStyle indent_style{ IndentationStyle::SPACES };
-    EndOfLine eol{ EndOfLine::LF };
+    EndOfLine eol_format{ EndOfLine::LF };
     PortMapConfig port_map{ true };
     DeclarationConfig declarations{ .align_colons = true };
     CasingConfig casing{ .keywords = CaseStyle::LOWER,
@@ -139,51 +139,51 @@ struct Config final
     /// Set the formatting line length
     auto setLineConfig(const std::uint8_t line_length) & -> Config &
     {
-        this->line_config = LineConfig::create(LineLength{ .length = line_length },
-                                               IndentSize{ .size = this->line_config.indent_size });
+        line_config = LineConfig::create(LineLength{ .length = line_length },
+                                         IndentSize{ .size = line_config.indent_size });
         return *this;
     }
 
     /// Set the indentation size
     auto setIndentionSize(const std::uint8_t indent_size) & -> Config &
     {
-        this->line_config = LineConfig::create(
-          LineLength{ .length = this->line_config.line_length }, IndentSize{ .size = indent_size });
+        line_config = LineConfig::create(LineLength{ .length = line_config.line_length },
+                                         IndentSize{ .size = indent_size });
         return *this;
     }
 
     /// Set the indentation style
     auto setIndentationStyle(const IndentationStyle style) & noexcept -> Config &
     {
-        this->indent_style = style;
+        indent_style = style;
         return *this;
     }
 
     /// Set the end of line
     auto setEndOfLine(const EndOfLine eol) & noexcept -> Config &
     {
-        this->eol = eol;
+        eol_format = eol;
         return *this;
     }
 
     /// Set the port map configuration
     auto setPortMapConfig(const PortMapConfig config) & noexcept -> Config &
     {
-        this->port_map = config;
+        port_map = config;
         return *this;
     }
 
     /// Set the declaration configuration
     auto setDeclarationConfig(const DeclarationConfig config) & noexcept -> Config &
     {
-        this->declarations = config;
+        declarations = config;
         return *this;
     }
 
     /// Set the casing configuration
     auto setCasingConfig(const CasingConfig config) & noexcept -> Config &
     {
-        this->casing = config;
+        casing = config;
         return *this;
     }
 };
