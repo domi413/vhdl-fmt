@@ -139,8 +139,8 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
         common::Config config{};
 
         config.casing = readCasingConfig(root_node, config.casing);
-        config.eol_format = readEndOfLine(root_node, config.eol_format);
         config.port_map = readPortMapConfig(root_node, config.port_map);
+        config.eol_format = readEndOfLine(root_node, config.eol_format);
         config.line_config = readLineconfig(root_node, config.line_config);
         config.indent_style = readIndentationStyle(root_node, config.indent_style);
         config.declarations = readDeclarationConfig(root_node, config.declarations);
