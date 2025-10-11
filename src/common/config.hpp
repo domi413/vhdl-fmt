@@ -124,7 +124,6 @@ struct LineConfig final
 // Holds the configuration from the config file
 struct Config final
 {
-
     LineConfig line_config{ LineConfig::defaultConfig() };
     IndentationStyle indent_style{ IndentationStyle::SPACES };
     EndOfLine eol_format{ EndOfLine::LF };

@@ -24,7 +24,7 @@ auto ArgumentParser::getConfigPath() const noexcept -> const std::optional<std::
     return config_file_path_;
 }
 
-auto ArgumentParser::getFlags() const noexcept -> const std::unordered_map<std::string_view, bool> &
+auto ArgumentParser::getFlags() const noexcept -> const std::unordered_map<Arguments, bool> &
 {
     return used_flags_;
 }
@@ -81,10 +81,10 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
         program.parse_args(c_args);
 
         if (program.is_used("--write")) {
-            used_flags_.at("write") = true;
+            used_flags_.at(Arguments::WRITE) = true;
         }
         if (program.is_used("--check")) {
-            used_flags_.at("check") = true;
+            used_flags_.at(Arguments::CHECK) = true;
         }
 
     } catch (const std::exception &err) {
