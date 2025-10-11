@@ -105,6 +105,7 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
         const auto default_path = std::filesystem::current_path() / "vhdl-fmt.yaml";
 
         if (!std::filesystem::exists(default_path)) {
+            // When no config file location was passed, return the default config
             return common::Config{};
         }
 
