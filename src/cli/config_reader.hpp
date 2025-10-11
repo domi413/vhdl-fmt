@@ -1,18 +1,17 @@
 #ifndef CLI_CONFIG_READER_HPP
 #define CLI_CONFIG_READER_HPP
 
-// NOTE: clang-tidy complains that there are unused headers, though otherwise
-// the compilation fails
-
 #include "common/config.hpp"
-#include "yaml-cpp/node/convert.h"
-#include "yaml-cpp/node/detail/impl.h"
-#include "yaml-cpp/node/node.h"
 
 #include <expected>
 #include <filesystem>
 #include <optional>
 #include <string>
+
+// YAML-cpp requires these headers for proper template instantiation
+// The convert.h is needed for Node::as<T>() to work
+#include <yaml-cpp/node/convert.h>
+#include <yaml-cpp/node/node.h>
 
 namespace cli {
 
@@ -26,10 +25,13 @@ class ConfigReader final
 {
   public:
     /// Constructs a ConfigReader instance
-    explicit ConfigReader(const std::optional<std::filesystem::path> &config_file_path) :
-      config_file_path_(config_file_path) {};
+    explicit ConfigReader(std::optional<std::filesystem::path> config_file_path) :
+      config_file_path_(std::move(config_file_path))
+    {
+    }
 
     /// Reads the config file and returns either a Config object or a ConfigReadError
+    [[nodiscard]]
     auto readConfigFile() -> std::expected<common::Config, ConfigReadError>;
 
   private:

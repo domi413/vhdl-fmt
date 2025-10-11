@@ -2,15 +2,17 @@
 
 #include "common/config.hpp"
 
+#include <array>
 #include <cstdint>
 #include <exception>
 #include <expected>
 #include <filesystem>
+#include <format>
 #include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <unordered_map>
+#include <utility>
 #include <yaml-cpp/exceptions.h>
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/parse.h>
@@ -19,56 +21,65 @@ namespace cli {
 
 namespace {
 
-// The map isn't `constexpr` as clang-tidy suggests. A singleton pattern would
-// suppress the warning but reduce readability without significant benefit.
-// ---
-// NOLINTBEGIN(fuchsia-statically-constructed-objects, cert-err58-cpp)
-
 using PortMapMemberPtr = bool common::PortMapConfig::*;
 using DeclarationMemberPtr = bool common::DeclarationConfig::*;
 using CasingMemberPtr = common::CaseStyle common::CasingConfig::*;
 
-const std::unordered_map<std::string_view, common::IndentationStyle> INDENTATION_STYLE_MAP = {
-    { "spaces", common::IndentationStyle::SPACES },
-    { "tabs",   common::IndentationStyle::TABS   },
+constexpr std::array INDENTATION_STYLE_MAP = {
+    std::pair{ "spaces", common::IndentationStyle::SPACES },
+    std::pair{ "tabs",   common::IndentationStyle::TABS   },
 };
 
-const std::unordered_map<std::string_view, common::EndOfLine> EOL_STYLE_MAP = {
-    { "auto", common::EndOfLine::AUTO },
-    { "crlf", common::EndOfLine::CRLF },
-    { "lf",   common::EndOfLine::LF   },
+constexpr std::array EOL_STYLE_MAP = {
+    std::pair{ "auto", common::EndOfLine::AUTO },
+    std::pair{ "crlf", common::EndOfLine::CRLF },
+    std::pair{ "lf",   common::EndOfLine::LF   },
 };
 
-const std::unordered_map<std::string_view, PortMapMemberPtr> PORT_MAP_ASSIGNMENTS_MAP = {
-    { "align_signals", &common::PortMapConfig::align_signals },
+constexpr std::array PORT_MAP_ASSIGNMENTS_MAP = {
+    std::pair{ "align_signals", &common::PortMapConfig::align_signals },
 };
 
-const std::unordered_map<std::string_view, DeclarationMemberPtr> DECLARATION_ASSIGNMENTS_MAP = {
-    { "align_colons",         &common::DeclarationConfig::align_colons         },
-    { "align_types",          &common::DeclarationConfig::align_types          },
-    { "align_initialization", &common::DeclarationConfig::align_initialization },
+constexpr std::array DECLARATION_ASSIGNMENTS_MAP = {
+    std::pair{ "align_colons",         &common::DeclarationConfig::align_colons         },
+    std::pair{ "align_types",          &common::DeclarationConfig::align_types          },
+    std::pair{ "align_initialization", &common::DeclarationConfig::align_initialization },
 };
 
-const std::unordered_map<std::string_view, common::CaseStyle> CASE_STYLE_MAP = {
-    { "lower_case", common::CaseStyle::LOWER },
-    { "UPPER_CASE", common::CaseStyle::UPPER },
+constexpr std::array CASE_STYLE_MAP = {
+    std::pair{ "lower_case", common::CaseStyle::LOWER },
+    std::pair{ "UPPER_CASE", common::CaseStyle::UPPER },
 };
 
-const std::unordered_map<std::string_view, CasingMemberPtr> CASING_ASSIGNMENTS_MAP = {
-    { "keywords",    &common::CasingConfig::keywords    },
-    { "constants",   &common::CasingConfig::constants   },
-    { "identifiers", &common::CasingConfig::identifiers },
+constexpr std::array CASING_ASSIGNMENTS_MAP = {
+    std::pair{ "keywords",    &common::CasingConfig::keywords    },
+    std::pair{ "constants",   &common::CasingConfig::constants   },
+    std::pair{ "identifiers", &common::CasingConfig::identifiers },
 };
 
-// NOLINTEND(fuchsia-statically-constructed-objects, cert-err58-cpp)
+/// Helper for constexpr lookup in arrays
+template<typename T, std::size_t N>
+[[nodiscard]]
+constexpr auto findInMap(const std::array<std::pair<std::string_view, T>, N> &map,
+                         std::string_view key) -> std::optional<T>
+{
+    for (const auto &[k, v] : map) {
+        if (k == key) {
+            return v;
+        }
+    }
+    return std::nullopt;
+}
 
 /// Checks if a node exists and is not null
-constexpr auto isValid(const YAML::Node &node) -> bool
+[[nodiscard]]
+inline auto isValid(const YAML::Node &node) -> bool
 {
     return node && !node.IsNull();
-};
+}
 
 template<typename T>
+[[nodiscard]]
 auto tryParseYaml(const YAML::Node &node, std::string_view name) -> std::optional<T>
 {
     if (!isValid(node)) {
@@ -78,22 +89,22 @@ auto tryParseYaml(const YAML::Node &node, std::string_view name) -> std::optiona
     try {
         return node.as<T>();
     } catch (const YAML::BadConversion &e) {
-        throw std::runtime_error(std::string("Invalid value for config field '") + std::string(name)
-                                 + "': " + e.what());
+        throw std::runtime_error(
+          std::format("Invalid value for config field '{}': {}", name, e.what()));
     }
 }
 
-template<typename T>
-auto mapValueToConfig(const std::string_view style,
-                      const std::unordered_map<std::string_view, T> &map,
-                      const std::string_view error_context) -> T
+template<typename T, std::size_t N>
+[[nodiscard]]
+auto mapValueToConfig(std::string_view style,
+                      const std::array<std::pair<std::string_view, T>, N> &map,
+                      std::string_view error_context) -> T
 {
-    if (const auto it = map.find(style); it != map.end()) {
-        return it->second;
+    if (auto result = findInMap(map, style)) {
+        return *result;
     }
 
-    throw std::invalid_argument(std::string("Invalid ") + error_context.data()
-                                + " config: " + style.data());
+    throw std::invalid_argument(std::format("Invalid {} config: {}", error_context, style));
 }
 
 } // namespace
@@ -115,23 +126,23 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
 
     if (!std::filesystem::exists(path_to_read)) {
         return std::unexpected{ ConfigReadError{
-          "Config file does not exist at the defined location." } };
+          .message = "Config file does not exist at the defined location." } };
     }
 
     YAML::Node root_node{};
     try {
         root_node = YAML::LoadFile(path_to_read.string());
     } catch (const YAML::BadFile &e) {
-        return std::unexpected{ ConfigReadError{ std::string("Could not load config file: ")
-                                                 + e.what() } };
+        return std::unexpected{ ConfigReadError{
+          .message = std::format("Could not load config file: {}", e.what()) } };
     } catch (const std::exception &e) {
-        return std::unexpected{ ConfigReadError{ std::string("Error reading config file: ")
-                                                 + e.what() } };
+        return std::unexpected{ ConfigReadError{
+          .message = std::format("Error reading config file: {}", e.what()) } };
     }
 
     if (!root_node.IsNull() && !root_node.IsMap()) {
         return std::unexpected{ ConfigReadError{
-          "Config file is not a valid yaml file or could not be correctly loaded." } };
+          .message = "Config file is not a valid yaml file or could not be correctly loaded." } };
     }
 
     try {
@@ -146,10 +157,11 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
 
         return config;
     } catch (const std::exception &e) {
-        return std::unexpected{ ConfigReadError{ std::string("Config parsing failed: ")
-                                                 + e.what() } };
+        return std::unexpected{ ConfigReadError{
+          .message = std::format("Config parsing failed: {}", e.what()) } };
     }
 }
+
 auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::LineConfig &defaults)
   -> common::LineConfig
 {

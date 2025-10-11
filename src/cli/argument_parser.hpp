@@ -1,18 +1,19 @@
 #ifndef CLI_ARGUMENT_PARSER_HPP
 #define CLI_ARGUMENT_PARSER_HPP
 
+#include <bitset>
 #include <cstdint>
 #include <filesystem>
 #include <optional>
 #include <span>
-#include <unordered_map>
 
 namespace cli {
 
-enum class Arguments : std::uint8_t
+enum class ArgumentFlag : std::uint8_t
 {
-    WRITE,
-    CHECK
+    WRITE = 0,
+    CHECK = 1,
+    FLAG_COUNT = 2 // Required for flag count
 };
 
 class ArgumentParser final
@@ -25,19 +26,16 @@ class ArgumentParser final
     [[nodiscard]]
     auto getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &;
 
-    /// Returns a map of the cli flags and their values
+    /// Returns whether a specific flag is set
     [[nodiscard]]
-    auto getFlags() const noexcept -> const std::unordered_map<Arguments, bool> &;
+    auto isFlagSet(ArgumentFlag flag) const noexcept -> bool;
 
   private:
     /// Parses and processes the cli arguments
     auto parseArguments(std::span<char *> args) -> void;
 
     std::optional<std::filesystem::path> config_file_path_;
-    std::unordered_map<Arguments, bool> used_flags_ = {
-        { Arguments::WRITE, false },
-        { Arguments::CHECK, false }
-    };
+    std::bitset<static_cast<std::size_t>(ArgumentFlag::FLAG_COUNT)> used_flags_;
 };
 
 } // namespace cli

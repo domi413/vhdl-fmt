@@ -10,6 +10,7 @@ BinPackParameters: false
 BreakAfterAttributes: Always
 BreakAfterReturnType: None
 BreakBeforeBinaryOperators: true
+BreakBinaryOperations: OnePerLine
 BreakConstructorInitializers: AfterColon
 ColumnLimit: 100
 FixNamespaceComments: true
