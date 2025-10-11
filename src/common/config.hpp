@@ -103,11 +103,9 @@ struct Config final
     LineConfig line_config{};
     IndentationStyle indent_style{ IndentationStyle::SPACES };
     EndOfLine eol_format{ EndOfLine::AUTO };
-    PortMapConfig port_map{ true };
-    DeclarationConfig declarations{ .align_colons = true };
-    CasingConfig casing{ .keywords = CaseStyle::LOWER,
-                         .constants = CaseStyle::UPPER,
-                         .identifiers = CaseStyle::LOWER };
+    PortMapConfig port_map{};
+    DeclarationConfig declarations{};
+    CasingConfig casing{};
 };
 
 } // namespace common

@@ -1,23 +1,20 @@
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
-#include "ast/nodes/design_file.hpp"
-#include "builder/assembly/assembler.hpp"
-#include "builder/translator.hpp"
-#include "builder/visitor.hpp"
+// #include "ANTLRInputStream.h"
+// #include "CommonTokenStream.h"
+// #include "ast/nodes/design_file.hpp"
+// #include "builder/assembly/assembler.hpp"
+// #include "builder/translator.hpp"
+// #include "builder/visitor.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
-#include "emit/debug_printer.hpp"
-#include "vhdlLexer.h"
-#include "vhdlParser.h"
+// #include "emit/debug_printer.hpp"
+// #include "vhdlLexer.h"
+// #include "vhdlParser.h"
 
 #include <cstddef>
 #include <cstdlib>
 #include <exception>
-#include <filesystem>
-#include <fstream>
 #include <iostream>
 #include <span>
-#include <sstream>
 
 /// The main entry point of the program
 auto main(int argc, char *argv[]) -> int

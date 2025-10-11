@@ -5,10 +5,33 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <string>
 
 namespace {
+
+// RAII class for scope exit cleanup
+template<typename F>
+class ScopeExit
+{
+  public:
+    ScopeExit(const ScopeExit &) = delete;
+    ScopeExit(ScopeExit &&) = delete;
+    auto operator=(const ScopeExit &) -> ScopeExit & = delete;
+    auto operator=(ScopeExit &&) -> ScopeExit & = delete;
+    explicit ScopeExit(F func) : func_(std::move(func)) {}
+    ~ScopeExit() { func_(); }
+
+  private:
+    F func_;
+};
+
+template<typename F>
+auto makeScopeExit(F func) -> ScopeExit<F>
+{
+    return ScopeExit<F>(std::move(func));
+}
 
 constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem::path
 {
@@ -121,6 +144,11 @@ SCENARIO("ConfigReader handles configuration file reading")
         std::filesystem::create_directories(temp_dir);
         std::filesystem::current_path(temp_dir);
 
+        auto cleanup_guard = makeScopeExit([&] {
+            std::filesystem::current_path(original_path);
+            std::filesystem::remove_all(temp_dir);
+        });
+
         cli::ConfigReader reader{ std::nullopt };
 
         WHEN("the config file is read")
@@ -138,10 +166,6 @@ SCENARIO("ConfigReader handles configuration file reading")
                 REQUIRE(config.eol_format == common::EndOfLine::AUTO);
             }
         }
-
-        // Restore original path
-        std::filesystem::current_path(original_path);
-        std::filesystem::remove_all(temp_dir);
     }
 
     GIVEN("An invalid configuration parameter")
@@ -173,6 +197,8 @@ SCENARIO("ConfigReader handles configuration file reading")
                 temp_file << content;
             }
 
+            auto cleanup_guard = makeScopeExit([&] { std::filesystem::remove(temp_path); });
+
             cli::ConfigReader reader{ temp_path };
             const auto result = reader.readConfigFile();
 
@@ -192,8 +218,6 @@ SCENARIO("ConfigReader handles configuration file reading")
                 INFO("Actual: " << error.message);
                 REQUIRE(absl::StrContains(error.message, expected_error));
             }
-
-            std::filesystem::remove(temp_path);
         }
     }
 
@@ -210,11 +234,13 @@ SCENARIO("ConfigReader handles configuration file reading")
         WHEN(description)
         {
             const auto temp_path = std::filesystem::temp_directory_path()
-                                 / ("test_" + std::to_string(expected_value) + ".yaml");
+                                 / std::format("test_{}.yaml", std::to_string(expected_value));
             {
                 std::ofstream temp_file{ temp_path };
                 temp_file << content;
             }
+
+            auto cleanup_guard = makeScopeExit([&] { std::filesystem::remove(temp_path); });
 
             cli::ConfigReader reader{ temp_path };
             const auto result = reader.readConfigFile();
@@ -230,8 +256,6 @@ SCENARIO("ConfigReader handles configuration file reading")
                     REQUIRE(config.line_config.indent_size == expected_value);
                 }
             }
-
-            std::filesystem::remove(temp_path);
         }
     }
 }
