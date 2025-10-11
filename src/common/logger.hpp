@@ -104,4 +104,4 @@ class Logger final
 
 } // namespace common
 
-#endif
+#endif /* COMMON_LOGGER_HPP */
