@@ -137,15 +137,12 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
     try {
         common::Config config{};
 
-        const auto line_cfg = readLineconfig(root_node, config.line_config);
-
-        config.setLineConfig(line_cfg.line_length)
-          .setIndentionSize(line_cfg.indent_size)
-          .setIndentationStyle(readIndentationStyle(root_node, config.indent_style))
-          .setEndOfLine(readEndOfLine(root_node, config.eol_format))
-          .setPortMapConfig(readPortMapConfig(root_node, config.port_map))
-          .setDeclarationConfig(readDeclarationConfig(root_node, config.declarations))
-          .setCasingConfig(readCasingConfig(root_node, config.casing));
+        config.line_config = readLineconfig(root_node, config.line_config);
+        config.indent_style = readIndentationStyle(root_node, config.indent_style);
+        config.eol_format = readEndOfLine(root_node, config.eol_format);
+        config.port_map = readPortMapConfig(root_node, config.port_map);
+        config.declarations = readDeclarationConfig(root_node, config.declarations);
+        config.casing = readCasingConfig(root_node, config.casing);
 
         return config;
     } catch (const std::exception &e) {

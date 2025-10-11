@@ -124,7 +124,6 @@ struct LineConfig final
 // Holds the configuration from the config file
 struct Config final
 {
-    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 
     LineConfig line_config{ LineConfig::defaultConfig() };
     IndentationStyle indent_style{ IndentationStyle::SPACES };
@@ -134,59 +133,6 @@ struct Config final
     CasingConfig casing{ .keywords = CaseStyle::LOWER,
                          .constants = CaseStyle::UPPER,
                          .identifiers = CaseStyle::LOWER };
-
-    // NOLINTEND(misc-non-private-member-variables-in-classes)
-
-    /// Set the formatting line length
-    auto setLineConfig(const std::uint8_t line_length) & -> Config &
-    {
-        line_config = LineConfig::create(LineLength{ .length = line_length },
-                                         IndentSize{ .size = line_config.indent_size });
-        return *this;
-    }
-
-    /// Set the indentation size
-    auto setIndentionSize(const std::uint8_t indent_size) & -> Config &
-    {
-        line_config = LineConfig::create(LineLength{ .length = line_config.line_length },
-                                         IndentSize{ .size = indent_size });
-        return *this;
-    }
-
-    /// Set the indentation style
-    auto setIndentationStyle(const IndentationStyle style) & noexcept -> Config &
-    {
-        indent_style = style;
-        return *this;
-    }
-
-    /// Set the end of line
-    auto setEndOfLine(const EndOfLine eol) & noexcept -> Config &
-    {
-        eol_format = eol;
-        return *this;
-    }
-
-    /// Set the port map configuration
-    auto setPortMapConfig(const PortMapConfig config) & noexcept -> Config &
-    {
-        port_map = config;
-        return *this;
-    }
-
-    /// Set the declaration configuration
-    auto setDeclarationConfig(const DeclarationConfig config) & noexcept -> Config &
-    {
-        declarations = config;
-        return *this;
-    }
-
-    /// Set the casing configuration
-    auto setCasingConfig(const CasingConfig config) & noexcept -> Config &
-    {
-        casing = config;
-        return *this;
-    }
 };
 
 } // namespace common
