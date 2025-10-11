@@ -1,9 +1,6 @@
 #ifndef COMMON_LOGGER_HPP
 #define COMMON_LOGGER_HPP
 
-#include <cstdint>
-#include <memory>
-#include <spdlog/logger.h>
 #ifndef SPDLOG_ACTIVE_LEVEL
     #ifdef NDEBUG
         #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
@@ -12,12 +9,14 @@
     #endif
 #endif
 
+#include <memory>
+#include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-#include <string_view>
 
 namespace common {
 
+/// Log level enumeration matching spdlog levels
 enum class Level : std::uint8_t
 {
     trace = SPDLOG_LEVEL_TRACE,
@@ -29,9 +28,11 @@ enum class Level : std::uint8_t
     off = SPDLOG_LEVEL_OFF
 };
 
+/// Thread-safe singleton logger wrapper around spdlog
 class Logger final
 {
   public:
+    /// Get the singleton logger instance
     static auto instance() -> Logger &
     {
         static Logger instance;
@@ -43,15 +44,6 @@ class Logger final
     Logger(Logger &&) = delete;
     auto operator=(Logger &&) -> Logger & = delete;
     ~Logger() = default;
-
-    void setLevel(Level level)
-    {
-        logger_->set_level(static_cast<spdlog::level::level_enum>(level));
-    }
-
-    void setPattern(std::string_view pattern) { logger_->set_pattern(std::string(pattern)); }
-
-    void flush() { logger_->flush(); }
 
     template<typename... Args>
     void trace([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
@@ -92,13 +84,13 @@ class Logger final
   private:
     Logger() :
       logger_([] {
-          auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+          const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
           console_sink->set_level(spdlog::level::warn);
           console_sink->set_level(spdlog::level::trace);
           console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
-          auto logger = std::make_shared<spdlog::logger>("vhdl_fmt", console_sink);
+          const auto logger = std::make_shared<spdlog::logger>("logger", console_sink);
           logger->set_level(console_sink->level());
           logger->flush_on(spdlog::level::err);
 

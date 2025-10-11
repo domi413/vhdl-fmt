@@ -5,7 +5,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(ast)
 add_subdirectory(builder)
 add_subdirectory(emit)
-add_subdirectory(common)
 
 # Main executable
 add_executable(vhdl_formatter main.cpp)
@@ -16,7 +15,6 @@ target_link_libraries(
         ast
         builder
         emit
-        common
         vhdl_generated
         argparse::argparse
         fmt::fmt
