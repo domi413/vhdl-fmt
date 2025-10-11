@@ -9,7 +9,7 @@
     #endif
 #endif
 
-#include <memory>
+#include <cstdint>
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
