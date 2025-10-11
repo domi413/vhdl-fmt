@@ -82,11 +82,7 @@ set(VERSION_OUT_FILE "${CMAKE_BINARY_DIR}/generated/version.hpp")
 # Ensure the output directory exists
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/generated")
 
-configure_file(
-    ${VERSION_IN_FILE}
-    ${VERSION_OUT_FILE}
-    @ONLY
-)
+configure_file(${VERSION_IN_FILE} ${VERSION_OUT_FILE} @ONLY)
 
 # --------------------------------------------------------------------
 # Project subdirs

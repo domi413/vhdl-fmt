@@ -12,6 +12,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <yaml-cpp/exceptions.h>
+#include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/parse.h>
 
 namespace cli {

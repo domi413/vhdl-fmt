@@ -1,13 +1,18 @@
 #ifndef CLI_CONFIG_READER_HPP
 #define CLI_CONFIG_READER_HPP
 
+// NOTE: clang-tidy complains that there are unused headers, though otherwise
+// the compilation fails
+
 #include "common/config.hpp"
+#include "yaml-cpp/node/convert.h"
+#include "yaml-cpp/node/detail/impl.h"
+#include "yaml-cpp/node/node.h"
 
 #include <expected>
 #include <filesystem>
 #include <optional>
 #include <string>
-#include <yaml-cpp/node/node.h>
 
 namespace cli {
 
