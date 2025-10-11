@@ -18,7 +18,7 @@ namespace builder {
  *
  * The `Translator` converts ANTLR CST nodes into AST representations.
  *
- * Responsibilities:
+ * **Responsibilities:**
  *  - Construct AST nodes from parser contexts
  *  - Attach comments and source metadata
  *  - Delegate structural operations to `Assembler`
@@ -28,7 +28,7 @@ namespace builder {
 class Translator
 {
   public:
-    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
+    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder_(b), tokens_(ts) {}
 
     ~Translator() = default;
     Translator(const Translator &) = delete;
@@ -36,29 +36,29 @@ class Translator
     Translator(Translator &&) = delete;
     auto operator=(Translator &&) -> Translator & = delete;
 
-    // ---- Scoped assembly helpers ----
+    // Scoped assembly helpers
     template<typename Vec, typename Fn>
     void into(Vec &vec, Fn &&fn)
     {
-        builder.into(vec, std::forward<Fn>(fn));
+        builder_.into(vec, std::forward<Fn>(fn));
     }
 
     template<typename Vec>
     auto with(Vec &vec)
     {
-        return builder.with(vec);
+        return builder_.with(vec);
     }
 
   private:
-    Assembler &builder;
-    antlr4::CommonTokenStream &tokens;
-    std::unordered_set<std::size_t> consumed_comment_token_indices;
+    Assembler &builder_;
+    antlr4::CommonTokenStream &tokens_;
+    std::unordered_set<std::size_t> consumed_comment_token_indices_;
 
-    // ---- Node creation and metadata helpers ----
+    // Node creation and comment helpers
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
-        auto &node{ builder.spawn<T>() };
+        auto &node{ builder_.spawn<T>() };
         attachComments(node, ctx);
         return node;
     }
@@ -66,7 +66,7 @@ class Translator
     void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
   public:
-    // ---- AST node constructors ----
+    // AST node constructors
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
     auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
       -> ast::GenericParam &;
