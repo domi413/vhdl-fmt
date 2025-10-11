@@ -41,15 +41,15 @@ struct Node
 
     virtual void accept(Visitor &v) const = 0;
 
-    auto getComments() -> NodeComments & { return comments.emplace(); }
+    auto getComments() -> NodeComments & { return comments_.emplace(); }
     [[nodiscard]]
     auto tryGetComments() const -> const std::optional<NodeComments> &
     {
-        return this->comments;
+        return this->comments_;
     }
 
   private:
-    std::optional<NodeComments> comments;
+    std::optional<NodeComments> comments_;
 };
 
 } // namespace ast

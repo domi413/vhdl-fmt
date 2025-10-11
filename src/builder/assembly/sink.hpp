@@ -27,7 +27,7 @@ struct ISink
 template<typename T>
 struct SinkImpl : ISink
 {
-    explicit SinkImpl(std::vector<std::unique_ptr<T>> &v) : vec(v) {}
+    explicit SinkImpl(std::vector<std::unique_ptr<T>> &v) : vec_(v) {}
 
     ~SinkImpl() override = default;
     SinkImpl(const SinkImpl &) = delete;
@@ -39,11 +39,11 @@ struct SinkImpl : ISink
     {
         auto *casted{ dynamic_cast<T *>(n.release()) };
         assert(casted && "Wrong node type pushed into sink!");
-        this->vec.emplace_back(casted);
+        this->vec_.emplace_back(casted);
     }
 
   private:
-    std::vector<std::unique_ptr<T>> &vec;
+    std::vector<std::unique_ptr<T>> &vec_;
 };
 
 } // namespace builder

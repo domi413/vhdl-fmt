@@ -40,7 +40,7 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure 
+	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
 
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
@@ -54,7 +54,7 @@ LINT_CPUS ?= $(shell nproc)
 
 lint:
 	@echo "Running clang-tidy on source files..."
-	@run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SRCS)
+	@run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES)
 
 	@echo "Running clang-tidy on headers..."
 	@echo "$(SOURCES)" | \

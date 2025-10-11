@@ -22,10 +22,10 @@ namespace builder {
  */
 class Visitor : public adapter::BaseVoidVisitor
 {
-    Translator &translator;
+    Translator &translator_;
 
   public:
-    explicit Visitor(Translator &t) : translator(t) {};
+    explicit Visitor(Translator &t) : translator_(t) {};
 
     ~Visitor() override = default;
     Visitor(const Visitor &) = delete;

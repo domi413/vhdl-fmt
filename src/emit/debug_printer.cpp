@@ -14,7 +14,7 @@ namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    std::cout << std::string(static_cast<std::uint8_t>(indent * 2), ' ');
+    std::cout << std::string(static_cast<std::uint8_t>(indent_ * 2), ' ');
 }
 
 void DebugPrinter::printNode(const ast::Node &n,
@@ -34,17 +34,17 @@ void DebugPrinter::printNode(const ast::Node &n,
 void DebugPrinter::visit(const ast::DesignFile &node)
 {
     printNode(node, {}, "DesignFile");
-    ++indent;
+    ++indent_;
     walk(node); // recursive traversal handled by BaseVisitor
-    --indent;
+    --indent_;
 }
 
 void DebugPrinter::visit(const ast::Entity &node)
 {
     printNode(node, node.name, "Entity");
-    ++indent;
+    ++indent_;
     walk(node); // recurse into generics and ports
-    --indent;
+    --indent_;
 }
 
 void DebugPrinter::visit(const ast::GenericParam &node)
@@ -87,22 +87,16 @@ void DebugPrinter::visit(const ast::Port &node)
     }
 
     printNode(node, oss.str(), "Port");
-    ++indent;
+    ++indent_;
     walk(node); // recurse into constraints
-    --indent;
+    --indent_;
 }
 
 void DebugPrinter::visit(const ast::Range &node)
 {
     printIndent();
-    std::cout
-      << "Range ["
-      << node.left_expr
-      << " "
-      << node.direction
-      << " "
-      << node.right_expr
-      << "]\n";
+    std::cout << "Range [" << node.left_expr << " " << node.direction << " " << node.right_expr
+              << "]\n";
 }
 
 } // namespace emit

@@ -34,10 +34,10 @@ struct Assembler
     // Attach to any node container (e.g. DesignFile.units)
     explicit Assembler(std::vector<std::unique_ptr<ast::Node>> &sink)
     {
-        this->sinks.push_back(std::make_unique<SinkImpl<ast::Node>>(sink));
+        this->sinks_.push_back(std::make_unique<SinkImpl<ast::Node>>(sink));
     }
 
-    ~Assembler() noexcept { assert(this->sinks.size() <= 1 && "Unclosed sinks remain!"); }
+    ~Assembler() noexcept { assert(this->sinks_.size() <= 1 && "Unclosed sinks remain!"); }
 
     Assembler(const Assembler &) = delete;
     auto operator=(const Assembler &) -> Assembler & = delete;
@@ -50,18 +50,18 @@ struct Assembler
     auto spawn(Args &&...args) -> T &
     {
         static_assert(std::derived_from<T, Node>, "T must derive from ast::Node");
-        assert(!this->sinks.empty() && "No active sink");
+        assert(!this->sinks_.empty() && "No active sink");
 
         auto node{ std::make_unique<T>(std::forward<Args>(args)...) };
         T &ref = *node;
-        this->sinks.back()->push(std::move(node));
+        this->sinks_.back()->push(std::move(node));
         return ref;
     }
 
     template<typename Vec>
     auto with(Vec &vec) -> SlotGuard<Vec>
     {
-        return SlotGuard<Vec>(this->sinks, vec);
+        return SlotGuard<Vec>(this->sinks_, vec);
     }
 
     template<typename Vec, typename Fn>
@@ -72,7 +72,7 @@ struct Assembler
     }
 
   private:
-    std::vector<std::unique_ptr<ISink>> sinks; // stack of active sinks
+    std::vector<std::unique_ptr<ISink>> sinks_; // stack of active sinks
 };
 
 } // namespace builder

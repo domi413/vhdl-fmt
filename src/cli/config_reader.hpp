@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
-#include <yaml-cpp/yaml.h>
+#include <yaml-cpp/node/node.h>
 
 namespace cli {
 

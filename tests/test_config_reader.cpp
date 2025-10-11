@@ -2,12 +2,16 @@
 #include "cli/config_reader.hpp"
 #include "common/config.hpp"
 
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
+#include <cstdint>
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <optional>
 #include <string>
+#include <string_view>
 
 namespace {
 

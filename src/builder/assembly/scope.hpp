@@ -12,13 +12,13 @@ namespace builder {
 template<typename Vec>
 struct SlotGuard
 {
-    explicit SlotGuard(std::vector<std::unique_ptr<ISink>> &s, Vec &vec) : sinks(s)
+    explicit SlotGuard(std::vector<std::unique_ptr<ISink>> &s, Vec &vec) : sinks_(s)
     {
         using NodeT = typename Vec::value_type::element_type;
-        this->sinks.push_back(std::make_unique<SinkImpl<NodeT>>(vec));
+        this->sinks_.push_back(std::make_unique<SinkImpl<NodeT>>(vec));
     }
 
-    ~SlotGuard() noexcept { this->sinks.pop_back(); }
+    ~SlotGuard() noexcept { this->sinks_.pop_back(); }
 
     SlotGuard(const SlotGuard &) = delete;
     auto operator=(const SlotGuard &) -> SlotGuard & = delete;
@@ -26,7 +26,7 @@ struct SlotGuard
     auto operator=(SlotGuard &&) -> SlotGuard & = delete;
 
   private:
-    std::vector<std::unique_ptr<ISink>> &sinks;
+    std::vector<std::unique_ptr<ISink>> &sinks_;
 };
 
 } // namespace builder

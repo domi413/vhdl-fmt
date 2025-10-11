@@ -86,22 +86,22 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
             return;
         }
         const std::size_t idx{ t->getTokenIndex() };
-        if (consumed_comment_token_indices.contains(idx)) {
+        if (consumed_comment_token_indices_.contains(idx)) {
             return;
         }
-        consumed_comment_token_indices.insert(idx);
+        consumed_comment_token_indices_.insert(idx);
         dst.push_back({ t->getText(), kind(t), static_cast<int>(t->getLine()), is_inline });
     };
 
     // Leading: everything hidden to the left of start (consume all)
-    for (const auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
+    for (const auto *t : tokens_.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
         push(t, cm.leading, false);
     }
 
     // Trailing: only inline. Standalone comments are left
     // unconsumed here so the next node will pick them up as leading.
     const std::size_t stop_line = ctx->getStop()->getLine();
-    for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
+    for (const auto *t : tokens_.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
         if (t == nullptr) {
             continue;
         }

@@ -32,7 +32,7 @@ struct DebugPrinter : ast::BaseVisitor
     void visit(const ast::Range &node) override;
 
   private:
-    std::uint8_t indent{ 0 };
+    std::uint8_t indent_{ 0 };
 };
 
 } // namespace emit

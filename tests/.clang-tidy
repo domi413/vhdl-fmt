@@ -1,0 +1,6 @@
+---
+InheritParentConfig: true
+
+Checks: >
+  -readability-function-cognitive-complexity,
+  -readability-magic-numbers,

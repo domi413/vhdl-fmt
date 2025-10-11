@@ -18,7 +18,7 @@ target_include_directories(
     tests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/build/generated
+        ${GENERATED_DIR}
 )
 
 # Copy test data and define macro for C++
