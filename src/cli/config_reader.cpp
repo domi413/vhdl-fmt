@@ -151,7 +151,6 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
                                                  + e.what() } };
     }
 }
-
 auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::LineConfig &defaults)
   -> common::LineConfig
 {
@@ -166,6 +165,10 @@ auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::Lin
             line_config.indent_size = *value;
         }
     }
+
+    const common::LineLength length_to_validate{ .length = line_config.line_length };
+    const common::IndentSize size_to_validate{ .size = line_config.indent_size };
+    common::LineConfig::validateLineConfig(length_to_validate, size_to_validate);
 
     return line_config;
 }

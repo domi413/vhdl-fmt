@@ -67,42 +67,8 @@ struct CasingConfig final
 /// General configuration for line wrapping and indentation
 struct LineConfig final
 {
-    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
-    std::uint8_t line_length;
-    std::uint8_t indent_size;
-    // NOLINTEND(misc-non-private-member-variables-in-classes)
-
-    static auto create(const LineLength length, const IndentSize size) -> LineConfig
-    {
-        validateLineConfig(length, size);
-        return { length, size };
-    }
-
-    static auto defaultConfig() -> LineConfig
-    {
-        static constexpr LineLength DEFAULT_LENGTH{ .length = DEFAULT_LINE_LENGTH };
-        static constexpr IndentSize DEFAULT_SIZE{ .size = DEFAULT_INDENT_SIZE };
-
-        return create(DEFAULT_LENGTH, DEFAULT_SIZE);
-    }
-
-  private:
-    static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
-    static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
-
-    static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
-    static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
-
-    static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
-    static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
-
-    LineConfig(const LineLength length, const IndentSize size) :
-      line_length(length.length),
-      indent_size(size.size)
-    {
-    }
-
-    // TODO(domi): Mozilla style formats the constructor braces ugly
+    std::uint8_t line_length{ DEFAULT_LINE_LENGTH };
+    std::uint8_t indent_size{ DEFAULT_INDENT_SIZE };
 
     /// Validate line configuration
     static auto validateLineConfig(const LineLength length, const IndentSize size) -> void
@@ -119,12 +85,22 @@ struct LineConfig final
             throw std::invalid_argument(msg);
         }
     }
+
+  private:
+    static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
+    static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
+
+    static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
+    static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
+
+    static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
+    static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
 };
 
 // Holds the configuration from the config file
 struct Config final
 {
-    LineConfig line_config{ LineConfig::defaultConfig() };
+    LineConfig line_config{};
     IndentationStyle indent_style{ IndentationStyle::SPACES };
     EndOfLine eol_format{ EndOfLine::LF };
     PortMapConfig port_map{ true };
