@@ -14,24 +14,18 @@ namespace ast {
 template<typename T>
 concept AstNode = std::derived_from<T, ast::Node>;
 
-/**
- * @brief Default recursive AST visitor.
- *
- * Provides base implementations that traverse all child nodes.
- *
- * **Responsibilities:**
- *  - Recursively walk the AST hierarchy.
- *  - Serve as a base for specialized visitors.
- */
+/// @brief Default recursive AST visitor.
+///
+/// Provides traversal logic for visiting all child nodes.
+/// Serves as a reusable base for visitors performing formatting,
+/// analysis, or transformation.
 class BaseVisitor : public Visitor
 {
   protected:
-    /**
-     * @brief Visit a node if it exists.
-     *
-     * Safely invokes `accept()` on a node pointer, allowing
-     * traversal of optional or nullable children.
-     */
+    /// @brief Safely visit a node if it exists.
+    ///
+    /// Invokes `accept()` on the given pointer, allowing traversal of
+    /// optional or nullable children.
     template<AstNode T>
     void dispatch(const std::unique_ptr<T> &node)
     {
@@ -40,12 +34,10 @@ class BaseVisitor : public Visitor
         }
     }
 
-    /**
-     * @brief Continue recursive traversal.
-     *
-     * Calls the default `visit()` implementation for the given node,
-     * allowing derived visitors to resume walking after custom logic.
-     */
+    /// @brief Continue recursive traversal from a specific node.
+    ///
+    /// Calls the default `visit()` implementation, enabling derived
+    /// visitors to resume automatic child traversal after custom logic.
     template<AstNode T>
     void walk(const T &node)
     {
@@ -53,7 +45,6 @@ class BaseVisitor : public Visitor
     }
 
   public:
-    // -- Node visitors --
     void visit(const DesignFile &node) override
     {
         for (const std::unique_ptr<Node> &u : node.units) {

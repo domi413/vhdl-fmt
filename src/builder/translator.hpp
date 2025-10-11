@@ -13,30 +13,23 @@
 
 namespace builder {
 
-/**
- * @brief Builds semantic AST nodes from CST contexts.
- *
- * The `Translator` converts ANTLR CST nodes into AST representations.
- *
- * **Responsibilities:**
- *  - Construct AST nodes from parser contexts
- *  - Attach comments and source metadata
- *  - Delegate structural operations to `Assembler`
- *
- * Contains no traversal logic — called by `Visitor` during tree walking.
- */
+/// @brief Converts CST nodes into semantic AST structures.
+///
+/// Builds `ast::Node` objects from ANTLR parse contexts,
+/// attaches metadata, and delegates structural insertion to `Assembler`.
 class Translator
 {
   public:
+    /// @brief Construct a translator bound to an assembler and token stream.
     Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
-
     ~Translator() = default;
+
     Translator(const Translator &) = delete;
     auto operator=(const Translator &) -> Translator & = delete;
     Translator(Translator &&) = delete;
     auto operator=(Translator &&) -> Translator & = delete;
 
-    // Scoped assembly helpers
+    /// @brief Execute a block with temporary output redirection.
     template<typename Vec, typename Fn>
     void into(Vec &vec, Fn &&fn)
     {
@@ -44,11 +37,11 @@ class Translator
     }
 
   private:
-    Assembler &builder;
-    antlr4::CommonTokenStream &tokens;
+    Assembler &builder;                ///< Active assembler used for node creation.
+    antlr4::CommonTokenStream &tokens; ///< Token stream for comment attachment.
     std::unordered_set<std::size_t> consumed_comment_token_indices;
 
-    // Node creation and comment helpers
+    /// @brief Create and register a node, attaching relevant comments.
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
@@ -57,10 +50,10 @@ class Translator
         return node;
     }
 
+    /// @brief Attach comments and metadata from the token stream.
     void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
   public:
-    // AST node constructors
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
     auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
       -> ast::GenericParam &;

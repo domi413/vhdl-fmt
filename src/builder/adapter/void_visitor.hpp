@@ -5,6 +5,11 @@
 
 namespace builder::adapter {
 
+/// @brief Base interface for void-returning CST visitors.
+///
+/// Serves as the root of the ANTLR visitor hierarchy.
+/// All concrete visitors derive from this to implement
+/// traversal logic without returning a value.
 class VoidVisitor
 {
   public:

@@ -11,12 +11,10 @@
 
 namespace emit {
 
-/**
- * @brief AST debug printer.
- *
- * Traverses the AST and prints its structure with indentation.
- * Inherits recursive traversal from `BaseVisitor`.
- */
+///@brief AST debug printer.
+///
+/// Traverses the AST and prints its structure with indentation.
+/// Inherits recursive traversal from `BaseVisitor`.
 struct DebugPrinter : ast::BaseVisitor
 {
     void printIndent() const;

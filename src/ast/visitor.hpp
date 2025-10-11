@@ -10,16 +10,11 @@ struct GenericParam;
 struct Range;
 struct Port;
 
-/**
- * @brief Abstract interface for visiting AST nodes.
- *
- * Defines the entry points for all visitable node types.
- * Concrete visitors implement these to perform operations
- * on specific parts of the AST.
- *
- * **Responsibilities:**
- *  - Define visit entry points for all node types.
- */
+/// @brief Abstract interface for visiting AST nodes.
+///
+/// Defines the entry points for all visitable node types.
+/// Concrete visitors implement these to perform operations
+/// such as formatting, analysis, or transformation.
 class Visitor
 {
   public:

@@ -9,10 +9,14 @@
 
 namespace builder::adapter {
 
+/// @brief Adapter between ANTLR-generated visitors and internal `VoidVisitor`.
+///
+/// Converts ANTLR's `visit*()` callbacks into corresponding calls on the
+/// user-provided `VoidVisitor` implementation, discarding return values.
 class AntlrVoidAdapter : public vhdlBaseVisitor
 {
 
-    VoidVisitor &impl;
+    VoidVisitor &impl; ///< Target visitor implementation.
 
   public:
     explicit AntlrVoidAdapter(VoidVisitor &v) : impl(v) {}
