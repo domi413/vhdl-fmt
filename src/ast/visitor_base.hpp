@@ -7,6 +7,7 @@
 #include "ast/visitor.hpp"
 
 #include <concepts>
+#include <memory>
 
 namespace ast {
 
@@ -31,14 +32,14 @@ class BaseVisitor : public Visitor
      * Safely invokes `accept()` on a node pointer, allowing
      * traversal of optional or nullable children.
      */
-    void dispatch(const Node *node)
+    template<AstNode T>
+    void dispatch(const std::unique_ptr<T> &node)
     {
         if (node != nullptr) {
             node->accept(*this);
         }
     }
 
-  public:
     /**
      * @brief Continue recursive traversal.
      *
@@ -51,34 +52,34 @@ class BaseVisitor : public Visitor
         BaseVisitor::visit(node);
     }
 
-    // Node visitors
+  public:
+    // -- Node visitors --
     void visit(const DesignFile &node) override
     {
-        for (const auto &u : node.units) {
-            dispatch(u.get());
+        for (const std::unique_ptr<Node> &u : node.units) {
+            dispatch(u);
         }
     }
 
     void visit(const Entity &node) override
     {
-        // Recurse into generics and ports
         for (const auto &g : node.generics) {
-            dispatch(g.get());
+            dispatch(g);
         }
         for (const auto &p : node.ports) {
-            dispatch(p.get());
+            dispatch(p);
         }
     }
-
-    void visit(const GenericParam &node) override { (void)node; }
 
     void visit(const Port &node) override
     {
         for (const auto &r : node.constraints) {
-            dispatch(r.get());
+            dispatch(r);
         }
     }
 
+    // -- Leaf visitors --
+    void visit(const GenericParam &node) override { (void)node; }
     void visit(const Range &node) override { (void)node; }
 };
 
