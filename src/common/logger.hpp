@@ -46,51 +46,50 @@ class Logger final
     ~Logger() = default;
 
     template<typename... Args>
-    void trace([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    void trace([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_TRACE(logger_, std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_TRACE(logger, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    void debug([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    void debug([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_DEBUG(logger_, std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_DEBUG(logger, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    void info([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    void info([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_INFO(logger_, std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_INFO(logger, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    void warn([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    void warn([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_WARN(logger_, std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_WARN(logger, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    void error([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    void error([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_ERROR(logger_, std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_ERROR(logger, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
-    void critical([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    void critical([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_CRITICAL(logger_, std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_CRITICAL(logger, fmt, std::forward<Args>(args)...);
     }
 
   private:
     Logger() :
-      logger_([] {
+      logger([] {
           auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
-          console_sink->set_level(spdlog::level::warn);
-          console_sink->set_level(spdlog::level::trace);
+          console_sink->set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
           console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
-          auto logger = std::make_shared<spdlog::logger>("logger", console_sink);
+          auto logger = std::make_shared<spdlog::logger>("", console_sink);
           logger->set_level(console_sink->level());
           logger->flush_on(spdlog::level::err);
 
@@ -99,7 +98,7 @@ class Logger final
     {
     }
 
-    std::shared_ptr<spdlog::logger> logger_;
+    std::shared_ptr<spdlog::logger> logger;
 };
 
 } // namespace common
