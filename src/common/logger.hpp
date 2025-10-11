@@ -84,13 +84,13 @@ class Logger final
   private:
     Logger() :
       logger_([] {
-          const auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+          auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
           console_sink->set_level(spdlog::level::warn);
           console_sink->set_level(spdlog::level::trace);
           console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
-          const auto logger = std::make_shared<spdlog::logger>("logger", console_sink);
+          auto logger = std::make_shared<spdlog::logger>("logger", console_sink);
           logger->set_level(console_sink->level());
           logger->flush_on(spdlog::level::err);
 
