@@ -75,40 +75,39 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
     if (ctx == nullptr) {
         return;
     }
+
     auto &cm = node.getComments();
-    auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
-        return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::line
-                                                  : ast::Comment::Kind::block;
-    };
-    const auto push
-      = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) -> void {
+
+    const auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
         if (!t) {
             return;
         }
-        const std::size_t idx{ t->getTokenIndex() };
+
+        const std::size_t idx = t->getTokenIndex();
         if (consumed_comment_token_indices.contains(idx)) {
             return;
         }
+
         consumed_comment_token_indices.insert(idx);
-        dst.push_back({ t->getText(), kind(t), static_cast<int>(t->getLine()), is_inline });
+        dst.push_back({ t->getText(), static_cast<int>(t->getLine()), is_inline });
     };
 
-    // Leading: everything hidden to the left of start (consume all)
-    for (const auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
+    const auto start_idx = ctx->getStart()->getTokenIndex();
+    const auto stop_idx = ctx->getStop()->getTokenIndex();
+    const auto stop_line = ctx->getStop()->getLine();
+
+    // --- Leading comments (from COMMENTS channel) ---
+    auto hidden_left = tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex(), vhdlLexer::COMMENTS);
+    for (const auto *t : hidden_left) {
         push(t, cm.leading, false);
     }
 
-    // Trailing: only inline. Standalone comments are left
-    // unconsumed here so the next node will pick them up as leading.
-    const std::size_t stop_line = ctx->getStop()->getLine();
-    for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
-        if (t == nullptr) {
-            continue;
-        }
-        if (t->getLine() == stop_line) {
+    // --- Trailing (inline) comments ---
+    auto hidden_right = tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex(), vhdlLexer::COMMENTS);
+    for (const auto *t : hidden_right) {
+        if (t && t->getLine() == stop_line) {
             push(t, cm.trailing, true);
         }
     }
 }
-
 } // namespace builder

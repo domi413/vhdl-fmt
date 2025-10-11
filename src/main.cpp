@@ -52,7 +52,7 @@ auto main(int argc, char *argv[]) -> int
 
     tree->accept(&adapter);
 
-    std::cout << tree->toStringTree(&parser, true) << "\n\n";
+    // std::cout << tree->toStringTree(&parser, true) << "\n\n";
 
     emit::DebugPrinter printer;
     root.accept(printer);

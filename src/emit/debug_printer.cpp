@@ -29,13 +29,36 @@ void DebugPrinter::printNode(const ast::Node &n,
     std::cout << '\n';
 }
 
+void DebugPrinter::printComments(const ast::Node &n) const
+{
+    const auto &maybe_comments = n.tryGetComments();
+    if (!maybe_comments.has_value()) {
+        return;
+    }
+
+    const auto &comments = *maybe_comments;
+
+    // Leading comments
+    for (const auto &c : comments.leading) {
+        printIndent();
+        std::cout << (c.is_inline ? "(inline) " : "") << c.text << '\n';
+    }
+
+    // Trailing comments
+    for (const auto &c : comments.trailing) {
+        printIndent();
+        std::cout << (c.is_inline ? "(inline) " : "") << c.text << '\n';
+    }
+}
+
 // ---- Nodes ----
 
 void DebugPrinter::visit(const ast::DesignFile &node)
 {
     printNode(node, {}, "DesignFile");
     ++indent;
-    walk(node); // recursive traversal handled by BaseVisitor
+    printComments(node);
+    walk(node);
     --indent;
 }
 
@@ -43,7 +66,8 @@ void DebugPrinter::visit(const ast::Entity &node)
 {
     printNode(node, node.name, "Entity");
     ++indent;
-    walk(node); // recurse into generics and ports
+    printComments(node);
+    walk(node);
     --indent;
 }
 
@@ -63,12 +87,14 @@ void DebugPrinter::visit(const ast::GenericParam &node)
     }
 
     printNode(node, info, "Generic");
+    ++indent;
+    printComments(node);
+    --indent;
 }
 
 void DebugPrinter::visit(const ast::Port &node)
 {
     std::ostringstream oss;
-
     for (const auto &[i, name] : node.names | std::views::enumerate) {
         if (i > 0) {
             oss << ", ";
@@ -88,7 +114,8 @@ void DebugPrinter::visit(const ast::Port &node)
 
     printNode(node, oss.str(), "Port");
     ++indent;
-    walk(node); // recurse into constraints
+    printComments(node);
+    walk(node);
     --indent;
 }
 
@@ -103,6 +130,9 @@ void DebugPrinter::visit(const ast::Range &node)
       << " "
       << node.right_expr
       << "]\n";
+    ++indent;
+    printComments(node);
+    --indent;
 }
 
 } // namespace emit

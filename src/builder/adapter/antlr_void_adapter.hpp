@@ -1,7 +1,7 @@
 #ifndef BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
 #define BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
 
-#include "vhdlBaseVisitor.h"
+#include "vhdlParserBaseVisitor.h"
 #include "vhdlParser.h"
 #include "void_visitor.hpp"
 
@@ -13,7 +13,7 @@ namespace builder::adapter {
 ///
 /// Converts ANTLR's `visit*()` callbacks into corresponding calls on the
 /// user-provided `VoidVisitor` implementation, discarding return values.
-class AntlrVoidAdapter : public vhdlBaseVisitor
+class AntlrVoidAdapter : public vhdlParserBaseVisitor
 {
 
     VoidVisitor &impl; ///< Target visitor implementation.

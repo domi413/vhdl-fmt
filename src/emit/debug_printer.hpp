@@ -22,6 +22,8 @@ struct DebugPrinter : ast::BaseVisitor
                    const std::string &extra,
                    const std::string &name_override) const;
 
+    void printComments(const ast::Node &n) const;
+
     // Node visitors
     void visit(const ast::DesignFile &node) override;
     void visit(const ast::Entity &node) override;
