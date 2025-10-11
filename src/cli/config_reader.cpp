@@ -22,8 +22,7 @@ namespace {
 // The map isn't `constexpr` as clang-tidy suggests. A singleton pattern would
 // suppress the warning but reduce readability without significant benefit.
 // ---
-// NOLINTBEGIN(fuchsia-statically-constructed-objects)
-// NOLINTBEGIN(cert-err58-cpp)
+// NOLINTBEGIN(fuchsia-statically-constructed-objects, cert-err58-cpp)
 
 using PortMapMemberPtr = bool common::PortMapConfig::*;
 using DeclarationMemberPtr = bool common::DeclarationConfig::*;
@@ -61,8 +60,7 @@ const std::unordered_map<std::string_view, CasingMemberPtr> CASING_ASSIGNMENTS_M
     { "identifiers", &common::CasingConfig::identifiers },
 };
 
-// NOLINTEND(cert-err58-cpp)
-// NOLINTEND(fuchsia-statically-constructed-objects)
+// NOLINTEND(fuchsia-statically-constructed-objects, cert-err58-cpp)
 
 /// Checks if a node exists and is not null
 constexpr auto isValid(const YAML::Node &node) -> bool
