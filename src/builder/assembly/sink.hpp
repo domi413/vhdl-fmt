@@ -11,8 +11,7 @@ namespace builder {
 
 struct ISink
 {
-    using Node = ast::Node;
-    using NodePtr = std::unique_ptr<Node>;
+    using NodePtr = std::unique_ptr<ast::Node>;
 
     ISink() = default;
     virtual ~ISink() = default;

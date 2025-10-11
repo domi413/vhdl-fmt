@@ -3,7 +3,6 @@
 
 #include "builder/adapter/base_void_visitor.hpp"
 #include "translator.hpp"
-#include "tree/ParseTree.h"
 #include "vhdlParser.h"
 
 namespace builder {
@@ -32,14 +31,6 @@ class Visitor : public adapter::BaseVoidVisitor
     auto operator=(const Visitor &) -> Visitor & = delete;
     Visitor(Visitor &&) = delete;
     auto operator=(Visitor &&) -> Visitor & = delete;
-
-    /**
-     * @brief Continue recursive traversal.
-     *
-     * Calls the default `walk()` implementation for the given node,
-     * allowing derived visitors to resume walking after custom logic.
-     */
-    void walk(antlr4::tree::ParseTree *ctx) { adapter::BaseVoidVisitor::walk(ctx); }
 
     // Node Visitors
     void visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx) override;

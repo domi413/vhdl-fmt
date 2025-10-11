@@ -44,8 +44,9 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
     builder::Assembler builder(design.units);
     builder::Translator translator(builder, tokens);
     builder::Visitor visitor(translator);
+    builder::adapter::AntlrVoidAdapter adapter(visitor);
 
-    visitor.walk(tree);
+    tree->accept(&adapter);
 
     // --- Verify AST ---
     REQUIRE(design.units.size() == 1);

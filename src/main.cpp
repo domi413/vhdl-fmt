@@ -1,6 +1,7 @@
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
 #include "ast/nodes/design_file.hpp"
+#include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitor.hpp"
@@ -45,16 +46,16 @@ auto main(int argc, char *argv[]) -> int
     //--- AST construction pipeline ---
     ast::DesignFile root;
     builder::Assembler builder(root.units);
-
     builder::Translator translator(builder, tokens);
-
     builder::Visitor visitor(translator);
-    visitor.walk(tree);
+    builder::adapter::AntlrVoidAdapter adapter(visitor);
+
+    tree->accept(&adapter);
 
     std::cout << tree->toStringTree(&parser, true) << "\n\n";
 
     emit::DebugPrinter printer;
-    printer.walk(root);
+    root.accept(printer);
 
     return 0;
 }

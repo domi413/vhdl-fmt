@@ -28,9 +28,6 @@ namespace builder {
  */
 struct Assembler
 {
-    using Node = ast::Node;
-    using NodePtr = std::unique_ptr<Node>;
-
     // Attach to any node container (e.g. DesignFile.units)
     explicit Assembler(std::vector<std::unique_ptr<ast::Node>> &sink)
     {
@@ -45,13 +42,13 @@ struct Assembler
     auto operator=(Assembler &&) -> Assembler & = delete;
 
     // Spawn node and insert into current sink
-    template<typename T, typename... Args>
-    [[nodiscard]] auto spawn(Args &&...args) -> T &
+    template<typename T>
+    [[nodiscard]] auto spawn() -> T &
     {
-        static_assert(std::derived_from<T, Node>, "T must derive from ast::Node");
+        static_assert(std::derived_from<T, ast::Node>, "T must derive from ast::Node");
         assert(!this->sinks.empty() && "No active sink");
 
-        auto node{ std::make_unique<T>(std::forward<Args>(args)...) };
+        auto node{ std::make_unique<T>() };
         T &ref = *node;
         this->sinks.back()->push(std::move(node));
         return ref;
