@@ -2,6 +2,7 @@
 #include "CommonTokenStream.h"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
+#include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitor.hpp"
