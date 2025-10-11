@@ -2,6 +2,8 @@
 #define COMMON_LOGGER_HPP
 
 #include <cstdint>
+#include <memory>
+#include <spdlog/logger.h>
 #ifndef SPDLOG_ACTIVE_LEVEL
     #ifdef NDEBUG
         #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
@@ -10,8 +12,6 @@
     #endif
 #endif
 
-#include <format>
-#include <memory>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <string_view>
@@ -39,65 +39,75 @@ class Logger final
     }
 
     Logger(const Logger &) = delete;
-    Logger(Logger &&) = delete;
-    ~Logger() = default;
     auto operator=(const Logger &) -> Logger & = delete;
+    Logger(Logger &&) = delete;
     auto operator=(Logger &&) -> Logger & = delete;
+    ~Logger() = default;
 
-    void setLevel(Level level) { logger->set_level(static_cast<spdlog::level::level_enum>(level)); }
+    void setLevel(Level level)
+    {
+        logger_->set_level(static_cast<spdlog::level::level_enum>(level));
+    }
 
-    void setPattern(std::string_view pattern) { logger->set_pattern(std::string(pattern)); }
+    void setPattern(std::string_view pattern) { logger_->set_pattern(std::string(pattern)); }
 
-    void flush() { logger->flush(); }
+    void flush() { logger_->flush(); }
 
     template<typename... Args>
-    void trace(std::format_string<Args...> fmt, Args &&...args)
+    void trace([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        logger->trace(std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_TRACE(logger_, std::format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void debug(std::format_string<Args...> fmt, Args &&...args)
+    void debug([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        logger->debug(std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_DEBUG(logger_, std::format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void info(std::format_string<Args...> fmt, Args &&...args)
+    void info([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        logger->info(std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_INFO(logger_, std::format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void warn(std::format_string<Args...> fmt, Args &&...args)
+    void warn([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        logger->warn(std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_WARN(logger_, std::format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void error(std::format_string<Args...> fmt, Args &&...args)
+    void error([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        logger->error(std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_ERROR(logger_, std::format(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void critical(std::format_string<Args...> fmt, Args &&...args)
+    void critical([[maybe_unused]] std::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        logger->critical(std::format(fmt, std::forward<Args>(args)...));
+        SPDLOG_LOGGER_CRITICAL(logger_, std::format(fmt, std::forward<Args>(args)...));
     }
 
   private:
-    Logger()
-    {
-        auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-        console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+    Logger() :
+      logger_([] {
+          auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
 
-        logger = std::make_shared<spdlog::logger>("vhdl_fmt", console_sink);
-        logger->set_level(console_sink->level());
-        logger->flush_on(spdlog::level::err);
+          console_sink->set_level(spdlog::level::warn);
+          console_sink->set_level(spdlog::level::trace);
+          console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+
+          auto logger = std::make_shared<spdlog::logger>("vhdl_fmt", console_sink);
+          logger->set_level(console_sink->level());
+          logger->flush_on(spdlog::level::err);
+
+          return logger;
+      }())
+    {
     }
 
-    std::shared_ptr<spdlog::logger> logger;
+    std::shared_ptr<spdlog::logger> logger_;
 };
 
 } // namespace common
