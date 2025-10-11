@@ -4,17 +4,16 @@
 #include <cstdint>
 #include <format>
 #include <stdexcept>
-#include <string>
 
 namespace common {
 
-/// Line length
+/// Line length wrapper for type safety
 struct LineLength final
 {
     std::uint16_t length;
 };
 
-/// Indentation size
+/// Indentation size wrapper for type safety
 struct IndentSize final
 {
     std::uint8_t size;
@@ -49,11 +48,11 @@ struct DeclarationConfig final
     bool align_initialization{ true };
 };
 
-/// Casing conventions
+/// Casing conventions for identifiers
 enum class CaseStyle : std::uint8_t
 {
     LOWER,
-    UPPER,
+    UPPER
 };
 
 /// Specific casing configuration that overwrites the default casing
@@ -67,37 +66,35 @@ struct CasingConfig final
 /// General configuration for line wrapping and indentation
 struct LineConfig final
 {
-    std::uint8_t line_length{ DEFAULT_LINE_LENGTH };
-    std::uint8_t indent_size{ DEFAULT_INDENT_SIZE };
-
-    /// Validate line configuration
-    static auto validateLineConfig(const LineLength length, const IndentSize size) -> void
-    {
-        if (length.length < MIN_LINE_LENGTH || length.length > MAX_LINE_LENGTH) {
-            const std::string msg = std::format(
-              "Line length must be between {} and {}", MIN_LINE_LENGTH, MAX_LINE_LENGTH);
-            throw std::invalid_argument(msg);
-        }
-
-        if (size.size < MIN_INDENT_SIZE || size.size > MAX_INDENT_SIZE) {
-            const std::string msg = std::format(
-              "Indent size must be between {} and {}", MIN_INDENT_SIZE, MAX_INDENT_SIZE);
-            throw std::invalid_argument(msg);
-        }
-    }
-
-  private:
-    static constexpr std::uint8_t DEFAULT_LINE_LENGTH{ 100 };
+    // Public constants for external validation/UI
+    static constexpr std::uint16_t DEFAULT_LINE_LENGTH{ 100 };
     static constexpr std::uint8_t DEFAULT_INDENT_SIZE{ 4 };
 
-    static constexpr std::uint8_t MIN_LINE_LENGTH{ 10 };
-    static constexpr std::uint8_t MAX_LINE_LENGTH{ 200 };
+    static constexpr std::uint16_t MIN_LINE_LENGTH{ 10 };
+    static constexpr std::uint16_t MAX_LINE_LENGTH{ 200 };
 
     static constexpr std::uint8_t MIN_INDENT_SIZE{ 1 };
     static constexpr std::uint8_t MAX_INDENT_SIZE{ 16 };
+
+    std::uint16_t line_length{ DEFAULT_LINE_LENGTH };
+    std::uint8_t indent_size{ DEFAULT_INDENT_SIZE };
+
+    /// Validate line configuration (throws on invalid values)
+    static auto validateLineConfig(const LineLength length, const IndentSize size) -> void
+    {
+        if (length.length < MIN_LINE_LENGTH || length.length > MAX_LINE_LENGTH) {
+            throw std::invalid_argument(std::format(
+              "Line length must be between {} and {}", MIN_LINE_LENGTH, MAX_LINE_LENGTH));
+        }
+
+        if (size.size < MIN_INDENT_SIZE || size.size > MAX_INDENT_SIZE) {
+            throw std::invalid_argument(std::format(
+              "Indent size must be between {} and {}", MIN_INDENT_SIZE, MAX_INDENT_SIZE));
+        }
+    }
 };
 
-// Holds the configuration from the config file
+/// Main configuration structure containing all formatter settings
 struct Config final
 {
     LineConfig line_config{};
@@ -108,6 +105,6 @@ struct Config final
     CasingConfig casing{};
 };
 
-} // namespace common
+}; // namespace common
 
 #endif /* COMMON_CONFIG_HPP */
