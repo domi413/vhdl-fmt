@@ -45,8 +45,8 @@ auto main(int argc, char *argv[]) -> int
 
     //--- AST construction pipeline ---
     ast::DesignFile root;
-    builder::Assembler builder(root.units);
-    builder::Translator translator(builder, tokens);
+    builder::Assembler assembler(root.units);
+    builder::Translator translator(assembler, tokens);
     builder::Visitor visitor(translator);
     builder::adapter::AntlrVoidAdapter adapter(visitor);
 

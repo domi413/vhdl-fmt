@@ -43,12 +43,6 @@ class Translator
         builder.into(vec, std::forward<Fn>(fn));
     }
 
-    template<typename Vec>
-    auto with(Vec &vec)
-    {
-        return builder.with(vec);
-    }
-
   private:
     Assembler &builder;
     antlr4::CommonTokenStream &tokens;

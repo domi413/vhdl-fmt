@@ -8,10 +8,7 @@ void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 {
     auto &entity{ translator.makeEntity(ctx) };
     if (auto *header = ctx->entity_header()) {
-        // GENERICS
         translator.into(entity.generics, [&] -> void { dispatch(header->generic_clause()); });
-
-        // PORTS
         translator.into(entity.ports, [&] -> void { dispatch(header->port_clause()); });
     }
 }
