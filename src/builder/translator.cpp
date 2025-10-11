@@ -97,15 +97,17 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
     const auto stop_line = ctx->getStop()->getLine();
 
     // --- Leading comments (from COMMENTS channel) ---
-    auto hidden_left = tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex(), vhdlLexer::COMMENTS);
+    auto hidden_left
+      = tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex(), vhdlLexer::COMMENTS);
     for (const auto *t : hidden_left) {
         push(t, cm.leading, false);
     }
 
     // --- Trailing (inline) comments ---
-    auto hidden_right = tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex(), vhdlLexer::COMMENTS);
+    auto hidden_right
+      = tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex(), vhdlLexer::COMMENTS);
     for (const auto *t : hidden_right) {
-        if (t && t->getLine() == stop_line) {
+        if ((t != nullptr) && t->getLine() == stop_line) {
             push(t, cm.trailing, true);
         }
     }

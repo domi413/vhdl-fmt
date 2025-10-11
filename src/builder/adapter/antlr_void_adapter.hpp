@@ -1,8 +1,8 @@
 #ifndef BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
 #define BUILDER_ADAPTER_ANTLR_VOID_ADAPTER_HPP
 
-#include "vhdlParserBaseVisitor.h"
 #include "vhdlParser.h"
+#include "vhdlParserBaseVisitor.h"
 #include "void_visitor.hpp"
 
 #include <any>
