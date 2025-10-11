@@ -85,7 +85,6 @@ class Logger final
     Logger() :
       logger([] {
           auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-
           console_sink->set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
           console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
 
