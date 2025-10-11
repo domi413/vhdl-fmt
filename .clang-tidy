@@ -13,7 +13,7 @@ Checks: >
   -readability-identifier-length,
 
 CheckOptions:
-  # Types start use PascalCase: MyClass
+  # Types use PascalCase: MyClass
   - key: readability-identifier-naming.ClassCase
     value: "CamelCase"
   - key: readability-identifier-naming.StructCase
@@ -45,7 +45,7 @@ CheckOptions:
   - key: readability-identifier-naming.TemplateParameterCase
     value: "CamelCase"
 
-  # All other names use snake case: unordered_map
+  # All other names use snake case: config_value
   - key: readability-identifier-naming.StaticConstantCase
     value: "lower_case"
   - key: readability-identifier-naming.ConstantCase

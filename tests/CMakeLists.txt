@@ -8,8 +8,10 @@ target_link_libraries(
         Catch2::Catch2WithMain
         ast
         builder
+        cli
         emit
         vhdl_generated
+        yaml-cpp::yaml-cpp
 )
 
 target_include_directories(

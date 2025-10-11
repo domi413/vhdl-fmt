@@ -40,7 +40,7 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET)
+	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure 
 
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache

@@ -11,7 +11,7 @@ namespace common {
 /// Line length
 struct LineLength final
 {
-    std::uint8_t length;
+    std::uint16_t length;
 };
 
 /// Indentation size
@@ -102,7 +102,7 @@ struct Config final
 {
     LineConfig line_config{};
     IndentationStyle indent_style{ IndentationStyle::SPACES };
-    EndOfLine eol_format{ EndOfLine::LF };
+    EndOfLine eol_format{ EndOfLine::AUTO };
     PortMapConfig port_map{ true };
     DeclarationConfig declarations{ .align_colons = true };
     CasingConfig casing{ .keywords = CaseStyle::LOWER,

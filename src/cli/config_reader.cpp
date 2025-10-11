@@ -156,7 +156,7 @@ auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::Lin
 {
     auto line_config = defaults;
 
-    if (const auto value = tryParseYaml<std::uint8_t>(root_node["line_length"], "line_length")) {
+    if (const auto value = tryParseYaml<std::uint16_t>(root_node["line_length"], "line_length")) {
         line_config.line_length = *value;
     }
 
