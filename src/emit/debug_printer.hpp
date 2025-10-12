@@ -7,32 +7,18 @@
 #include "ast/visitor_base.hpp"
 
 #include <cstdint>
+#include <iosfwd>
+#include <iostream>
 #include <string>
 #include <string_view>
 #include <vector>
 
 namespace emit {
 
-/// @brief AST debug printer.
-/// Traverses the AST and prints its structure with indentation.
+/// @brief AST debug printer. Traverses the AST and prints its structure with indentation.
 struct DebugPrinter : ast::BaseVisitor
 {
-    void printIndent() const;
-
-    /// Print node header: `Name [extra] <inline_suffix>`
-    void printNode(const ast::Node &n,
-                   const std::string &extra,
-                   const std::string &name_override,
-                   const std::string &inline_suffix) const;
-
-    /// Print a trivia sequence (comments as lines; newlines as actual blank lines).
-    void printTriviaLines(const std::vector<ast::Trivia> &tv) const;
-
-    /// Build the inline suffix from trailing trivia:
-    ///   "<c1> <c2> ... (N[\n])"
-    /// where N is the total trailing newline breaks (omitted if 0).
-    [[nodiscard]] auto buildInlineSuffix(const std::vector<ast::Trivia> &trailing) const
-      -> std::string;
+    explicit DebugPrinter(std::ostream &out) : out(out) {}
 
     // Node visitors
     void visit(const ast::DesignFile &node) override;
@@ -42,10 +28,40 @@ struct DebugPrinter : ast::BaseVisitor
     void visit(const ast::Range &node) override;
 
   private:
+    std::ostream &out;
+    std::uint8_t indent{ 0 };
+
+    void printIndent() const;
+    void printLine(std::string_view s) const;
+
+    /// Print node header: `Name [extra] <(N[\n])>`.
+    void printNodeHeader(const ast::Node &n,
+                         const std::string &extra,
+                         std::string_view name_override,
+                         std::size_t trailing_breaks) const;
+
+    /// Print only comment lines from a trivia sequence (prefix each line).
+    void printCommentLines(const std::vector<ast::Trivia> &tv, std::string_view prefix) const;
+
+    /// Count total trailing newline breaks.
+    [[nodiscard]] static auto countNewlines(const std::vector<ast::Trivia> &trailing)
+      -> std::size_t;
+
     template<class NodeT>
     void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra);
 
-    std::uint8_t indent{ 0 };
+    struct IndentGuard
+    {
+        explicit IndentGuard(std::uint8_t &r) : ref(r) { ++ref; }
+        ~IndentGuard() { --ref; }
+        IndentGuard(const IndentGuard &) = delete;
+        auto operator=(const IndentGuard &) -> IndentGuard & = delete;
+        IndentGuard(IndentGuard &&) = delete;
+        auto operator=(IndentGuard &&) -> IndentGuard & = delete;
+
+      private:
+        std::uint8_t &ref;
+    };
 };
 
 } // namespace emit

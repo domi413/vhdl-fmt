@@ -4,7 +4,6 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 
-#include <cstdint>
 #include <iostream>
 #include <ranges>
 #include <sstream>
@@ -12,67 +11,59 @@
 
 namespace emit {
 
+// --- small helpers ---
+
 void DebugPrinter::printIndent() const
 {
-    std::cout << std::string(static_cast<std::uint8_t>(indent * 2), ' ');
+    out << std::string(static_cast<std::uint8_t>(indent * 2), ' ');
 }
 
-void DebugPrinter::printNode(const ast::Node &n,
-                             const std::string &extra,
-                             const std::string &name_override,
-                             const std::string &inline_suffix) const
+void DebugPrinter::printLine(std::string_view s) const
 {
     printIndent();
-    std::cout << (!name_override.empty() ? name_override : typeid(n).name());
-    if (!extra.empty()) {
-        std::cout << " [" << extra << "]";
-    }
-    if (!inline_suffix.empty()) {
-        std::cout << " " << inline_suffix;
-    }
-    std::cout << '\n';
+    out << s << '\n';
 }
 
-void DebugPrinter::printTriviaLines(const std::vector<ast::Trivia> &tv) const
+void DebugPrinter::printNodeHeader(const ast::Node &n,
+                                   const std::string &extra,
+                                   std::string_view name_override,
+                                   std::size_t trailing_breaks) const
+{
+    printIndent();
+    out << (!name_override.empty() ? std::string{ name_override } : typeid(n).name());
+    if (!extra.empty()) {
+        out << " [" << extra << "]";
+    }
+    if (trailing_breaks > 0U) {
+        out << " (" << trailing_breaks << R"([\n]))";
+    }
+    out << '\n';
+}
+
+void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
+                                     std::string_view prefix) const
 {
     for (const auto &t : tv) {
         if (t.kind == ast::Trivia::Kind::comment) {
             printIndent();
-            std::cout << t.text << '\n';
-        }
-    }
-}
-
-auto DebugPrinter::buildInlineSuffix(const std::vector<ast::Trivia> &trailing) const -> std::string
-{
-    std::ostringstream oss;
-    bool first_comment = true;
-    std::size_t newline_breaks = 0;
-
-    for (const auto &t : trailing) {
-        if (t.kind == ast::Trivia::Kind::comment) {
-            if (!first_comment) {
-                oss << ' ';
+            if (!prefix.empty()) {
+                out << prefix;
             }
-            // Text already includes the VHDL prefix ("-- ...").
-            oss << t.text;
-            first_comment = false;
-        } else {
-            newline_breaks += t.breaks;
+            out << t.text << '\n';
         }
     }
-
-    if (newline_breaks > 0U) {
-        if (!first_comment) {
-            oss << ' ';
-        }
-        oss << '(' << newline_breaks << R"([\n]))";
-    }
-
-    return oss.str();
 }
 
-// ---- Generic emission helper ----
+auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &trailing) -> std::size_t
+{
+    std::size_t total = 0;
+    for (const auto &t : trailing) {
+        if (t.kind == ast::Trivia::Kind::newlines) {
+            total += t.breaks;
+        }
+    }
+    return total;
+}
 
 template<class NodeT>
 void DebugPrinter::emitNodeLike(const NodeT &node,
@@ -80,58 +71,58 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
                                 const std::string &extra)
 {
     const auto &maybe = node.tryGetComments();
+    const std::size_t nl = maybe.has_value() ? countNewlines(maybe->trailing) : 0U;
+
+    // 1) Header with only newline count.
+    printNodeHeader(node, extra, pretty_name, nl);
+
+    // 2) Under the node, show leading comments, then trailing inline comments.
     if (maybe.has_value()) {
-        // Leading trivia above the node.
-        printTriviaLines(maybe->leading);
+        IndentGuard _{ indent };
+        printCommentLines(maybe->leading, /*prefix=*/"(^) ");
+        printCommentLines(maybe->trailing, /*prefix=*/"(>) ");
     }
-
-    // Build inline suffix from trailing trivia (inline comments + "(N[\n])").
-    const std::string inline_suffix
-      = maybe.has_value() ? buildInlineSuffix(maybe->trailing) : std::string{};
-
-    // Print header line.
-    printNode(node, extra, std::string(pretty_name), inline_suffix);
-
-    // Do NOT emit extra blank lines after the header — the trailing newline count
-    // is already shown inline via "(N[\n])".
 }
 
-// ---- Nodes ----
+// ---- Visitors ----
 
 void DebugPrinter::visit(const ast::DesignFile &node)
 {
-    // DesignFile typically has no inline comments; use the helper for consistency.
     emitNodeLike(node, "DesignFile", /*extra=*/"");
-
-    ++indent;
+    IndentGuard _{ indent };
     walk(node);
-    --indent;
 }
 
 void DebugPrinter::visit(const ast::Entity &node)
 {
     emitNodeLike(node, "Entity", node.name);
 
-    ++indent;
-    std::cout << std::string(static_cast<std::uint8_t>(indent * 2), ' ') << "Generics:\n";
-    ++indent;
-    dispatchAll(node.generics);
-    --indent;
-    std::cout << std::string(static_cast<std::uint8_t>(indent * 2), ' ') << "Ports:\n";
-    ++indent;
-    dispatchAll(node.ports);
-    --indent;
+    IndentGuard _{ indent };
+    // Children sections
+    printLine("Generics:");
+    {
+        IndentGuard _{ indent };
+        for (const auto &g : node.generics) {
+            if (g != nullptr) {
+                g->accept(*this);
+            }
+        }
+    }
+    printLine("Ports:");
+    {
+        IndentGuard _{ indent };
+        for (const auto &p : node.ports) {
+            if (p != nullptr) {
+                p->accept(*this);
+            }
+        }
+    }
 }
 
 void DebugPrinter::visit(const ast::GenericParam &node)
 {
-    std::string info;
-    for (const auto &n : node.names) {
-        if (!info.empty()) {
-            info += ", ";
-        }
-        info += n;
-    }
+    auto names = node.names | (std::views::join_with(std::string_view{ ", " }));
+    auto info = std::ranges::to<std::string>(names);
     info += " : " + node.type;
     if (node.init.has_value()) {
         info += " := " + *node.init;
@@ -143,28 +134,25 @@ void DebugPrinter::visit(const ast::GenericParam &node)
 void DebugPrinter::visit(const ast::Port &node)
 {
     std::ostringstream oss;
-    for (const auto &[i, name] : node.names | std::views::enumerate) {
-        if (i > 0) {
-            oss << ", ";
-        }
-        oss << name;
-    }
+
+    auto names = node.names | (std::views::join_with(std::string_view{ ", " }));
+    oss << std::ranges::to<std::string>(names);
+
+    // mode/type (if present)
     if (!node.mode.empty() || !node.type.empty()) {
         oss << " :";
         if (!node.mode.empty()) {
-            oss << " " << node.mode;
+            oss << ' ' << node.mode;
         }
         if (!node.type.empty()) {
-            oss << " " << node.type;
+            oss << ' ' << node.type;
         }
     }
 
     emitNodeLike(node, "Port", oss.str());
 
-    ++indent;
-    // Ports may have children (e.g., ranges)
+    IndentGuard _{ indent };
     walk(node);
-    --indent;
 }
 
 void DebugPrinter::visit(const ast::Range &node)

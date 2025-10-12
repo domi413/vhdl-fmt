@@ -54,7 +54,7 @@ auto main(int argc, char *argv[]) -> int
 
     // std::cout << tree->toStringTree(&parser, true) << "\n\n";
 
-    emit::DebugPrinter printer;
+    emit::DebugPrinter printer(std::cout);
     root.accept(printer);
 
     return 0;
