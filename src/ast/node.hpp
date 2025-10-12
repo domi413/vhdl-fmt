@@ -4,6 +4,7 @@
 #include "ast/visitor.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <vector>
@@ -13,12 +14,12 @@ namespace ast {
 /// @brief Represents comments or newlines attached to an AST node.
 struct Trivia
 {
-    enum class Kind
+    enum class Kind : std::uint8_t
     {
-        Comment,
-        Newlines
+        comment,
+        newlines
     };
-    Kind kind{ Kind::Comment };
+    Kind kind{ Kind::comment };
 
     // For Kind::Comment
     std::string text;

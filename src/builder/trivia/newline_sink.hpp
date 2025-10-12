@@ -12,13 +12,17 @@ namespace builder {
 class NewlineSink
 {
   public:
-    void push(ast::Node::NodeComments &dst, bool to_leading, std::size_t breaks)
+    void push( // NOLINT (readability-convert-member-functions-to-static)
+      ast::Node::NodeComments &dst,
+      bool to_leading,
+      std::size_t breaks)
     {
-        if (breaks == 0)
+        if (breaks == 0) {
             return;
+        }
 
         ast::Trivia tv;
-        tv.kind = ast::Trivia::Kind::Newlines;
+        tv.kind = ast::Trivia::Kind::newlines;
         tv.breaks = breaks;
 
         auto &vec = to_leading ? dst.leading : dst.trailing;

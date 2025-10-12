@@ -18,14 +18,16 @@ class CommentSink
 
     void push(ast::Node::NodeComments &dst, bool to_leading, const antlr4::Token *t)
     {
-        if (!t)
+        if (t == nullptr) {
             return;
-        const std::size_t idx = static_cast<std::size_t>(t->getTokenIndex());
-        if (!used_.insert(idx).second)
+}
+        const auto idx = static_cast<std::size_t>(t->getTokenIndex());
+        if (!used.insert(idx).second) {
             return;
+}
 
         ast::Trivia tv;
-        tv.kind = ast::Trivia::Kind::Comment;
+        tv.kind = ast::Trivia::Kind::comment;
         tv.text = t->getText();
 
         auto &vec = to_leading ? dst.leading : dst.trailing;
@@ -33,7 +35,7 @@ class CommentSink
     }
 
   private:
-    std::unordered_set<std::size_t> used_;
+    std::unordered_set<std::size_t> used;
 };
 
 } // namespace builder

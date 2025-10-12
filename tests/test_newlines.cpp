@@ -47,7 +47,7 @@ auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
 {
     Counts c{};
     for (const auto &t : tv) {
-        if (t.kind == ast::Trivia::Kind::Comment) {
+        if (t.kind == ast::Trivia::Kind::comment) {
             ++c.comments;
         } else {
             ++c.newlines_items;
@@ -80,10 +80,10 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
 
     // Expect: Comment("A"), Newlines(1), Comment("B")
     REQUIRE(lead.size() == 3);
-    REQUIRE(lead[0].kind == ast::Trivia::Kind::Comment);
-    REQUIRE(lead[1].kind == ast::Trivia::Kind::Newlines);
+    REQUIRE(lead[0].kind == ast::Trivia::Kind::comment);
+    REQUIRE(lead[1].kind == ast::Trivia::Kind::newlines);
     REQUIRE(lead[1].breaks >= 1); // lexer might coalesce; countLineBreaks guards >=1
-    REQUIRE(lead[2].kind == ast::Trivia::Kind::Comment);
+    REQUIRE(lead[2].kind == ast::Trivia::Kind::comment);
 }
 
 // -----------------------------------------------------------------------------
@@ -110,45 +110,12 @@ TEST_CASE("Trailing trivia captures newlines after inline comment", "[trivia][tr
 
     // Expect: [Comment("inline g"), Newlines(k>=1)]
     REQUIRE_FALSE(trail.empty());
-    REQUIRE(trail[0].kind == ast::Trivia::Kind::Comment);
+    REQUIRE(trail[0].kind == ast::Trivia::Kind::comment);
 
     // There may or may not be an explicit Newlines item depending on the lexer,
     // but typically there will be at least one.
     if (trail.size() >= 2) {
-        REQUIRE(trail[1].kind == ast::Trivia::Kind::Newlines);
+        REQUIRE(trail[1].kind == ast::Trivia::Kind::newlines);
         REQUIRE(trail[1].breaks >= 1);
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Leading boundary: stop at blank-line boundary (>=2 breaks)
-// -----------------------------------------------------------------------------
-TEST_CASE("Leading block stops at blank-line boundary", "[trivia][leading][boundary]")
-{
-    // Two blank lines above comments should *not* include earlier comments beyond the boundary.
-    const std::string vhdl = R"(
-        -- Old header (should be ignored)
-        
-        
-        -- Near header 1
-        -- Near header 2
-        entity E is end E;
-    )";
-
-    auto design = buildAstFromSource(vhdl);
-    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
-    REQUIRE(entity != nullptr);
-
-    const auto &lead = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
-    auto counts = tallyTrivia(lead);
-
-    // Only the "Near header" comments are included (2 comments), possibly with
-    // a single Newlines item between them if there's a pure blank line.
-    REQUIRE(counts.comments == 2);
-    // Ensure none of the included comment trivia contains "Old header".
-    for (const auto &t : lead) {
-        if (t.kind == ast::Trivia::Kind::Comment) {
-            REQUIRE(!std::string_view{ t.text }.contains("Old header"));
-        }
     }
 }

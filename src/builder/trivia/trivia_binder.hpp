@@ -17,7 +17,13 @@ namespace builder {
 class TriviaBinder
 {
   public:
-    explicit TriviaBinder(antlr4::CommonTokenStream &ts) : tokens_(ts) {}
+    explicit TriviaBinder(antlr4::CommonTokenStream &ts) : tokens(ts) {}
+
+    ~TriviaBinder() = default;
+    TriviaBinder(const TriviaBinder &) = delete;
+    auto operator=(const TriviaBinder &) -> TriviaBinder & = delete;
+    TriviaBinder(TriviaBinder &&) = delete;
+    auto operator=(TriviaBinder &&) -> TriviaBinder & = delete;
 
     void bind(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
@@ -28,27 +34,29 @@ class TriviaBinder
         int line;
     };
 
-    antlr4::CommonTokenStream &tokens_;
-    CommentSink comments_;
-    NewlineSink newlines_;
+    antlr4::CommonTokenStream &tokens;
+    CommentSink comments;
+    NewlineSink newlines;
 
-    static inline bool isComment(const antlr4::Token *t)
+    static auto isComment(const antlr4::Token *t) -> bool
     {
-        return t && t->getChannel() == vhdlLexer::COMMENTS;
+        return (t != nullptr) && t->getChannel() == vhdlLexer::COMMENTS;
     }
 
-    static inline bool isNewline(const antlr4::Token *t)
+    static auto isNewline(const antlr4::Token *t) -> bool
     {
-        return t && t->getChannel() == vhdlLexer::NEWLINES;
+        return (t != nullptr) && t->getChannel() == vhdlLexer::NEWLINES;
     }
 
-    static std::size_t countLineBreaks(const std::string &s)
+    static auto countLineBreaks(const std::string &s) -> std::size_t
     {
         std::size_t n = 0;
-        for (char c : s)
-            if (c == '\n')
+        for (char c : s) {
+            if (c == '\n') {
                 ++n;
-        return n ? n : 1;
+}
+}
+        return (n != 0) ? n : 1;
     }
 
     void collectLeading(ast::Node::NodeComments &dst, std::size_t start_idx);

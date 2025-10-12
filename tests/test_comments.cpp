@@ -42,7 +42,7 @@ auto commentTexts(const std::vector<ast::Trivia> &tv) -> std::vector<std::string
     std::vector<std::string_view> out;
     out.reserve(tv.size());
     for (const auto &t : tv) {
-        if (t.kind == ast::Trivia::Kind::Comment) {
+        if (t.kind == ast::Trivia::Kind::comment) {
             out.push_back(t.text);
         }
     }
@@ -66,8 +66,8 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    const auto &leadingTrivia = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
-    const auto texts = commentTexts(leadingTrivia);
+    const auto &leading_trivia = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
+    const auto texts = commentTexts(leading_trivia);
 
     REQUIRE(texts.size() == 2);
     REQUIRE(texts.front().contains("License text"));
