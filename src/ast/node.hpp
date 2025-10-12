@@ -3,6 +3,7 @@
 
 #include "ast/visitor.hpp"
 
+#include <cstddef>
 #include <optional>
 #include <string>
 #include <vector>
@@ -13,7 +14,7 @@ namespace ast {
 struct Comment
 {
     std::string text;        ///< Raw comment text.
-    int line{ 0 };           ///< Line number in source.
+    std::size_t line{ 0 };   ///< Line number in source.
     bool is_inline{ false }; ///< Whether the comment appears inline.
 };
 

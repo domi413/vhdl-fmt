@@ -8,6 +8,7 @@
 #include "vhdlLexer.h"
 
 #include <cstddef>
+#include <string>
 #include <unordered_set>
 #include <vector>
 
@@ -38,8 +39,8 @@ class CommentBinder
   private:
     struct StopInfo
     {
-        std::size_t idx; ///< Stop token index in the stream.
-        int line;        ///< Stop token source line.
+        std::size_t idx;  ///< Stop token index in the stream.
+        std::size_t line; ///< Stop token source line.
     };
 
     antlr4::CommonTokenStream &tokens;    ///< Token stream (owner elsewhere).
@@ -58,7 +59,7 @@ class CommentBinder
     static auto countLineBreaks(const std::string &s) -> std::size_t
     {
         std::size_t n = 0;
-        for (char c : s) {
+        for (const char c : s) {
             if (c == '\n') {
                 ++n;
             }

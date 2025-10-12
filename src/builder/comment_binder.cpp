@@ -1,7 +1,15 @@
 #include "builder/comment_binder.hpp"
 
+#include "ParserRuleContext.h"
+#include "Token.h"
+#include "ast/node.hpp"
+#include "vhdlLexer.h"
+
 #include <algorithm>
+#include <cstddef>
 #include <ranges>
+#include <utility>
+#include <vector>
 
 namespace builder {
 
@@ -12,9 +20,9 @@ void CommentBinder::pushIfFresh(const antlr4::Token *t,
     if (t == nullptr) {
         return;
     }
-    const auto idx = static_cast<std::size_t>(t->getTokenIndex());
+    const auto idx = t->getTokenIndex();
     if (used.insert(idx).second) {
-        vec.push_back({ t->getText(), static_cast<int>(t->getLine()), inline_flag });
+        vec.push_back({ t->getText(), t->getLine(), inline_flag });
     }
 }
 
@@ -26,13 +34,14 @@ void CommentBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t sta
     std::vector<const antlr4::Token *> acc; // collected in reverse while walking left
 
     // Walk indices [0, startIdx) in reverse
-    for (std::size_t i : std::views::iota(std::size_t{ 0 }, start_idx) | std::views::reverse) {
+    for (const std::size_t i :
+         std::views::iota(std::size_t{ 0 }, start_idx) | std::views::reverse) {
         const auto *t = toks[i];
         if (t == nullptr) {
             break;
         }
 
-        const auto ch = static_cast<std::size_t>(t->getChannel());
+        const auto ch = t->getChannel();
         if (ch != vhdlLexer::COMMENTS && ch != vhdlLexer::NEWLINES) {
             // hit default or other hidden channel => stop
             break;
@@ -65,7 +74,7 @@ void CommentBinder::collectInline(ast::Node::NodeComments &dst, StopInfo stop)
     const std::size_t n = toks.size();
 
     // Walk indices (stop.idx, n) forward
-    for (std::size_t i : std::views::iota(stop.idx + 1, n)) {
+    for (const std::size_t i : std::views::iota(stop.idx + 1, n)) {
         const auto *t = toks[i];
         if (t == nullptr) {
             break;
@@ -78,7 +87,7 @@ void CommentBinder::collectInline(ast::Node::NodeComments &dst, StopInfo stop)
             continue; // skip other hidden tokens
         }
 
-        if (static_cast<int>(t->getLine()) == stop.line) {
+        if (t->getLine() == stop.line) {
             pushIfFresh(t, dst.trailing, /*inline_flag=*/true);
         } else {
             break; // comment not on same line → not inline
@@ -93,9 +102,9 @@ void CommentBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     }
 
     auto &cm = node.getComments();
-    const auto start_idx = static_cast<std::size_t>(ctx->getStart()->getTokenIndex());
-    const StopInfo stop{ .idx = static_cast<std::size_t>(ctx->getStop()->getTokenIndex()),
-                         .line = static_cast<int>(ctx->getStop()->getLine()) };
+    const auto start_idx = ctx->getStart()->getTokenIndex();
+    const StopInfo stop{ .idx = ctx->getStop()->getTokenIndex(),
+                         .line = ctx->getStop()->getLine() };
 
     collectLeading(cm, start_idx);
     collectInline(cm, stop);
