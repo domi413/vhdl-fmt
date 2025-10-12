@@ -35,8 +35,8 @@ class ArgumentParser final
     /// Parses and processes the cli arguments
     auto parseArguments(std::span<char *> args) -> void;
 
-    std::optional<std::filesystem::path> config_file_path_;
-    std::bitset<static_cast<std::size_t>(ArgumentFlag::FLAG_COUNT)> used_flags_;
+    std::optional<std::filesystem::path> config_file_path;
+    std::bitset<static_cast<std::size_t>(ArgumentFlag::FLAG_COUNT)> used_flags;
 };
 
 } // namespace cli

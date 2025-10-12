@@ -46,7 +46,8 @@ struct Assembler
 
     // Spawn node and insert into current sink
     template<typename T, typename... Args>
-    [[nodiscard]] auto spawn(Args &&...args) -> T &
+    [[nodiscard]]
+    auto spawn(Args &&...args) -> T &
     {
         static_assert(std::derived_from<T, Node>, "T must derive from ast::Node");
         assert(!this->sinks.empty() && "No active sink");

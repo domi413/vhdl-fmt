@@ -139,7 +139,7 @@ inline auto parseAndMapYamlValue(const YAML::Node &node,
 
 auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadError>
 {
-    if (!config_file_path_.has_value()) {
+    if (!config_file_path.has_value()) {
         const auto default_path = std::filesystem::current_path() / "vhdl-fmt.yaml";
 
         if (!std::filesystem::exists(default_path)) {
@@ -147,10 +147,10 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
             return common::Config{};
         }
 
-        config_file_path_ = default_path;
+        config_file_path = default_path;
     }
 
-    const auto &path_to_read = config_file_path_.value();
+    const auto &path_to_read = config_file_path.value();
 
     if (!std::filesystem::exists(path_to_read)) {
         return std::unexpected{ ConfigReadError{

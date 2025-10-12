@@ -23,11 +23,11 @@ class ScopeExit
     ScopeExit(ScopeExit &&) = delete;
     auto operator=(const ScopeExit &) -> ScopeExit & = delete;
     auto operator=(ScopeExit &&) -> ScopeExit & = delete;
-    explicit ScopeExit(F func) : func_(std::move(func)) {}
-    ~ScopeExit() { func_(); }
+    explicit ScopeExit(F func) : func(std::move(func)) {}
+    ~ScopeExit() { func(); }
 
   private:
-    F func_;
+    F func;
 };
 
 template<typename F>
