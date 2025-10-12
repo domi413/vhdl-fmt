@@ -1,4 +1,3 @@
-#include "absl/strings/match.h"
 #include "cli/config_reader.hpp"
 #include "common/config.hpp"
 
@@ -135,7 +134,7 @@ SCENARIO("ConfigReader handles configuration file reading")
             {
                 REQUIRE_FALSE(result.has_value());
                 const auto &error = result.error();
-                REQUIRE(absl::StrContains(error.message, "Error reading config file"));
+                REQUIRE(error.message.contains("Error reading config file"));
             }
         }
     }
