@@ -72,7 +72,7 @@ class CommentBinder
     void collectInline(ast::Node::NodeComments &dst, StopInfo stop);
 
     // insertion with deduplication
-    void pushIfFresh(const antlr4::Token *t, std::vector<ast::Comment> &vec, bool inline_flag);
+    void pushIfFresh(const antlr4::Token *t, std::vector<ast::Comment> &vec);
 };
 
 } // namespace builder

@@ -41,13 +41,13 @@ void DebugPrinter::printComments(const ast::Node &n) const
     // Leading comments
     for (const auto &c : comments.leading) {
         printIndent();
-        std::cout << (c.is_inline ? "(inline) " : "") << c.text << '\n';
+        std::cout << c.text << '\n';
     }
 
     // Trailing comments
     for (const auto &c : comments.trailing) {
         printIndent();
-        std::cout << (c.is_inline ? "(inline) " : "") << c.text << '\n';
+        std::cout << "(inline) " << c.text << '\n';
     }
 }
 

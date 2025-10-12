@@ -13,16 +13,14 @@
 
 namespace builder {
 
-void CommentBinder::pushIfFresh(const antlr4::Token *t,
-                                std::vector<ast::Comment> &vec,
-                                bool inline_flag)
+void CommentBinder::pushIfFresh(const antlr4::Token *t, std::vector<ast::Comment> &vec)
 {
     if (t == nullptr) {
         return;
     }
     const auto idx = t->getTokenIndex();
     if (used.insert(idx).second) {
-        vec.push_back({ t->getText(), t->getLine(), inline_flag });
+        vec.push_back({ t->getText(), t->getLine() });
     }
 }
 
@@ -64,7 +62,7 @@ void CommentBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t sta
 
     std::ranges::reverse(acc);
     for (const auto *t : acc) {
-        pushIfFresh(t, dst.leading, /*inline_flag=*/false);
+        pushIfFresh(t, dst.leading);
     }
 }
 
@@ -88,7 +86,7 @@ void CommentBinder::collectInline(ast::Node::NodeComments &dst, StopInfo stop)
         }
 
         if (t->getLine() == stop.line) {
-            pushIfFresh(t, dst.trailing, /*inline_flag=*/true);
+            pushIfFresh(t, dst.trailing);
         } else {
             break; // comment not on same line → not inline
         }

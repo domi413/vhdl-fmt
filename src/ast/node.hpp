@@ -15,7 +15,6 @@ struct Comment
 {
     std::string text;        ///< Raw comment text.
     std::size_t line{ 0 };   ///< Line number in source.
-    bool is_inline{ false }; ///< Whether the comment appears inline.
 };
 
 /// @brief Base class for all AST nodes.
