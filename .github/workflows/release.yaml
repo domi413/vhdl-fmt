@@ -24,7 +24,7 @@ jobs:
         with:
           path: |
             /var/cache/pacman/pkg
-          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yaml') }}-v1
           restore-keys: |
             arch-deps-${{ runner.os }}-v1
             arch-deps-${{ runner.os }}-
@@ -59,7 +59,7 @@ jobs:
           source venv/bin/activate
           conan profile detect --force
 
-      - name: Create Release Draft
+      - name: Create and Publish Release
         uses: release-drafter/release-drafter@v6
         id: release-drafter
         with:
@@ -77,10 +77,7 @@ jobs:
       - name: Upload Binary to Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ steps.release-drafter.outputs.tag_name }}
           files: build/Release/bin/vhdl_formatter
-          append_body: false
-          generate_release_notes: false
-          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
