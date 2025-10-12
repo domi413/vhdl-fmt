@@ -1,6 +1,5 @@
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
-#include "absl/strings/match.h"
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
@@ -15,6 +14,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 
 namespace {
 
@@ -55,8 +55,8 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
 
     const auto &comments = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
     REQUIRE(comments.size() == 2);
-    REQUIRE(absl::StrContains(comments.front().text, "License text"));
-    REQUIRE(absl::StrContains(comments.back().text, "Entity declaration"));
+    REQUIRE(std::string_view{ comments.front().text }.contains("License text"));
+    REQUIRE(std::string_view{ comments.back().text }.contains("Entity declaration"));
 }
 
 // -----------------------------------------------------------------------------
@@ -82,10 +82,10 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     const auto &c = g.tryGetComments().value_or(ast::Node::NodeComments{});
 
     REQUIRE_FALSE(c.leading.empty());
-    REQUIRE(absl::StrContains(c.leading.front().text, "Leading for CONST_V"));
+    REQUIRE(std::string_view{ c.leading.front().text }.contains("Leading for CONST_V"));
 
     REQUIRE_FALSE(c.trailing.empty());
-    REQUIRE(absl::StrContains(c.trailing.front().text, "Inline for CONST_V"));
+    REQUIRE(std::string_view{ c.trailing.front().text }.contains("Inline for CONST_V"));
 }
 
 // -----------------------------------------------------------------------------
@@ -112,16 +112,16 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     const auto &clk = *entity->ports[0];
     const auto &clk_c = clk.tryGetComments().value_or(ast::Node::NodeComments{});
     REQUIRE_FALSE(clk_c.leading.empty());
-    REQUIRE(absl::StrContains(clk_c.leading.front().text, "Clock input"));
+    REQUIRE(std::string_view{ clk_c.leading.front().text }.contains("Clock input"));
     REQUIRE_FALSE(clk_c.trailing.empty());
-    REQUIRE(absl::StrContains(clk_c.trailing.front().text, "inline clock"));
+    REQUIRE(std::string_view{ clk_c.trailing.front().text }.contains("inline clock"));
 
     const auto &rst = *entity->ports[1];
     const auto &rst_c = rst.tryGetComments().value_or(ast::Node::NodeComments{});
     REQUIRE_FALSE(rst_c.leading.empty());
-    REQUIRE(absl::StrContains(rst_c.leading.front().text, "Reset input"));
+    REQUIRE(std::string_view{ rst_c.leading.front().text }.contains("Reset input"));
     REQUIRE_FALSE(rst_c.trailing.empty());
-    REQUIRE(absl::StrContains(rst_c.trailing.front().text, "inline reset"));
+    REQUIRE(std::string_view{ rst_c.trailing.front().text }.contains("inline reset"));
 }
 
 // -----------------------------------------------------------------------------
@@ -142,6 +142,6 @@ TEST_CASE("Consecutive comment block with newlines is preserved", "[comments][mu
 
     const auto &comments = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
     REQUIRE(comments.size() == 3);
-    REQUIRE(absl::StrContains(comments.front().text, "Header line 1"));
-    REQUIRE(absl::StrContains(comments.back().text, "Header line 3"));
+    REQUIRE(std::string_view{ comments.front().text }.contains("Header line 1"));
+    REQUIRE(std::string_view{ comments.back().text }.contains("Header line 3"));
 }

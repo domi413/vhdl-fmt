@@ -44,7 +44,7 @@ class CommentBinder
     };
 
     antlr4::CommonTokenStream &tokens;    ///< Token stream (owner elsewhere).
-    std::unordered_set<std::size_t> used; ///< Dedup set of attached comment token indices.
+    std::unordered_set<std::size_t> used; ///< Deduplication set of attached comment token indices.
 
     // channel helpers
     static auto isComment(const antlr4::Token *t) -> bool
@@ -71,7 +71,7 @@ class CommentBinder
     void collectLeading(ast::Node::NodeComments &dst, std::size_t start_idx);
     void collectInline(ast::Node::NodeComments &dst, StopInfo stop);
 
-    // insertion with dedup
+    // insertion with deduplication
     void pushIfFresh(const antlr4::Token *t, std::vector<ast::Comment> &vec, bool inline_flag);
 };
 
