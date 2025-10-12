@@ -14,8 +14,8 @@ struct Comment
 {
     enum class Kind : std::uint8_t
     {
-        line,
-        block
+        LINE,
+        BLOCK
     };
 
     std::string text;

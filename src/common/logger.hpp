@@ -1,6 +1,7 @@
 #ifndef COMMON_LOGGER_HPP
 #define COMMON_LOGGER_HPP
 
+#include <fmt/base.h>
 #ifndef SPDLOG_ACTIVE_LEVEL
     #ifdef NDEBUG
         #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
@@ -10,22 +11,26 @@
 #endif
 
 #include <cstdint>
+#include <fmt/base.h>
+#include <memory>
+#include <spdlog/common.h>
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+#include <utility>
 
 namespace common {
 
 /// Log level enumeration matching spdlog levels
 enum class Level : std::uint8_t
 {
-    trace = SPDLOG_LEVEL_TRACE,
-    debug = SPDLOG_LEVEL_DEBUG,
-    info = SPDLOG_LEVEL_INFO,
-    warn = SPDLOG_LEVEL_WARN,
-    error = SPDLOG_LEVEL_ERROR,
-    critical = SPDLOG_LEVEL_CRITICAL,
-    off = SPDLOG_LEVEL_OFF
+    TRACE = SPDLOG_LEVEL_TRACE,
+    DEBUG = SPDLOG_LEVEL_DEBUG,
+    INFO = SPDLOG_LEVEL_INFO,
+    WARN = SPDLOG_LEVEL_WARN,
+    ERROR = SPDLOG_LEVEL_ERROR,
+    CRITICAL = SPDLOG_LEVEL_CRITICAL,
+    OFF = SPDLOG_LEVEL_OFF
 };
 
 /// Thread-safe singleton logger wrapper around spdlog
