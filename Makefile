@@ -40,6 +40,9 @@ run: $(BUILD_STAMP)
 test: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET)
 
+test-verbose: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET) --verbose
+
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
 

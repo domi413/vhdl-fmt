@@ -1,5 +1,5 @@
-#ifndef AST_DESIGN_FILE_HPP
-#define AST_DESIGN_FILE_HPP
+#ifndef AST_NODES_DESIGN_FILE_HPP
+#define AST_NODES_DESIGN_FILE_HPP
 
 #include "ast/node.hpp"
 
@@ -15,4 +15,4 @@ struct DesignFile : Node
 
 } // namespace ast
 
-#endif /* AST_DESIGN_FILE_HPP */
+#endif /* AST_NODES_DESIGN_FILE_HPP */

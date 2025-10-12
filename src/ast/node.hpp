@@ -10,11 +10,21 @@
 
 namespace ast {
 
-/// @brief Represents a source comment attached to an AST node.
-struct Comment
+/// @brief Represents comments or newlines attached to an AST node.
+struct Trivia
 {
-    std::string text;        ///< Raw comment text.
-    std::size_t line{ 0 };   ///< Line number in source.
+    enum class Kind
+    {
+        Comment,
+        Newlines
+    };
+    Kind kind{ Kind::Comment };
+
+    // For Kind::Comment
+    std::string text;
+
+    // For Kind::Newlines: number of line breaks (>=1).
+    std::size_t breaks{ 0 };
 };
 
 /// @brief Base class for all AST nodes.
@@ -34,8 +44,8 @@ struct Node
     /// @brief Container for leading and trailing comments.
     struct NodeComments
     {
-        std::vector<Comment> leading;  ///< Comments appearing before the node.
-        std::vector<Comment> trailing; ///< Comments appearing after the node.
+        std::vector<Trivia> leading;  ///< Trivia appearing before the node.
+        std::vector<Trivia> trailing; ///< Trivia appearing after the node.
     };
 
     /// @brief Accept a visitor for dynamic dispatch.

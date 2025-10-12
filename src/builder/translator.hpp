@@ -5,7 +5,7 @@
 #include "ParserRuleContext.h"
 #include "ast/nodes/declarations.hpp"
 #include "builder/assembly/assembler.hpp"
-#include "builder/comment_binder.hpp"
+#include "builder/trivia/trivia_binder.hpp"
 #include "vhdlParser.h"
 
 namespace builder {
@@ -18,9 +18,7 @@ class Translator
 {
   public:
     /// @brief Construct a translator bound to an assembler and token stream.
-    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts), comments(ts)
-    {
-    }
+    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts), trivia(ts) {}
     ~Translator() = default;
 
     Translator(const Translator &) = delete;
@@ -38,14 +36,14 @@ class Translator
   private:
     Assembler &builder;                ///< Active assembler used for node creation.
     antlr4::CommonTokenStream &tokens; ///< Token stream for comment attachment.
-    CommentBinder comments;            ///< Comment binder for attaching comments to nodes.
+    TriviaBinder trivia;               ///< Trivia binder for attaching trivia to nodes.
 
     /// @brief Create and register a node, attaching relevant comments.
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
         auto &node{ builder.spawn<T>() };
-        comments.bind(node, ctx);
+        trivia.bind(node, ctx);
         return node;
     }
 
