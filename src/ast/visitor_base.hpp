@@ -8,6 +8,7 @@
 
 #include <concepts>
 #include <memory>
+#include <vector>
 
 namespace ast {
 

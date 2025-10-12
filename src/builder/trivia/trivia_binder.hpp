@@ -10,6 +10,7 @@
 #include "vhdlLexer.h"
 
 #include <cstddef>
+#include <string>
 
 namespace builder {
 
@@ -51,7 +52,7 @@ class TriviaBinder
     static auto countLineBreaks(const std::string &s) -> std::size_t
     {
         std::size_t n = 0;
-        for (char c : s) {
+        for (const char c : s) {
             if (c == '\n') {
                 ++n;
             }

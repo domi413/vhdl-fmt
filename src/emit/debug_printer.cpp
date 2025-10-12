@@ -4,10 +4,14 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include <ranges>
 #include <sstream>
+#include <string_view>
 #include <typeinfo>
+#include <vector>
 
 namespace emit {
 
@@ -78,7 +82,7 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
 
     // 2) Under the node, show leading comments, then trailing inline comments.
     if (maybe.has_value()) {
-        IndentGuard _{ indent };
+        const IndentGuard _{ indent };
         printCommentLines(maybe->leading, /*prefix=*/"(^) ");
         printCommentLines(maybe->trailing, /*prefix=*/"(>) ");
     }
@@ -89,7 +93,7 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
 void DebugPrinter::visit(const ast::DesignFile &node)
 {
     emitNodeLike(node, "DesignFile", /*extra=*/"");
-    IndentGuard _{ indent };
+    const IndentGuard _{ indent };
     walk(node);
 }
 
@@ -97,11 +101,11 @@ void DebugPrinter::visit(const ast::Entity &node)
 {
     emitNodeLike(node, "Entity", node.name);
 
-    IndentGuard _{ indent };
+    const IndentGuard _{ indent };
     // Children sections
     printLine("Generics:");
     {
-        IndentGuard _{ indent };
+        const IndentGuard _{ indent };
         for (const auto &g : node.generics) {
             if (g != nullptr) {
                 g->accept(*this);
@@ -110,7 +114,7 @@ void DebugPrinter::visit(const ast::Entity &node)
     }
     printLine("Ports:");
     {
-        IndentGuard _{ indent };
+        const IndentGuard _{ indent };
         for (const auto &p : node.ports) {
             if (p != nullptr) {
                 p->accept(*this);
@@ -151,7 +155,7 @@ void DebugPrinter::visit(const ast::Port &node)
 
     emitNodeLike(node, "Port", oss.str());
 
-    IndentGuard _{ indent };
+    const IndentGuard _{ indent };
     walk(node);
 }
 

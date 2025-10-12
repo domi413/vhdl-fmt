@@ -11,6 +11,7 @@
 #include "vhdlParser.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <cstddef>
 #include <memory>
 #include <optional>
 #include <string>
@@ -112,8 +113,6 @@ TEST_CASE("Trailing trivia captures newlines after inline comment", "[trivia][tr
     REQUIRE_FALSE(trail.empty());
     REQUIRE(trail[0].kind == ast::Trivia::Kind::comment);
 
-    // There may or may not be an explicit Newlines item depending on the lexer,
-    // but typically there will be at least one.
     if (trail.size() >= 2) {
         REQUIRE(trail[1].kind == ast::Trivia::Kind::newlines);
         REQUIRE(trail[1].breaks >= 1);

@@ -6,6 +6,7 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/visitor_base.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <iosfwd>
 #include <iostream>
