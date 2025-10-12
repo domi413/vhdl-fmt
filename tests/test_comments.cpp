@@ -11,29 +11,12 @@
 #include "vhdlParser.h"
 
 #include <catch2/catch_test_macros.hpp>
-#include <fstream>
-#include <sstream>
 #include <string>
 
 namespace {
 
-auto loadVhdl(const std::string &filename) -> std::string
+auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
 {
-    const std::ifstream file(filename);
-    REQUIRE(file.is_open());
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
-
-} // namespace
-
-TEST_CASE("Attach VHDL comments to AST nodes", "[integration][comments]")
-{
-    // --- Input VHDL with rich comments ---
-    const std::string vhdl_code{ loadVhdl(std::string(TEST_DATA_DIR) + "/comments.vhdl") };
-
-    // --- Setup ANTLR ---
     antlr4::ANTLRInputStream input(vhdl_code);
     vhdlLexer lexer(&input);
     antlr4::CommonTokenStream tokens(&lexer);
@@ -41,36 +24,125 @@ TEST_CASE("Attach VHDL comments to AST nodes", "[integration][comments]")
 
     auto *tree = parser.design_file();
 
-    // --- Build AST ---
-    ast::DesignFile design;
-    builder::Assembler assembler(design.units);
+    auto design = std::make_unique<ast::DesignFile>();
+    builder::Assembler assembler(design->units);
     builder::Translator translator(assembler, tokens);
     builder::Visitor visitor(translator);
     builder::adapter::AntlrVoidAdapter adapter(visitor);
     tree->accept(&adapter);
+    return design;
+}
 
-    // --- Verify AST and comments ---
-    REQUIRE(design.units.size() == 1);
-    auto *entity = dynamic_cast<ast::Entity *>(design.units[0].get());
+} // namespace
+
+
+// -----------------------------------------------------------------------------
+// Test 1: Entity-level leading comments
+// -----------------------------------------------------------------------------
+TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
+{
+    const std::string vhdl = R"(
+        -- License text
+        -- Entity declaration for a simple counter
+        entity MyEntity is end MyEntity;
+    )";
+
+    auto design = buildAstFromSource(vhdl);
+    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    // Leading comment block above the entity
-    REQUIRE(entity->tryGetComments().has_value());
     const auto &comments = entity->tryGetComments()->leading;
-    REQUIRE_FALSE(comments.empty());
-    REQUIRE(absl::StrContains(comments.front().text, "Entity declaration"));
+    REQUIRE(comments.size() == 2);
+    REQUIRE(absl::StrContains(comments.front().text, "License text"));
+    REQUIRE(absl::StrContains(comments.back().text, "Entity declaration"));
+}
 
-    // Generic parameters: check CONST_V for leading and inline
-    REQUIRE(entity->generics.size() > 0);
-    const auto &first_generic = *entity->generics.front();
-    REQUIRE(first_generic.tryGetComments().has_value());
 
-    const auto &g_comments = first_generic.tryGetComments().value();
-    REQUIRE_FALSE(g_comments.leading.empty());
-    REQUIRE(absl::StrContains(g_comments.leading.front().text, "Configuration constants"));
+// -----------------------------------------------------------------------------
+// Test 2: Generic-level leading and inline comments
+// -----------------------------------------------------------------------------
+TEST_CASE("Generic captures both leading and inline comments", "[comments][generic]")
+{
+    const std::string vhdl = R"(
+        entity Example is
+            generic (
+                -- Leading for CONST_V
+                CONST_V : integer := 42   -- Inline for CONST_V
+            );
+        end Example;
+    )";
 
-    // Check inline trailing comment (e.g. "-- Example constant")
-    REQUIRE_FALSE(g_comments.trailing.empty());
-    REQUIRE(g_comments.trailing.front().is_inline);
-    REQUIRE(absl::StrContains(g_comments.trailing.front().text, "Example constant"));
+    auto design = buildAstFromSource(vhdl);
+    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    REQUIRE(entity != nullptr);
+    REQUIRE(entity->generics.size() == 1);
+
+    const auto &g = *entity->generics[0];
+    const auto &c = g.tryGetComments().value();
+
+    REQUIRE_FALSE(c.leading.empty());
+    REQUIRE(absl::StrContains(c.leading.front().text, "Leading for CONST_V"));
+
+    REQUIRE_FALSE(c.trailing.empty());
+    REQUIRE(absl::StrContains(c.trailing.front().text, "Inline for CONST_V"));
+}
+
+
+// -----------------------------------------------------------------------------
+// Test 3: Port-level leading and inline comments
+// -----------------------------------------------------------------------------
+TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
+{
+    const std::string vhdl = R"(
+        entity Example is
+            port (
+                -- Clock input
+                clk : in std_logic;  -- inline clock
+                -- Reset input
+                rst : in std_logic   -- inline reset
+            );
+        end Example;
+    )";
+
+    auto design = buildAstFromSource(vhdl);
+    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    REQUIRE(entity != nullptr);
+    REQUIRE(entity->ports.size() == 2);
+
+    const auto &clk = *entity->ports[0];
+    const auto &clk_c = clk.tryGetComments().value();
+    REQUIRE_FALSE(clk_c.leading.empty());
+    REQUIRE(absl::StrContains(clk_c.leading.front().text, "Clock input"));
+    REQUIRE_FALSE(clk_c.trailing.empty());
+    REQUIRE(absl::StrContains(clk_c.trailing.front().text, "inline clock"));
+
+    const auto &rst = *entity->ports[1];
+    const auto &rst_c = rst.tryGetComments().value();
+    REQUIRE_FALSE(rst_c.leading.empty());
+    REQUIRE(absl::StrContains(rst_c.leading.front().text, "Reset input"));
+    REQUIRE_FALSE(rst_c.trailing.empty());
+    REQUIRE(absl::StrContains(rst_c.trailing.front().text, "inline reset"));
+}
+
+
+// -----------------------------------------------------------------------------
+// Test 4: Mixed leading comment block and newlines
+// -----------------------------------------------------------------------------
+TEST_CASE("Consecutive comment block with newlines is preserved", "[comments][multiline]")
+{
+    const std::string vhdl = R"(
+        -- Header line 1
+        --
+        -- Header line 3
+        entity Blocky is end Blocky;
+    )";
+
+    auto design = buildAstFromSource(vhdl);
+    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    REQUIRE(entity != nullptr);
+
+    const auto &comments = entity->tryGetComments()->leading;
+    REQUIRE(comments.size() == 3);
+    REQUIRE(absl::StrContains(comments.front().text, "Header line 1"));
+    REQUIRE(absl::StrContains(comments.back().text, "Header line 3"));
 }
