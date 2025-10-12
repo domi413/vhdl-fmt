@@ -6,34 +6,35 @@ template: |
 
   $CHANGES
 
-  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
-
-branches:
-  - main
-
 categories:
   - title: "📚 Documentation"
-    label: "docs"
+    labels:
+      - "documentation"
 
   - title: "✨ Features"
     labels:
-      - "feat"
-      - "perf"
+      - "feature"
+      - "performance"
 
   - title: "🔧 Fixes"
     labels:
       - "fix"
 
   - title: "🛠️ Maintenance"
-    label:
+    labels:
       - "build"
       - "chore"
-      - "ci"
+      - "pipeline"
       - "refactor"
 
   - title: "🧪 Tests"
-    label: "test"
+    labels:
+      - "test"
 
 category-template: "### $TITLE"
 change-template: "- $TITLE by @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&'
+
+replacers:
+  - search: '/(build|chore|ci|docs|feat|fix|perf|refactor|test):\s+/gi'
+    replace: ""
