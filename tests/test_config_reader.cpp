@@ -1,7 +1,7 @@
 #include "cli/config_reader.hpp"
 #include "common/config.hpp"
 
-#include <catch2/catch_message.hpp>
+include<catch2 / catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <cstdint>
@@ -12,34 +12,35 @@
 #include <string>
 #include <string_view>
 
-namespace {
-
-// RAII class for scope exit cleanup
-template<typename F>
-class ScopeExit
+  namespace
 {
-  public:
-    ScopeExit(const ScopeExit &) = delete;
-    ScopeExit(ScopeExit &&) = delete;
-    auto operator=(const ScopeExit &) -> ScopeExit & = delete;
-    auto operator=(ScopeExit &&) -> ScopeExit & = delete;
-    explicit ScopeExit(F func) : func_(std::move(func)) {}
-    ~ScopeExit() { func_(); }
 
-  private:
-    F func_;
-};
+    // RAII class for scope exit cleanup
+    template<typename F>
+    class ScopeExit
+    {
+      public:
+        ScopeExit(const ScopeExit &) = delete;
+        ScopeExit(ScopeExit &&) = delete;
+        auto operator=(const ScopeExit &) -> ScopeExit & = delete;
+        auto operator=(ScopeExit &&) -> ScopeExit & = delete;
+        explicit ScopeExit(F func) : func_(std::move(func)) {}
+        ~ScopeExit() { func_(); }
 
-template<typename F>
-auto makeScopeExit(F func) -> ScopeExit<F>
-{
-    return ScopeExit<F>(std::move(func));
-}
+      private:
+        F func_;
+    };
 
-constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem::path
-{
-    return std::filesystem::path{ TEST_DATA_DIR } / "config_file" / filename;
-}
+    template<typename F>
+    auto makeScopeExit(F func) -> ScopeExit<F>
+    {
+        return ScopeExit<F>(std::move(func));
+    }
+
+    constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem::path
+    {
+        return std::filesystem::path{ TEST_DATA_DIR } / "config_file" / filename;
+    }
 
 } // namespace
 
@@ -219,7 +220,7 @@ SCENARIO("ConfigReader handles configuration file reading")
                 const auto &error = result.error();
                 INFO("Expected: " << expected_error);
                 INFO("Actual: " << error.message);
-                REQUIRE(absl::StrContains(error.message, expected_error));
+                REQUIRE(error.message.contains(expected_error));
             }
         }
     }
