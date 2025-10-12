@@ -95,8 +95,14 @@ void DebugPrinter::visit(const ast::Port &node)
 void DebugPrinter::visit(const ast::Range &node)
 {
     printIndent();
-    std::cout << "Range [" << node.left_expr << " " << node.direction << " " << node.right_expr
-              << "]\n";
+    std::cout
+      << "Range ["
+      << node.left_expr
+      << " "
+      << node.direction
+      << " "
+      << node.right_expr
+      << "]\n";
 }
 
 } // namespace emit

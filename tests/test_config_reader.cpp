@@ -1,7 +1,7 @@
 #include "cli/config_reader.hpp"
 #include "common/config.hpp"
 
-include<catch2 / catch_message.hpp>
+#include <catch2/catch_message.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 #include <cstdint>
@@ -12,35 +12,34 @@ include<catch2 / catch_message.hpp>
 #include <string>
 #include <string_view>
 
-  namespace
+namespace {
+
+// RAII class for scope exit cleanup
+template<typename F>
+class ScopeExit
 {
+  public:
+    ScopeExit(const ScopeExit &) = delete;
+    ScopeExit(ScopeExit &&) = delete;
+    auto operator=(const ScopeExit &) -> ScopeExit & = delete;
+    auto operator=(ScopeExit &&) -> ScopeExit & = delete;
+    explicit ScopeExit(F func) : func_(std::move(func)) {}
+    ~ScopeExit() { func_(); }
 
-    // RAII class for scope exit cleanup
-    template<typename F>
-    class ScopeExit
-    {
-      public:
-        ScopeExit(const ScopeExit &) = delete;
-        ScopeExit(ScopeExit &&) = delete;
-        auto operator=(const ScopeExit &) -> ScopeExit & = delete;
-        auto operator=(ScopeExit &&) -> ScopeExit & = delete;
-        explicit ScopeExit(F func) : func_(std::move(func)) {}
-        ~ScopeExit() { func_(); }
+  private:
+    F func_;
+};
 
-      private:
-        F func_;
-    };
+template<typename F>
+auto makeScopeExit(F func) -> ScopeExit<F>
+{
+    return ScopeExit<F>(std::move(func));
+}
 
-    template<typename F>
-    auto makeScopeExit(F func) -> ScopeExit<F>
-    {
-        return ScopeExit<F>(std::move(func));
-    }
-
-    constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem::path
-    {
-        return std::filesystem::path{ TEST_DATA_DIR } / "config_file" / filename;
-    }
+constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem::path
+{
+    return std::filesystem::path{ TEST_DATA_DIR } / "config_file" / filename;
+}
 
 } // namespace
 
