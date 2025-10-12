@@ -35,7 +35,6 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
 
 } // namespace
 
-
 // -----------------------------------------------------------------------------
 // Test 1: Entity-level leading comments
 // -----------------------------------------------------------------------------
@@ -56,7 +55,6 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(absl::StrContains(comments.front().text, "License text"));
     REQUIRE(absl::StrContains(comments.back().text, "Entity declaration"));
 }
-
 
 // -----------------------------------------------------------------------------
 // Test 2: Generic-level leading and inline comments
@@ -86,7 +84,6 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE_FALSE(c.trailing.empty());
     REQUIRE(absl::StrContains(c.trailing.front().text, "Inline for CONST_V"));
 }
-
 
 // -----------------------------------------------------------------------------
 // Test 3: Port-level leading and inline comments
@@ -123,7 +120,6 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     REQUIRE_FALSE(rst_c.trailing.empty());
     REQUIRE(absl::StrContains(rst_c.trailing.front().text, "inline reset"));
 }
-
 
 // -----------------------------------------------------------------------------
 // Test 4: Mixed leading comment block and newlines
