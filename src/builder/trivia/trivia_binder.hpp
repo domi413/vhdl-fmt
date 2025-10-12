@@ -54,8 +54,8 @@ class TriviaBinder
         for (char c : s) {
             if (c == '\n') {
                 ++n;
-}
-}
+            }
+        }
         return (n != 0) ? n : 1;
     }
 

@@ -34,6 +34,16 @@ class BaseVisitor : public Visitor
         }
     }
 
+    template<AstNode T>
+    void dispatchAll(const std::vector<std::unique_ptr<T>> &vec)
+    {
+        for (const auto &node : vec) {
+            if (node != nullptr) {
+                node->accept(*this);
+            }
+        }
+    }
+
     /// @brief Continue recursive traversal from a specific node.
     ///
     /// Calls the default `visit()` implementation, enabling derived

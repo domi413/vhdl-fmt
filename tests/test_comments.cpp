@@ -66,7 +66,8 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    const auto &leading_trivia = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
+    const auto &leading_trivia
+      = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
     const auto texts = commentTexts(leading_trivia);
 
     REQUIRE(texts.size() == 2);

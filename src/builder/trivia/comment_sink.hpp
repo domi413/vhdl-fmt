@@ -20,11 +20,11 @@ class CommentSink
     {
         if (t == nullptr) {
             return;
-}
+        }
         const auto idx = static_cast<std::size_t>(t->getTokenIndex());
         if (!used.insert(idx).second) {
             return;
-}
+        }
 
         ast::Trivia tv;
         tv.kind = ast::Trivia::Kind::comment;
