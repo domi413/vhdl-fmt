@@ -85,7 +85,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
         std::vector<std::string> c_args;
         c_args.reserve(args.size());
 
-        // Convert char* array to vector of strings
+        // parse_args expects a c-style array
         for (const auto *arg : args) {
             if (arg != nullptr) {
                 c_args.emplace_back(arg);
