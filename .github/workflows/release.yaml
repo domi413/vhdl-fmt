@@ -1,23 +1,86 @@
-name: Release Drafter
+name: Release
 
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+" # e.g., v1.2.3, v0.2.7
+      - "v[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: read
 
 jobs:
-  update_release_draft:
-    permissions:
-      contents: write
-      pull-requests: read
-
+  release:
     runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
 
     steps:
-      - name: Create Release
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          pacman -Sy --needed --noconfirm \
+              base-devel \
+              clang \
+              cmake \
+              git \
+              make \
+              ninja \
+              uv
+
+          # Create venv and install python packages
+          uv venv venv
+          source venv/bin/activate
+          uv pip install conan
+
+      - name: Setup Conan profile
+        run: |
+          source venv/bin/activate
+          conan profile detect --force
+
+      - name: Create Release Draft
         uses: release-drafter/release-drafter@v6
+        id: release-drafter
+        with:
+          config-name: release-drafter.yaml
+          publish: true
+          latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Release Binary
+        run: |
+          source venv/bin/activate
+          make BUILD_TYPE=Release
+
+      - name: Upload Binary to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: build/Release/bin/vhdl_formatter
+          append_body: false
+          generate_release_notes: false
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
