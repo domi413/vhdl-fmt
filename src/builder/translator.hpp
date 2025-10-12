@@ -6,6 +6,7 @@
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "builder/assembly/assembler.hpp"
+#include "builder/comment_binder.hpp"
 #include "vhdlParser.h"
 
 #include <cstddef>
@@ -21,7 +22,9 @@ class Translator
 {
   public:
     /// @brief Construct a translator bound to an assembler and token stream.
-    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts) {}
+    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts), comments(ts)
+    {
+    }
     ~Translator() = default;
 
     Translator(const Translator &) = delete;
@@ -39,19 +42,16 @@ class Translator
   private:
     Assembler &builder;                ///< Active assembler used for node creation.
     antlr4::CommonTokenStream &tokens; ///< Token stream for comment attachment.
-    std::unordered_set<std::size_t> consumed_comment_token_indices;
+    CommentBinder comments;            ///< Comment binder for attaching comments to nodes.
 
     /// @brief Create and register a node, attaching relevant comments.
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
         auto &node{ builder.spawn<T>() };
-        attachComments(node, ctx);
+        comments.bind(node, ctx);
         return node;
     }
-
-    /// @brief Attach comments and metadata from the token stream.
-    void attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
   public:
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;

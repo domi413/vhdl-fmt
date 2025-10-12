@@ -69,47 +69,4 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range
 
     return range;
 }
-
-void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx)
-{
-    if (ctx == nullptr) {
-        return;
-    }
-
-    auto &cm = node.getComments();
-
-    const auto push = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) {
-        if (!t) {
-            return;
-        }
-
-        const std::size_t idx = t->getTokenIndex();
-        if (consumed_comment_token_indices.contains(idx)) {
-            return;
-        }
-
-        consumed_comment_token_indices.insert(idx);
-        dst.push_back({ t->getText(), static_cast<int>(t->getLine()), is_inline });
-    };
-
-    const auto start_idx = ctx->getStart()->getTokenIndex();
-    const auto stop_idx = ctx->getStop()->getTokenIndex();
-    const auto stop_line = ctx->getStop()->getLine();
-
-    // --- Leading comments (from COMMENTS channel) ---
-    auto hidden_left
-      = tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex(), vhdlLexer::COMMENTS);
-    for (const auto *t : hidden_left) {
-        push(t, cm.leading, false);
-    }
-
-    // --- Trailing (inline) comments ---
-    auto hidden_right
-      = tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex(), vhdlLexer::COMMENTS);
-    for (const auto *t : hidden_right) {
-        if ((t != nullptr) && t->getLine() == stop_line) {
-            push(t, cm.trailing, true);
-        }
-    }
-}
 } // namespace builder
