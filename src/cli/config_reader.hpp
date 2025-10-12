@@ -7,11 +7,7 @@
 #include <filesystem>
 #include <optional>
 #include <string>
-
-// YAML-cpp requires these headers for proper template instantiation
-// The convert.h is needed for Node::as<T>() to work
-#include <yaml-cpp/node/convert.h>
-#include <yaml-cpp/node/node.h>
+#include <yaml-cpp/yaml.h>
 
 namespace cli {
 

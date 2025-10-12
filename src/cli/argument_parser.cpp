@@ -4,6 +4,7 @@
 
 #include <argparse/argparse.hpp>
 #include <bitset>
+#include <cstddef>
 #include <exception>
 #include <filesystem>
 #include <format>
@@ -19,10 +20,9 @@ namespace cli {
 
 namespace {
 
-// Named constants for CLI flags to avoid magic strings
-constexpr std::string_view FLAG_WRITE = "--write";
-constexpr std::string_view FLAG_CHECK = "--check";
-constexpr std::string_view FLAG_LOCATION = "--location";
+constexpr std::string_view FLAG_WRITE{ "--write" };
+constexpr std::string_view FLAG_CHECK{ "--check" };
+constexpr std::string_view FLAG_LOCATION{ "--location" };
 
 } // namespace
 
@@ -94,13 +94,8 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 
         program.parse_args(c_args);
 
-        // Set flags using bitset operations
-        if (program.is_used(std::string(FLAG_WRITE))) {
-            used_flags_.set(static_cast<std::size_t>(ArgumentFlag::WRITE));
-        }
-        if (program.is_used(std::string(FLAG_CHECK))) {
-            used_flags_.set(static_cast<std::size_t>(ArgumentFlag::CHECK));
-        }
+        used_flags_.set(static_cast<std::size_t>(ArgumentFlag::WRITE), program.is_used(FLAG_WRITE));
+        used_flags_.set(static_cast<std::size_t>(ArgumentFlag::CHECK), program.is_used(FLAG_CHECK));
 
     } catch (const std::exception &err) {
         std::cerr << std::format("Error parsing arguments: {}\n", err.what());

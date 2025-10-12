@@ -3,6 +3,7 @@
 #include "common/config.hpp"
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <expected>
@@ -25,33 +26,35 @@ using PortMapMemberPtr = bool common::PortMapConfig::*;
 using DeclarationMemberPtr = bool common::DeclarationConfig::*;
 using CasingMemberPtr = common::CaseStyle common::CasingConfig::*;
 
-constexpr std::array INDENTATION_STYLE_MAP = {
-    std::pair{ "spaces", common::IndentationStyle::SPACES },
-    std::pair{ "tabs",   common::IndentationStyle::TABS   },
+constexpr std::array<std::pair<std::string_view, common::IndentationStyle>, 2> INDENTATION_STYLE_MAP
+  = {
+        std::pair{ "spaces", common::IndentationStyle::SPACES },
+        std::pair{ "tabs",   common::IndentationStyle::TABS   },
 };
 
-constexpr std::array EOL_STYLE_MAP = {
+constexpr std::array<std::pair<std::string_view, common::EndOfLine>, 3> EOL_STYLE_MAP = {
     std::pair{ "auto", common::EndOfLine::AUTO },
     std::pair{ "crlf", common::EndOfLine::CRLF },
     std::pair{ "lf",   common::EndOfLine::LF   },
 };
 
-constexpr std::array PORT_MAP_ASSIGNMENTS_MAP = {
+constexpr std::array<std::pair<std::string_view, PortMapMemberPtr>, 1> PORT_MAP_ASSIGNMENTS_MAP = {
     std::pair{ "align_signals", &common::PortMapConfig::align_signals },
 };
 
-constexpr std::array DECLARATION_ASSIGNMENTS_MAP = {
-    std::pair{ "align_colons",         &common::DeclarationConfig::align_colons         },
-    std::pair{ "align_types",          &common::DeclarationConfig::align_types          },
-    std::pair{ "align_initialization", &common::DeclarationConfig::align_initialization },
+constexpr std::array<std::pair<std::string_view, DeclarationMemberPtr>, 3>
+  DECLARATION_ASSIGNMENTS_MAP = {
+      std::pair{ "align_colons",         &common::DeclarationConfig::align_colons         },
+      std::pair{ "align_types",          &common::DeclarationConfig::align_types          },
+      std::pair{ "align_initialization", &common::DeclarationConfig::align_initialization },
 };
 
-constexpr std::array CASE_STYLE_MAP = {
+constexpr std::array<std::pair<std::string_view, common::CaseStyle>, 2> CASE_STYLE_MAP = {
     std::pair{ "lower_case", common::CaseStyle::LOWER },
     std::pair{ "UPPER_CASE", common::CaseStyle::UPPER },
 };
 
-constexpr std::array CASING_ASSIGNMENTS_MAP = {
+constexpr std::array<std::pair<std::string_view, CasingMemberPtr>, 3> CASING_ASSIGNMENTS_MAP = {
     std::pair{ "keywords",    &common::CasingConfig::keywords    },
     std::pair{ "constants",   &common::CasingConfig::constants   },
     std::pair{ "identifiers", &common::CasingConfig::identifiers },
@@ -63,9 +66,9 @@ template<typename T, std::size_t N>
 constexpr auto findInMap(const std::array<std::pair<std::string_view, T>, N> &map,
                          std::string_view key) -> std::optional<T>
 {
-    for (const auto &[k, v] : map) {
-        if (k == key) {
-            return v;
+    for (const auto &[map_key, map_val] : map) {
+        if (map_key == key) {
+            return map_val;
         }
     }
     return std::nullopt;
@@ -76,6 +79,18 @@ constexpr auto findInMap(const std::array<std::pair<std::string_view, T>, N> &ma
 inline auto isValid(const YAML::Node &node) -> bool
 {
     return node && !node.IsNull();
+}
+
+/// Helper to get a nested YAML node if it exists and is valid
+[[nodiscard]]
+inline auto getNestedNode(const YAML::Node &parent, std::string_view path) -> YAML::Node
+{
+    if (!isValid(parent)) {
+        return YAML::Node{};
+    }
+
+    const YAML::Node node = parent[std::string{ path }];
+    return isValid(node) ? node : YAML::Node{};
 }
 
 template<typename T>
@@ -94,9 +109,9 @@ auto tryParseYaml(const YAML::Node &node, std::string_view name) -> std::optiona
     }
 }
 
-template<typename T, std::size_t N>
+template<typename T, std::size_t N, typename KeyType>
 [[nodiscard]]
-auto mapValueToConfig(std::string_view style,
+auto mapValueToConfig(const KeyType &style,
                       const std::array<std::pair<std::string_view, T>, N> &map,
                       std::string_view error_context) -> T
 {
@@ -105,6 +120,19 @@ auto mapValueToConfig(std::string_view style,
     }
 
     throw std::invalid_argument(std::format("Invalid {} config: {}", error_context, style));
+}
+
+/// Helper to parse and map a YAML value to a config enum
+template<typename T, std::size_t N>
+inline auto parseAndMapYamlValue(const YAML::Node &node,
+                                 std::string_view key,
+                                 const std::array<std::pair<std::string_view, T>, N> &map,
+                                 std::string_view error_context) -> std::optional<T>
+{
+    if (auto value_str = tryParseYaml<std::string>(node[std::string{ key }], key)) {
+        return mapValueToConfig(*value_str, map, error_context);
+    }
+    return std::nullopt;
 }
 
 } // namespace
@@ -156,6 +184,7 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
         config.declarations = readDeclarationConfig(root_node, config.declarations);
 
         return config;
+
     } catch (const std::exception &e) {
         return std::unexpected{ ConfigReadError{
           .message = std::format("Config parsing failed: {}", e.what()) } };
@@ -171,8 +200,10 @@ auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::Lin
         line_config.line_length = *value;
     }
 
-    if (const auto node = root_node["indentation"]; isValid(node)) {
-        if (auto value = tryParseYaml<std::uint8_t>(node["size"], "indentation.size")) {
+    const auto indent_node = getNestedNode(root_node, "indentation");
+
+    if (isValid(indent_node)) {
+        if (auto value = tryParseYaml<std::uint8_t>(indent_node["size"], "indentation.size")) {
             line_config.indent_size = *value;
         }
     }
@@ -190,9 +221,12 @@ auto ConfigReader::readIndentationStyle(const YAML::Node &root_node,
 {
     auto indent_style = defaults;
 
-    if (const auto node = root_node["indentation"]; isValid(node)) {
-        if (auto style_str = tryParseYaml<std::string_view>(node["style"], "indentation.style")) {
-            indent_style = mapValueToConfig(*style_str, INDENTATION_STYLE_MAP, "indentation style");
+    const auto indent_node = getNestedNode(root_node, "indentation");
+
+    if (isValid(indent_node)) {
+        if (auto result = parseAndMapYamlValue<common::IndentationStyle, 2>(
+              indent_node, "style", INDENTATION_STYLE_MAP, "indentation style")) {
+            indent_style = *result;
         }
     }
 
@@ -204,9 +238,9 @@ auto ConfigReader::readEndOfLine(const YAML::Node &root_node, const common::EndO
 {
     auto eol = defaults;
 
-    if (const auto style_str
-        = tryParseYaml<std::string_view>(root_node["end_of_line"], "end_of_line")) {
-        eol = mapValueToConfig(*style_str, EOL_STYLE_MAP, "end of line style");
+    if (auto result = parseAndMapYamlValue<common::EndOfLine, 3>(
+          root_node, "end_of_line", EOL_STYLE_MAP, "end of line style")) {
+        eol = *result;
     }
 
     return eol;
@@ -217,12 +251,13 @@ auto ConfigReader::readPortMapConfig(const YAML::Node &root_node,
 {
     auto port_map = defaults;
 
-    if (const auto formatting_node = root_node["formatting"]; isValid(formatting_node)) {
-        if (const auto port_map_node = formatting_node["port_map"]; isValid(port_map_node)) {
-            for (const auto &[key, member_ptr] : PORT_MAP_ASSIGNMENTS_MAP) {
-                if (auto value = tryParseYaml<bool>(port_map_node[std::string{ key }], key)) {
-                    port_map.*member_ptr = *value;
-                }
+    const auto formatting_node = getNestedNode(root_node, "formatting");
+    const auto port_map_node = getNestedNode(formatting_node, "port_map");
+
+    if (isValid(port_map_node)) {
+        for (const auto &[key, member_ptr] : PORT_MAP_ASSIGNMENTS_MAP) {
+            if (auto value = tryParseYaml<bool>(port_map_node[std::string{ key }], key)) {
+                port_map.*member_ptr = *value;
             }
         }
     }
@@ -236,13 +271,13 @@ auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
 {
     auto declarations = defaults;
 
-    if (const auto formatting_node = root_node["formatting"]; isValid(formatting_node)) {
-        if (const auto declarations_node = formatting_node["declarations"];
-            isValid(declarations_node)) {
-            for (const auto &[key, member_ptr] : DECLARATION_ASSIGNMENTS_MAP) {
-                if (auto value = tryParseYaml<bool>(declarations_node[std::string{ key }], key)) {
-                    declarations.*member_ptr = *value;
-                }
+    const auto formatting_node = getNestedNode(root_node, "formatting");
+    const auto declarations_node = getNestedNode(formatting_node, "declarations");
+
+    if (isValid(declarations_node)) {
+        for (const auto &[key, member_ptr] : DECLARATION_ASSIGNMENTS_MAP) {
+            if (auto value = tryParseYaml<bool>(declarations_node[std::string{ key }], key)) {
+                declarations.*member_ptr = *value;
             }
         }
     }
@@ -255,13 +290,14 @@ auto ConfigReader::readCasingConfig(const YAML::Node &root_node,
 {
     auto casing = defaults;
 
-    if (const auto formatting_node = root_node["formatting"]; isValid(formatting_node)) {
-        if (const auto casing_node = formatting_node["casing"]; isValid(casing_node)) {
-            for (const auto &[key, member_ptr] : CASING_ASSIGNMENTS_MAP) {
-                if (auto style_str
-                    = tryParseYaml<std::string_view>(casing_node[std::string{ key }], key)) {
-                    casing.*member_ptr = mapValueToConfig(*style_str, CASE_STYLE_MAP, "casing");
-                }
+    const auto formatting_node = getNestedNode(root_node, "formatting");
+    const auto casing_node = getNestedNode(formatting_node, "casing");
+
+    if (isValid(casing_node)) {
+        for (const auto &[key, member_ptr] : CASING_ASSIGNMENTS_MAP) {
+            if (auto result = parseAndMapYamlValue<common::CaseStyle, 2>(
+                  casing_node, key, CASE_STYLE_MAP, "casing")) {
+                casing.*member_ptr = *result;
             }
         }
     }
