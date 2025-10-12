@@ -1,5 +1,5 @@
-#ifndef BUILDER_ASSEMBLY_SINK_HPP
-#define BUILDER_ASSEMBLY_SINK_HPP
+#ifndef BUILDER_ASSEMBLY_BUILDER_SINK_HPP
+#define BUILDER_ASSEMBLY_BUILDER_SINK_HPP
 
 #include "ast/node.hpp"
 
@@ -27,7 +27,7 @@ struct ISink
 template<typename T>
 struct SinkImpl : ISink
 {
-    explicit SinkImpl(std::vector<std::unique_ptr<T>> &v) : vec_(v) {}
+    explicit SinkImpl(std::vector<std::unique_ptr<T>> &v) : vec(v) {}
 
     ~SinkImpl() override = default;
     SinkImpl(const SinkImpl &) = delete;
@@ -39,13 +39,13 @@ struct SinkImpl : ISink
     {
         auto *casted{ dynamic_cast<T *>(n.release()) };
         assert(casted && "Wrong node type pushed into sink!");
-        this->vec_.emplace_back(casted);
+        this->vec.emplace_back(casted);
     }
 
   private:
-    std::vector<std::unique_ptr<T>> &vec_;
+    std::vector<std::unique_ptr<T>> &vec;
 };
 
 } // namespace builder
 
-#endif /* BUILDER_ASSEMBLY_SINK_HPP */
+#endif /* BUILDER_ASSEMBLY_BUILDER_SINK_HPP */

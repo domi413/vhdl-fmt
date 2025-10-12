@@ -29,8 +29,7 @@ struct Range : Node
 
 struct Port : Node
 {
-    std::string mode;
-    std::string type;
+    std::string mode, type;
     std::vector<std::string> names;
     std::vector<std::unique_ptr<ast::Range>> constraints;
     std::optional<std::string> init;

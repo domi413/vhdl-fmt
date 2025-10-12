@@ -76,9 +76,9 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
         return;
     }
     auto &cm = node.getComments();
-    const auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
-        return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::LINE
-                                                  : ast::Comment::Kind::BLOCK;
+    auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
+        return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::line
+                                                  : ast::Comment::Kind::block;
     };
     const auto push
       = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) -> void {
@@ -86,22 +86,22 @@ void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext
             return;
         }
         const std::size_t idx{ t->getTokenIndex() };
-        if (consumed_comment_token_indices_.contains(idx)) {
+        if (consumed_comment_token_indices.contains(idx)) {
             return;
         }
-        consumed_comment_token_indices_.insert(idx);
+        consumed_comment_token_indices.insert(idx);
         dst.push_back({ t->getText(), kind(t), static_cast<int>(t->getLine()), is_inline });
     };
 
     // Leading: everything hidden to the left of start (consume all)
-    for (const auto *t : tokens_.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
+    for (const auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
         push(t, cm.leading, false);
     }
 
     // Trailing: only inline. Standalone comments are left
     // unconsumed here so the next node will pick them up as leading.
     const std::size_t stop_line = ctx->getStop()->getLine();
-    for (const auto *t : tokens_.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
+    for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
         if (t == nullptr) {
             continue;
         }

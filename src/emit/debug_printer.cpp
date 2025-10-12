@@ -8,13 +8,14 @@
 #include <iostream>
 #include <ranges>
 #include <sstream>
+#include <string>
 #include <typeinfo>
 
 namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    std::cout << std::string(static_cast<std::uint8_t>(indent_ * 2), ' ');
+    std::cout << std::string(static_cast<std::uint8_t>(this->indent * 2), ' ');
 }
 
 void DebugPrinter::printNode(const ast::Node &n,
@@ -22,87 +23,103 @@ void DebugPrinter::printNode(const ast::Node &n,
                              const std::string &name_override) const
 {
     printIndent();
-    std::cout << (!name_override.empty() ? name_override : typeid(n).name());
+    if (!name_override.empty()) {
+        std::cout << name_override;
+    } else {
+        std::cout << typeid(n).name(); // fallback RTTI
+    }
+
     if (!extra.empty()) {
         std::cout << " [" << extra << "]";
     }
-    std::cout << '\n';
+
+    std::cout << "\n";
 }
 
 // ---- Nodes ----
 
-void DebugPrinter::visit(const ast::DesignFile &node)
+void DebugPrinter::visit(const ast::DesignFile &df)
 {
-    printNode(node, {}, "DesignFile");
-    ++indent_;
-    walk(node); // recursive traversal handled by BaseVisitor
-    --indent_;
+    printNode(df, {}, "DesignFile");
+    ++this->indent;
+    for (const auto &u : df.units) {
+        u->accept(*this);
+    }
+    --this->indent;
 }
 
-void DebugPrinter::visit(const ast::Entity &node)
+void DebugPrinter::visit(const ast::Entity &e)
 {
-    printNode(node, node.name, "Entity");
-    ++indent_;
-    walk(node); // recurse into generics and ports
-    --indent_;
+    printNode(e, e.name, "Entity");
+    ++this->indent;
+
+    // Print generics first
+    for (const auto &g : e.generics) {
+        g->accept(*this);
+    }
+
+    // Then ports
+    for (const auto &p : e.ports) {
+        p->accept(*this);
+    }
+
+    --this->indent;
 }
 
-void DebugPrinter::visit(const ast::GenericParam &node)
+void DebugPrinter::visit(const ast::GenericParam &g)
 {
     std::string info;
-    for (const auto &n : node.names) {
+    for (const auto &n : g.names) {
         if (!info.empty()) {
-            info += ", ";
+            info += ",";
         }
         info += n;
     }
 
-    info += " : " + node.type;
-    if (node.init.has_value()) {
-        info += " := " + *node.init;
+    info += " : " + g.type;
+    if (g.init.has_value()) {
+        info += " := " + *g.init;
     }
 
-    printNode(node, info, "Generic");
+    printNode(g, info, "Generic");
 }
 
-void DebugPrinter::visit(const ast::Port &node)
+void DebugPrinter::visit(const ast::Port &p)
 {
     std::ostringstream oss;
 
-    for (const auto &[i, name] : node.names | std::views::enumerate) {
+    // Names
+    for (const auto &[i, name] : p.names | std::views::enumerate) {
         if (i > 0) {
             oss << ", ";
         }
         oss << name;
     }
 
-    if (!node.mode.empty() || !node.type.empty()) {
+    // Mode + Type
+    if (!p.mode.empty() || !p.type.empty()) {
         oss << " :";
-        if (!node.mode.empty()) {
-            oss << " " << node.mode;
+        if (!p.mode.empty()) {
+            oss << " " << p.mode;
         }
-        if (!node.type.empty()) {
-            oss << " " << node.type;
+        if (!p.type.empty()) {
+            oss << " " << p.type;
         }
     }
 
-    printNode(node, oss.str(), "Port");
-    ++indent_;
-    walk(node); // recurse into constraints
-    --indent_;
+    printNode(p, oss.str(), "Port");
+
+    ++this->indent;
+    for (const auto &r : p.constraints) {
+        r->accept(*this);
+    }
+    --this->indent;
 }
 
-void DebugPrinter::visit(const ast::Range &node)
+void DebugPrinter::visit(const ast::Range &r)
 {
     printIndent();
-    std::cout
-      << "Range ["
-      << node.left_expr
-      << " "
-      << node.direction
-      << " "
-      << node.right_expr
-      << "]\n";
+    std::cout << "Range [" << r.left_expr << " " << r.direction << " " << r.right_expr << "]\n";
 }
 
 } // namespace emit
