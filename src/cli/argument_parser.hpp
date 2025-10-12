@@ -2,6 +2,7 @@
 #define CLI_ARGUMENT_PARSER_HPP
 
 #include <bitset>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <optional>
