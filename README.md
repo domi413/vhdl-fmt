@@ -69,7 +69,7 @@ _(You can find a complete example configuration file in `example/vhdl-fmt.yaml`)
 
 ## Contribution
 
-contributions are welcome\! Please fork the repository and open a pull request to submit your changes.
+Contributions are welcome\! Please fork the repository and open a pull request to submit your changes.
 
 ### Dependencies for Development
 
