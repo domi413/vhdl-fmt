@@ -19,7 +19,7 @@
 
 namespace common {
 
-/// Thread-safe singleton logger wrapper around spdlog
+/// Singleton logger wrapper around spdlog
 class Logger final
 {
   public:
