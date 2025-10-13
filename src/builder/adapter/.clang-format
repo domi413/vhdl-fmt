@@ -1,22 +1,3 @@
 ---
-AlignAfterOpenBracket: Align
-AlignArrayOfStructures: Right
-AlignEscapedNewlines: Left
-AlignOperands: AlignAfterOperator
-AllowShortLoopsOnASingleLine: true
-AlwaysBreakAfterDefinitionReturnType: None
-BasedOnStyle: Mozilla
-BinPackParameters: false
-BreakAfterReturnType: None
-BreakBeforeBinaryOperators: true
-BreakBinaryOperations: OnePerLine
-BreakConstructorInitializers: AfterColon
+BasedOnStyle: InheritParentConfig
 ColumnLimit: 200
-FixNamespaceComments: true
-IncludeBlocks: Regroup
-IndentPPDirectives: BeforeHash
-IndentWidth: 4
-PackConstructorInitializers: CurrentLine
-PointerAlignment: Right
-QualifierAlignment: Left
-TabWidth: 4

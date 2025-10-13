@@ -1,3 +1,5 @@
+.PHONY: all run clean conan test
+
 # Default preset, override with `make BUILD_TYPE=Release`
 BUILD_TYPE ?= Debug
 CMAKE_PRESET := conan-$(shell echo $(BUILD_TYPE) | tr A-Z a-z)
@@ -6,8 +8,8 @@ TARGET := build/$(BUILD_TYPE)/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
 BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 
-SRCS := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
-SRCS_CMAKE := $(shell find src tests . -maxdepth 1 -name 'CMakeLists.txt')
+SOURCES := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
+SOURCES_CMAKE := $(shell find src tests . -name 'CMakeLists.txt')
 
 ifeq ($(wildcard venv/bin),venv/bin)
 	VENV_BIN := venv/bin/
@@ -17,7 +19,7 @@ endif
 
 all: $(BUILD_STAMP)
 
-$(BUILD_STAMP): $(SRCS) $(SRCS_CMAKE) $(CONAN_STAMP)
+$(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
 	@echo "Building project ($(BUILD_TYPE))..."
 	@cmake --preset $(CMAKE_PRESET)
 	@cmake --build --preset $(CMAKE_PRESET)
@@ -38,36 +40,34 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET)
+	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
 
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
-
-.PHONY: all run clean conan test
 
 # -----------------------------
 # Utility targets
 # -----------------------------
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
-LINT_TIDY_FLAGS = --warnings-as-errors='*'
+LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
 lint:
 	@echo "Running clang-tidy on source files..."
-	@CLANG_TIDY_EXTRA_ARGS="$(LINT_TIDY_FLAGS)" \
-	run-clang-tidy $(LINT_COMMON_FLAGS) -j $(LINT_CPUS) $(SRCS)
+	@run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES)
 
 	@echo "Running clang-tidy on headers..."
-	@find src tests \( -path '*/build/*' -o -path '*/generated/*' -o -path '*/generators/*' -o -path '*/external/*' \) -prune \
-		-o -type f \( -name '*.hpp' -o -name '*.h' \) -print | \
-		xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
+	@echo "$(SOURCES)" | \
+	xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
 
 	@echo "✓ Linting complete"
 
 
+GERMESI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
+
 check-format:
 	@echo "Checking code formatting..."
-	@if clang-format --dry-run --Werror $(SRCS) && $(VENV_BIN)gersemi --check $(SRCS_CMAKE); then \
+	@if clang-format --dry-run --Werror $(SOURCES) && $(VENV_BIN)gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
@@ -75,8 +75,8 @@ check-format:
 
 format:
 	@echo "Formatting code..."
-	@clang-format -i $(SRCS)
-	@$(VENV_BIN)gersemi -i $(SRCS_CMAKE)
+	@clang-format -i $(SOURCES)
+	@$(VENV_BIN)gersemi -i $(GERMESI_FLAGS) $(SOURCES_CMAKE)
 	@echo "✓ Code formatting complete"
 
 sort-dictionary:

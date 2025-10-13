@@ -11,9 +11,7 @@ dictionaries:
   - project-words
 
 ignorePaths:
-  - "build/"
+  - ".*"
   - "example/"
   - "grammars/"
-  - "LICENSE"
   - "clang.profile"
-  - ".*"
