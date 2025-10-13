@@ -39,42 +39,42 @@ class Logger final
     template<typename... Args>
     void trace([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_TRACE(logger_t, fmt, std::forward<Args>(args)...);
+        SPDLOG_LOGGER_TRACE(logger_, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     void debug([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_DEBUG(logger_t, fmt, std::forward<Args>(args)...);
+        SPDLOG_LOGGER_DEBUG(logger_, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     void info([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_INFO(logger_t, fmt, std::forward<Args>(args)...);
+        SPDLOG_LOGGER_INFO(logger_, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     void warn([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_WARN(logger_t, fmt, std::forward<Args>(args)...);
+        SPDLOG_LOGGER_WARN(logger_, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     void error([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_ERROR(logger_t, fmt, std::forward<Args>(args)...);
+        SPDLOG_LOGGER_ERROR(logger_, fmt, std::forward<Args>(args)...);
     }
 
     template<typename... Args>
     void critical([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
     {
-        SPDLOG_LOGGER_CRITICAL(logger_t, fmt, std::forward<Args>(args)...);
+        SPDLOG_LOGGER_CRITICAL(logger_, fmt, std::forward<Args>(args)...);
     }
 
   private:
     Logger() :
-      logger_t([] {
+      logger_([] {
           auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
           console_sink->set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
           console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
@@ -88,7 +88,7 @@ class Logger final
     {
     }
 
-    std::shared_ptr<spdlog::logger> logger_t;
+    std::shared_ptr<spdlog::logger> logger_;
 };
 
 } // namespace common

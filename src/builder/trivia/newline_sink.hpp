@@ -13,7 +13,7 @@ class NewlineSink
 {
   public:
     /// @brief Push newline trivia into the node’s comment list if any breaks exist.
-    constexpr void push(ast::Node::NodeComments &dst, bool to_leading, std::size_t breaks)
+    static constexpr void push(ast::Node::NodeComments &dst, bool to_leading, std::size_t breaks)
     {
         if (breaks == 0) {
             return;
@@ -27,5 +27,4 @@ class NewlineSink
 
 } // namespace builder
 
-// NOLINTEND(readability-convert-member-functions-to-static)
-#endif // BUILDER_TRIVIA_NEWLINE_SINK_HPP
+#endif /* BUILDER_TRIVIA_NEWLINE_SINK_HPP */

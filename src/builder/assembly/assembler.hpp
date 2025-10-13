@@ -26,7 +26,7 @@ class Assembler
         pushSink(root);
     }
 
-    ~Assembler() noexcept { assert(sinks.size() == 1 && "Unclosed sinks remain!"); }
+    ~Assembler() noexcept { assert(sinks_.size() == 1 && "Unclosed sinks remain!"); }
 
     Assembler(const Assembler &) = delete;
     auto operator=(const Assembler &) -> Assembler & = delete;
@@ -36,12 +36,13 @@ class Assembler
     /// @brief Create and insert a new node into the active sink.
     /// @return Reference to the created node.
     template<std::derived_from<ast::Node> T>
-    [[nodiscard]] auto spawn() -> T &
+    [[nodiscard]]
+    auto spawn() -> T &
     {
-        assert(!sinks.empty() && "No active sink!");
+        assert(!sinks_.empty() && "No active sink!");
         auto node = std::make_unique<T>();
         T &ref = *node;
-        sinks.back()->push(std::move(node));
+        sinks_.back()->push(std::move(node));
         return ref;
     }
 
@@ -51,12 +52,12 @@ class Assembler
     {
         pushSink(vec);
         std::forward<Fn>(fn)();
-        sinks.pop_back();
+        sinks_.pop_back();
     }
 
   private:
     /// @brief Stack of active sinks.
-    std::vector<std::unique_ptr<ISink>> sinks;
+    std::vector<std::unique_ptr<ISink>> sinks_;
 
     /// @brief Push a new sink for the given container.
     template<typename Vec>
@@ -65,7 +66,7 @@ class Assembler
         using ElemT = typename Vec::value_type::element_type;
         static_assert(std::derived_from<ElemT, ast::Node>,
                       "Sink element type must derive from ast::Node");
-        sinks.push_back(std::make_unique<Sink<ElemT>>(vec));
+        sinks_.push_back(std::make_unique<Sink<ElemT>>(vec));
     }
 };
 
