@@ -44,7 +44,7 @@ auto commentTexts(const std::vector<ast::Trivia> &tv) -> std::vector<std::string
 
     for (const auto &t : tv) {
         std::visit(
-          [&](const auto &val) {
+          [&](const auto &val) -> auto {
               using T = std::decay_t<decltype(val)>;
               if constexpr (std::is_same_v<T, ast::CommentTrivia>) {
                   out.push_back(val.text);

@@ -48,7 +48,7 @@ void DebugPrinter::printNodeHeader(const ast::Node &n,
 void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
                                      std::string_view prefix) const
 {
-    for (std::string_view sv :
+    for (const std::string_view sv :
          tv | std::views::filter([](const ast::Trivia &t) -> bool {
              return std::holds_alternative<ast::CommentTrivia>(t);
          }) | std::views::transform([](const ast::Trivia &t) -> std::string_view {

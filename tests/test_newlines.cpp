@@ -49,7 +49,7 @@ auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
     Counts c{};
     for (const auto &t : tv) {
         std::visit(
-          [&](const auto &val) {
+          [&](const auto &val) -> auto {
               using T = std::decay_t<decltype(val)>;
 
               if constexpr (std::is_same_v<T, ast::CommentTrivia>) {
@@ -74,7 +74,7 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     // One blank *source* line between two leading comments.
     const std::string vhdl = R"(
         -- A
-       
+
         -- B
         entity E is end E;
     )";
@@ -105,7 +105,7 @@ TEST_CASE("Trailing trivia captures newlines after inline comment", "[trivia][tr
         entity E is
             generic (
                 G : integer := 0  -- inline g
-                                
+
             );
         end E;
     )";
