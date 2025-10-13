@@ -4,34 +4,27 @@
 #include "ast/visitor.hpp"
 
 #include <cstddef>
-#include <cstdint>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace ast {
 
-/// @brief Represents comments or newlines attached to an AST node.
-struct Trivia
+struct CommentTrivia
 {
-    enum class Kind : std::uint8_t
-    {
-        comment,
-        newlines
-    };
-    Kind kind{ Kind::comment };
-
-    // For Kind::Comment
     std::string text;
-
-    // For Kind::Newlines: number of line breaks (>=1).
-    std::size_t breaks{ 0 };
 };
 
+struct NewlinesTrivia
+{
+    std::size_t breaks{ 1 };
+};
+
+/// @brief A variant representing either a comment or a newline to preserve order.
+using Trivia = std::variant<CommentTrivia, NewlinesTrivia>;
+
 /// @brief Base class for all AST nodes.
-///
-/// Defines the common interface for traversal, comment attachment,
-/// and polymorphic destruction.
 struct Node
 {
     Node() = default;
@@ -45,8 +38,8 @@ struct Node
     /// @brief Container for leading and trailing comments.
     struct NodeComments
     {
-        std::vector<Trivia> leading;  ///< Trivia appearing before the node.
-        std::vector<Trivia> trailing; ///< Trivia appearing after the node.
+        std::vector<Trivia> leading;
+        std::vector<Trivia> trailing;
     };
 
     /// @brief Accept a visitor for dynamic dispatch.
@@ -58,11 +51,11 @@ struct Node
     /// @brief Return attached comments if present.
     [[nodiscard]] auto tryGetComments() const -> const std::optional<NodeComments> &
     {
-        return this->comments;
+        return comments;
     }
 
   private:
-    std::optional<NodeComments> comments; ///< Optional comment data.
+    std::optional<NodeComments> comments;
 };
 
 } // namespace ast

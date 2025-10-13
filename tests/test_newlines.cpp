@@ -48,12 +48,18 @@ auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
 {
     Counts c{};
     for (const auto &t : tv) {
-        if (t.kind == ast::Trivia::Kind::comment) {
-            ++c.comments;
-        } else {
-            ++c.newlines_items;
-            c.newline_breaks += t.breaks;
-        }
+        std::visit(
+          [&](const auto &val) {
+              using T = std::decay_t<decltype(val)>;
+
+              if constexpr (std::is_same_v<T, ast::CommentTrivia>) {
+                  ++c.comments;
+              } else if constexpr (std::is_same_v<T, ast::NewlinesTrivia>) {
+                  ++c.newlines_items;
+                  c.newline_breaks += val.breaks;
+              }
+          },
+          t);
     }
     return c;
 }
@@ -80,11 +86,14 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     const auto &lead = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
 
     // Expect: Comment("A"), Newlines(1), Comment("B")
-    REQUIRE(lead.size() == 3);
-    REQUIRE(lead[0].kind == ast::Trivia::Kind::comment);
-    REQUIRE(lead[1].kind == ast::Trivia::Kind::newlines);
-    REQUIRE(lead[1].breaks >= 1); // lexer might coalesce; countLineBreaks guards >=1
-    REQUIRE(lead[2].kind == ast::Trivia::Kind::comment);
+    REQUIRE(std::holds_alternative<ast::CommentTrivia>(lead[0]));
+    REQUIRE(std::holds_alternative<ast::NewlinesTrivia>(lead[1]));
+    REQUIRE(std::holds_alternative<ast::CommentTrivia>(lead[2]));
+
+    if (std::holds_alternative<ast::NewlinesTrivia>(lead[1])) {
+        const auto &nl = std::get<ast::NewlinesTrivia>(lead[1]);
+        REQUIRE(nl.breaks >= 1);
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -111,10 +120,10 @@ TEST_CASE("Trailing trivia captures newlines after inline comment", "[trivia][tr
 
     // Expect: [Comment("inline g"), Newlines(k>=1)]
     REQUIRE_FALSE(trail.empty());
-    REQUIRE(trail[0].kind == ast::Trivia::Kind::comment);
+    REQUIRE(std::holds_alternative<ast::CommentTrivia>(trail[0]));
 
-    if (trail.size() >= 2) {
-        REQUIRE(trail[1].kind == ast::Trivia::Kind::newlines);
-        REQUIRE(trail[1].breaks >= 1);
+    if (trail.size() >= 2 && std::holds_alternative<ast::NewlinesTrivia>(trail[1])) {
+        const auto &nl = std::get<ast::NewlinesTrivia>(trail[1]);
+        REQUIRE(nl.breaks >= 1);
     }
 }

@@ -11,11 +11,12 @@
 #include <sstream>
 #include <string_view>
 #include <typeinfo>
+#include <variant>
 #include <vector>
 
 namespace emit {
 
-// --- small helpers ---
+// ---- Helper methods ----
 
 void DebugPrinter::printIndent() const
 {
@@ -47,14 +48,17 @@ void DebugPrinter::printNodeHeader(const ast::Node &n,
 void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
                                      std::string_view prefix) const
 {
-    for (const auto &t : tv) {
-        if (t.kind == ast::Trivia::Kind::comment) {
-            printIndent();
-            if (!prefix.empty()) {
-                out << prefix;
-            }
-            out << t.text << '\n';
+    for (std::string_view sv :
+         tv | std::views::filter([](const ast::Trivia &t) {
+             return std::holds_alternative<ast::CommentTrivia>(t);
+         }) | std::views::transform([](const ast::Trivia &t) -> std::string_view {
+             return std::get<ast::CommentTrivia>(t).text;
+         })) {
+        printIndent();
+        if (!prefix.empty()) {
+            out << prefix;
         }
+        out << sv << '\n';
     }
 }
 
@@ -62,9 +66,14 @@ auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &trailing) -> st
 {
     std::size_t total = 0;
     for (const auto &t : trailing) {
-        if (t.kind == ast::Trivia::Kind::newlines) {
-            total += t.breaks;
-        }
+        std::visit(
+          [&](const auto &val) {
+              using T = std::decay_t<decltype(val)>;
+              if constexpr (std::is_same_v<T, ast::NewlinesTrivia>) {
+                  total += val.breaks;
+              }
+          },
+          t);
     }
     return total;
 }
@@ -88,7 +97,7 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
     }
 }
 
-// ---- Visitors ----
+// ---- Visitor methods ----
 
 void DebugPrinter::visit(const ast::DesignFile &node)
 {
@@ -107,7 +116,7 @@ void DebugPrinter::visit(const ast::Entity &node)
     {
         const IndentGuard _{ indent };
         for (const auto &g : node.generics) {
-            if (g != nullptr) {
+            if (g) {
                 g->accept(*this);
             }
         }
@@ -116,7 +125,7 @@ void DebugPrinter::visit(const ast::Entity &node)
     {
         const IndentGuard _{ indent };
         for (const auto &p : node.ports) {
-            if (p != nullptr) {
+            if (p) {
                 p->accept(*this);
             }
         }
@@ -125,7 +134,7 @@ void DebugPrinter::visit(const ast::Entity &node)
 
 void DebugPrinter::visit(const ast::GenericParam &node)
 {
-    auto names = node.names | (std::views::join_with(std::string_view{ ", " }));
+    auto names = node.names | std::views::join_with(std::string_view{ ", " });
     auto info = std::ranges::to<std::string>(names);
     info += " : " + node.type;
     if (node.init.has_value()) {
@@ -139,10 +148,9 @@ void DebugPrinter::visit(const ast::Port &node)
 {
     std::ostringstream oss;
 
-    auto names = node.names | (std::views::join_with(std::string_view{ ", " }));
+    auto names = node.names | std::views::join_with(std::string_view{ ", " });
     oss << std::ranges::to<std::string>(names);
 
-    // mode/type (if present)
     if (!node.mode.empty() || !node.type.empty()) {
         oss << " :";
         if (!node.mode.empty()) {

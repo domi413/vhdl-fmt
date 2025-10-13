@@ -5,7 +5,6 @@
 #include "ast/node.hpp"
 #include "vhdlLexer.h"
 
-#include <algorithm>
 #include <cstddef>
 #include <ranges>
 #include <vector>
@@ -18,16 +17,18 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 
     struct Tmp
     {
-        bool nl;
-        const antlr4::Token *tok;
-        std::size_t breaks;
+        bool nl{};
+        const antlr4::Token *tok{};
+        std::size_t breaks{};
     };
+
     std::vector<Tmp> rev;
     std::size_t budget = 0;
 
-    for (const std::size_t i :
-         std::views::iota(std::size_t{ 0 }, start_idx) | std::views::reverse) {
-        const auto *t = toks[i];
+    // Iterate backward from start_idx, collecting comment and newline tokens.
+    for (const auto i : std::views::iota(std::size_t{ 0 }, start_idx) | std::views::reverse) {
+
+        const antlr4::Token *const t = toks[i];
         if (t == nullptr) {
             break;
         }
@@ -44,18 +45,19 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
             }
             continue;
         }
+
         if (isComment(t)) {
-            if ((budget != 0) && !rev.empty()) {
-                rev.push_back(Tmp{ .nl = true, .tok = nullptr, .breaks = budget });
+            if (budget != 0 && !rev.empty()) {
+                rev.push_back({ .nl = true, .tok = nullptr, .breaks = budget });
             }
+
             budget = 0;
-            rev.push_back(Tmp{ .nl = false, .tok = t, .breaks = 0 });
-            continue;
+            rev.push_back({ .nl = false, .tok = t });
         }
     }
 
-    std::ranges::reverse(rev);
-    for (const auto &e : rev) {
+    // Push trivia items in forward order
+    for (const auto &e : rev | std::views::reverse) {
         if (e.nl) {
             newlines.push(dst, /*to_leading=*/true, e.breaks);
         } else {
@@ -64,23 +66,24 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     }
 }
 
-void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, StopInfo stop)
+void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 {
     const auto &toks = tokens.getTokens();
     const std::size_t n = toks.size();
 
     std::size_t i = stop.idx + 1;
 
+    // Collect trailing comments that appear on the same line as the stop token
     for (; i < n; ++i) {
-        const auto *t = toks[i];
+        const antlr4::Token *const t = toks[i];
         if (t == nullptr) {
             break;
         }
         if (isNewline(t)) {
             break;
         }
-        if (isComment(t) && t->getLine() == stop.line) {
-            comments.push(dst, false, t);
+        if (isComment(t) && static_cast<std::size_t>(t->getLine()) == stop.line) {
+            comments.push(dst, /*to_leading=*/false, t);
             continue;
         }
         if (t->getChannel() != vhdlLexer::COMMENTS) {
@@ -89,14 +92,16 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, StopInfo stop)
         break;
     }
 
+    // Collect subsequent newline tokens
     std::size_t breaks = 0;
     for (; i < n; ++i) {
-        const auto *t = toks[i];
+        const antlr4::Token *const t = toks[i];
         if ((t == nullptr) || !isNewline(t)) {
             break;
         }
         breaks += countLineBreaks(t->getText());
     }
+
     newlines.push(dst, /*to_leading=*/false, breaks);
 }
 
@@ -107,9 +112,9 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     }
 
     auto &cm = node.getComments();
-    const auto start_idx = ctx->getStart()->getTokenIndex();
-    const StopInfo stop{ .idx = ctx->getStop()->getTokenIndex(),
-                         .line = ctx->getStop()->getLine() };
+    const auto start_idx = static_cast<std::size_t>(ctx->getStart()->getTokenIndex());
+    const StopInfo stop{ .idx = static_cast<std::size_t>(ctx->getStop()->getTokenIndex()),
+                         .line = static_cast<std::size_t>(ctx->getStop()->getLine()) };
 
     collectLeading(cm, start_idx);
     collectTrailing(cm, stop);

@@ -6,7 +6,6 @@
 
 #include <cstddef>
 #include <unordered_set>
-#include <utility>
 
 namespace builder {
 
@@ -16,28 +15,27 @@ class CommentSink
   public:
     CommentSink() = default;
 
+    /// @brief Push a comment token into the node’s comment list, unless already added.
     void push(ast::Node::NodeComments &dst, bool to_leading, const antlr4::Token *t)
     {
         if (t == nullptr) {
             return;
         }
-        const auto idx = static_cast<std::size_t>(t->getTokenIndex());
+
+        const auto idx = t->getTokenIndex();
         if (!used.insert(idx).second) {
-            return;
+            return; // duplicate token already handled
         }
 
-        ast::Trivia tv;
-        tv.kind = ast::Trivia::Kind::comment;
-        tv.text = t->getText();
-
-        auto &vec = to_leading ? dst.leading : dst.trailing;
-        vec.push_back(std::move(tv));
+        ast::CommentTrivia c{ t->getText() };
+        auto& vec = to_leading ? dst.leading : dst.trailing;
+        vec.emplace_back(std::move(c)); // stores as variant<CommentTrivia, NewlinesTrivia>
     }
 
   private:
-    std::unordered_set<std::size_t> used;
+    std::unordered_set<std::size_t> used; ///< set of token indices already added
 };
 
 } // namespace builder
 
-#endif /* BUILDER_TRIVIA_COMMENT_SINK_HPP */
+#endif // BUILDER_TRIVIA_COMMENT_SINK_HPP

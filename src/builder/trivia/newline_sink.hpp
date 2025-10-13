@@ -1,10 +1,10 @@
 #ifndef BUILDER_TRIVIA_NEWLINE_SINK_HPP
 #define BUILDER_TRIVIA_NEWLINE_SINK_HPP
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 
 #include "ast/node.hpp"
 
 #include <cstddef>
-#include <utility>
 
 namespace builder {
 
@@ -12,24 +12,20 @@ namespace builder {
 class NewlineSink
 {
   public:
-    void push( // NOLINT (readability-convert-member-functions-to-static)
-      ast::Node::NodeComments &dst,
-      bool to_leading,
-      std::size_t breaks)
+    /// @brief Push newline trivia into the node’s comment list if any breaks exist.
+    constexpr void push(ast::Node::NodeComments &dst, bool to_leading, std::size_t breaks)
     {
         if (breaks == 0) {
             return;
         }
 
-        ast::Trivia tv;
-        tv.kind = ast::Trivia::Kind::newlines;
-        tv.breaks = breaks;
-
+        ast::NewlinesTrivia n{ breaks };
         auto &vec = to_leading ? dst.leading : dst.trailing;
-        vec.push_back(std::move(tv));
+        vec.emplace_back(n);
     }
 };
 
 } // namespace builder
 
-#endif /* BUILDER_TRIVIA_NEWLINE_SINK_HPP */
+// NOLINTEND(readability-convert-member-functions-to-static)
+#endif // BUILDER_TRIVIA_NEWLINE_SINK_HPP
