@@ -28,4 +28,4 @@ class NewlineSink
 } // namespace builder
 
 // NOLINTEND(readability-convert-member-functions-to-static)
-#endif // BUILDER_TRIVIA_NEWLINE_SINK_HPP
+#endif /* BUILDER_TRIVIA_NEWLINE_SINK_HPP */

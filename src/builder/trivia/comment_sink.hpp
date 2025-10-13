@@ -38,4 +38,4 @@ class CommentSink
 
 } // namespace builder
 
-#endif // BUILDER_TRIVIA_COMMENT_SINK_HPP
+#endif /* BUILDER_TRIVIA_COMMENT_SINK_HPP */

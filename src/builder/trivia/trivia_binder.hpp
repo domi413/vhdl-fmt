@@ -70,4 +70,4 @@ class TriviaBinder
 
 } // namespace builder
 
-#endif // BUILDER_TRIVIA_TRIVIA_BINDER_HPP
+#endif /* BUILDER_TRIVIA_TRIVIA_BINDER_HPP */
