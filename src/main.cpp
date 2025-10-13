@@ -37,7 +37,7 @@ auto main(int argc, char *argv[]) -> int
             throw std::runtime_error("Failed to open input file: "
                                      + argparser.getInputPath().string());
         }
-        
+
         // Note that these pipelines should be abstracted away into separate classes
         // -- CST construction --
         antlr4::ANTLRInputStream input(in);
