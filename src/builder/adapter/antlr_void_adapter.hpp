@@ -16,10 +16,10 @@ namespace builder::adapter {
 class AntlrVoidAdapter : public vhdlParserBaseVisitor
 {
 
-    VoidVisitor &impl; ///< Target visitor implementation.
+    VoidVisitor &impl_; ///< Target visitor implementation.
 
   public:
-    explicit AntlrVoidAdapter(VoidVisitor &v) : impl(v) {}
+    explicit AntlrVoidAdapter(VoidVisitor &v) : impl_(v) {}
 
     ~AntlrVoidAdapter() override = default;
     AntlrVoidAdapter(const AntlrVoidAdapter &) = delete;
@@ -29,1531 +29,1531 @@ class AntlrVoidAdapter : public vhdlParserBaseVisitor
 
     auto visitAbstract_literal(vhdlParser::Abstract_literalContext *context) -> std::any override
     {
-        impl.visitAbstractLiteral(context);
+        impl_.visitAbstractLiteral(context);
         return {};
     }
 
     auto visitAccess_type_definition(vhdlParser::Access_type_definitionContext *context) -> std::any override
     {
-        impl.visitAccessTypeDefinition(context);
+        impl_.visitAccessTypeDefinition(context);
         return {};
     }
 
     auto visitAcross_aspect(vhdlParser::Across_aspectContext *context) -> std::any override
     {
-        impl.visitAcrossAspect(context);
+        impl_.visitAcrossAspect(context);
         return {};
     }
 
     auto visitActual_designator(vhdlParser::Actual_designatorContext *context) -> std::any override
     {
-        impl.visitActualDesignator(context);
+        impl_.visitActualDesignator(context);
         return {};
     }
 
     auto visitActual_parameter_part(vhdlParser::Actual_parameter_partContext *context) -> std::any override
     {
-        impl.visitActualParameterPart(context);
+        impl_.visitActualParameterPart(context);
         return {};
     }
 
     auto visitActual_part(vhdlParser::Actual_partContext *context) -> std::any override
     {
-        impl.visitActualPart(context);
+        impl_.visitActualPart(context);
         return {};
     }
 
     auto visitAdding_operator(vhdlParser::Adding_operatorContext *context) -> std::any override
     {
-        impl.visitAddingOperator(context);
+        impl_.visitAddingOperator(context);
         return {};
     }
 
     auto visitAggregate(vhdlParser::AggregateContext *context) -> std::any override
     {
-        impl.visitAggregate(context);
+        impl_.visitAggregate(context);
         return {};
     }
 
     auto visitAlias_declaration(vhdlParser::Alias_declarationContext *context) -> std::any override
     {
-        impl.visitAliasDeclaration(context);
+        impl_.visitAliasDeclaration(context);
         return {};
     }
 
     auto visitAlias_designator(vhdlParser::Alias_designatorContext *context) -> std::any override
     {
-        impl.visitAliasDesignator(context);
+        impl_.visitAliasDesignator(context);
         return {};
     }
 
     auto visitAlias_indication(vhdlParser::Alias_indicationContext *context) -> std::any override
     {
-        impl.visitAliasIndication(context);
+        impl_.visitAliasIndication(context);
         return {};
     }
 
     auto visitAllocator(vhdlParser::AllocatorContext *context) -> std::any override
     {
-        impl.visitAllocator(context);
+        impl_.visitAllocator(context);
         return {};
     }
 
     auto visitArchitecture_body(vhdlParser::Architecture_bodyContext *context) -> std::any override
     {
-        impl.visitArchitectureBody(context);
+        impl_.visitArchitectureBody(context);
         return {};
     }
 
     auto visitArchitecture_declarative_part(vhdlParser::Architecture_declarative_partContext *context) -> std::any override
     {
-        impl.visitArchitectureDeclarativePart(context);
+        impl_.visitArchitectureDeclarativePart(context);
         return {};
     }
 
     auto visitArchitecture_statement(vhdlParser::Architecture_statementContext *context) -> std::any override
     {
-        impl.visitArchitectureStatement(context);
+        impl_.visitArchitectureStatement(context);
         return {};
     }
 
     auto visitArchitecture_statement_part(vhdlParser::Architecture_statement_partContext *context) -> std::any override
     {
-        impl.visitArchitectureStatementPart(context);
+        impl_.visitArchitectureStatementPart(context);
         return {};
     }
 
     auto visitArray_nature_definition(vhdlParser::Array_nature_definitionContext *context) -> std::any override
     {
-        impl.visitArrayNatureDefinition(context);
+        impl_.visitArrayNatureDefinition(context);
         return {};
     }
 
     auto visitArray_type_definition(vhdlParser::Array_type_definitionContext *context) -> std::any override
     {
-        impl.visitArrayTypeDefinition(context);
+        impl_.visitArrayTypeDefinition(context);
         return {};
     }
 
     auto visitAssertion(vhdlParser::AssertionContext *context) -> std::any override
     {
-        impl.visitAssertion(context);
+        impl_.visitAssertion(context);
         return {};
     }
 
     auto visitAssertion_statement(vhdlParser::Assertion_statementContext *context) -> std::any override
     {
-        impl.visitAssertionStatement(context);
+        impl_.visitAssertionStatement(context);
         return {};
     }
 
     auto visitAssociation_element(vhdlParser::Association_elementContext *context) -> std::any override
     {
-        impl.visitAssociationElement(context);
+        impl_.visitAssociationElement(context);
         return {};
     }
 
     auto visitAssociation_list(vhdlParser::Association_listContext *context) -> std::any override
     {
-        impl.visitAssociationList(context);
+        impl_.visitAssociationList(context);
         return {};
     }
 
     auto visitAttribute_declaration(vhdlParser::Attribute_declarationContext *context) -> std::any override
     {
-        impl.visitAttributeDeclaration(context);
+        impl_.visitAttributeDeclaration(context);
         return {};
     }
 
     auto visitAttribute_designator(vhdlParser::Attribute_designatorContext *context) -> std::any override
     {
-        impl.visitAttributeDesignator(context);
+        impl_.visitAttributeDesignator(context);
         return {};
     }
 
     auto visitAttribute_specification(vhdlParser::Attribute_specificationContext *context) -> std::any override
     {
-        impl.visitAttributeSpecification(context);
+        impl_.visitAttributeSpecification(context);
         return {};
     }
 
     auto visitBase_unit_declaration(vhdlParser::Base_unit_declarationContext *context) -> std::any override
     {
-        impl.visitBaseUnitDeclaration(context);
+        impl_.visitBaseUnitDeclaration(context);
         return {};
     }
 
     auto visitBinding_indication(vhdlParser::Binding_indicationContext *context) -> std::any override
     {
-        impl.visitBindingIndication(context);
+        impl_.visitBindingIndication(context);
         return {};
     }
 
     auto visitBlock_configuration(vhdlParser::Block_configurationContext *context) -> std::any override
     {
-        impl.visitBlockConfiguration(context);
+        impl_.visitBlockConfiguration(context);
         return {};
     }
 
     auto visitBlock_declarative_item(vhdlParser::Block_declarative_itemContext *context) -> std::any override
     {
-        impl.visitBlockDeclarativeItem(context);
+        impl_.visitBlockDeclarativeItem(context);
         return {};
     }
 
     auto visitBlock_declarative_part(vhdlParser::Block_declarative_partContext *context) -> std::any override
     {
-        impl.visitBlockDeclarativePart(context);
+        impl_.visitBlockDeclarativePart(context);
         return {};
     }
 
     auto visitBlock_header(vhdlParser::Block_headerContext *context) -> std::any override
     {
-        impl.visitBlockHeader(context);
+        impl_.visitBlockHeader(context);
         return {};
     }
 
     auto visitBlock_specification(vhdlParser::Block_specificationContext *context) -> std::any override
     {
-        impl.visitBlockSpecification(context);
+        impl_.visitBlockSpecification(context);
         return {};
     }
 
     auto visitBlock_statement(vhdlParser::Block_statementContext *context) -> std::any override
     {
-        impl.visitBlockStatement(context);
+        impl_.visitBlockStatement(context);
         return {};
     }
 
     auto visitBlock_statement_part(vhdlParser::Block_statement_partContext *context) -> std::any override
     {
-        impl.visitBlockStatementPart(context);
+        impl_.visitBlockStatementPart(context);
         return {};
     }
 
     auto visitBranch_quantity_declaration(vhdlParser::Branch_quantity_declarationContext *context) -> std::any override
     {
-        impl.visitBranchQuantityDeclaration(context);
+        impl_.visitBranchQuantityDeclaration(context);
         return {};
     }
 
     auto visitBreak_element(vhdlParser::Break_elementContext *context) -> std::any override
     {
-        impl.visitBreakElement(context);
+        impl_.visitBreakElement(context);
         return {};
     }
 
     auto visitBreak_list(vhdlParser::Break_listContext *context) -> std::any override
     {
-        impl.visitBreakList(context);
+        impl_.visitBreakList(context);
         return {};
     }
 
     auto visitBreak_selector_clause(vhdlParser::Break_selector_clauseContext *context) -> std::any override
     {
-        impl.visitBreakSelectorClause(context);
+        impl_.visitBreakSelectorClause(context);
         return {};
     }
 
     auto visitBreak_statement(vhdlParser::Break_statementContext *context) -> std::any override
     {
-        impl.visitBreakStatement(context);
+        impl_.visitBreakStatement(context);
         return {};
     }
 
     auto visitCase_statement(vhdlParser::Case_statementContext *context) -> std::any override
     {
-        impl.visitCaseStatement(context);
+        impl_.visitCaseStatement(context);
         return {};
     }
 
     auto visitCase_statement_alternative(vhdlParser::Case_statement_alternativeContext *context) -> std::any override
     {
-        impl.visitCaseStatementAlternative(context);
+        impl_.visitCaseStatementAlternative(context);
         return {};
     }
 
     auto visitChoice(vhdlParser::ChoiceContext *context) -> std::any override
     {
-        impl.visitChoice(context);
+        impl_.visitChoice(context);
         return {};
     }
 
     auto visitChoices(vhdlParser::ChoicesContext *context) -> std::any override
     {
-        impl.visitChoices(context);
+        impl_.visitChoices(context);
         return {};
     }
 
     auto visitComponent_configuration(vhdlParser::Component_configurationContext *context) -> std::any override
     {
-        impl.visitComponentConfiguration(context);
+        impl_.visitComponentConfiguration(context);
         return {};
     }
 
     auto visitComponent_declaration(vhdlParser::Component_declarationContext *context) -> std::any override
     {
-        impl.visitComponentDeclaration(context);
+        impl_.visitComponentDeclaration(context);
         return {};
     }
 
     auto visitComponent_instantiation_statement(vhdlParser::Component_instantiation_statementContext *context) -> std::any override
     {
-        impl.visitComponentInstantiationStatement(context);
+        impl_.visitComponentInstantiationStatement(context);
         return {};
     }
 
     auto visitComponent_specification(vhdlParser::Component_specificationContext *context) -> std::any override
     {
-        impl.visitComponentSpecification(context);
+        impl_.visitComponentSpecification(context);
         return {};
     }
 
     auto visitComposite_nature_definition(vhdlParser::Composite_nature_definitionContext *context) -> std::any override
     {
-        impl.visitCompositeNatureDefinition(context);
+        impl_.visitCompositeNatureDefinition(context);
         return {};
     }
 
     auto visitComposite_type_definition(vhdlParser::Composite_type_definitionContext *context) -> std::any override
     {
-        impl.visitCompositeTypeDefinition(context);
+        impl_.visitCompositeTypeDefinition(context);
         return {};
     }
 
     auto visitConcurrent_assertion_statement(vhdlParser::Concurrent_assertion_statementContext *context) -> std::any override
     {
-        impl.visitConcurrentAssertionStatement(context);
+        impl_.visitConcurrentAssertionStatement(context);
         return {};
     }
 
     auto visitConcurrent_break_statement(vhdlParser::Concurrent_break_statementContext *context) -> std::any override
     {
-        impl.visitConcurrentBreakStatement(context);
+        impl_.visitConcurrentBreakStatement(context);
         return {};
     }
 
     auto visitConcurrent_procedure_call_statement(vhdlParser::Concurrent_procedure_call_statementContext *context) -> std::any override
     {
-        impl.visitConcurrentProcedureCallStatement(context);
+        impl_.visitConcurrentProcedureCallStatement(context);
         return {};
     }
 
     auto visitConcurrent_signal_assignment_statement(vhdlParser::Concurrent_signal_assignment_statementContext *context) -> std::any override
     {
-        impl.visitConcurrentSignalAssignmentStatement(context);
+        impl_.visitConcurrentSignalAssignmentStatement(context);
         return {};
     }
 
     auto visitCondition(vhdlParser::ConditionContext *context) -> std::any override
     {
-        impl.visitCondition(context);
+        impl_.visitCondition(context);
         return {};
     }
 
     auto visitCondition_clause(vhdlParser::Condition_clauseContext *context) -> std::any override
     {
-        impl.visitConditionClause(context);
+        impl_.visitConditionClause(context);
         return {};
     }
 
     auto visitConditional_signal_assignment(vhdlParser::Conditional_signal_assignmentContext *context) -> std::any override
     {
-        impl.visitConditionalSignalAssignment(context);
+        impl_.visitConditionalSignalAssignment(context);
         return {};
     }
 
     auto visitConditional_waveforms(vhdlParser::Conditional_waveformsContext *context) -> std::any override
     {
-        impl.visitConditionalWaveforms(context);
+        impl_.visitConditionalWaveforms(context);
         return {};
     }
 
     auto visitConfiguration_declaration(vhdlParser::Configuration_declarationContext *context) -> std::any override
     {
-        impl.visitConfigurationDeclaration(context);
+        impl_.visitConfigurationDeclaration(context);
         return {};
     }
 
     auto visitConfiguration_declarative_item(vhdlParser::Configuration_declarative_itemContext *context) -> std::any override
     {
-        impl.visitConfigurationDeclarativeItem(context);
+        impl_.visitConfigurationDeclarativeItem(context);
         return {};
     }
 
     auto visitConfiguration_declarative_part(vhdlParser::Configuration_declarative_partContext *context) -> std::any override
     {
-        impl.visitConfigurationDeclarativePart(context);
+        impl_.visitConfigurationDeclarativePart(context);
         return {};
     }
 
     auto visitConfiguration_item(vhdlParser::Configuration_itemContext *context) -> std::any override
     {
-        impl.visitConfigurationItem(context);
+        impl_.visitConfigurationItem(context);
         return {};
     }
 
     auto visitConfiguration_specification(vhdlParser::Configuration_specificationContext *context) -> std::any override
     {
-        impl.visitConfigurationSpecification(context);
+        impl_.visitConfigurationSpecification(context);
         return {};
     }
 
     auto visitConstant_declaration(vhdlParser::Constant_declarationContext *context) -> std::any override
     {
-        impl.visitConstantDeclaration(context);
+        impl_.visitConstantDeclaration(context);
         return {};
     }
 
     auto visitConstrained_array_definition(vhdlParser::Constrained_array_definitionContext *context) -> std::any override
     {
-        impl.visitConstrainedArrayDefinition(context);
+        impl_.visitConstrainedArrayDefinition(context);
         return {};
     }
 
     auto visitConstrained_nature_definition(vhdlParser::Constrained_nature_definitionContext *context) -> std::any override
     {
-        impl.visitConstrainedNatureDefinition(context);
+        impl_.visitConstrainedNatureDefinition(context);
         return {};
     }
 
     auto visitConstraint(vhdlParser::ConstraintContext *context) -> std::any override
     {
-        impl.visitConstraint(context);
+        impl_.visitConstraint(context);
         return {};
     }
 
     auto visitContext_clause(vhdlParser::Context_clauseContext *context) -> std::any override
     {
-        impl.visitContextClause(context);
+        impl_.visitContextClause(context);
         return {};
     }
 
     auto visitContext_item(vhdlParser::Context_itemContext *context) -> std::any override
     {
-        impl.visitContextItem(context);
+        impl_.visitContextItem(context);
         return {};
     }
 
     auto visitDelay_mechanism(vhdlParser::Delay_mechanismContext *context) -> std::any override
     {
-        impl.visitDelayMechanism(context);
+        impl_.visitDelayMechanism(context);
         return {};
     }
 
     auto visitDesign_file(vhdlParser::Design_fileContext *context) -> std::any override
     {
-        impl.visitDesignFile(context);
+        impl_.visitDesignFile(context);
         return {};
     }
 
     auto visitDesign_unit(vhdlParser::Design_unitContext *context) -> std::any override
     {
-        impl.visitDesignUnit(context);
+        impl_.visitDesignUnit(context);
         return {};
     }
 
     auto visitDesignator(vhdlParser::DesignatorContext *context) -> std::any override
     {
-        impl.visitDesignator(context);
+        impl_.visitDesignator(context);
         return {};
     }
 
     auto visitDirection(vhdlParser::DirectionContext *context) -> std::any override
     {
-        impl.visitDirection(context);
+        impl_.visitDirection(context);
         return {};
     }
 
     auto visitDisconnection_specification(vhdlParser::Disconnection_specificationContext *context) -> std::any override
     {
-        impl.visitDisconnectionSpecification(context);
+        impl_.visitDisconnectionSpecification(context);
         return {};
     }
 
     auto visitDiscrete_range(vhdlParser::Discrete_rangeContext *context) -> std::any override
     {
-        impl.visitDiscreteRange(context);
+        impl_.visitDiscreteRange(context);
         return {};
     }
 
     auto visitElement_association(vhdlParser::Element_associationContext *context) -> std::any override
     {
-        impl.visitElementAssociation(context);
+        impl_.visitElementAssociation(context);
         return {};
     }
 
     auto visitElement_declaration(vhdlParser::Element_declarationContext *context) -> std::any override
     {
-        impl.visitElementDeclaration(context);
+        impl_.visitElementDeclaration(context);
         return {};
     }
 
     auto visitElement_subnature_definition(vhdlParser::Element_subnature_definitionContext *context) -> std::any override
     {
-        impl.visitElementSubnatureDefinition(context);
+        impl_.visitElementSubnatureDefinition(context);
         return {};
     }
 
     auto visitElement_subtype_definition(vhdlParser::Element_subtype_definitionContext *context) -> std::any override
     {
-        impl.visitElementSubtypeDefinition(context);
+        impl_.visitElementSubtypeDefinition(context);
         return {};
     }
 
     auto visitEntity_aspect(vhdlParser::Entity_aspectContext *context) -> std::any override
     {
-        impl.visitEntityAspect(context);
+        impl_.visitEntityAspect(context);
         return {};
     }
 
     auto visitEntity_class(vhdlParser::Entity_classContext *context) -> std::any override
     {
-        impl.visitEntityClass(context);
+        impl_.visitEntityClass(context);
         return {};
     }
 
     auto visitEntity_class_entry(vhdlParser::Entity_class_entryContext *context) -> std::any override
     {
-        impl.visitEntityClassEntry(context);
+        impl_.visitEntityClassEntry(context);
         return {};
     }
 
     auto visitEntity_class_entry_list(vhdlParser::Entity_class_entry_listContext *context) -> std::any override
     {
-        impl.visitEntityClassEntryList(context);
+        impl_.visitEntityClassEntryList(context);
         return {};
     }
 
     auto visitEntity_declaration(vhdlParser::Entity_declarationContext *context) -> std::any override
     {
-        impl.visitEntityDeclaration(context);
+        impl_.visitEntityDeclaration(context);
         return {};
     }
 
     auto visitEntity_declarative_item(vhdlParser::Entity_declarative_itemContext *context) -> std::any override
     {
-        impl.visitEntityDeclarativeItem(context);
+        impl_.visitEntityDeclarativeItem(context);
         return {};
     }
 
     auto visitEntity_declarative_part(vhdlParser::Entity_declarative_partContext *context) -> std::any override
     {
-        impl.visitEntityDeclarativePart(context);
+        impl_.visitEntityDeclarativePart(context);
         return {};
     }
 
     auto visitEntity_designator(vhdlParser::Entity_designatorContext *context) -> std::any override
     {
-        impl.visitEntityDesignator(context);
+        impl_.visitEntityDesignator(context);
         return {};
     }
 
     auto visitEntity_header(vhdlParser::Entity_headerContext *context) -> std::any override
     {
-        impl.visitEntityHeader(context);
+        impl_.visitEntityHeader(context);
         return {};
     }
 
     auto visitEntity_name_list(vhdlParser::Entity_name_listContext *context) -> std::any override
     {
-        impl.visitEntityNameList(context);
+        impl_.visitEntityNameList(context);
         return {};
     }
 
     auto visitEntity_specification(vhdlParser::Entity_specificationContext *context) -> std::any override
     {
-        impl.visitEntitySpecification(context);
+        impl_.visitEntitySpecification(context);
         return {};
     }
 
     auto visitEntity_statement(vhdlParser::Entity_statementContext *context) -> std::any override
     {
-        impl.visitEntityStatement(context);
+        impl_.visitEntityStatement(context);
         return {};
     }
 
     auto visitEntity_statement_part(vhdlParser::Entity_statement_partContext *context) -> std::any override
     {
-        impl.visitEntityStatementPart(context);
+        impl_.visitEntityStatementPart(context);
         return {};
     }
 
     auto visitEntity_tag(vhdlParser::Entity_tagContext *context) -> std::any override
     {
-        impl.visitEntityTag(context);
+        impl_.visitEntityTag(context);
         return {};
     }
 
     auto visitEnumeration_literal(vhdlParser::Enumeration_literalContext *context) -> std::any override
     {
-        impl.visitEnumerationLiteral(context);
+        impl_.visitEnumerationLiteral(context);
         return {};
     }
 
     auto visitEnumeration_type_definition(vhdlParser::Enumeration_type_definitionContext *context) -> std::any override
     {
-        impl.visitEnumerationTypeDefinition(context);
+        impl_.visitEnumerationTypeDefinition(context);
         return {};
     }
 
     auto visitExit_statement(vhdlParser::Exit_statementContext *context) -> std::any override
     {
-        impl.visitExitStatement(context);
+        impl_.visitExitStatement(context);
         return {};
     }
 
     auto visitExpression(vhdlParser::ExpressionContext *context) -> std::any override
     {
-        impl.visitExpression(context);
+        impl_.visitExpression(context);
         return {};
     }
 
     auto visitFactor(vhdlParser::FactorContext *context) -> std::any override
     {
-        impl.visitFactor(context);
+        impl_.visitFactor(context);
         return {};
     }
 
     auto visitFile_declaration(vhdlParser::File_declarationContext *context) -> std::any override
     {
-        impl.visitFileDeclaration(context);
+        impl_.visitFileDeclaration(context);
         return {};
     }
 
     auto visitFile_logical_name(vhdlParser::File_logical_nameContext *context) -> std::any override
     {
-        impl.visitFileLogicalName(context);
+        impl_.visitFileLogicalName(context);
         return {};
     }
 
     auto visitFile_open_information(vhdlParser::File_open_informationContext *context) -> std::any override
     {
-        impl.visitFileOpenInformation(context);
+        impl_.visitFileOpenInformation(context);
         return {};
     }
 
     auto visitFile_type_definition(vhdlParser::File_type_definitionContext *context) -> std::any override
     {
-        impl.visitFileTypeDefinition(context);
+        impl_.visitFileTypeDefinition(context);
         return {};
     }
 
     auto visitFormal_parameter_list(vhdlParser::Formal_parameter_listContext *context) -> std::any override
     {
-        impl.visitFormalParameterList(context);
+        impl_.visitFormalParameterList(context);
         return {};
     }
 
     auto visitFormal_part(vhdlParser::Formal_partContext *context) -> std::any override
     {
-        impl.visitFormalPart(context);
+        impl_.visitFormalPart(context);
         return {};
     }
 
     auto visitFree_quantity_declaration(vhdlParser::Free_quantity_declarationContext *context) -> std::any override
     {
-        impl.visitFreeQuantityDeclaration(context);
+        impl_.visitFreeQuantityDeclaration(context);
         return {};
     }
 
     auto visitGenerate_statement(vhdlParser::Generate_statementContext *context) -> std::any override
     {
-        impl.visitGenerateStatement(context);
+        impl_.visitGenerateStatement(context);
         return {};
     }
 
     auto visitGeneration_scheme(vhdlParser::Generation_schemeContext *context) -> std::any override
     {
-        impl.visitGenerationScheme(context);
+        impl_.visitGenerationScheme(context);
         return {};
     }
 
     auto visitGeneric_clause(vhdlParser::Generic_clauseContext *context) -> std::any override
     {
-        impl.visitGenericClause(context);
+        impl_.visitGenericClause(context);
         return {};
     }
 
     auto visitGeneric_list(vhdlParser::Generic_listContext *context) -> std::any override
     {
-        impl.visitGenericList(context);
+        impl_.visitGenericList(context);
         return {};
     }
 
     auto visitGeneric_map_aspect(vhdlParser::Generic_map_aspectContext *context) -> std::any override
     {
-        impl.visitGenericMapAspect(context);
+        impl_.visitGenericMapAspect(context);
         return {};
     }
 
     auto visitGroup_constituent(vhdlParser::Group_constituentContext *context) -> std::any override
     {
-        impl.visitGroupConstituent(context);
+        impl_.visitGroupConstituent(context);
         return {};
     }
 
     auto visitGroup_constituent_list(vhdlParser::Group_constituent_listContext *context) -> std::any override
     {
-        impl.visitGroupConstituentList(context);
+        impl_.visitGroupConstituentList(context);
         return {};
     }
 
     auto visitGroup_declaration(vhdlParser::Group_declarationContext *context) -> std::any override
     {
-        impl.visitGroupDeclaration(context);
+        impl_.visitGroupDeclaration(context);
         return {};
     }
 
     auto visitGroup_template_declaration(vhdlParser::Group_template_declarationContext *context) -> std::any override
     {
-        impl.visitGroupTemplateDeclaration(context);
+        impl_.visitGroupTemplateDeclaration(context);
         return {};
     }
 
     auto visitGuarded_signal_specification(vhdlParser::Guarded_signal_specificationContext *context) -> std::any override
     {
-        impl.visitGuardedSignalSpecification(context);
+        impl_.visitGuardedSignalSpecification(context);
         return {};
     }
 
     auto visitIdentifier(vhdlParser::IdentifierContext *context) -> std::any override
     {
-        impl.visitIdentifier(context);
+        impl_.visitIdentifier(context);
         return {};
     }
 
     auto visitIdentifier_list(vhdlParser::Identifier_listContext *context) -> std::any override
     {
-        impl.visitIdentifierList(context);
+        impl_.visitIdentifierList(context);
         return {};
     }
 
     auto visitIf_statement(vhdlParser::If_statementContext *context) -> std::any override
     {
-        impl.visitIfStatement(context);
+        impl_.visitIfStatement(context);
         return {};
     }
 
     auto visitIndex_constraint(vhdlParser::Index_constraintContext *context) -> std::any override
     {
-        impl.visitIndexConstraint(context);
+        impl_.visitIndexConstraint(context);
         return {};
     }
 
     auto visitIndex_specification(vhdlParser::Index_specificationContext *context) -> std::any override
     {
-        impl.visitIndexSpecification(context);
+        impl_.visitIndexSpecification(context);
         return {};
     }
 
     auto visitIndex_subtype_definition(vhdlParser::Index_subtype_definitionContext *context) -> std::any override
     {
-        impl.visitIndexSubtypeDefinition(context);
+        impl_.visitIndexSubtypeDefinition(context);
         return {};
     }
 
     auto visitInstantiated_unit(vhdlParser::Instantiated_unitContext *context) -> std::any override
     {
-        impl.visitInstantiatedUnit(context);
+        impl_.visitInstantiatedUnit(context);
         return {};
     }
 
     auto visitInstantiation_list(vhdlParser::Instantiation_listContext *context) -> std::any override
     {
-        impl.visitInstantiationList(context);
+        impl_.visitInstantiationList(context);
         return {};
     }
 
     auto visitInterface_constant_declaration(vhdlParser::Interface_constant_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceConstantDeclaration(context);
+        impl_.visitInterfaceConstantDeclaration(context);
         return {};
     }
 
     auto visitInterface_declaration(vhdlParser::Interface_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceDeclaration(context);
+        impl_.visitInterfaceDeclaration(context);
         return {};
     }
 
     auto visitInterface_element(vhdlParser::Interface_elementContext *context) -> std::any override
     {
-        impl.visitInterfaceElement(context);
+        impl_.visitInterfaceElement(context);
         return {};
     }
 
     auto visitInterface_file_declaration(vhdlParser::Interface_file_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceFileDeclaration(context);
+        impl_.visitInterfaceFileDeclaration(context);
         return {};
     }
 
     auto visitInterface_signal_list(vhdlParser::Interface_signal_listContext *context) -> std::any override
     {
-        impl.visitInterfaceSignalList(context);
+        impl_.visitInterfaceSignalList(context);
         return {};
     }
 
     auto visitInterface_port_list(vhdlParser::Interface_port_listContext *context) -> std::any override
     {
-        impl.visitInterfacePortList(context);
+        impl_.visitInterfacePortList(context);
         return {};
     }
 
     auto visitInterface_list(vhdlParser::Interface_listContext *context) -> std::any override
     {
-        impl.visitInterfaceList(context);
+        impl_.visitInterfaceList(context);
         return {};
     }
 
     auto visitInterface_quantity_declaration(vhdlParser::Interface_quantity_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceQuantityDeclaration(context);
+        impl_.visitInterfaceQuantityDeclaration(context);
         return {};
     }
 
     auto visitInterface_port_declaration(vhdlParser::Interface_port_declarationContext *context) -> std::any override
     {
-        impl.visitInterfacePortDeclaration(context);
+        impl_.visitInterfacePortDeclaration(context);
         return {};
     }
 
     auto visitInterface_signal_declaration(vhdlParser::Interface_signal_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceSignalDeclaration(context);
+        impl_.visitInterfaceSignalDeclaration(context);
         return {};
     }
 
     auto visitInterface_terminal_declaration(vhdlParser::Interface_terminal_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceTerminalDeclaration(context);
+        impl_.visitInterfaceTerminalDeclaration(context);
         return {};
     }
 
     auto visitInterface_variable_declaration(vhdlParser::Interface_variable_declarationContext *context) -> std::any override
     {
-        impl.visitInterfaceVariableDeclaration(context);
+        impl_.visitInterfaceVariableDeclaration(context);
         return {};
     }
 
     auto visitIteration_scheme(vhdlParser::Iteration_schemeContext *context) -> std::any override
     {
-        impl.visitIterationScheme(context);
+        impl_.visitIterationScheme(context);
         return {};
     }
 
     auto visitLabel_colon(vhdlParser::Label_colonContext *context) -> std::any override
     {
-        impl.visitLabelColon(context);
+        impl_.visitLabelColon(context);
         return {};
     }
 
     auto visitLibrary_clause(vhdlParser::Library_clauseContext *context) -> std::any override
     {
-        impl.visitLibraryClause(context);
+        impl_.visitLibraryClause(context);
         return {};
     }
 
     auto visitLibrary_unit(vhdlParser::Library_unitContext *context) -> std::any override
     {
-        impl.visitLibraryUnit(context);
+        impl_.visitLibraryUnit(context);
         return {};
     }
 
     auto visitLiteral(vhdlParser::LiteralContext *context) -> std::any override
     {
-        impl.visitLiteral(context);
+        impl_.visitLiteral(context);
         return {};
     }
 
     auto visitLogical_name(vhdlParser::Logical_nameContext *context) -> std::any override
     {
-        impl.visitLogicalName(context);
+        impl_.visitLogicalName(context);
         return {};
     }
 
     auto visitLogical_name_list(vhdlParser::Logical_name_listContext *context) -> std::any override
     {
-        impl.visitLogicalNameList(context);
+        impl_.visitLogicalNameList(context);
         return {};
     }
 
     auto visitLogical_operator(vhdlParser::Logical_operatorContext *context) -> std::any override
     {
-        impl.visitLogicalOperator(context);
+        impl_.visitLogicalOperator(context);
         return {};
     }
 
     auto visitLoop_statement(vhdlParser::Loop_statementContext *context) -> std::any override
     {
-        impl.visitLoopStatement(context);
+        impl_.visitLoopStatement(context);
         return {};
     }
 
     auto visitSignal_mode(vhdlParser::Signal_modeContext *context) -> std::any override
     {
-        impl.visitSignalMode(context);
+        impl_.visitSignalMode(context);
         return {};
     }
 
     auto visitMultiplying_operator(vhdlParser::Multiplying_operatorContext *context) -> std::any override
     {
-        impl.visitMultiplyingOperator(context);
+        impl_.visitMultiplyingOperator(context);
         return {};
     }
 
     auto visitName(vhdlParser::NameContext *context) -> std::any override
     {
-        impl.visitName(context);
+        impl_.visitName(context);
         return {};
     }
 
     auto visitName_part(vhdlParser::Name_partContext *context) -> std::any override
     {
-        impl.visitNamePart(context);
+        impl_.visitNamePart(context);
         return {};
     }
 
     auto visitSelected_name(vhdlParser::Selected_nameContext *context) -> std::any override
     {
-        impl.visitSelectedName(context);
+        impl_.visitSelectedName(context);
         return {};
     }
 
     auto visitSelected_name_part(vhdlParser::Selected_name_partContext *context) -> std::any override
     {
-        impl.visitSelectedNamePart(context);
+        impl_.visitSelectedNamePart(context);
         return {};
     }
 
     auto visitFunction_call_or_indexed_name_part(vhdlParser::Function_call_or_indexed_name_partContext *context) -> std::any override
     {
-        impl.visitFunctionCallOrIndexedNamePart(context);
+        impl_.visitFunctionCallOrIndexedNamePart(context);
         return {};
     }
 
     auto visitSlice_name_part(vhdlParser::Slice_name_partContext *context) -> std::any override
     {
-        impl.visitSliceNamePart(context);
+        impl_.visitSliceNamePart(context);
         return {};
     }
 
     auto visitAttribute_name_part(vhdlParser::Attribute_name_partContext *context) -> std::any override
     {
-        impl.visitAttributeNamePart(context);
+        impl_.visitAttributeNamePart(context);
         return {};
     }
 
     auto visitNature_declaration(vhdlParser::Nature_declarationContext *context) -> std::any override
     {
-        impl.visitNatureDeclaration(context);
+        impl_.visitNatureDeclaration(context);
         return {};
     }
 
     auto visitNature_definition(vhdlParser::Nature_definitionContext *context) -> std::any override
     {
-        impl.visitNatureDefinition(context);
+        impl_.visitNatureDefinition(context);
         return {};
     }
 
     auto visitNature_element_declaration(vhdlParser::Nature_element_declarationContext *context) -> std::any override
     {
-        impl.visitNatureElementDeclaration(context);
+        impl_.visitNatureElementDeclaration(context);
         return {};
     }
 
     auto visitNext_statement(vhdlParser::Next_statementContext *context) -> std::any override
     {
-        impl.visitNextStatement(context);
+        impl_.visitNextStatement(context);
         return {};
     }
 
     auto visitNumeric_literal(vhdlParser::Numeric_literalContext *context) -> std::any override
     {
-        impl.visitNumericLiteral(context);
+        impl_.visitNumericLiteral(context);
         return {};
     }
 
     auto visitObject_declaration(vhdlParser::Object_declarationContext *context) -> std::any override
     {
-        impl.visitObjectDeclaration(context);
+        impl_.visitObjectDeclaration(context);
         return {};
     }
 
     auto visitOpts(vhdlParser::OptsContext *context) -> std::any override
     {
-        impl.visitOpts(context);
+        impl_.visitOpts(context);
         return {};
     }
 
     auto visitPackage_body(vhdlParser::Package_bodyContext *context) -> std::any override
     {
-        impl.visitPackageBody(context);
+        impl_.visitPackageBody(context);
         return {};
     }
 
     auto visitPackage_body_declarative_item(vhdlParser::Package_body_declarative_itemContext *context) -> std::any override
     {
-        impl.visitPackageBodyDeclarativeItem(context);
+        impl_.visitPackageBodyDeclarativeItem(context);
         return {};
     }
 
     auto visitPackage_body_declarative_part(vhdlParser::Package_body_declarative_partContext *context) -> std::any override
     {
-        impl.visitPackageBodyDeclarativePart(context);
+        impl_.visitPackageBodyDeclarativePart(context);
         return {};
     }
 
     auto visitPackage_declaration(vhdlParser::Package_declarationContext *context) -> std::any override
     {
-        impl.visitPackageDeclaration(context);
+        impl_.visitPackageDeclaration(context);
         return {};
     }
 
     auto visitPackage_declarative_item(vhdlParser::Package_declarative_itemContext *context) -> std::any override
     {
-        impl.visitPackageDeclarativeItem(context);
+        impl_.visitPackageDeclarativeItem(context);
         return {};
     }
 
     auto visitPackage_declarative_part(vhdlParser::Package_declarative_partContext *context) -> std::any override
     {
-        impl.visitPackageDeclarativePart(context);
+        impl_.visitPackageDeclarativePart(context);
         return {};
     }
 
     auto visitParameter_specification(vhdlParser::Parameter_specificationContext *context) -> std::any override
     {
-        impl.visitParameterSpecification(context);
+        impl_.visitParameterSpecification(context);
         return {};
     }
 
     auto visitPhysical_literal(vhdlParser::Physical_literalContext *context) -> std::any override
     {
-        impl.visitPhysicalLiteral(context);
+        impl_.visitPhysicalLiteral(context);
         return {};
     }
 
     auto visitPhysical_type_definition(vhdlParser::Physical_type_definitionContext *context) -> std::any override
     {
-        impl.visitPhysicalTypeDefinition(context);
+        impl_.visitPhysicalTypeDefinition(context);
         return {};
     }
 
     auto visitPort_clause(vhdlParser::Port_clauseContext *context) -> std::any override
     {
-        impl.visitPortClause(context);
+        impl_.visitPortClause(context);
         return {};
     }
 
     auto visitPort_list(vhdlParser::Port_listContext *context) -> std::any override
     {
-        impl.visitPortList(context);
+        impl_.visitPortList(context);
         return {};
     }
 
     auto visitPort_map_aspect(vhdlParser::Port_map_aspectContext *context) -> std::any override
     {
-        impl.visitPortMapAspect(context);
+        impl_.visitPortMapAspect(context);
         return {};
     }
 
     auto visitPrimary(vhdlParser::PrimaryContext *context) -> std::any override
     {
-        impl.visitPrimary(context);
+        impl_.visitPrimary(context);
         return {};
     }
 
     auto visitPrimary_unit(vhdlParser::Primary_unitContext *context) -> std::any override
     {
-        impl.visitPrimaryUnit(context);
+        impl_.visitPrimaryUnit(context);
         return {};
     }
 
     auto visitProcedural_declarative_item(vhdlParser::Procedural_declarative_itemContext *context) -> std::any override
     {
-        impl.visitProceduralDeclarativeItem(context);
+        impl_.visitProceduralDeclarativeItem(context);
         return {};
     }
 
     auto visitProcedural_declarative_part(vhdlParser::Procedural_declarative_partContext *context) -> std::any override
     {
-        impl.visitProceduralDeclarativePart(context);
+        impl_.visitProceduralDeclarativePart(context);
         return {};
     }
 
     auto visitProcedural_statement_part(vhdlParser::Procedural_statement_partContext *context) -> std::any override
     {
-        impl.visitProceduralStatementPart(context);
+        impl_.visitProceduralStatementPart(context);
         return {};
     }
 
     auto visitProcedure_call(vhdlParser::Procedure_callContext *context) -> std::any override
     {
-        impl.visitProcedureCall(context);
+        impl_.visitProcedureCall(context);
         return {};
     }
 
     auto visitProcedure_call_statement(vhdlParser::Procedure_call_statementContext *context) -> std::any override
     {
-        impl.visitProcedureCallStatement(context);
+        impl_.visitProcedureCallStatement(context);
         return {};
     }
 
     auto visitProcess_declarative_item(vhdlParser::Process_declarative_itemContext *context) -> std::any override
     {
-        impl.visitProcessDeclarativeItem(context);
+        impl_.visitProcessDeclarativeItem(context);
         return {};
     }
 
     auto visitProcess_declarative_part(vhdlParser::Process_declarative_partContext *context) -> std::any override
     {
-        impl.visitProcessDeclarativePart(context);
+        impl_.visitProcessDeclarativePart(context);
         return {};
     }
 
     auto visitProcess_statement(vhdlParser::Process_statementContext *context) -> std::any override
     {
-        impl.visitProcessStatement(context);
+        impl_.visitProcessStatement(context);
         return {};
     }
 
     auto visitProcess_statement_part(vhdlParser::Process_statement_partContext *context) -> std::any override
     {
-        impl.visitProcessStatementPart(context);
+        impl_.visitProcessStatementPart(context);
         return {};
     }
 
     auto visitQualified_expression(vhdlParser::Qualified_expressionContext *context) -> std::any override
     {
-        impl.visitQualifiedExpression(context);
+        impl_.visitQualifiedExpression(context);
         return {};
     }
 
     auto visitQuantity_declaration(vhdlParser::Quantity_declarationContext *context) -> std::any override
     {
-        impl.visitQuantityDeclaration(context);
+        impl_.visitQuantityDeclaration(context);
         return {};
     }
 
     auto visitQuantity_list(vhdlParser::Quantity_listContext *context) -> std::any override
     {
-        impl.visitQuantityList(context);
+        impl_.visitQuantityList(context);
         return {};
     }
 
     auto visitQuantity_specification(vhdlParser::Quantity_specificationContext *context) -> std::any override
     {
-        impl.visitQuantitySpecification(context);
+        impl_.visitQuantitySpecification(context);
         return {};
     }
 
     auto visitRange_decl(vhdlParser::Range_declContext *context) -> std::any override
     {
-        impl.visitRangeDecl(context);
+        impl_.visitRangeDecl(context);
         return {};
     }
 
     auto visitExplicit_range(vhdlParser::Explicit_rangeContext *context) -> std::any override
     {
-        impl.visitExplicitRange(context);
+        impl_.visitExplicitRange(context);
         return {};
     }
 
     auto visitRange_constraint(vhdlParser::Range_constraintContext *context) -> std::any override
     {
-        impl.visitRangeConstraint(context);
+        impl_.visitRangeConstraint(context);
         return {};
     }
 
     auto visitRecord_nature_definition(vhdlParser::Record_nature_definitionContext *context) -> std::any override
     {
-        impl.visitRecordNatureDefinition(context);
+        impl_.visitRecordNatureDefinition(context);
         return {};
     }
 
     auto visitRecord_type_definition(vhdlParser::Record_type_definitionContext *context) -> std::any override
     {
-        impl.visitRecordTypeDefinition(context);
+        impl_.visitRecordTypeDefinition(context);
         return {};
     }
 
     auto visitRelation(vhdlParser::RelationContext *context) -> std::any override
     {
-        impl.visitRelation(context);
+        impl_.visitRelation(context);
         return {};
     }
 
     auto visitRelational_operator(vhdlParser::Relational_operatorContext *context) -> std::any override
     {
-        impl.visitRelationalOperator(context);
+        impl_.visitRelationalOperator(context);
         return {};
     }
 
     auto visitReport_statement(vhdlParser::Report_statementContext *context) -> std::any override
     {
-        impl.visitReportStatement(context);
+        impl_.visitReportStatement(context);
         return {};
     }
 
     auto visitReturn_statement(vhdlParser::Return_statementContext *context) -> std::any override
     {
-        impl.visitReturnStatement(context);
+        impl_.visitReturnStatement(context);
         return {};
     }
 
     auto visitScalar_nature_definition(vhdlParser::Scalar_nature_definitionContext *context) -> std::any override
     {
-        impl.visitScalarNatureDefinition(context);
+        impl_.visitScalarNatureDefinition(context);
         return {};
     }
 
     auto visitScalar_type_definition(vhdlParser::Scalar_type_definitionContext *context) -> std::any override
     {
-        impl.visitScalarTypeDefinition(context);
+        impl_.visitScalarTypeDefinition(context);
         return {};
     }
 
     auto visitSecondary_unit(vhdlParser::Secondary_unitContext *context) -> std::any override
     {
-        impl.visitSecondaryUnit(context);
+        impl_.visitSecondaryUnit(context);
         return {};
     }
 
     auto visitSecondary_unit_declaration(vhdlParser::Secondary_unit_declarationContext *context) -> std::any override
     {
-        impl.visitSecondaryUnitDeclaration(context);
+        impl_.visitSecondaryUnitDeclaration(context);
         return {};
     }
 
     auto visitSelected_signal_assignment(vhdlParser::Selected_signal_assignmentContext *context) -> std::any override
     {
-        impl.visitSelectedSignalAssignment(context);
+        impl_.visitSelectedSignalAssignment(context);
         return {};
     }
 
     auto visitSelected_waveforms(vhdlParser::Selected_waveformsContext *context) -> std::any override
     {
-        impl.visitSelectedWaveforms(context);
+        impl_.visitSelectedWaveforms(context);
         return {};
     }
 
     auto visitSensitivity_clause(vhdlParser::Sensitivity_clauseContext *context) -> std::any override
     {
-        impl.visitSensitivityClause(context);
+        impl_.visitSensitivityClause(context);
         return {};
     }
 
     auto visitSensitivity_list(vhdlParser::Sensitivity_listContext *context) -> std::any override
     {
-        impl.visitSensitivityList(context);
+        impl_.visitSensitivityList(context);
         return {};
     }
 
     auto visitSequence_of_statements(vhdlParser::Sequence_of_statementsContext *context) -> std::any override
     {
-        impl.visitSequenceOfStatements(context);
+        impl_.visitSequenceOfStatements(context);
         return {};
     }
 
     auto visitSequential_statement(vhdlParser::Sequential_statementContext *context) -> std::any override
     {
-        impl.visitSequentialStatement(context);
+        impl_.visitSequentialStatement(context);
         return {};
     }
 
     auto visitShift_expression(vhdlParser::Shift_expressionContext *context) -> std::any override
     {
-        impl.visitShiftExpression(context);
+        impl_.visitShiftExpression(context);
         return {};
     }
 
     auto visitShift_operator(vhdlParser::Shift_operatorContext *context) -> std::any override
     {
-        impl.visitShiftOperator(context);
+        impl_.visitShiftOperator(context);
         return {};
     }
 
     auto visitSignal_assignment_statement(vhdlParser::Signal_assignment_statementContext *context) -> std::any override
     {
-        impl.visitSignalAssignmentStatement(context);
+        impl_.visitSignalAssignmentStatement(context);
         return {};
     }
 
     auto visitSignal_declaration(vhdlParser::Signal_declarationContext *context) -> std::any override
     {
-        impl.visitSignalDeclaration(context);
+        impl_.visitSignalDeclaration(context);
         return {};
     }
 
     auto visitSignal_kind(vhdlParser::Signal_kindContext *context) -> std::any override
     {
-        impl.visitSignalKind(context);
+        impl_.visitSignalKind(context);
         return {};
     }
 
     auto visitSignal_list(vhdlParser::Signal_listContext *context) -> std::any override
     {
-        impl.visitSignalList(context);
+        impl_.visitSignalList(context);
         return {};
     }
 
     auto visitSignature(vhdlParser::SignatureContext *context) -> std::any override
     {
-        impl.visitSignature(context);
+        impl_.visitSignature(context);
         return {};
     }
 
     auto visitSimple_expression(vhdlParser::Simple_expressionContext *context) -> std::any override
     {
-        impl.visitSimpleExpression(context);
+        impl_.visitSimpleExpression(context);
         return {};
     }
 
     auto visitSimple_simultaneous_statement(vhdlParser::Simple_simultaneous_statementContext *context) -> std::any override
     {
-        impl.visitSimpleSimultaneousStatement(context);
+        impl_.visitSimpleSimultaneousStatement(context);
         return {};
     }
 
     auto visitSimultaneous_alternative(vhdlParser::Simultaneous_alternativeContext *context) -> std::any override
     {
-        impl.visitSimultaneousAlternative(context);
+        impl_.visitSimultaneousAlternative(context);
         return {};
     }
 
     auto visitSimultaneous_case_statement(vhdlParser::Simultaneous_case_statementContext *context) -> std::any override
     {
-        impl.visitSimultaneousCaseStatement(context);
+        impl_.visitSimultaneousCaseStatement(context);
         return {};
     }
 
     auto visitSimultaneous_if_statement(vhdlParser::Simultaneous_if_statementContext *context) -> std::any override
     {
-        impl.visitSimultaneousIfStatement(context);
+        impl_.visitSimultaneousIfStatement(context);
         return {};
     }
 
     auto visitSimultaneous_procedural_statement(vhdlParser::Simultaneous_procedural_statementContext *context) -> std::any override
     {
-        impl.visitSimultaneousProceduralStatement(context);
+        impl_.visitSimultaneousProceduralStatement(context);
         return {};
     }
 
     auto visitSimultaneous_statement(vhdlParser::Simultaneous_statementContext *context) -> std::any override
     {
-        impl.visitSimultaneousStatement(context);
+        impl_.visitSimultaneousStatement(context);
         return {};
     }
 
     auto visitSimultaneous_statement_part(vhdlParser::Simultaneous_statement_partContext *context) -> std::any override
     {
-        impl.visitSimultaneousStatementPart(context);
+        impl_.visitSimultaneousStatementPart(context);
         return {};
     }
 
     auto visitSource_aspect(vhdlParser::Source_aspectContext *context) -> std::any override
     {
-        impl.visitSourceAspect(context);
+        impl_.visitSourceAspect(context);
         return {};
     }
 
     auto visitSource_quantity_declaration(vhdlParser::Source_quantity_declarationContext *context) -> std::any override
     {
-        impl.visitSourceQuantityDeclaration(context);
+        impl_.visitSourceQuantityDeclaration(context);
         return {};
     }
 
     auto visitStep_limit_specification(vhdlParser::Step_limit_specificationContext *context) -> std::any override
     {
-        impl.visitStepLimitSpecification(context);
+        impl_.visitStepLimitSpecification(context);
         return {};
     }
 
     auto visitSubnature_declaration(vhdlParser::Subnature_declarationContext *context) -> std::any override
     {
-        impl.visitSubnatureDeclaration(context);
+        impl_.visitSubnatureDeclaration(context);
         return {};
     }
 
     auto visitSubnature_indication(vhdlParser::Subnature_indicationContext *context) -> std::any override
     {
-        impl.visitSubnatureIndication(context);
+        impl_.visitSubnatureIndication(context);
         return {};
     }
 
     auto visitSubprogram_body(vhdlParser::Subprogram_bodyContext *context) -> std::any override
     {
-        impl.visitSubprogramBody(context);
+        impl_.visitSubprogramBody(context);
         return {};
     }
 
     auto visitSubprogram_declaration(vhdlParser::Subprogram_declarationContext *context) -> std::any override
     {
-        impl.visitSubprogramDeclaration(context);
+        impl_.visitSubprogramDeclaration(context);
         return {};
     }
 
     auto visitSubprogram_declarative_item(vhdlParser::Subprogram_declarative_itemContext *context) -> std::any override
     {
-        impl.visitSubprogramDeclarativeItem(context);
+        impl_.visitSubprogramDeclarativeItem(context);
         return {};
     }
 
     auto visitSubprogram_declarative_part(vhdlParser::Subprogram_declarative_partContext *context) -> std::any override
     {
-        impl.visitSubprogramDeclarativePart(context);
+        impl_.visitSubprogramDeclarativePart(context);
         return {};
     }
 
     auto visitSubprogram_kind(vhdlParser::Subprogram_kindContext *context) -> std::any override
     {
-        impl.visitSubprogramKind(context);
+        impl_.visitSubprogramKind(context);
         return {};
     }
 
     auto visitSubprogram_specification(vhdlParser::Subprogram_specificationContext *context) -> std::any override
     {
-        impl.visitSubprogramSpecification(context);
+        impl_.visitSubprogramSpecification(context);
         return {};
     }
 
     auto visitProcedure_specification(vhdlParser::Procedure_specificationContext *context) -> std::any override
     {
-        impl.visitProcedureSpecification(context);
+        impl_.visitProcedureSpecification(context);
         return {};
     }
 
     auto visitFunction_specification(vhdlParser::Function_specificationContext *context) -> std::any override
     {
-        impl.visitFunctionSpecification(context);
+        impl_.visitFunctionSpecification(context);
         return {};
     }
 
     auto visitSubprogram_statement_part(vhdlParser::Subprogram_statement_partContext *context) -> std::any override
     {
-        impl.visitSubprogramStatementPart(context);
+        impl_.visitSubprogramStatementPart(context);
         return {};
     }
 
     auto visitSubtype_declaration(vhdlParser::Subtype_declarationContext *context) -> std::any override
     {
-        impl.visitSubtypeDeclaration(context);
+        impl_.visitSubtypeDeclaration(context);
         return {};
     }
 
     auto visitSubtype_indication(vhdlParser::Subtype_indicationContext *context) -> std::any override
     {
-        impl.visitSubtypeIndication(context);
+        impl_.visitSubtypeIndication(context);
         return {};
     }
 
     auto visitSuffix(vhdlParser::SuffixContext *context) -> std::any override
     {
-        impl.visitSuffix(context);
+        impl_.visitSuffix(context);
         return {};
     }
 
     auto visitTarget(vhdlParser::TargetContext *context) -> std::any override
     {
-        impl.visitTarget(context);
+        impl_.visitTarget(context);
         return {};
     }
 
     auto visitTerm(vhdlParser::TermContext *context) -> std::any override
     {
-        impl.visitTerm(context);
+        impl_.visitTerm(context);
         return {};
     }
 
     auto visitTerminal_aspect(vhdlParser::Terminal_aspectContext *context) -> std::any override
     {
-        impl.visitTerminalAspect(context);
+        impl_.visitTerminalAspect(context);
         return {};
     }
 
     auto visitTerminal_declaration(vhdlParser::Terminal_declarationContext *context) -> std::any override
     {
-        impl.visitTerminalDeclaration(context);
+        impl_.visitTerminalDeclaration(context);
         return {};
     }
 
     auto visitThrough_aspect(vhdlParser::Through_aspectContext *context) -> std::any override
     {
-        impl.visitThroughAspect(context);
+        impl_.visitThroughAspect(context);
         return {};
     }
 
     auto visitTimeout_clause(vhdlParser::Timeout_clauseContext *context) -> std::any override
     {
-        impl.visitTimeoutClause(context);
+        impl_.visitTimeoutClause(context);
         return {};
     }
 
     auto visitTolerance_aspect(vhdlParser::Tolerance_aspectContext *context) -> std::any override
     {
-        impl.visitToleranceAspect(context);
+        impl_.visitToleranceAspect(context);
         return {};
     }
 
     auto visitType_declaration(vhdlParser::Type_declarationContext *context) -> std::any override
     {
-        impl.visitTypeDeclaration(context);
+        impl_.visitTypeDeclaration(context);
         return {};
     }
 
     auto visitType_definition(vhdlParser::Type_definitionContext *context) -> std::any override
     {
-        impl.visitTypeDefinition(context);
+        impl_.visitTypeDefinition(context);
         return {};
     }
 
     auto visitUnconstrained_array_definition(vhdlParser::Unconstrained_array_definitionContext *context) -> std::any override
     {
-        impl.visitUnconstrainedArrayDefinition(context);
+        impl_.visitUnconstrainedArrayDefinition(context);
         return {};
     }
 
     auto visitUnconstrained_nature_definition(vhdlParser::Unconstrained_nature_definitionContext *context) -> std::any override
     {
-        impl.visitUnconstrainedNatureDefinition(context);
+        impl_.visitUnconstrainedNatureDefinition(context);
         return {};
     }
 
     auto visitUse_clause(vhdlParser::Use_clauseContext *context) -> std::any override
     {
-        impl.visitUseClause(context);
+        impl_.visitUseClause(context);
         return {};
     }
 
     auto visitVariable_assignment_statement(vhdlParser::Variable_assignment_statementContext *context) -> std::any override
     {
-        impl.visitVariableAssignmentStatement(context);
+        impl_.visitVariableAssignmentStatement(context);
         return {};
     }
 
     auto visitVariable_declaration(vhdlParser::Variable_declarationContext *context) -> std::any override
     {
-        impl.visitVariableDeclaration(context);
+        impl_.visitVariableDeclaration(context);
         return {};
     }
 
     auto visitWait_statement(vhdlParser::Wait_statementContext *context) -> std::any override
     {
-        impl.visitWaitStatement(context);
+        impl_.visitWaitStatement(context);
         return {};
     }
 
     auto visitWaveform(vhdlParser::WaveformContext *context) -> std::any override
     {
-        impl.visitWaveform(context);
+        impl_.visitWaveform(context);
         return {};
     }
 
     auto visitWaveform_element(vhdlParser::Waveform_elementContext *context) -> std::any override
     {
-        impl.visitWaveformElement(context);
+        impl_.visitWaveformElement(context);
         return {};
     }
 };
