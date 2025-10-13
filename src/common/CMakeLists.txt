@@ -1,10 +1,14 @@
-file(GLOB_RECURSE CLI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+add_library(common INTERFACE)
 
-add_library(common STATIC ${CLI_SOURCES})
+file(GLOB_RECURSE COMMON_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
+
+target_include_directories(common INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_sources(common INTERFACE FILE_SET HEADERS FILES ${COMMON_HEADERS})
 
 target_link_libraries(
     common
-    PUBLIC
+    INTERFACE
         spdlog::spdlog
         fmt::fmt
 )
