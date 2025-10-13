@@ -9,6 +9,7 @@
     #endif
 #endif
 
+#include <bits/shared_ptr.h>
 #include <fmt/base.h>
 #include <memory>
 #include <spdlog/common.h>

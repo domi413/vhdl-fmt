@@ -13,10 +13,12 @@
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstddef>
+#include <iterator>
 #include <memory>
-#include <numeric>
 #include <optional>
+#include <ranges>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace {

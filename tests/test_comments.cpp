@@ -13,8 +13,10 @@
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <string>
 #include <string_view>
+#include <variant>
 #include <vector>
 
 namespace {

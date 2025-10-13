@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <iterator>
 #include <ranges>
 #include <sstream>
 #include <string_view>
@@ -64,18 +65,15 @@ void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
 
 auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &trailing) -> std::size_t
 {
-    std::size_t total = 0;
-    for (const auto &t : trailing) {
-        std::visit(
-          [&](const auto &val) -> auto {
-              using T = std::decay_t<decltype(val)>;
-              if constexpr (std::is_same_v<T, ast::NewlinesTrivia>) {
-                  total += val.breaks;
-              }
-          },
-          t);
-    }
-    return total;
+    auto newlines = trailing
+                  | std::views::filter([](const ast::Trivia &t) {
+                        return std::holds_alternative<ast::NewlinesTrivia>(t);
+                    })
+                  | std::views::transform([](const ast::Trivia &t) -> const ast::NewlinesTrivia & {
+                        return std::get<ast::NewlinesTrivia>(t);
+                    });
+
+    return std::ranges::distance(newlines);
 }
 
 template<class NodeT>
