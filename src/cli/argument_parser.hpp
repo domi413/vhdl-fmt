@@ -20,19 +20,15 @@ enum class ArgumentFlag : std::uint8_t
 class ArgumentParser final
 {
   public:
-    /// Constructs an ArgumentParser instance and parses the cli arguments
     explicit ArgumentParser(std::span<char *> args);
 
-    /// Returns the path to the config file
     [[nodiscard]]
     auto getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &;
 
-    /// Returns whether a specific flag is set
     [[nodiscard]]
     auto isFlagSet(ArgumentFlag flag) const noexcept -> bool;
 
   private:
-    /// Parses and processes the cli arguments
     auto parseArguments(std::span<char *> args) -> void;
 
     std::optional<std::filesystem::path> config_file_path;

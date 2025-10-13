@@ -22,6 +22,10 @@ namespace cli {
 
 namespace {
 
+//===----------------------------------------------------------------------===//
+// Configuration Mappings
+//===----------------------------------------------------------------------===//
+
 using PortMapMemberPtr = bool common::PortMapConfig::*;
 using DeclarationMemberPtr = bool common::DeclarationConfig::*;
 using CasingMemberPtr = common::CaseStyle common::CasingConfig::*;
@@ -59,6 +63,10 @@ constexpr std::array<std::pair<std::string_view, CasingMemberPtr>, 3> CASING_ASS
     std::pair{ "constants",   &common::CasingConfig::constants   },
     std::pair{ "identifiers", &common::CasingConfig::identifiers },
 };
+
+//===----------------------------------------------------------------------===//
+// Parsing Helpers
+//===----------------------------------------------------------------------===//
 
 /// Helper for constexpr lookup in arrays
 template<typename T, std::size_t N>
@@ -190,6 +198,10 @@ auto ConfigReader::readConfigFile() -> std::expected<common::Config, ConfigReadE
           .message = std::format("Config parsing failed: {}", e.what()) } };
     }
 }
+
+//===----------------------------------------------------------------------===//
+// Config Readers
+//===----------------------------------------------------------------------===//
 
 auto ConfigReader::readLineconfig(const YAML::Node &root_node, const common::LineConfig &defaults)
   -> common::LineConfig
