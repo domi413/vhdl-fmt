@@ -42,17 +42,14 @@ auto commentTexts(const std::vector<ast::Trivia> &tv) -> std::vector<std::string
     std::vector<std::string_view> out;
     out.reserve(tv.size());
 
-    for (const auto &t : tv) {
-        std::visit(
-          [&](const auto &val) -> auto {
-              using T = std::decay_t<decltype(val)>;
-              if constexpr (std::is_same_v<T, ast::CommentTrivia>) {
-                  out.push_back(val.text);
-              }
-          },
-          t);
+    for (const std::string_view sv :
+         tv | std::views::filter([](const ast::Trivia &t) -> bool {
+             return std::holds_alternative<ast::CommentTrivia>(t);
+         }) | std::views::transform([](const ast::Trivia &t) -> std::string_view {
+             return std::get<ast::CommentTrivia>(t).text;
+         })) {
+        out.push_back(sv);
     }
-
     return out;
 }
 

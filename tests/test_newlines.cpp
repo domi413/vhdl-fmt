@@ -10,9 +10,11 @@
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstddef>
 #include <memory>
+#include <numeric>
 #include <optional>
 #include <string>
 #include <vector>
@@ -47,20 +49,24 @@ struct Counts
 auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
 {
     Counts c{};
-    for (const auto &t : tv) {
-        std::visit(
-          [&](const auto &val) -> auto {
-              using T = std::decay_t<decltype(val)>;
 
-              if constexpr (std::is_same_v<T, ast::CommentTrivia>) {
-                  ++c.comments;
-              } else if constexpr (std::is_same_v<T, ast::NewlinesTrivia>) {
-                  ++c.newlines_items;
-                  c.newline_breaks += val.breaks;
-              }
-          },
-          t);
-    }
+    c.comments = std::ranges::count_if(
+      tv, [](const ast::Trivia &t) { return std::holds_alternative<ast::CommentTrivia>(t); });
+
+    auto newlines = tv
+                  | std::views::filter([](const ast::Trivia &t) {
+                        return std::holds_alternative<ast::NewlinesTrivia>(t);
+                    })
+                  | std::views::transform([](const ast::Trivia &t) -> const ast::NewlinesTrivia & {
+                        return std::get<ast::NewlinesTrivia>(t);
+                    });
+
+    c.newlines_items = std::ranges::distance(newlines);
+    c.newline_breaks = std::ranges::fold_left(
+      newlines, std::size_t{ 0 }, [](std::size_t acc, const ast::NewlinesTrivia &nl) {
+          return acc + nl.breaks;
+      });
+
     return c;
 }
 
