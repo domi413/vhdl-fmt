@@ -3,6 +3,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Submodules
 add_subdirectory(ast)
+add_subdirectory(cli)
 add_subdirectory(builder)
 add_subdirectory(common)
 add_subdirectory(emit)
@@ -14,6 +15,7 @@ target_link_libraries(
     vhdl_formatter
     PRIVATE
         ast
+        cli
         builder
         emit
         vhdl_generated
