@@ -13,7 +13,7 @@ namespace builder {
 
 void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t start_idx)
 {
-    const auto &toks = tokens.getTokens();
+    const auto &toks = tokens_.getTokens();
 
     struct Tmp
     {
@@ -59,16 +59,16 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     // Push trivia items in forward order
     for (const auto &e : rev | std::views::reverse) {
         if (e.nl) {
-            newlines.push(dst, /*to_leading=*/true, e.breaks);
+            newlines_.push(dst, /*to_leading=*/true, e.breaks);
         } else {
-            comments.push(dst, /*to_leading=*/true, e.tok);
+            comments_.push(dst, /*to_leading=*/true, e.tok);
         }
     }
 }
 
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 {
-    const auto &toks = tokens.getTokens();
+    const auto &toks = tokens_.getTokens();
     const std::size_t n = toks.size();
 
     std::size_t i = stop.idx + 1;
@@ -83,7 +83,7 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
             break;
         }
         if (isComment(t) && static_cast<std::size_t>(t->getLine()) == stop.line) {
-            comments.push(dst, /*to_leading=*/false, t);
+            comments_.push(dst, /*to_leading=*/false, t);
             continue;
         }
         if (t->getChannel() != vhdlLexer::COMMENTS) {
@@ -102,7 +102,7 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
         breaks += countLineBreaks(t->getText());
     }
 
-    newlines.push(dst, /*to_leading=*/false, breaks);
+    newlines_.push(dst, /*to_leading=*/false, breaks);
 }
 
 void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
