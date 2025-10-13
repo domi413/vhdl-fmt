@@ -30,27 +30,36 @@ void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
     if (p_list == nullptr) {
         return;
     }
-    if (auto *i_p_list = p_list->interface_port_list()) {
-        for (auto *i_p_decl : i_p_list->interface_port_declaration()) {
-            auto &port = translator_.makeSignalPort(i_p_decl);
-            if (auto *s_type = i_p_decl->subtype_indication()) {
-                if (auto *con = s_type->constraint()) {
-                    translator_.into(port.constraints, [&] -> void { dispatch(con); });
-                }
-            }
+    auto *i_p_list = p_list->interface_port_list();
+    if (i_p_list == nullptr) {
+        return;
+    }
+    for (auto *i_p_decl : i_p_list->interface_port_declaration()) {
+        auto &port = translator_.makeSignalPort(i_p_decl);
+
+        auto *s_type = i_p_decl->subtype_indication();
+        if (s_type == nullptr) {
+            continue;
+        }
+        if (auto *con = s_type->constraint()) {
+            translator_.into(port.constraints, [&] -> void { dispatch(con); });
         }
     }
 }
 
 void Visitor::visitConstraint(vhdlParser::ConstraintContext *ctx)
 {
-    if (auto *i_con = ctx->index_constraint()) {
-        for (auto *d_range : i_con->discrete_range()) {
-            if (auto *r_decl = d_range->range_decl()) {
-                if (auto *erange = r_decl->explicit_range()) {
-                    translator_.makeRange(erange);
-                }
-            }
+    auto *i_con = ctx->index_constraint();
+    if (i_con == nullptr) {
+        return;
+    }
+    for (auto *d_range : i_con->discrete_range()) {
+        auto *r_decl = d_range->range_decl();
+        if (r_decl == nullptr) {
+            return;
+        }
+        if (auto *erange = r_decl->explicit_range()) {
+            translator_.makeRange(erange);
         }
     }
 }
