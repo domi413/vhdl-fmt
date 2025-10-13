@@ -15,6 +15,7 @@ target_link_libraries(
     vhdl_formatter
     PRIVATE
         ast
+        common
         cli
         builder
         emit
