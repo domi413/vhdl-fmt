@@ -32,7 +32,7 @@ class TriviaBinder
     struct StopInfo
     {
         std::size_t idx;
-        int line;
+        std::size_t line;
     };
 
     antlr4::CommonTokenStream &tokens;

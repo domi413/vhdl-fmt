@@ -107,9 +107,9 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     }
 
     auto &cm = node.getComments();
-    const auto start_idx = static_cast<std::size_t>(ctx->getStart()->getTokenIndex());
-    const StopInfo stop{ .idx = static_cast<std::size_t>(ctx->getStop()->getTokenIndex()),
-                         .line = static_cast<int>(ctx->getStop()->getLine()) };
+    const auto start_idx = ctx->getStart()->getTokenIndex();
+    const StopInfo stop{ .idx = ctx->getStop()->getTokenIndex(),
+                         .line = ctx->getStop()->getLine() };
 
     collectLeading(cm, start_idx);
     collectTrailing(cm, stop);
