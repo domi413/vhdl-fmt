@@ -5,6 +5,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(ast)
 add_subdirectory(cli)
 add_subdirectory(builder)
+add_subdirectory(common)
 add_subdirectory(emit)
 
 # Main executable
