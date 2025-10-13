@@ -1,61 +1,69 @@
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
-#include "ast/nodes/design_file.hpp"
-#include "builder/adapter/antlr_void_adapter.hpp"
-#include "builder/assembly/assembler.hpp"
-#include "builder/translator.hpp"
-#include "builder/visitor.hpp"
-#include "emit/debug_printer.hpp"
-#include "vhdlLexer.h"
-#include "vhdlParser.h"
+// #include "ANTLRInputStream.h"
+// #include "CommonTokenStream.h"
+// #include "ast/nodes/design_file.hpp"
+// #include "builder/assembly/assembler.hpp"
+// #include "builder/translator.hpp"
+// #include "builder/visitor.hpp"
+#include "cli/argument_parser.hpp"
+#include "cli/config_reader.hpp"
+// #include "emit/debug_printer.hpp"
+// #include "vhdlLexer.h"
+// #include "vhdlParser.h"
 
 #include <cstddef>
-#include <filesystem>
-#include <fstream>
+#include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <span>
-#include <sstream>
 
+/// The main entry point of the program
 auto main(int argc, char *argv[]) -> int
 {
-    const std::span args(argv, static_cast<std::size_t>(argc));
+    try {
+        const cli::ArgumentParser argparser{
+            std::span<char *>{ argv, static_cast<std::size_t>(argc) }
+        };
 
-    if (args.size() < 2) {
-        std::cerr << "Usage: vhdl_formatter <file.vhdl>\n";
-        return 1;
+        const cli::ConfigReader config_reader{ argparser.getConfigPath() };
+
+        // Call the formatter and pass the flag status & config object
+        // formatter{ argparser.getFlags(), config_reader.readConfigFile() };
+
+        /* NOTE: The following code is from the previous main function
+
+           std::stringstream buffer;
+           buffer << in.rdbuf();
+
+           antlr4::ANTLRInputStream input(buffer.str());
+           vhdlLexer lexer(&input);
+           antlr4::CommonTokenStream tokens(&lexer);
+           tokens.fill();
+
+           vhdlParser parser(&tokens);
+           auto *tree = parser.design_file();
+
+           //--- AST construction pipeline ---
+           ast::DesignFile root;
+           builder::Assembler builder(root.units);
+
+           builder::Translator translator(builder, tokens);
+
+           builder::Visitor visitor(translator);
+           visitor.walk(tree);
+
+           std::cout << tree->toStringTree(&parser, true) << "\n\n";
+
+           emit::DebugPrinter printer;
+           root.accept(printer);
+        */
+
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << '\n';
+        return EXIT_FAILURE;
+    } catch (...) {
+        std::cerr << "Unknown error occurred." << '\n';
+        return EXIT_FAILURE;
     }
 
-    const std::filesystem::path path{ args[1] };
-    const std::ifstream in(path);
-    if (!in) {
-        std::cerr << "Could not open input file: " << path << '\n';
-        return 1;
-    }
-
-    std::stringstream buffer;
-    buffer << in.rdbuf();
-
-    antlr4::ANTLRInputStream input(buffer.str());
-    vhdlLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    tokens.fill();
-
-    vhdlParser parser(&tokens);
-    auto *tree = parser.design_file();
-
-    //--- AST construction pipeline ---
-    ast::DesignFile root;
-    builder::Assembler assembler(root.units);
-    builder::Translator translator(assembler, tokens);
-    builder::Visitor visitor(translator);
-    builder::adapter::AntlrVoidAdapter adapter(visitor);
-
-    tree->accept(&adapter);
-
-    // std::cout << tree->toStringTree(&parser, true) << "\n\n";
-
-    emit::DebugPrinter printer(std::cout);
-    root.accept(printer);
-
-    return 0;
+    return EXIT_SUCCESS;
 }

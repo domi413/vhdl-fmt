@@ -13,7 +13,7 @@ Checks: >
   -readability-identifier-length,
 
 CheckOptions:
-  # Types start with upper case (PascalCase): MyClass
+  # Types use PascalCase: MyClass
   - key: readability-identifier-naming.ClassCase
     value: "CamelCase"
   - key: readability-identifier-naming.StructCase
@@ -27,7 +27,7 @@ CheckOptions:
   - key: readability-identifier-naming.UnionCase
     value: "CamelCase"
 
-  # Functions and variables start with lower case (camelStyle): myMethod
+  # Functions and variables use camelCase: myMethod
   - key: readability-identifier-naming.FunctionCase
     value: "camelBack"
   - key: readability-identifier-naming.MethodCase
@@ -36,26 +36,21 @@ CheckOptions:
   # Constants names use upper case with underscores: const int TIMEOUT_MS = 100
   - key: readability-identifier-naming.GlobalConstantCase
     value: "UPPER_CASE"
-
   - key: readability-identifier-naming.ConstexprVariableCase
     value: "UPPER_CASE"
-
-  # Macro names use upper case with underscores: INT_MAX
-  - key: readability-identifier-naming.MacroDefinitionCase
+  - key: readability-identifier-naming.EnumConstantCase
     value: "UPPER_CASE"
 
   # Template parameter names use PascalCase: InputIterator
   - key: readability-identifier-naming.TemplateParameterCase
     value: "CamelCase"
 
-  # All other names use snake case: unordered_map
+  # All other names use snake case: config_value
   - key: readability-identifier-naming.StaticConstantCase
     value: "lower_case"
   - key: readability-identifier-naming.ConstantCase
     value: "lower_case"
   - key: readability-identifier-naming.NamespaceCase
-    value: "lower_case"
-  - key: readability-identifier-naming.EnumConstantCase
     value: "lower_case"
   - key: readability-identifier-naming.ParameterCase
     value: "lower_case"
@@ -63,3 +58,9 @@ CheckOptions:
     value: "lower_case"
   - key: readability-identifier-naming.MemberCase
     value: "lower_case"
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: "lower_case"
+    # - key: "readability-identifier-naming.PrivateMemberSuffix"  # TODO: UNCOMMENT!!!!
+    #   value: "_"
+
+# TODO: renamed some variables to _t because of shadowing

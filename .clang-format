@@ -1,12 +1,13 @@
 ---
 AlignAfterOpenBracket: Align
-AlignArrayOfStructures: Right
+AlignArrayOfStructures: Left
 AlignEscapedNewlines: Left
 AlignOperands: AlignAfterOperator
 AllowShortLoopsOnASingleLine: true
 AlwaysBreakAfterDefinitionReturnType: None
 BasedOnStyle: Mozilla
 BinPackParameters: false
+BreakAfterAttributes: Always
 BreakAfterReturnType: None
 BreakBeforeBinaryOperators: true
 BreakBinaryOperations: OnePerLine
