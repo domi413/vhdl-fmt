@@ -1,0 +1,96 @@
+#ifndef COMMON_LOGGER_HPP
+#define COMMON_LOGGER_HPP
+
+#ifndef SPDLOG_ACTIVE_LEVEL
+    #ifdef NDEBUG
+        #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
+    #else
+        #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+    #endif
+#endif
+
+#include <fmt/base.h>
+#include <memory>
+#include <spdlog/common.h>
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
+#include <utility>
+
+namespace common {
+
+/// Singleton logger wrapper around spdlog
+class Logger final
+{
+  public:
+    /// Get the singleton logger instance
+    static auto instance() -> Logger &
+    {
+        static Logger instance;
+        return instance;
+    }
+
+    Logger(const Logger &) = delete;
+    auto operator=(const Logger &) -> Logger & = delete;
+    Logger(Logger &&) = delete;
+    auto operator=(Logger &&) -> Logger & = delete;
+    ~Logger() = default;
+
+    template<typename... Args>
+    void trace([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    {
+        SPDLOG_LOGGER_TRACE(logger_t, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void debug([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    {
+        SPDLOG_LOGGER_DEBUG(logger_t, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void info([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    {
+        SPDLOG_LOGGER_INFO(logger_t, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void warn([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    {
+        SPDLOG_LOGGER_WARN(logger_t, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void error([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    {
+        SPDLOG_LOGGER_ERROR(logger_t, fmt, std::forward<Args>(args)...);
+    }
+
+    template<typename... Args>
+    void critical([[maybe_unused]] fmt::format_string<Args...> fmt, [[maybe_unused]] Args &&...args)
+    {
+        SPDLOG_LOGGER_CRITICAL(logger_t, fmt, std::forward<Args>(args)...);
+    }
+
+  private:
+    Logger() :
+      logger_t([] {
+          auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+          console_sink->set_level(static_cast<spdlog::level::level_enum>(SPDLOG_ACTIVE_LEVEL));
+          console_sink->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] %v");
+
+          auto logger = std::make_shared<spdlog::logger>("", console_sink);
+          logger->set_level(console_sink->level());
+          logger->flush_on(spdlog::level::err);
+
+          return logger;
+      }())
+    {
+    }
+
+    std::shared_ptr<spdlog::logger> logger_t;
+};
+
+} // namespace common
+
+#endif /* COMMON_LOGGER_HPP */

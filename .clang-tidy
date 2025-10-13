@@ -62,3 +62,5 @@ CheckOptions:
     value: "lower_case"
     # - key: "readability-identifier-naming.PrivateMemberSuffix"  # TODO: UNCOMMENT!!!!
     #   value: "_"
+
+# TODO: renamed some variables to _t because of shadowing

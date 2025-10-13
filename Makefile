@@ -52,14 +52,32 @@ LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
 LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
+# Default to linting both sources and headers
+SOURCES_TO_LINT := $(SOURCES)
+ifeq ($(LINT_FILES),source)
+    SOURCES_TO_LINT := $(shell find src tests -name '*.cpp')
+endif
+
+ifeq ($(LINT_FILES),header)
+    SOURCES_TO_LINT := $(shell find src tests -name '*.hpp')
+endif
+
+# make lint LINT_FILES=header/source to lint either headers or sources
 lint:
-	@echo "Running clang-tidy on source files..."
-	@run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES)
-
-	@echo "Running clang-tidy on headers..."
-	@echo "$(SOURCES)" | \
-	xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS)
-
+	@if [ -z "$(SOURCES_TO_LINT)" ]; then \
+		echo "No files to lint (LINT_FILES='$(LINT_FILES)')."; \
+	else \
+		if [ "$(LINT_FILES)" != "header" ]; then \
+			echo "Running clang-tidy on source files..."; \
+		fi; \
+		run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES_TO_LINT); \
+		 \
+		if [ "$(LINT_FILES)" = "header" ] || [ -z "$(LINT_FILES)" ]; then \
+			echo "Running clang-tidy on headers..."; \
+			echo "$(SOURCES_TO_LINT)" | \
+			xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS); \
+		fi; \
+	fi
 	@echo "✓ Linting complete"
 
 
