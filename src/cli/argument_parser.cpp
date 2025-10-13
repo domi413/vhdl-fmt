@@ -33,12 +33,12 @@ ArgumentParser::ArgumentParser(std::span<char *> args)
 
 auto ArgumentParser::getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &
 {
-    return config_file_path;
+    return config_file_path_;
 }
 
 auto ArgumentParser::isFlagSet(ArgumentFlag flag) const noexcept -> bool
 {
-    return used_flags.test(static_cast<std::size_t>(flag));
+    return used_flags_.test(static_cast<std::size_t>(flag));
 }
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
@@ -77,7 +77,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
                 std::format("Configuration path is not a regular file: {}", location));
           }
 
-          config_file_path = std::filesystem::canonical(config_path);
+          config_file_path_ = std::filesystem::canonical(config_path);
           return location;
       });
 
@@ -94,8 +94,8 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 
         program.parse_args(c_args);
 
-        used_flags.set(static_cast<std::size_t>(ArgumentFlag::WRITE), program.is_used(FLAG_WRITE));
-        used_flags.set(static_cast<std::size_t>(ArgumentFlag::CHECK), program.is_used(FLAG_CHECK));
+        used_flags_.set(static_cast<std::size_t>(ArgumentFlag::WRITE), program.is_used(FLAG_WRITE));
+        used_flags_.set(static_cast<std::size_t>(ArgumentFlag::CHECK), program.is_used(FLAG_CHECK));
 
     } catch (const std::exception &err) {
         std::cerr << std::format("Error parsing arguments: {}\n", err.what());

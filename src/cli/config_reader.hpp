@@ -24,7 +24,7 @@ class ConfigReader final
 {
   public:
     explicit ConfigReader(std::optional<std::filesystem::path> config_file_path) :
-      config_file_path_t(std::move(config_file_path))
+      config_file_path_(std::move(config_file_path))
     {
     }
 
@@ -58,7 +58,7 @@ class ConfigReader final
     static auto readCasingConfig(const YAML::Node &root_node, const common::CasingConfig &defaults)
       -> common::CasingConfig;
 
-    std::optional<std::filesystem::path> config_file_path_t;
+    std::optional<std::filesystem::path> config_file_path_;
 };
 
 } // namespace cli

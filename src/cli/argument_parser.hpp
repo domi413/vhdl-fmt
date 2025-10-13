@@ -31,8 +31,8 @@ class ArgumentParser final
   private:
     auto parseArguments(std::span<char *> args) -> void;
 
-    std::optional<std::filesystem::path> config_file_path;
-    std::bitset<static_cast<std::size_t>(ArgumentFlag::FLAG_COUNT)> used_flags;
+    std::optional<std::filesystem::path> config_file_path_;
+    std::bitset<static_cast<std::size_t>(ArgumentFlag::FLAG_COUNT)> used_flags_;
 };
 
 } // namespace cli
