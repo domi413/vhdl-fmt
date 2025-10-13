@@ -77,8 +77,6 @@ jobs:
     timeout-minutes: 10
     container:
       image: archlinux:base-devel
-    env:
-      HOME: /github/home
 
     if: ${{ !github.event.pull_request.draft }}
 
