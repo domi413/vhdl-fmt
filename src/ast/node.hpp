@@ -46,16 +46,17 @@ struct Node
     virtual void accept(Visitor &v) const = 0;
 
     /// @brief Create and return this node’s comment block.
-    auto getComments() -> NodeComments & { return comments.emplace(); }
+    auto getComments() -> NodeComments & { return comments_.emplace(); }
 
     /// @brief Return attached comments if present.
-    [[nodiscard]] auto tryGetComments() const -> const std::optional<NodeComments> &
+    [[nodiscard]]
+    auto tryGetComments() const -> const std::optional<NodeComments> &
     {
-        return comments;
+        return comments_;
     }
 
   private:
-    std::optional<NodeComments> comments;
+    std::optional<NodeComments> comments_;
 };
 
 } // namespace ast
