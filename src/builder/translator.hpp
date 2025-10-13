@@ -18,9 +18,7 @@ class Translator
 {
   public:
     /// @brief Construct a translator bound to an assembler and token stream.
-    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder_(b), tokens_(ts), trivia_(ts)
-    {
-    }
+    Translator(Assembler &b, antlr4::CommonTokenStream &ts) : builder(b), tokens(ts), trivia(ts) {}
     ~Translator() = default;
 
     Translator(const Translator &) = delete;
@@ -32,20 +30,20 @@ class Translator
     template<typename Vec, typename Fn>
     void into(Vec &vec, Fn &&fn)
     {
-        builder_.into(vec, std::forward<Fn>(fn));
+        builder.into(vec, std::forward<Fn>(fn));
     }
 
   private:
-    Assembler &builder_;                ///< Active assembler used for node creation.
-    antlr4::CommonTokenStream &tokens_; ///< Token stream for comment attachment.
-    TriviaBinder trivia_;               ///< Trivia binder for attaching trivia to nodes.
+    Assembler &builder;                ///< Active assembler used for node creation.
+    antlr4::CommonTokenStream &tokens; ///< Token stream for comment attachment.
+    TriviaBinder trivia;               ///< Trivia binder for attaching trivia to nodes.
 
     /// @brief Create and register a node, attaching relevant comments.
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
-        auto &node{ builder_.spawn<T>() };
-        trivia_.bind(node, ctx);
+        auto &node{ builder.spawn<T>() };
+        trivia.bind(node, ctx);
         return node;
     }
 

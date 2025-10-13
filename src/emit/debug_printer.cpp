@@ -20,13 +20,13 @@ namespace emit {
 
 void DebugPrinter::printIndent() const
 {
-    out_ << std::string(static_cast<std::uint8_t>(indent_ * 2), ' ');
+    out << std::string(static_cast<std::uint8_t>(indent * 2), ' ');
 }
 
 void DebugPrinter::printLine(std::string_view s) const
 {
     printIndent();
-    out_ << s << '\n';
+    out << s << '\n';
 }
 
 void DebugPrinter::printNodeHeader(const ast::Node &n,
@@ -35,30 +35,30 @@ void DebugPrinter::printNodeHeader(const ast::Node &n,
                                    std::size_t trailing_breaks) const
 {
     printIndent();
-    out_ << (!name_override.empty() ? std::string{ name_override } : typeid(n).name());
+    out << (!name_override.empty() ? std::string{ name_override } : typeid(n).name());
     if (!extra.empty()) {
-        out_ << " [" << extra << "]";
+        out << " [" << extra << "]";
     }
     if (trailing_breaks > 0U) {
-        out_ << " (" << trailing_breaks << R"([\n]))";
+        out << " (" << trailing_breaks << R"([\n]))";
     }
-    out_ << '\n';
+    out << '\n';
 }
 
 void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
                                      std::string_view prefix) const
 {
-    for (const std::string_view sv :
-         tv | std::views::filter([](const ast::Trivia &t) -> bool {
+    for (std::string_view sv :
+         tv | std::views::filter([](const ast::Trivia &t) {
              return std::holds_alternative<ast::CommentTrivia>(t);
          }) | std::views::transform([](const ast::Trivia &t) -> std::string_view {
              return std::get<ast::CommentTrivia>(t).text;
          })) {
         printIndent();
         if (!prefix.empty()) {
-            out_ << prefix;
+            out << prefix;
         }
-        out_ << sv << '\n';
+        out << sv << '\n';
     }
 }
 
@@ -67,7 +67,7 @@ auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &trailing) -> st
     std::size_t total = 0;
     for (const auto &t : trailing) {
         std::visit(
-          [&](const auto &val) -> auto {
+          [&](const auto &val) {
               using T = std::decay_t<decltype(val)>;
               if constexpr (std::is_same_v<T, ast::NewlinesTrivia>) {
                   total += val.breaks;
@@ -91,7 +91,7 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
 
     // 2) Under the node, show leading comments, then trailing inline comments.
     if (maybe.has_value()) {
-        const IndentGuard _{ indent_ };
+        const IndentGuard _{ indent };
         printCommentLines(maybe->leading, /*prefix=*/"(^) ");
         printCommentLines(maybe->trailing, /*prefix=*/"(>) ");
     }
@@ -102,7 +102,7 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
 void DebugPrinter::visit(const ast::DesignFile &node)
 {
     emitNodeLike(node, "DesignFile", /*extra=*/"");
-    const IndentGuard _{ indent_ };
+    const IndentGuard _{ indent };
     walk(node);
 }
 
@@ -110,11 +110,11 @@ void DebugPrinter::visit(const ast::Entity &node)
 {
     emitNodeLike(node, "Entity", node.name);
 
-    const IndentGuard _{ indent_ };
+    const IndentGuard _{ indent };
     // Children sections
     printLine("Generics:");
     {
-        const IndentGuard _{ indent_ };
+        const IndentGuard _{ indent };
         for (const auto &g : node.generics) {
             if (g) {
                 g->accept(*this);
@@ -123,7 +123,7 @@ void DebugPrinter::visit(const ast::Entity &node)
     }
     printLine("Ports:");
     {
-        const IndentGuard _{ indent_ };
+        const IndentGuard _{ indent };
         for (const auto &p : node.ports) {
             if (p) {
                 p->accept(*this);
@@ -163,7 +163,7 @@ void DebugPrinter::visit(const ast::Port &node)
 
     emitNodeLike(node, "Port", oss.str());
 
-    const IndentGuard _{ indent_ };
+    const IndentGuard _{ indent };
     walk(node);
 }
 

@@ -36,18 +36,18 @@ template<typename ElemT>
 struct Sink : ISink
 {
     /// @brief Bind this sink to an external node container.
-    explicit Sink(std::vector<std::unique_ptr<ElemT>> &v) : vec_(v) {}
+    explicit Sink(std::vector<std::unique_ptr<ElemT>> &v) : vec(v) {}
 
     /// @brief Store a node in the bound container after casting.
     void push(std::unique_ptr<ast::Node> n) override
     {
         auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));
-        vec_.push_back(std::move(casted));
+        vec.push_back(std::move(casted));
     }
 
   private:
     /// @brief Reference to the target container.
-    std::vector<std::unique_ptr<ElemT>> &vec_;
+    std::vector<std::unique_ptr<ElemT>> &vec;
 };
 
 } // namespace builder

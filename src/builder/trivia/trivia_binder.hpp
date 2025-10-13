@@ -22,7 +22,7 @@ namespace builder {
 class TriviaBinder
 {
   public:
-    explicit TriviaBinder(antlr4::CommonTokenStream &ts) noexcept : tokens_(ts) {}
+    explicit TriviaBinder(antlr4::CommonTokenStream &ts) noexcept : tokens(ts) {}
 
     ~TriviaBinder() = default;
 
@@ -41,20 +41,20 @@ class TriviaBinder
         std::size_t line{};
     };
 
-    antlr4::CommonTokenStream &tokens_;
-    CommentSink comments_;
-    NewlineSink newlines_;
+    antlr4::CommonTokenStream &tokens;
+    CommentSink comments;
+    NewlineSink newlines;
 
     [[nodiscard]]
     static constexpr auto isComment(const antlr4::Token *t) noexcept -> bool
     {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::COMMENT;
+        return (t != nullptr) && t->getChannel() == vhdlLexer::COMMENTS;
     }
 
     [[nodiscard]]
     static constexpr auto isNewline(const antlr4::Token *t) noexcept -> bool
     {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::NEWLINE;
+        return (t != nullptr) && t->getChannel() == vhdlLexer::NEWLINES;
     }
 
     [[nodiscard]]

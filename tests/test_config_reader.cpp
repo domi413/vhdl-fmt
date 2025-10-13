@@ -23,11 +23,11 @@ class ScopeExit
     ScopeExit(ScopeExit &&) = delete;
     auto operator=(const ScopeExit &) -> ScopeExit & = delete;
     auto operator=(ScopeExit &&) -> ScopeExit & = delete;
-    explicit ScopeExit(F func) : func_(std::move(func)) {}
-    ~ScopeExit() { func_(); }
+    explicit ScopeExit(F func) : func(std::move(func)) {}
+    ~ScopeExit() { func(); }
 
   private:
-    F func_;
+    F func;
 };
 
 template<typename F>
@@ -147,7 +147,7 @@ SCENARIO("ConfigReader handles configuration file reading")
         std::filesystem::create_directories(temp_dir);
         std::filesystem::current_path(temp_dir);
 
-        auto cleanup_guard = makeScopeExit([&] -> void {
+        auto cleanup_guard = makeScopeExit([&] {
             std::filesystem::current_path(original_path);
             std::filesystem::remove_all(temp_dir);
         });
@@ -200,7 +200,7 @@ SCENARIO("ConfigReader handles configuration file reading")
                 temp_file << content;
             }
 
-            auto cleanup_guard = makeScopeExit([&] -> void { std::filesystem::remove(temp_path); });
+            auto cleanup_guard = makeScopeExit([&] { std::filesystem::remove(temp_path); });
 
             cli::ConfigReader reader{ temp_path };
             const auto result = reader.readConfigFile();
@@ -243,7 +243,7 @@ SCENARIO("ConfigReader handles configuration file reading")
                 temp_file << content;
             }
 
-            auto cleanup_guard = makeScopeExit([&] -> void { std::filesystem::remove(temp_path); });
+            auto cleanup_guard = makeScopeExit([&] { std::filesystem::remove(temp_path); });
 
             cli::ConfigReader reader{ temp_path };
             const auto result = reader.readConfigFile();

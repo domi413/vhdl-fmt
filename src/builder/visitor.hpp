@@ -13,11 +13,11 @@ namespace builder {
 /// to the associated `Translator`. Contains traversal logic only.
 class Visitor : public adapter::BaseVoidVisitor
 {
-    Translator &translator_; ///< Translator used for node creation.
+    Translator &translator; ///< Translator used for node creation.
 
   public:
     /// @brief Create a visitor bound to a translator.
-    explicit Visitor(Translator &t) : translator_(t) {}
+    explicit Visitor(Translator &t) : translator(t) {}
 
     ~Visitor() override = default;
     Visitor(const Visitor &) = delete;
