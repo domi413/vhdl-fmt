@@ -42,7 +42,7 @@ struct Sink : ISink
     void push(std::unique_ptr<ast::Node> n) override
     {
         auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));
-        vec_.push_back(std::move(casted));
+        vec_.emplace_back(std::move(casted));
     }
 
   private:

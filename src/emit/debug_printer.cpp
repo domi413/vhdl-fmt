@@ -49,24 +49,21 @@ void DebugPrinter::printNodeHeader(const ast::Node &n,
 void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
                                      std::string_view prefix) const
 {
-    for (const std::string_view sv :
-         tv | std::views::filter([](const ast::Trivia &t) -> bool {
-             return std::holds_alternative<ast::CommentTrivia>(t);
-         }) | std::views::transform([](const ast::Trivia &t) -> std::string_view {
-             return std::get<ast::CommentTrivia>(t).text;
-         })) {
-        printIndent();
-        if (!prefix.empty()) {
-            out_ << prefix;
+    for (const auto &t : tv) {
+        if (const auto *comment = std::get_if<ast::CommentTrivia>(&t)) {
+            printIndent();
+            if (!prefix.empty()) {
+                out_ << prefix;
+            }
+            out_ << comment->text << '\n';
         }
-        out_ << sv << '\n';
     }
 }
 
 auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &trailing) -> std::size_t
 {
     auto newlines = trailing
-                  | std::views::filter([](const ast::Trivia &t) {
+                  | std::views::filter([](const ast::Trivia &t) -> bool {
                         return std::holds_alternative<ast::NewlinesTrivia>(t);
                     })
                   | std::views::transform([](const ast::Trivia &t) -> const ast::NewlinesTrivia & {

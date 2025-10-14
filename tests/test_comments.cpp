@@ -35,24 +35,21 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     builder::Translator translator(assembler, tokens);
     builder::Visitor visitor(translator);
     builder::adapter::AntlrVoidAdapter adapter(visitor);
+
     tree->accept(&adapter);
     return design;
 }
 
 auto commentTexts(const std::vector<ast::Trivia> &tv) -> std::vector<std::string_view>
 {
-    std::vector<std::string_view> out;
-    out.reserve(tv.size());
-
-    for (const std::string_view sv :
-         tv | std::views::filter([](const ast::Trivia &t) -> bool {
-             return std::holds_alternative<ast::CommentTrivia>(t);
-         }) | std::views::transform([](const ast::Trivia &t) -> std::string_view {
-             return std::get<ast::CommentTrivia>(t).text;
-         })) {
-        out.push_back(sv);
-    }
-    return out;
+    return tv
+         | std::views::filter([](const ast::Trivia &t) -> bool {
+               return std::holds_alternative<ast::CommentTrivia>(t);
+           })
+         | std::views::transform([](const ast::Trivia &t) -> std::string_view {
+               return std::get<ast::CommentTrivia>(t).text;
+           })
+         | std::ranges::to<std::vector<std::string_view>>();
 }
 
 } // namespace

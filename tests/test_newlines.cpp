@@ -50,26 +50,15 @@ struct Counts
 
 auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
 {
-    Counts c{};
-
-    c.comments = std::ranges::count_if(
-      tv, [](const ast::Trivia &t) { return std::holds_alternative<ast::CommentTrivia>(t); });
-
-    auto newlines = tv
-                  | std::views::filter([](const ast::Trivia &t) {
-                        return std::holds_alternative<ast::NewlinesTrivia>(t);
-                    })
-                  | std::views::transform([](const ast::Trivia &t) -> const ast::NewlinesTrivia & {
-                        return std::get<ast::NewlinesTrivia>(t);
-                    });
-
-    c.newlines_items = std::ranges::distance(newlines);
-    c.newline_breaks = std::ranges::fold_left(
-      newlines, std::size_t{ 0 }, [](std::size_t acc, const ast::NewlinesTrivia &nl) {
-          return acc + nl.breaks;
-      });
-
-    return c;
+    return std::ranges::fold_left(tv, Counts{}, [](Counts c, const ast::Trivia &t) -> Counts {
+        if (std::holds_alternative<ast::CommentTrivia>(t)) {
+            ++c.comments;
+        } else if (const auto *nl = std::get_if<ast::NewlinesTrivia>(&t)) {
+            ++c.newlines_items;
+            c.newline_breaks += nl->breaks;
+        }
+        return c;
+    });
 }
 
 } // namespace
