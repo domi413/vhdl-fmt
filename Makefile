@@ -11,6 +11,12 @@ BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 SOURCES := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
 SOURCES_CMAKE := $(shell find src tests . -name 'CMakeLists.txt')
 
+ifeq ($(wildcard venv/bin),venv/bin)
+	VENV_BIN := venv/bin/
+else
+	VENV_BIN :=
+endif
+
 all: $(BUILD_STAMP)
 
 $(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
@@ -22,7 +28,7 @@ $(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
 
 $(CONAN_STAMP): conanfile.txt
 	@echo "Running Conan ($(BUILD_TYPE))..."
-	@conan install . \
+	@$(VENV_BIN)conan install . \
 		-pr=clang.profile \
 		--build=missing \
 		-s build_type=$(BUILD_TYPE)
@@ -82,7 +88,7 @@ GERMESI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-comman
 
 check-format:
 	@echo "Checking code formatting..."
-	@if clang-format --dry-run --Werror $(SOURCES) && gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
+	@$(VENV_BIN)if clang-format --dry-run --Werror $(SOURCES) && gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
@@ -91,7 +97,7 @@ check-format:
 format:
 	@echo "Formatting code..."
 	@clang-format -i $(SOURCES)
-	@gersemi -i $(GERMESI_FLAGS) $(SOURCES_CMAKE)
+	@$(VENV_BIN)gersemi -i $(GERMESI_FLAGS) $(SOURCES_CMAKE)
 	@echo "✓ Code formatting complete"
 
 sort-dictionary:
