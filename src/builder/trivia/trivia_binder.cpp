@@ -11,7 +11,7 @@
 
 namespace builder {
 
-void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t start_idx)
+void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t start_index)
 {
     constexpr std::size_t BLANK_LINE_BOUNDARY{ 2 };
 
@@ -27,8 +27,8 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     std::vector<Tmp> reverse{};
     std::size_t new_line_count{ 0 };
 
-    // Iterate backward from start_idx, collecting comment and newline tokens.
-    for (const auto i : std::views::iota(std::size_t{ 0 }, start_idx) | std::views::reverse) {
+    // Iterate backward from start_index, collecting comment and newline tokens.
+    for (const auto i : std::views::iota(std::size_t{ 0 }, start_index) | std::views::reverse) {
 
         const antlr4::Token *const token = tokens[i];
         if (token == nullptr) {
@@ -73,7 +73,7 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
     const std::vector<antlr4::Token *> &tokens = tokens_.getTokens();
     const std::size_t tokens_size = tokens.size();
 
-    std::size_t i = stop.idx + 1;
+    std::size_t i = stop.index + 1;
 
     // Collect trailing comments that appear on the same line as the stop token
     for (; i < tokens_size; ++i) {
@@ -97,11 +97,11 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
     // Collect subsequent newline tokens
     std::size_t breaks = 0;
     for (; i < tokens_size; ++i) {
-        const antlr4::Token *const t = tokens[i];
-        if ((t == nullptr) || !isNewline(t)) {
+        const antlr4::Token *const token = tokens[i];
+        if ((token == nullptr) || !isNewline(token)) {
             break;
         }
-        breaks += countLineBreaks(t->getText());
+        breaks += countLineBreaks(token->getText());
     }
 
     newlines_.push(dst, /*to_leading=*/false, breaks);
@@ -115,11 +115,11 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
 
     auto &comment = node.getComments();
 
-    const auto start_idx = ctx->getStart()->getTokenIndex();
-    const StopInfo stop{ .idx = ctx->getStop()->getTokenIndex(),
+    const auto start_index = ctx->getStart()->getTokenIndex();
+    const StopInfo stop{ .index = ctx->getStop()->getTokenIndex(),
                          .line = ctx->getStop()->getLine() };
 
-    collectLeading(comment, start_idx);
+    collectLeading(comment, start_index);
     collectTrailing(comment, stop);
 }
 

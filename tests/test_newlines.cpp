@@ -90,7 +90,7 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
 
     if (std::holds_alternative<ast::NewlinesTrivia>(lead[1])) {
         const auto &nl = std::get<ast::NewlinesTrivia>(lead[1]);
-        REQUIRE(nl.breaks >= 1);
+        REQUIRE(nl.breaks == 2); // 2 breaks = 1 blank line
     }
 }
 

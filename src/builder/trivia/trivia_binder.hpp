@@ -37,7 +37,7 @@ class TriviaBinder
   private:
     struct StopInfo
     {
-        std::size_t idx{};
+        std::size_t index{};
         std::size_t line{};
     };
 
@@ -64,7 +64,7 @@ class TriviaBinder
         return std::max<std::size_t>(1, n);
     }
 
-    void collectLeading(ast::Node::NodeComments &dst, std::size_t start_idx);
+    void collectLeading(ast::Node::NodeComments &dst, std::size_t start_index);
     void collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop);
 };
 
