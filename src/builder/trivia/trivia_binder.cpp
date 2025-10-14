@@ -68,16 +68,15 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     }
 }
 
-// FIXME(-):
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 {
-    const auto &tokens = tokens_.getTokens();
-    const std::size_t token_size = tokens.size();
+    const std::vector<antlr4::Token *> &tokens = tokens_.getTokens();
+    const std::size_t tokens_size = tokens.size();
 
     std::size_t i = stop.idx + 1;
 
     // Collect trailing comments that appear on the same line as the stop token
-    for (; i < token_size; ++i) {
+    for (; i < tokens_size; ++i) {
         const antlr4::Token *const token = tokens[i];
         if (token == nullptr) {
             break;
@@ -96,15 +95,14 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
     }
 
     // Collect subsequent newline tokens
-    const std::size_t breaks = 0;
-    // dead code?
-    // for (; i < n; ++i) {
-    //     const antlr4::Token *const t = toks[i];
-    //     if ((t == nullptr) || !isNewline(t)) {
-    //         break;
-    //     }
-    //     breaks += countLineBreaks(t->getText());
-    // }
+    std::size_t breaks = 0;
+    for (; i < tokens_size; ++i) {
+        const antlr4::Token *const t = tokens[i];
+        if ((t == nullptr) || !isNewline(t)) {
+            break;
+        }
+        breaks += countLineBreaks(t->getText());
+    }
 
     newlines_.push(dst, /*to_leading=*/false, breaks);
 }

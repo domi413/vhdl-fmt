@@ -51,7 +51,7 @@ add_custom_command(
         ${ANTLR4_EXECUTABLE} -Dlanguage=Cpp ${GRAMMAR_FILES} -lib ${GRAMMAR_DIR}
         -o ${GENERATED_DIR} -no-listener -visitor
     DEPENDS
-        ${GRAMMAR_FILE}
+        ${GRAMMAR_FILES}
     COMMENT "Generating VHDL lexer and parser using ANTLR4"
     VERBATIM
 )
