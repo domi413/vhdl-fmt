@@ -57,6 +57,7 @@ auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
             ++c.newlines_items;
             c.newline_breaks += nl->breaks;
         }
+
         return c;
     });
 }

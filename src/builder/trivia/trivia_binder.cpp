@@ -19,13 +19,13 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 
     struct Tmp
     {
-        bool nl{};
-        const antlr4::Token *tok{};
+        bool new_line{};
+        const antlr4::Token *token{};
         std::size_t breaks{};
     };
 
-    std::vector<Tmp> reverse;
-    std::size_t new_line_count = 0;
+    std::vector<Tmp> reverse{};
+    std::size_t new_line_count{ 0 };
 
     // Iterate backward from start_idx, collecting comment and newline tokens.
     for (const auto i : std::views::iota(std::size_t{ 0 }, start_idx) | std::views::reverse) {
@@ -50,20 +50,20 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 
         if (isComment(token)) {
             if (new_line_count != 0 && !reverse.empty()) {
-                reverse.push_back({ .nl = true, .tok = nullptr, .breaks = new_line_count });
+                reverse.push_back({ .new_line = true, .token = nullptr, .breaks = new_line_count });
             }
 
             new_line_count = 0;
-            reverse.push_back({ .nl = false, .tok = token });
+            reverse.push_back({ .new_line = false, .token = token });
         }
     }
 
     // Push trivia items in forward order
     for (const auto &elem : reverse | std::views::reverse) {
-        if (elem.nl) {
+        if (elem.new_line) {
             newlines_.push(dst, /*to_leading=*/true, elem.breaks);
         } else {
-            comments_.push(dst, /*to_leading=*/true, elem.tok);
+            comments_.push(dst, /*to_leading=*/true, elem.token);
         }
     }
 }
@@ -96,7 +96,7 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
     }
 
     // Collect subsequent newline tokens
-    std::size_t breaks = 0;
+    const std::size_t breaks = 0;
     // dead code?
     // for (; i < n; ++i) {
     //     const antlr4::Token *const t = toks[i];

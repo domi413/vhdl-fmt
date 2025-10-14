@@ -26,6 +26,11 @@ class TriviaBinder
 
     ~TriviaBinder() = default;
 
+    TriviaBinder(const TriviaBinder &) = delete;
+    auto operator=(const TriviaBinder &) -> TriviaBinder & = delete;
+    TriviaBinder(TriviaBinder &&) = delete;
+    auto operator=(TriviaBinder &&) -> TriviaBinder & = delete;
+
     /// @brief Binds collected trivia to the specified AST node.
     void bind(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
