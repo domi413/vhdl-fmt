@@ -88,7 +88,7 @@ GERMESI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-comman
 
 check-format:
 	@echo "Checking code formatting..."
-	@if $(VENV_BIN)clang-format --dry-run --Werror $(SOURCES) && $(VENV_BIN)gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
+	@if clang-format --dry-run --Werror $(SOURCES) && $(VENV_BIN)gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
