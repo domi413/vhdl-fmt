@@ -2,7 +2,6 @@
 os=Linux
 arch=x86_64
 compiler=clang
-compiler.cppstd=clang++
 compiler.version=20
 compiler.cppstd=23
 
