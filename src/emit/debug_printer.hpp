@@ -17,7 +17,7 @@
 namespace emit {
 
 /// @brief AST debug printer. Traverses the AST and prints its structure with indentation.
-struct DebugPrinter : ast::BaseVisitor
+class DebugPrinter : public ast::BaseVisitor
 {
     explicit DebugPrinter(std::ostream &out) : out_(out) {}
 
