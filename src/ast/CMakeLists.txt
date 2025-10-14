@@ -4,9 +4,4 @@ file(GLOB_RECURSE AST_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 
 target_include_directories(ast INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_sources(
-    ast
-    INTERFACE
-        FILE_SET HEADERS
-        FILES ${AST_HEADERS}
-)
+target_sources(ast INTERFACE FILE_SET HEADERS FILES ${AST_HEADERS})
