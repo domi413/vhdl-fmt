@@ -46,7 +46,7 @@ struct Node
     virtual void accept(Visitor &v) const = 0;
 
     /// @brief Create and return this node’s comment block.
-    auto getComments() -> NodeComments & { return comments_.emplace(); }
+    auto emplaceComments() -> NodeComments & { return comments_.emplace(); }
 
     /// @brief Return attached comments if present.
     [[nodiscard]]

@@ -71,12 +71,12 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 {
     const std::vector<antlr4::Token *> &tokens = tokens_.getTokens();
-    const std::size_t tokens_size = tokens.size();
+    const std::size_t tokens_count = tokens.size();
 
     std::size_t i = stop.index + 1;
 
     // Collect trailing comments that appear on the same line as the stop token
-    for (; i < tokens_size; ++i) {
+    for (; i < tokens_count; ++i) {
         const antlr4::Token *const token = tokens[i];
         if (token == nullptr) {
             break;
@@ -88,15 +88,11 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo 
             comments_.push(dst, /*to_leading=*/false, token);
             continue;
         }
-        if (token->getChannel() != vhdlLexer::COMMENTS) {
-            continue;
-        }
-        break;
     }
 
     // Collect subsequent newline tokens
     std::size_t breaks = 0;
-    for (; i < tokens_size; ++i) {
+    for (; i < tokens_count; ++i) {
         const antlr4::Token *const token = tokens[i];
         if ((token == nullptr) || !isNewline(token)) {
             break;
@@ -113,7 +109,7 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
         return;
     }
 
-    auto &comment = node.getComments();
+    auto &comment = node.emplaceComments();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
     const StopInfo stop{ .index = ctx->getStop()->getTokenIndex(),
