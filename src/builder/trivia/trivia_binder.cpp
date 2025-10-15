@@ -74,9 +74,9 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     }
 }
 
-// TODO(-): Decide for one of two versions
-//  range based approach, though some overhead because of transform though compiler optimization
-//  will make this necletable
+// TODO(-): Decide for one of two versions:
+//  range based approach, though some overhead because of transform, but compiler optimization
+//  will make this irrelevant
 // void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 // {
 //     const auto &tokens = tokens_.getTokens();
