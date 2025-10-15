@@ -74,20 +74,19 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     }
 }
 
-// Simpler and maybe more readable approach that is in theory more performant
-void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
+void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor)
 {
     const auto &tokens = tokens_.getTokens();
 
-    // Collect trailing comments that appear on the same line as the stop token
-    const auto remaining = tokens | std::views::drop(stop.index + 1);
+    // Collect trailing comments that appear on the same line as the anchor
+    const auto next_tokens = tokens | std::views::drop(anchor.index + 1);
 
-    for (const antlr4::Token *token : remaining) {
+    for (const antlr4::Token *token : next_tokens) {
         if (token == nullptr || isNewline(token)) {
             break;
         }
 
-        if (isComment(token) && token->getLine() == stop.line) {
+        if (isComment(token) && token->getLine() == anchor.line) {
             comments_.push(dst, /*to_leading=*/false, token);
         }
     }
@@ -104,8 +103,8 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     auto &comment = node.emplaceComments();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
-    const StopInfo stop{ .index = ctx->getStop()->getTokenIndex(),
-                         .line = ctx->getStop()->getLine() };
+    const AnchorToken stop{ .index = ctx->getStop()->getTokenIndex(),
+                            .line = ctx->getStop()->getLine() };
 
     collectLeading(comment, start_index);
     collectTrailing(comment, stop);

@@ -35,7 +35,7 @@ class TriviaBinder
     void bind(ast::Node &node, const antlr4::ParserRuleContext *ctx);
 
   private:
-    struct StopInfo
+    struct AnchorToken
     {
         std::size_t index{};
         std::size_t line{};
@@ -65,7 +65,7 @@ class TriviaBinder
     }
 
     void collectLeading(ast::Node::NodeComments &dst, std::size_t start_index);
-    void collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop);
+    void collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor);
 };
 
 } // namespace builder
