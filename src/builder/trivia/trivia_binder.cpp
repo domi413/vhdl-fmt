@@ -17,19 +17,23 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 
     const auto &tokens = tokens_.getTokens();
 
-    struct Tmp
+    // Use std::variant instead of struct with bool flag
+    struct Newline
     {
-        bool new_line{};
-        const antlr4::Token *token{};
-        std::size_t breaks{};
+        std::size_t breaks;
     };
 
-    std::vector<Tmp> reverse{};
-    std::size_t new_line_count{ 0 };
+    struct Comment
+    {
+        const antlr4::Token *token;
+    };
+    using TriviaItem = std::variant<Newline, Comment>;
+
+    std::vector<TriviaItem> reverse{};
+    std::size_t newline_count{ 0 };
 
     // Iterate backward from start_index, collecting comment and newline tokens.
     for (const auto i : std::views::iota(std::size_t{ 0 }, start_index) | std::views::reverse) {
-
         const antlr4::Token *const token = tokens[i];
         if (token == nullptr) {
             break;
@@ -41,66 +45,80 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
         }
 
         if (isNewline(token)) {
-            new_line_count += countLineBreaks(token->getText());
-            if (new_line_count >= BLANK_LINE_BOUNDARY && reverse.empty()) {
+            newline_count += countLineBreaks(token->getText());
+            if (newline_count >= BLANK_LINE_BOUNDARY && reverse.empty()) {
                 break;
             }
             continue;
         }
 
         if (isComment(token)) {
-            if (new_line_count != 0 && !reverse.empty()) {
-                reverse.push_back({ .new_line = true, .token = nullptr, .breaks = new_line_count });
+            if (newline_count != 0 && !reverse.empty()) {
+                reverse.emplace_back(Newline{ newline_count });
             }
 
-            new_line_count = 0;
-            reverse.push_back({ .new_line = false, .token = token });
+            newline_count = 0;
+            reverse.emplace_back(Comment{ token });
         }
     }
 
     // Push trivia items in forward order
-    for (const auto &elem : reverse | std::views::reverse) {
-        if (elem.new_line) {
-            newlines_.push(dst, /*to_leading=*/true, elem.breaks);
+    for (const auto &item : reverse | std::views::reverse) {
+        if (std::holds_alternative<Newline>(item)) {
+            const auto &nl = std::get<Newline>(item);
+            newlines_.push(dst, /*to_leading=*/true, nl.breaks);
         } else {
-            comments_.push(dst, /*to_leading=*/true, elem.token);
+            const auto &cmt = std::get<Comment>(item);
+            comments_.push(dst, /*to_leading=*/true, cmt.token);
         }
     }
 }
 
+// TODO(-): Decide for one of two versions
+//  range based approach, though some overhead because of transform though compiler optimization
+//  will make this necletable
+// void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
+// {
+//     const auto &tokens = tokens_.getTokens();
+
+//     // Collect trailing comments that appear on the same line as the stop token
+//     auto trailing_comments = std::views::iota(stop.idx + 1, tokens.size())
+//                            | std::views::transform([&tokens](std::size_t i) { return tokens[i];
+//                            }) | std::views::take_while([](const auto *token) {
+//                                  return token != nullptr && !isNewline(token);
+//                              })
+//                            | std::views::filter([this, &stop](const auto *token) {
+//                                  return isComment(token) && token->getLine() == stop.line;
+//                              });
+
+//     for (const antlr4::Token *token : trailing_comments) {
+//         comments_.push(dst, /*to_leading=*/false, token);
+//     }
+
+//     newlines_.push(dst, /*to_leading=*/false, 0);
+// }
+
+// Simpler and maybe more readable approach that is in theory more performant
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 {
-    const std::vector<antlr4::Token *> &tokens = tokens_.getTokens();
-    const std::size_t tokens_count = tokens.size();
-
-    std::size_t i = stop.index + 1;
+    const auto &tokens = tokens_.getTokens();
 
     // Collect trailing comments that appear on the same line as the stop token
-    for (; i < tokens_count; ++i) {
-        const antlr4::Token *const token = tokens[i];
-        if (token == nullptr) {
+    auto remaining = tokens | std::views::drop(stop.index + 1);
+
+    for (const antlr4::Token *token : remaining) {
+        if (token == nullptr || isNewline(token)) {
             break;
         }
-        if (isNewline(token)) {
-            break;
-        }
+
         if (isComment(token) && token->getLine() == stop.line) {
             comments_.push(dst, /*to_leading=*/false, token);
-            continue;
-        }
-    }
-
-    // Collect subsequent newline tokens
-    std::size_t breaks = 0;
-    for (; i < tokens_count; ++i) {
-        const antlr4::Token *const token = tokens[i];
-        if ((token == nullptr) || !isNewline(token)) {
+        } else if (token->getChannel() != vhdlLexer::COMMENTS) {
             break;
         }
-        breaks += countLineBreaks(token->getText());
     }
 
-    newlines_.push(dst, /*to_leading=*/false, breaks);
+    newlines_.push(dst, /*to_leading=*/false, 0);
 }
 
 void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
