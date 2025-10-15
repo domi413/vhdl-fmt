@@ -58,11 +58,20 @@ class TriviaBinder
     }
 
     [[nodiscard]]
+    static constexpr auto isDefault(const antlr4::Token *t) noexcept -> bool
+    {
+        return (t != nullptr) && t->getChannel() == vhdlLexer::DEFAULT_TOKEN_CHANNEL;
+    }
+
+    [[nodiscard]]
     static constexpr auto countLineBreaks(std::string_view s) noexcept -> std::size_t
     {
         const auto n = static_cast<std::size_t>(std::ranges::count(s, '\n'));
         return std::max<std::size_t>(1, n);
     }
+
+    [[nodiscard]]
+    auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;
 
     void collectLeading(ast::Node::NodeComments &dst, std::size_t start_index);
     void collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor);

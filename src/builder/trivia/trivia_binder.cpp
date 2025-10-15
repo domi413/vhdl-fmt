@@ -50,15 +50,12 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     std::ranges::reverse(dst.leading);
 }
 
-
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor)
 {
-    const auto &tokens = tokens_.getTokens();
-
     // Collect trailing comments that appear on the same line as the anchor
-    const auto next_tokens = tokens | std::views::drop(anchor.index + 1);
+    const auto hidden = tokens_.getHiddenTokensToRight(anchor.index);
 
-    for (const antlr4::Token *token : next_tokens) {
+    for (const antlr4::Token *token : hidden) {
         if (token == nullptr || isNewline(token)) {
             break;
         }
@@ -80,11 +77,31 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
     auto &comment = node.emplaceComments();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
-    const AnchorToken stop{ .index = ctx->getStop()->getTokenIndex(),
+    const AnchorToken stop{ .index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex()),
                             .line = ctx->getStop()->getLine() };
 
     collectLeading(comment, start_index);
     collectTrailing(comment, stop);
+}
+
+auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t
+{
+    const auto &tokens = tokens_.getTokens();
+    const std::size_t line = tokens[start_index]->getLine();
+
+    std::size_t last_default = start_index;
+
+    for (auto *token : tokens | std::views::drop(start_index + 1)) {
+        if (token == nullptr || token->getLine() != line) {
+            break;
+        }
+
+        if (isDefault(token)) {
+            last_default = token->getTokenIndex();
+        }
+    }
+
+    return last_default;
 }
 
 } // namespace builder
