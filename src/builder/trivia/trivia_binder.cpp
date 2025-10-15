@@ -80,21 +80,23 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 // void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
 // {
 //     const auto &tokens = tokens_.getTokens();
-
+//
 //     // Collect trailing comments that appear on the same line as the stop token
-//     auto trailing_comments = std::views::iota(stop.idx + 1, tokens.size())
-//                            | std::views::transform([&tokens](std::size_t i) { return tokens[i];
-//                            }) | std::views::take_while([](const auto *token) {
-//                                  return token != nullptr && !isNewline(token);
-//                              })
-//                            | std::views::filter([this, &stop](const auto *token) {
-//                                  return isComment(token) && token->getLine() == stop.line;
-//                              });
-
+//     auto trailing_comments
+//       = std::views::iota(stop.index + 1, tokens.size())
+//       | std::views::transform(
+//           [&tokens](std::size_t i) -> const antlr4::Token * { return tokens[i]; })
+//       | std::views::take_while(
+//           [](const antlr4::Token *token) -> bool { return token != nullptr && !isNewline(token);
+//           })
+//       | std::views::filter([this, &stop](const antlr4::Token *token) -> bool {
+//             return isComment(token) && token->getLine() == stop.line;
+//         });
+//
 //     for (const antlr4::Token *token : trailing_comments) {
 //         comments_.push(dst, /*to_leading=*/false, token);
 //     }
-
+//
 //     newlines_.push(dst, /*to_leading=*/false, 0);
 // }
 
