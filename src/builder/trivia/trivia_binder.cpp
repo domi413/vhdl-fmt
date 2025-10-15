@@ -3,11 +3,9 @@
 #include "ParserRuleContext.h"
 #include "Token.h"
 #include "ast/node.hpp"
-#include "vhdlLexer.h"
 
 #include <cstddef>
 #include <ranges>
-#include <vector>
 
 namespace builder {
 
@@ -15,64 +13,43 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 {
     constexpr std::size_t BLANK_LINE_BOUNDARY{ 2 };
 
-    const auto &tokens = tokens_.getTokens();
+    // Tokens are given in source order
+    const auto &hidden = tokens_.getHiddenTokensToLeft(start_index);
 
-    // Use std::variant instead of struct with bool flag
-    struct Newline
-    {
-        std::size_t breaks;
-    };
+    std::size_t linebreaks{ 0 };
+    bool seen_comment = false;
 
-    struct Comment
-    {
-        const antlr4::Token *token;
-    };
-    using TriviaItem = std::variant<Newline, Comment>;
-
-    std::vector<TriviaItem> reverse{};
-    std::size_t newline_count{ 0 };
-
-    // Iterate backward from start_index, collecting comment and newline tokens.
-    for (const auto i : std::views::iota(std::size_t{ 0 }, start_index) | std::views::reverse) {
-        const antlr4::Token *const token = tokens[i];
+    // Iterate backward — closest token first
+    for (const antlr4::Token *token : hidden | std::views::reverse) {
         if (token == nullptr) {
             break;
         }
 
-        const auto ch = token->getChannel();
-        if (ch != vhdlLexer::COMMENTS && ch != vhdlLexer::NEWLINES) {
-            break;
-        }
-
         if (isNewline(token)) {
-            newline_count += countLineBreaks(token->getText());
-            if (newline_count >= BLANK_LINE_BOUNDARY && reverse.empty()) {
+            linebreaks += countLineBreaks(token->getText());
+            // Stop if blank line was hit *before* any comment
+            if (linebreaks >= BLANK_LINE_BOUNDARY && !seen_comment) {
                 break;
             }
             continue;
         }
 
         if (isComment(token)) {
-            if (newline_count != 0 && !reverse.empty()) {
-                reverse.emplace_back(Newline{ newline_count });
+            // If there were newlines before this comment, push them
+            if (linebreaks != 0) {
+                newlines_.push(dst, /*to_leading=*/true, linebreaks);
+                linebreaks = 0;
             }
 
-            newline_count = 0;
-            reverse.emplace_back(Comment{ token });
+            comments_.push(dst, /*to_leading=*/true, token);
+            seen_comment = true;
         }
     }
 
-    // Push trivia items in forward order
-    for (const auto &item : reverse | std::views::reverse) {
-        if (std::holds_alternative<Newline>(item)) {
-            const auto &nl = std::get<Newline>(item);
-            newlines_.push(dst, /*to_leading=*/true, nl.breaks);
-        } else {
-            const auto &cmt = std::get<Comment>(item);
-            comments_.push(dst, /*to_leading=*/true, cmt.token);
-        }
-    }
+    // Iteration went backward - restore to source order
+    std::ranges::reverse(dst.leading);
 }
+
 
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor)
 {
