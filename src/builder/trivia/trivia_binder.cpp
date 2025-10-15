@@ -77,26 +77,26 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 // TODO(-): Decide for one of two versions
 //  range based approach, though some overhead because of transform though compiler optimization
 //  will make this necletable
-// void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
-// {
-//     const auto &tokens = tokens_.getTokens();
+void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
+{
+    const auto &tokens = tokens_.getTokens();
 
-//     // Collect trailing comments that appear on the same line as the stop token
-//     auto trailing_comments = std::views::iota(stop.idx + 1, tokens.size())
-//                            | std::views::transform([&tokens](std::size_t i) { return tokens[i];
-//                            }) | std::views::take_while([](const auto *token) {
-//                                  return token != nullptr && !isNewline(token);
-//                              })
-//                            | std::views::filter([this, &stop](const auto *token) {
-//                                  return isComment(token) && token->getLine() == stop.line;
-//                              });
+    // Collect trailing comments that appear on the same line as the stop token
+    auto trailing_comments = std::views::iota(stop.idx + 1, tokens.size())
+                           | std::views::transform([&tokens](std::size_t i) { return tokens[i]; })
+                           | std::views::take_while([](const auto *token) {
+                                 return token != nullptr && !isNewline(token);
+                             })
+                           | std::views::filter([this, &stop](const auto *token) {
+                                 return isComment(token) && token->getLine() == stop.line;
+                             });
 
-//     for (const antlr4::Token *token : trailing_comments) {
-//         comments_.push(dst, /*to_leading=*/false, token);
-//     }
+    for (const antlr4::Token *token : trailing_comments) {
+        comments_.push(dst, /*to_leading=*/false, token);
+    }
 
-//     newlines_.push(dst, /*to_leading=*/false, 0);
-// }
+    newlines_.push(dst, /*to_leading=*/false, 0);
+}
 
 // Simpler and maybe more readable approach that is in theory more performant
 void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const StopInfo &stop)
