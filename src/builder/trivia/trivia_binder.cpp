@@ -4,6 +4,7 @@
 #include "Token.h"
 #include "ast/node.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <ranges>
 
