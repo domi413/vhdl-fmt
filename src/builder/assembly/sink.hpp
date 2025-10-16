@@ -67,7 +67,6 @@ struct SingleSink : ISink
     std::unique_ptr<ElemT> &slot_;
 };
 
-
 } // namespace builder
 
 #endif /* BUILDER_ASSEMBLY_SINK_HPP */
