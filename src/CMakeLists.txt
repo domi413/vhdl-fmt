@@ -28,21 +28,31 @@ target_link_libraries(
 target_compile_options(
     vhdl_formatter
     PRIVATE
-        -O3
+        -O3 # TODO: We should disable this optimization for debug builds.
+        # -O3 -ffast-math # lossy floating-point optimizations
+        # -flto=full # Apparently, this could improve performance by around 10%
         -Wall
         -Wcast-align
         -Wconversion
+        -Wdeprecated
         -Wdouble-promotion
         -Werror
         -Wextra
+        -Wfloat-conversion
+        -Wfloat-equal
+        -Wfor-loop-analysis
         -Wformat=2
+        -Winvalid-utf8
         -Wmisleading-indentation
         -Wnon-virtual-dtor
-        -Wnull-dereference
         -Wold-style-cast
         -Woverloaded-virtual
         -Wpedantic
-        -Wshadow
+        -Wpoison-system-directories
+        -Wshadow-all
         -Wsign-conversion
+        -Wsuggest-destructor-override
+        -Wsuggest-override
+        -Wsuper-class-method-mismatch
         -Wunused
 )
