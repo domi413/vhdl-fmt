@@ -49,9 +49,9 @@ struct Counts
 auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
 {
     return std::ranges::fold_left(tv, Counts{}, [](Counts c, const ast::Trivia &t) -> Counts {
-        if (std::holds_alternative<ast::CommentTrivia>(t)) {
+        if (std::holds_alternative<ast::Comments>(t)) {
             ++c.comments;
-        } else if (const auto *nl = std::get_if<ast::NewlinesTrivia>(&t)) {
+        } else if (const auto *nl = std::get_if<ast::Newlines>(&t)) {
             ++c.newlines_items;
             c.newline_breaks += nl->breaks;
         }
@@ -79,47 +79,15 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    const auto &lead = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
+    const auto &lead = entity->tryGetTrivia().value_or(ast::Node::NodeTrivia{}).leading;
 
     // Expect: Comment("A"), Newlines(1), Comment("B")
-    REQUIRE(std::holds_alternative<ast::CommentTrivia>(lead[0]));
-    REQUIRE(std::holds_alternative<ast::NewlinesTrivia>(lead[1]));
-    REQUIRE(std::holds_alternative<ast::CommentTrivia>(lead[2]));
+    REQUIRE(std::holds_alternative<ast::Comments>(lead[0]));
+    REQUIRE(std::holds_alternative<ast::Newlines>(lead[1]));
+    REQUIRE(std::holds_alternative<ast::Comments>(lead[2]));
 
-    if (std::holds_alternative<ast::NewlinesTrivia>(lead[1])) {
-        const auto &nl = std::get<ast::NewlinesTrivia>(lead[1]);
+    if (std::holds_alternative<ast::Newlines>(lead[1])) {
+        const auto &nl = std::get<ast::Newlines>(lead[1]);
         REQUIRE(nl.breaks == 2); // 2 breaks = 1 blank line
-    }
-}
-
-// -----------------------------------------------------------------------------
-// Trailing trivia: newlines after inline comment are preserved
-// -----------------------------------------------------------------------------
-TEST_CASE("Trailing trivia captures newlines after inline comment", "[trivia][trailing]")
-{
-    const std::string vhdl = R"(
-        entity E is
-            generic (
-                G : integer := 0  -- inline g
-
-            );
-        end E;
-    )";
-
-    auto design = buildAstFromSource(vhdl);
-    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generics.size() == 1);
-
-    const auto &g = *entity->generics[0];
-    const auto &trail = g.tryGetComments().value_or(ast::Node::NodeComments{}).trailing;
-
-    // Expect: [Comment("inline g"), Newlines(k>=1)]
-    REQUIRE_FALSE(trail.empty());
-    REQUIRE(std::holds_alternative<ast::CommentTrivia>(trail[0]));
-
-    if (trail.size() >= 2 && std::holds_alternative<ast::NewlinesTrivia>(trail[1])) {
-        const auto &nl = std::get<ast::NewlinesTrivia>(trail[1]);
-        REQUIRE(nl.breaks >= 1);
     }
 }

@@ -43,11 +43,12 @@ class DebugPrinter : public ast::BaseVisitor
                          std::size_t trailing_breaks) const;
 
     /// Print only comment lines from a trivia sequence (prefix each line).
-    void printCommentLines(const std::vector<ast::Trivia> &tv, std::string_view prefix) const;
+    void printCommentLines(const std::vector<ast::Comments> &comments,
+                           std::string_view prefix) const;
 
     /// Count total trailing newline breaks.
     [[nodiscard]]
-    static auto countNewlines(const std::vector<ast::Trivia> &trailing) -> std::size_t;
+    static auto countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t;
 
     template<class NodeT>
     void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra);

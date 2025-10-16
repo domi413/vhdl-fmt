@@ -17,20 +17,24 @@ class CommentSink
     CommentSink() = default;
 
     /// @brief Push a comment token into the node’s comment list, unless already added.
-    void push(ast::Node::NodeComments &dst, bool to_leading, const antlr4::Token *t)
+    void push(ast::Node::NodeTrivia &dst, bool to_leading, const antlr4::Token *t)
     {
         if (t == nullptr) {
             return;
         }
 
-        const auto idx = t->getTokenIndex();
+        const auto idx = static_cast<std::size_t>(t->getTokenIndex());
         if (!used_.insert(idx).second) {
-            return; // duplicate token already handled
+            return; // already added elsewhere
         }
 
-        ast::CommentTrivia c{ t->getText() };
-        auto &vec = to_leading ? dst.leading : dst.trailing;
-        vec.emplace_back(std::move(c)); // stores as variant<CommentTrivia, NewlinesTrivia>
+        const ast::Comments c{ t->getText() };
+
+        if (to_leading) {
+            dst.leading.emplace_back(c);
+        } else {
+            dst.trailing.emplace_back(c);
+        }
     }
 
   private:

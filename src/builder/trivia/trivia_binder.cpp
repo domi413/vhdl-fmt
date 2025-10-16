@@ -10,15 +10,12 @@
 
 namespace builder {
 
-void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t start_index)
+void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_index)
 {
-    constexpr std::size_t BLANK_LINE_BOUNDARY{ 2 };
-
     // Tokens are given in source order
     const auto &hidden = tokens_.getHiddenTokensToLeft(start_index);
 
     std::size_t linebreaks{ 0 };
-    bool seen_comment = false;
 
     // Iterate backward — closest token first
     for (const antlr4::Token *token : hidden | std::views::reverse) {
@@ -28,22 +25,17 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
 
         if (isNewline(token)) {
             linebreaks += countLineBreaks(token->getText());
-            // Stop if blank line was hit *before* any comment
-            if (linebreaks >= BLANK_LINE_BOUNDARY && !seen_comment) {
-                break;
-            }
             continue;
         }
 
         if (isComment(token)) {
             // If there were newlines before this comment, push them
             if (linebreaks != 0) {
-                newlines_.push(dst, /*to_leading=*/true, linebreaks);
+                newlines_.push(dst, linebreaks);
                 linebreaks = 0;
             }
 
             comments_.push(dst, /*to_leading=*/true, token);
-            seen_comment = true;
         }
     }
 
@@ -51,7 +43,7 @@ void TriviaBinder::collectLeading(ast::Node::NodeComments &dst, std::size_t star
     std::ranges::reverse(dst.leading);
 }
 
-void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor)
+void TriviaBinder::collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken &anchor)
 {
     // Collect trailing comments that appear on the same line as the anchor
     const auto hidden = tokens_.getHiddenTokensToRight(anchor.index);
@@ -65,8 +57,6 @@ void TriviaBinder::collectTrailing(ast::Node::NodeComments &dst, const AnchorTok
             comments_.push(dst, /*to_leading=*/false, token);
         }
     }
-
-    newlines_.push(dst, /*to_leading=*/false, 0);
 }
 
 void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
@@ -75,7 +65,7 @@ void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
         return;
     }
 
-    auto &comment = node.emplaceComments();
+    auto &comment = node.emplaceTrivia();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
     const AnchorToken stop{ .index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex()),

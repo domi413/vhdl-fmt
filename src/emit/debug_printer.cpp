@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <iterator>
 #include <ranges>
 #include <sstream>
 #include <string_view>
@@ -46,31 +45,27 @@ void DebugPrinter::printNodeHeader(const ast::Node &n,
     out_ << '\n';
 }
 
-void DebugPrinter::printCommentLines(const std::vector<ast::Trivia> &tv,
+void DebugPrinter::printCommentLines(const std::vector<ast::Comments> &comments,
                                      std::string_view prefix) const
 {
-    for (const auto &t : tv) {
-        if (const auto *comment = std::get_if<ast::CommentTrivia>(&t)) {
-            printIndent();
-            if (!prefix.empty()) {
-                out_ << prefix;
-            }
-            out_ << comment->text << '\n';
+    for (const auto &comment : comments) {
+        printIndent();
+        if (!prefix.empty()) {
+            out_ << prefix;
         }
+        out_ << comment.text << '\n';
     }
 }
 
-auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &trailing) -> std::size_t
+auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t
 {
-    auto newlines = trailing
-                  | std::views::filter([](const ast::Trivia &t) -> bool {
-                        return std::holds_alternative<ast::NewlinesTrivia>(t);
-                    })
-                  | std::views::transform([](const ast::Trivia &t) -> const ast::NewlinesTrivia & {
-                        return std::get<ast::NewlinesTrivia>(t);
-                    });
-
-    return std::ranges::distance(newlines);
+    std::size_t total = 0;
+    for (const auto &t : leading) {
+        if (const auto *nl = std::get_if<ast::Newlines>(&t)) {
+            total += nl->breaks;
+        }
+    }
+    return total;
 }
 
 template<class NodeT>
@@ -78,18 +73,25 @@ void DebugPrinter::emitNodeLike(const NodeT &node,
                                 std::string_view pretty_name,
                                 const std::string &extra)
 {
-    const auto &maybe = node.tryGetComments();
-    const std::size_t nl = maybe.has_value() ? countNewlines(maybe->trailing) : 0U;
+    const auto &trivia = node.tryGetTrivia();
 
-    // 1) Header with only newline count.
-    printNodeHeader(node, extra, pretty_name, nl);
+    // LEFT-STICK: show blank lines owned by this node (leading)
+    const std::size_t newlines = countNewlines(node.leading());
+    printNodeHeader(node, extra, pretty_name, newlines);
 
-    // 2) Under the node, show leading comments, then trailing inline comments.
-    if (maybe.has_value()) {
-        const IndentGuard _{ indent_ };
-        printCommentLines(maybe->leading, /*prefix=*/"(^) ");
-        printCommentLines(maybe->trailing, /*prefix=*/"(>) ");
+    const IndentGuard _{ indent_ };
+
+    // Print leading comments (full-line), then trailing inline comments
+    std::vector<ast::Comments> leading_comments;
+    leading_comments.reserve(node.leading().size());
+    for (const auto &t : node.leading()) {
+        if (const auto *c = std::get_if<ast::Comments>(&t)) {
+            leading_comments.push_back(*c);
+        }
     }
+
+    printCommentLines(leading_comments, /*prefix=*/"(^) ");
+    printCommentLines(node.trailing(), /*prefix=*/"(>) ");
 }
 
 // ---- Visitor methods ----

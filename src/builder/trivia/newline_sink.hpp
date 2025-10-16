@@ -12,16 +12,15 @@ namespace builder {
 class NewlineSink
 {
   public:
-    /// @brief Push newline trivia into the node’s comment list if any breaks exist.
-    constexpr void push(ast::Node::NodeComments &dst, bool to_leading, std::size_t breaks)
+    /// @brief Push newline trivia into the node’s trivia list if any breaks exist.
+    constexpr void push(ast::Node::NodeTrivia &dst, std::size_t breaks)
     {
         if (breaks == 0) {
             return;
         }
 
-        ast::NewlinesTrivia n{ breaks };
-        auto &vec = to_leading ? dst.leading : dst.trailing;
-        vec.emplace_back(n);
+        ast::Newlines n{ breaks };
+        dst.leading.emplace_back(n);
     }
 };
 

@@ -17,8 +17,19 @@ namespace builder {
 
 /// @brief Builds ordered trivia streams (comments + newlines) for AST nodes.
 ///
-/// The TriviaBinder inspects lexer tokens to collect leading and trailing
-/// trivia (comments and newline runs) and attaches them to AST nodes.
+/// Implements a *left-stick* policy:
+/// every comment or newline sequence appearing before a node in source order
+/// is attached to that node as **leading** trivia, regardless of spacing or
+/// paragraph boundaries. This ensures that all comment blocks and blank-line
+/// runs are preserved and follow the next syntactic construct.
+///
+/// Trailing trivia only captures **inline** comments that occur on the same
+/// line as a node’s final token; vertical spacing below a node is always
+/// considered part of the next node’s leading trivia.
+///
+/// The resulting trivia stream maintains the original ordering of comments
+/// and newlines exactly as they appear in the source, enabling precise
+/// round-tripping and faithful pretty-printing.
 class TriviaBinder
 {
   public:
@@ -73,8 +84,8 @@ class TriviaBinder
     [[nodiscard]]
     auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;
 
-    void collectLeading(ast::Node::NodeComments &dst, std::size_t start_index);
-    void collectTrailing(ast::Node::NodeComments &dst, const AnchorToken &anchor);
+    void collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_index);
+    void collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken &anchor);
 };
 
 } // namespace builder

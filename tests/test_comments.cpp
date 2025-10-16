@@ -40,16 +40,27 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     return design;
 }
 
-auto commentTexts(const std::vector<ast::Trivia> &tv) -> std::vector<std::string_view>
+// Extract only comment texts from LEADING (vector<Trivia>)
+auto leadingComments(const std::vector<ast::Trivia> &tv) -> std::vector<std::string_view>
 {
     return tv
-         | std::views::filter([](const ast::Trivia &t) -> bool {
-               return std::holds_alternative<ast::CommentTrivia>(t);
-           })
+         | std::views::filter(
+             [](const ast::Trivia &t) { return std::holds_alternative<ast::Comments>(t); })
          | std::views::transform([](const ast::Trivia &t) -> std::string_view {
-               return std::get<ast::CommentTrivia>(t).text;
+               return std::get<ast::Comments>(t).text;
            })
          | std::ranges::to<std::vector<std::string_view>>();
+}
+
+// Extract texts from TRAILING (vector<CommentTrivia>)
+auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vector<std::string_view>
+{
+    std::vector<std::string_view> out;
+    out.reserve(tv.size());
+    for (const auto &c : tv) {
+        out.push_back(c.text);
+    }
+    return out;
 }
 
 } // namespace
@@ -69,9 +80,8 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    const auto &leading_trivia
-      = entity->tryGetComments().value_or(ast::Node::NodeComments{}).leading;
-    const auto texts = commentTexts(leading_trivia);
+    const auto &leading_trivia = entity->tryGetTrivia().value_or(ast::Node::NodeTrivia{}).leading;
+    const auto texts = leadingComments(leading_trivia);
 
     REQUIRE(texts.size() == 2);
     REQUIRE(texts.front().contains("License text"));
@@ -98,10 +108,10 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE(entity->generics.size() == 1);
 
     const auto &g = *entity->generics[0];
-    const auto &c = g.tryGetComments().value_or(ast::Node::NodeComments{});
+    const auto &c = g.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
 
-    const auto lead = commentTexts(c.leading);
-    const auto trail = commentTexts(c.trailing);
+    const auto lead = leadingComments(c.leading);
+    const auto trail = trailingComments(c.trailing);
 
     REQUIRE_FALSE(lead.empty());
     REQUIRE(lead.front().contains("Leading for CONST_V"));
@@ -133,9 +143,9 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
 
     {
         const auto &clk = *entity->ports[0];
-        const auto &cm = clk.tryGetComments().value_or(ast::Node::NodeComments{});
-        const auto lead = commentTexts(cm.leading);
-        const auto trail = commentTexts(cm.trailing);
+        const auto &cm = clk.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
+        const auto lead = leadingComments(cm.leading);
+        const auto trail = trailingComments(cm.trailing);
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Clock input"));
         REQUIRE_FALSE(trail.empty());
@@ -143,9 +153,9 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     }
     {
         const auto &rst = *entity->ports[1];
-        const auto &cm = rst.tryGetComments().value_or(ast::Node::NodeComments{});
-        const auto lead = commentTexts(cm.leading);
-        const auto trail = commentTexts(cm.trailing);
+        const auto &cm = rst.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
+        const auto lead = leadingComments(cm.leading);
+        const auto trail = trailingComments(cm.trailing);
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Reset input"));
         REQUIRE_FALSE(trail.empty());
