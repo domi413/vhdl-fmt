@@ -60,13 +60,20 @@ class Assembler
     std::vector<std::unique_ptr<ISink>> sinks_;
 
     /// @brief Push a new sink for the given container.
-    template<typename Vec>
-    void pushSink(Vec &vec)
+    template<typename T>
+    void pushSink(std::vector<std::unique_ptr<T>> &vec)
     {
-        using ElemT = typename Vec::value_type::element_type;
-        static_assert(std::derived_from<ElemT, ast::Node>,
+        static_assert(std::derived_from<T, ast::Node>,
                       "Sink element type must derive from ast::Node");
-        sinks_.push_back(std::make_unique<Sink<ElemT>>(vec));
+        sinks_.push_back(std::make_unique<Sink<T>>(vec));
+    }
+
+    template<typename Slot>
+    void pushSink(std::unique_ptr<Slot> &slot)
+    {
+        static_assert(std::derived_from<Slot, ast::Node>,
+                      "Sink slot type must derive from ast::Node");
+        sinks_.push_back(std::make_unique<SingleSink<Slot>>(slot));
     }
 };
 

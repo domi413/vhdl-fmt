@@ -50,6 +50,24 @@ struct Sink : ISink
     std::vector<std::unique_ptr<ElemT>> &vec_;
 };
 
+/// @brief Type-specific sink for a single unique_ptr<ElemT> "slot".
+template<typename ElemT>
+struct SingleSink : ISink
+{
+    explicit SingleSink(std::unique_ptr<ElemT> &slot) : slot_(slot) {}
+
+    void push(std::unique_ptr<ast::Node> n) override
+    {
+        assert(!slot_ && "SingleSink already occupied");
+        auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));
+        slot_ = std::move(casted);
+    }
+
+  private:
+    std::unique_ptr<ElemT> &slot_;
+};
+
+
 } // namespace builder
 
 #endif /* BUILDER_ASSEMBLY_SINK_HPP */
