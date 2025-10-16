@@ -82,6 +82,13 @@ struct Node
     std::optional<NodeTrivia> trivia_;
 };
 
+/// @brief CRTP base class to simplify visitor pattern implementation.
+template<typename Derived, typename Base = Node>
+struct Visitable : Base
+{
+    void accept(Visitor &v) const override { v.visit(static_cast<const Derived &>(*this)); }
+};
+
 } // namespace ast
 
 #endif /* AST_NODE_HPP */

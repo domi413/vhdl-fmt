@@ -7,10 +7,9 @@
 
 namespace ast {
 
-struct DesignFile : Node
+struct DesignFile : Visitable<DesignFile>
 {
     std::vector<std::unique_ptr<Node>> units;
-    void accept(Visitor &v) const override { v.visit(*this); }
 };
 
 } // namespace ast
