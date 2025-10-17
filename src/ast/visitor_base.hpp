@@ -40,9 +40,7 @@ class BaseVisitor : public Visitor
     void dispatchAll(const std::vector<std::unique_ptr<T>> &vec)
     {
         for (const auto &node : vec) {
-            if (node) {
-                node->accept(*this);
-            }
+            dispatch(node);
         }
     }
 
