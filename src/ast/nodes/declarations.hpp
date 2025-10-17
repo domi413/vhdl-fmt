@@ -2,39 +2,51 @@
 #define AST_NODES_DECLARATIONS_HPP
 
 #include "ast/node.hpp"
+#include "nodes/ranges.hpp"
 
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
 namespace ast {
 
-struct GenericParam : Visitable<GenericParam>
+// Abstract base for all declarations
+struct Declaration : Visitable<Declaration>
 {
-    std::string type;
     std::vector<std::string> names;
-    std::optional<std::string> init;
+    virtual ~Declaration() = default;
 };
 
-struct Range : Visitable<Range>
+// Constant declaration: constant WIDTH : integer := 8;
+struct ConstantDecl : Visitable<ConstantDecl, Declaration>
 {
-    std::string left_expr;  // e.g. "DATA_WIDTH - 1"
-    std::string direction;  // "downto" or "to"
-    std::string right_expr; // e.g. "0"
+    std::string type_name;
+    std::optional<std::string> init_expr;
 };
 
-struct Port : Visitable<Port>
+// Signal declaration: signal clk : std_logic;
+struct SignalDecl : Visitable<SignalDecl, Declaration>
 {
-    std::string mode, type;
-    std::vector<std::string> names;
-    std::vector<std::unique_ptr<ast::Range>> constraints;
-    std::optional<std::string> init;
+    std::string type_name;
+    bool has_bus_kw{ false };
+    std::vector<std::unique_ptr<Range>> constraints;
 };
 
-struct Entity : Visitable<Entity>
+// Generic parameter inside GENERIC clause
+struct GenericParam : Visitable<GenericParam, Declaration>
 {
-    std::string name;
-    std::vector<std::unique_ptr<Port>> ports;
-    std::vector<std::unique_ptr<GenericParam>> generics;
+    std::string type_name;
+    std::unique_ptr<Expr> default_expr;
+};
+
+// Port entry inside PORT clause
+struct Port : Visitable<Port, Declaration>
+{
+    std::string mode; // "in" / "out"
+    std::string type_name;
+    std::unique_ptr<Expr> default_expr;
+    std::vector<std::unique_ptr<Range>> constraints;
 };
 
 } // namespace ast

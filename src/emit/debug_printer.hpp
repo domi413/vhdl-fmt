@@ -4,12 +4,11 @@
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
+#include "ast/nodes/entity.hpp"
 #include "ast/visitor_base.hpp"
 
-#include <cstddef>
 #include <cstdint>
 #include <iosfwd>
-#include <iostream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -25,9 +24,17 @@ class DebugPrinter : public ast::BaseVisitor
     // Node visitors
     void visit(const ast::DesignFile &node) override;
     void visit(const ast::Entity &node) override;
+    void visit(const ast::Architecture &node) override;
+    void visit(const ast::GenericClause &node) override;
+    void visit(const ast::PortClause &node) override;
     void visit(const ast::GenericParam &node) override;
     void visit(const ast::Port &node) override;
+    void visit(const ast::SignalDecl &node) override;
     void visit(const ast::Range &node) override;
+
+    // Expressions
+    void visit(const ast::TokenExpr &node) override;
+    void visit(const ast::GroupExpr &node) override;
 
   private:
     std::ostream &out_;
@@ -36,17 +43,14 @@ class DebugPrinter : public ast::BaseVisitor
     void printIndent() const;
     void printLine(std::string_view s) const;
 
-    /// Print node header: `Name [extra] <(N[\n])>`.
     void printNodeHeader(const ast::Node &n,
                          const std::string &extra,
                          std::string_view name_override,
                          std::size_t trailing_breaks) const;
 
-    /// Print only comment lines from a trivia sequence (prefix each line).
     void printCommentLines(const std::vector<ast::Comments> &comments,
                            std::string_view prefix) const;
 
-    /// Count total trailing newline breaks.
     [[nodiscard]]
     static auto countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t;
 

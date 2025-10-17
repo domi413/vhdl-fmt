@@ -4,12 +4,18 @@
 #include "ast/node.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace ast {
 
+struct DesignUnit : Visitable<DesignUnit>
+{
+    virtual ~DesignUnit() = default;
+};
+
 struct DesignFile : Visitable<DesignFile>
 {
-    std::vector<std::unique_ptr<Node>> units;
+    std::vector<std::unique_ptr<DesignUnit>> units;
 };
 
 } // namespace ast

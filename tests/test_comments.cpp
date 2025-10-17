@@ -105,9 +105,9 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     auto design = buildAstFromSource(vhdl);
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
-    REQUIRE(entity->generics.size() == 1);
+    REQUIRE(entity->generic_clause->generics.size() == 1);
 
-    const auto &g = *entity->generics[0];
+    const auto &g = *entity->generic_clause->generics[0];
     const auto &c = g.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
 
     const auto lead = leadingComments(c.leading);
@@ -139,10 +139,10 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     auto design = buildAstFromSource(vhdl);
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
-    REQUIRE(entity->ports.size() == 2);
+    REQUIRE(entity->port_clause->ports.size() == 2);
 
     {
-        const auto &clk = *entity->ports[0];
+        const auto &clk = *entity->port_clause->ports[0];
         const auto &cm = clk.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
         const auto lead = leadingComments(cm.leading);
         const auto trail = trailingComments(cm.trailing);
@@ -152,7 +152,7 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
         REQUIRE(trail.front().contains("inline clock"));
     }
     {
-        const auto &rst = *entity->ports[1];
+        const auto &rst = *entity->port_clause->ports[1];
         const auto &cm = rst.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
         const auto lead = leadingComments(cm.leading);
         const auto trail = trailingComments(cm.trailing);

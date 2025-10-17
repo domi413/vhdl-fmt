@@ -55,28 +55,30 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
     REQUIRE(entity != nullptr);
     REQUIRE(entity->name == "MyEntity");
 
+    auto &port_clause = entity->port_clause;
+
     // Ports
-    REQUIRE(entity->ports.size() == 4);
+    REQUIRE(port_clause->ports.size() == 4);
 
     // clk
-    REQUIRE(entity->ports[0]->names == std::vector<std::string>{ "clk" });
-    REQUIRE(entity->ports[0]->mode == "in");
-    REQUIRE(entity->ports[0]->type == "std_logic");
+    REQUIRE(port_clause->ports[0]->names == std::vector<std::string>{ "clk" });
+    REQUIRE(port_clause->ports[0]->mode == "in");
+    REQUIRE(port_clause->ports[0]->type_name == "std_logic");
 
     // rst_n
-    REQUIRE(entity->ports[1]->names == std::vector<std::string>{ "rst_n" });
-    REQUIRE(entity->ports[1]->mode == "in");
-    REQUIRE(entity->ports[1]->type == "std_logic");
+    REQUIRE(port_clause->ports[1]->names == std::vector<std::string>{ "rst_n" });
+    REQUIRE(port_clause->ports[1]->mode == "in");
+    REQUIRE(port_clause->ports[1]->type_name == "std_logic");
 
     // load_val
-    REQUIRE(entity->ports[2]->names == std::vector<std::string>{ "load_val" });
-    REQUIRE(entity->ports[2]->mode == "in");
-    REQUIRE(entity->ports[2]->type == "std_logic_vector");
-    REQUIRE(entity->ports[2]->constraints.size() == 1);
-    REQUIRE(entity->ports[2]->constraints[0]->direction == "downto");
+    REQUIRE(port_clause->ports[2]->names == std::vector<std::string>{ "load_val" });
+    REQUIRE(port_clause->ports[2]->mode == "in");
+    REQUIRE(port_clause->ports[2]->type_name == "std_logic_vector");
+    REQUIRE(port_clause->ports[2]->constraints.size() == 1);
+    REQUIRE(port_clause->ports[2]->constraints[0]->direction == "downto");
 
     // count
-    REQUIRE(entity->ports[3]->names == std::vector<std::string>{ "count" });
-    REQUIRE(entity->ports[3]->mode == "out");
-    REQUIRE(entity->ports[3]->type == "std_logic_vector");
+    REQUIRE(port_clause->ports[3]->names == std::vector<std::string>{ "count" });
+    REQUIRE(port_clause->ports[3]->mode == "out");
+    REQUIRE(port_clause->ports[3]->type_name == "std_logic_vector");
 }

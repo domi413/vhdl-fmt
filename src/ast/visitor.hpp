@@ -3,12 +3,31 @@
 
 namespace ast {
 
+// Forward declarations
 struct Node;
 struct DesignFile;
-struct Entity;
+struct DesignUnit;
+
+struct Declaration;
+struct ConstantDecl;
+struct SignalDecl;
 struct GenericParam;
-struct Range;
 struct Port;
+
+struct Statement;
+struct ConcurrentAssign;
+struct Process;
+
+struct Expr;
+struct TokenExpr;
+struct GroupExpr;
+
+struct Range;
+
+struct GenericClause;
+struct PortClause;
+struct Entity;
+struct Architecture;
 
 /// @brief Abstract interface for visiting AST nodes.
 ///
@@ -26,11 +45,35 @@ class Visitor
     Visitor(Visitor &&) = delete;
     auto operator=(Visitor &&) -> Visitor & = delete;
 
-    // Node visitors
+    // Core hierarchy
+    virtual void visit(const Node &) = 0;
     virtual void visit(const DesignFile &) = 0;
-    virtual void visit(const Entity &) = 0;
+    virtual void visit(const DesignUnit &) = 0;
+
+    // Declarations
+    virtual void visit(const Declaration &) = 0;
+    virtual void visit(const ConstantDecl &) = 0;
+    virtual void visit(const SignalDecl &) = 0;
     virtual void visit(const GenericParam &) = 0;
     virtual void visit(const Port &) = 0;
+
+    // Structural clauses (used inside Entity/Architecture)
+    virtual void visit(const GenericClause &) = 0;
+    virtual void visit(const PortClause &) = 0;
+    virtual void visit(const Entity &) = 0;
+    virtual void visit(const Architecture &) = 0;
+
+    // Statements
+    virtual void visit(const Statement &) = 0;
+    virtual void visit(const ConcurrentAssign &) = 0;
+    virtual void visit(const Process &) = 0;
+
+    // Expressions
+    virtual void visit(const Expr &) = 0;
+    virtual void visit(const TokenExpr &node) = 0;
+    virtual void visit(const GroupExpr &node) = 0;
+
+    // Ranges
     virtual void visit(const Range &) = 0;
 };
 

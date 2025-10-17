@@ -1,7 +1,6 @@
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
 #include "ast/node.hpp"
-#include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/assembly/assembler.hpp"

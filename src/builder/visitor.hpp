@@ -25,11 +25,23 @@ class Visitor : public adapter::BaseVoidVisitor
     Visitor(Visitor &&) = delete;
     auto operator=(Visitor &&) -> Visitor & = delete;
 
-    // Node visitors
+    // Entity / Architecture
     void visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx) override;
+    void visitArchitectureBody(vhdlParser::Architecture_bodyContext *ctx) override;
+
+    // Clauses
     void visitGenericClause(vhdlParser::Generic_clauseContext *ctx) override;
     void visitPortClause(vhdlParser::Port_clauseContext *ctx) override;
+
+    // Declarations
+    void visitConstantDeclaration(vhdlParser::Constant_declarationContext *ctx) override;
+    void visitSignalDeclaration(vhdlParser::Signal_declarationContext *ctx) override;
+
+    // Constraints
     void visitConstraint(vhdlParser::ConstraintContext *ctx) override;
+
+    // Expressions
+    void visitSimpleExpression(vhdlParser::Simple_expressionContext *ctx) override;
 };
 
 } // namespace builder
