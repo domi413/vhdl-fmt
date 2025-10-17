@@ -45,7 +45,7 @@ auto leadingComments(const std::vector<ast::Trivia> &tv) -> std::vector<std::str
 {
     return tv
          | std::views::filter(
-             [](const ast::Trivia &t) { return std::holds_alternative<ast::Comments>(t); })
+             [](const ast::Trivia &t) -> bool { return std::holds_alternative<ast::Comments>(t); })
          | std::views::transform([](const ast::Trivia &t) -> std::string_view {
                return std::get<ast::Comments>(t).text;
            })
