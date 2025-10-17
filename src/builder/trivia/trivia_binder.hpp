@@ -75,7 +75,7 @@ class TriviaBinder
     }
 
     [[nodiscard]]
-    static constexpr auto countLineBreaks(std::string_view s) noexcept -> std::size_t
+    static constexpr auto countLineBreaks(const std::string_view s) noexcept -> std::size_t
     {
         const auto n = static_cast<std::size_t>(std::ranges::count(s, '\n'));
         return std::max<std::size_t>(1, n);
