@@ -46,23 +46,6 @@ void Visitor::visitSignalDeclaration(vhdlParser::Signal_declarationContext *ctx)
 // -----------------------------------------------------------------------------
 // Constraints
 // -----------------------------------------------------------------------------
-// void Visitor::visitConstraint(vhdlParser::ConstraintContext *ctx)
-// {
-//     auto *index_con = ctx->index_constraint();
-//     if (index_con == nullptr) {
-//         return;
-//     }
-//     for (auto *range_ctx : index_con->discrete_range()) {
-//         auto *range_decl = range_ctx->range_decl();
-//         if (range_decl == nullptr) {
-//             continue;
-//         }
-//         if (auto *explicit_range = range_decl->explicit_range()) {
-//             translator_.makeRange(explicit_range);
-//         }
-//     }
-// }
-
 void Visitor::visitExplicitRange(vhdlParser::Explicit_rangeContext *ctx)
 {
     translator_.makeRange(ctx);
