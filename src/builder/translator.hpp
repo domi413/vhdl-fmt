@@ -5,10 +5,13 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
 #include "ast/nodes/expressions.hpp"
+#include "ast/nodes/ranges.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/trivia/trivia_binder.hpp"
+#include "tree/ParseTree.h"
 #include "vhdlParser.h"
 
+#include <concepts>
 #include <functional>
 
 namespace builder {

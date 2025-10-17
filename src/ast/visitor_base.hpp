@@ -83,9 +83,10 @@ class BaseVisitor : public Visitor
         walk(static_cast<const Declaration &>(node));
     }
 
-    void visit(const GenericParam &node) override { 
+    void visit(const GenericParam &node) override
+    {
         dispatch(node.default_expr);
-        walk(static_cast<const Declaration &>(node)); 
+        walk(static_cast<const Declaration &>(node));
     }
 
     void visit(const Port &node) override

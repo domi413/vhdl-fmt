@@ -5,8 +5,11 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/entity.hpp"
+#include "ast/nodes/expressions.hpp"
+#include "ast/nodes/ranges.hpp"
 #include "ast/visitor_base.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <iosfwd>
 #include <string>

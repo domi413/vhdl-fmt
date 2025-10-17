@@ -4,6 +4,9 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/entity.hpp"
+#include "ast/nodes/expressions.hpp"
+#include "ast/nodes/ranges.hpp"
+#include "ast/nodes/statements.hpp"
 
 #include <cstddef>
 #include <cstdint>

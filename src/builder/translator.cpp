@@ -2,9 +2,9 @@
 
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
+#include "ast/nodes/expressions.hpp"
+#include "ast/nodes/ranges.hpp"
 #include "vhdlParser.h"
-
-#include <ParserRuleContext.h>
 
 namespace builder {
 
