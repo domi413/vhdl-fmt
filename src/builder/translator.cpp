@@ -224,7 +224,7 @@ auto Translator::makeExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Exp
     auto &group = spawn<ast::GroupExpr>(ctx);
     into(group.children, [&] {
         for (auto *child : ctx->children) {
-            auto &tok = spawn<ast::TokenExpr>(ctx);
+            auto &tok = spawn<ast::TokenExpr>();
             tok.text = child->getText();
         }
     });
