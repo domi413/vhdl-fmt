@@ -4,6 +4,7 @@
 #include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
+#include "builder/trivia/trivia_binder.hpp"
 #include "builder/visitor.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
@@ -51,7 +52,8 @@ auto main(int argc, char *argv[]) -> int
         // -- AST construction --
         ast::DesignFile root;
         builder::Assembler builder(root.units);
-        builder::Translator translator(builder, tokens);
+        builder::TriviaBinder trivia(tokens);
+        builder::Translator translator(builder, trivia);
         builder::Visitor visitor(translator);
         builder::adapter::AntlrVoidAdapter adapter(visitor);
         tree->accept(&adapter);

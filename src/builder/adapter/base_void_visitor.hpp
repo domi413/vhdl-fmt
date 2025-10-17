@@ -15,7 +15,7 @@ namespace builder::adapter {
 /// that forwards calls into this visitor.
 class BaseVoidVisitor : public VoidVisitor
 {
-  protected:
+  public:
     /// @brief Dispatch a single node to this visitor.
     ///
     /// Creates an `AntlrVoidAdapter` to adapt between ANTLR's visitor API
@@ -47,7 +47,6 @@ class BaseVoidVisitor : public VoidVisitor
         }
     }
 
-  public:
     void visitAbstractLiteral(vhdlParser::Abstract_literalContext *context) override { walk(context); }
     void visitAccessTypeDefinition(vhdlParser::Access_type_definitionContext *context) override { walk(context); }
     void visitAcrossAspect(vhdlParser::Across_aspectContext *context) override { walk(context); }

@@ -17,7 +17,7 @@ class Visitor : public adapter::BaseVoidVisitor
 
   public:
     /// @brief Create a visitor bound to a translator.
-    explicit Visitor(Translator &t) : translator_(t) {}
+    explicit Visitor(Translator &t) : translator_(t) { translator_.attachTraversal(*this); }
 
     ~Visitor() override = default;
     Visitor(const Visitor &) = delete;
@@ -38,7 +38,7 @@ class Visitor : public adapter::BaseVoidVisitor
     void visitSignalDeclaration(vhdlParser::Signal_declarationContext *ctx) override;
 
     // Constraints
-    void visitConstraint(vhdlParser::ConstraintContext *ctx) override;
+    void visitExplicitRange(vhdlParser::Explicit_rangeContext *ctx) override;
 
     // Expressions
     void visitSimpleExpression(vhdlParser::Simple_expressionContext *ctx) override;

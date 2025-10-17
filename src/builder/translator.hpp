@@ -1,7 +1,6 @@
 #ifndef BUILDER_TRANSLATOR_HPP
 #define BUILDER_TRANSLATOR_HPP
 
-#include "CommonTokenStream.h"
 #include "ParserRuleContext.h"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
@@ -10,35 +9,24 @@
 #include "builder/trivia/trivia_binder.hpp"
 #include "vhdlParser.h"
 
+#include <functional>
+
 namespace builder {
+
+template<typename T>
+concept Traversal = requires(T t, antlr4::tree::ParseTree *node) {
+    { t.dispatch(node) } -> std::same_as<void>;
+    { t.walk(node) } -> std::same_as<void>;
+};
 
 class Translator
 {
-  public:
-    Translator(Assembler &ass, antlr4::CommonTokenStream &tokens) :
-      assembler_(ass),
-      tokens_(tokens),
-      trivia_(tokens)
-    {
-    }
-
-    ~Translator() = default;
-    Translator(const Translator &) = delete;
-    auto operator=(const Translator &) -> Translator & = delete;
-    Translator(Translator &&) = delete;
-    auto operator=(Translator &&) -> Translator & = delete;
-
-    template<typename Dest, typename Fn>
-    void into(Dest &dest, Fn &&fn)
-    {
-        assembler_.into(dest, std::forward<Fn>(fn));
-    }
-
-  private:
     Assembler &assembler_;
-    antlr4::CommonTokenStream &tokens_;
-    TriviaBinder trivia_;
+    TriviaBinder &trivia_;
+    std::function<void(antlr4::tree::ParseTree *)> dispatch_;
+    std::function<void(antlr4::tree::ParseTree *)> walk_;
 
+    /// @brief Spawn a new AST node of type T, binding trivia from the given context.
     template<typename T>
     auto spawn(antlr4::ParserRuleContext *ctx) -> T &
     {
@@ -47,7 +35,37 @@ class Translator
         return node;
     }
 
+    /// @brief Spawn a new AST node of type T without binding trivia.
+    template<typename T>
+    auto spawn() -> T &
+    {
+        auto &node = assembler_.spawn<T>();
+        return node;
+    }
+
+    /// @brief Helper to populate a destination container via a lambda.
+    template<typename Dest, typename Fn>
+    void into(Dest &dest, Fn &&fn)
+    {
+        assembler_.into(dest, std::forward<Fn>(fn));
+    }
+
   public:
+    Translator(Assembler &ass, TriviaBinder &tv) : assembler_(ass), trivia_(tv) {}
+
+    ~Translator() = default;
+    Translator(const Translator &) = delete;
+    auto operator=(const Translator &) -> Translator & = delete;
+    Translator(Translator &&) = delete;
+    auto operator=(Translator &&) -> Translator & = delete;
+
+    template<Traversal T>
+    void attachTraversal(T &trav)
+    {
+        dispatch_ = [&trav](antlr4::tree::ParseTree *node) { trav.dispatch(node); };
+        walk_ = [&trav](antlr4::tree::ParseTree *node) { trav.walk(node); };
+    }
+
     // Design units
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
     auto makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture &;

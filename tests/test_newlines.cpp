@@ -31,7 +31,8 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
 
     auto design = std::make_unique<ast::DesignFile>();
     builder::Assembler assembler(design->units);
-    builder::Translator translator(assembler, tokens);
+    builder::TriviaBinder trivia(tokens);
+    builder::Translator translator(assembler, trivia);
     builder::Visitor visitor(translator);
     builder::adapter::AntlrVoidAdapter adapter(visitor);
     tree->accept(&adapter);
