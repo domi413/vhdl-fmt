@@ -53,7 +53,7 @@ auto main(int argc, char *argv[]) -> int
         ast::DesignFile root;
         builder::Assembler builder(root.units);
         builder::TriviaBinder trivia(tokens);
-        builder::Translator translator(builder, trivia);
+        builder::Translator translator(builder, trivia, tokens);
         builder::Visitor visitor(translator);
         builder::adapter::AntlrVoidAdapter adapter(visitor);
         tree->accept(&adapter);

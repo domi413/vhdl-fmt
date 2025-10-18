@@ -11,6 +11,7 @@
 #include "tree/ParseTree.h"
 #include "vhdlParser.h"
 
+#include <CommonTokenStream.h>
 #include <concepts>
 #include <functional>
 
@@ -26,6 +27,7 @@ class Translator
 {
     Assembler &assembler_;
     TriviaBinder &trivia_;
+    antlr4::CommonTokenStream &tokens_;
     std::function<void(antlr4::tree::ParseTree *)> dispatch_;
     std::function<void(antlr4::tree::ParseTree *)> walk_;
 
@@ -53,8 +55,19 @@ class Translator
         assembler_.into(dest, std::forward<Fn>(fn));
     }
 
+    /**
+     *  TODO(dyb): This is currently a hack to tokenize expressions.
+     *  This should later be removed for proper expression handling.
+     */
+    auto makeTokenizedExpr(antlr4::ParserRuleContext *ctx) -> ast::Expr &;
+
   public:
-    Translator(Assembler &ass, TriviaBinder &tv) : assembler_(ass), trivia_(tv) {}
+    Translator(Assembler &ass, TriviaBinder &tv, antlr4::CommonTokenStream &tokens) :
+      assembler_(ass),
+      trivia_(tv),
+      tokens_(tokens)
+    {
+    }
 
     ~Translator() = default;
     Translator(const Translator &) = delete;
@@ -88,7 +101,8 @@ class Translator
     auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range &;
 
     // Expressions
-    auto makeExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr &;
+    auto makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr &;
+    auto makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr &;
 };
 
 } // namespace builder

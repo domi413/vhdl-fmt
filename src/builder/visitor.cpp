@@ -54,9 +54,14 @@ void Visitor::visitExplicitRange(vhdlParser::Explicit_rangeContext *ctx)
 // -----------------------------------------------------------------------------
 // Expressions
 // -----------------------------------------------------------------------------
-void Visitor::visitSimpleExpression(vhdlParser::Simple_expressionContext *ctx)
+void Visitor::visitExpression(vhdlParser::ExpressionContext *ctx)
 {
     translator_.makeExpr(ctx);
+}
+
+void Visitor::visitSimpleExpression(vhdlParser::Simple_expressionContext *ctx)
+{
+    translator_.makeSimpleExpr(ctx);
 }
 
 } // namespace builder

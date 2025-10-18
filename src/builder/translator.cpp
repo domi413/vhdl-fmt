@@ -2,11 +2,8 @@
 
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
-#include "ast/nodes/expressions.hpp"
 #include "ast/nodes/ranges.hpp"
 #include "vhdlParser.h"
-
-#include <ParserRuleContext.h>
 
 namespace builder {
 
@@ -217,25 +214,6 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range
     });
 
     return range;
-}
-
-auto Translator::makeExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr &
-{
-    if (ctx->children.size() == 1) {
-        auto &tok = spawn<ast::TokenExpr>(ctx);
-        tok.text = ctx->getText();
-        return tok;
-    }
-
-    auto &group = spawn<ast::GroupExpr>(ctx);
-    into(group.children, [&] {
-        for (auto *child : ctx->children) {
-            auto &tok = spawn<ast::TokenExpr>();
-            tok.text = child->getText();
-        }
-    });
-
-    return group;
 }
 
 } // namespace builder

@@ -41,6 +41,7 @@ class Visitor : public adapter::BaseVoidVisitor
     void visitExplicitRange(vhdlParser::Explicit_rangeContext *ctx) override;
 
     // Expressions
+    void visitExpression(vhdlParser::ExpressionContext *ctx) override;
     void visitSimpleExpression(vhdlParser::Simple_expressionContext *ctx) override;
 };
 
