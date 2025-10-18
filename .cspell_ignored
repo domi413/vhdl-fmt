@@ -3,6 +3,7 @@ antlr
 antlr4
 conanfile
 domi
+flto
 germesi
 gersemi
 subnature
@@ -11,12 +12,17 @@ wconversion
 wdouble
 werror
 wextra
+wfloat
+wfor
 wmisleading
 wnon
 wnull
 woverloaded
 wped
 wpedantic
+wpoison
 wshadow
 wsign
+wsuggest
+wsuper
 wunused

@@ -3,22 +3,21 @@
 
 namespace ast {
 
+struct Node;
 struct DesignFile;
 struct Entity;
 struct GenericParam;
 struct Range;
 struct Port;
 
-/**
- * @brief Interface used to traverse semantic context (AST nodes).
- *
- * The `ASTVisitor` walks the tree produced by the builder layer.
- *
- * Responsibilities:
- *  - Traverse semantic context (AST nodes)
- */
-struct Visitor
+/// @brief Abstract interface for visiting AST nodes.
+///
+/// Defines the entry points for all visitable node types.
+/// Concrete visitors implement these to perform operations
+/// such as formatting, analysis, or transformation.
+class Visitor
 {
+  public:
     Visitor() = default;
     virtual ~Visitor() = default;
 
@@ -27,10 +26,8 @@ struct Visitor
     Visitor(Visitor &&) = delete;
     auto operator=(Visitor &&) -> Visitor & = delete;
 
-    // ---- Root ----
+    // Node visitors
     virtual void visit(const DesignFile &) = 0;
-
-    // ---- Declarations ----
     virtual void visit(const Entity &) = 0;
     virtual void visit(const GenericParam &) = 0;
     virtual void visit(const Port &) = 0;

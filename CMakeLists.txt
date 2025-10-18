@@ -30,8 +30,13 @@ find_package(Catch2 CONFIG REQUIRED)
 # --------------------------------------------------------------------
 # ANTLR Generation
 # --------------------------------------------------------------------
-set(GRAMMAR_FILE ${CMAKE_SOURCE_DIR}/grammars/vhdl.g4)
+set(GRAMMAR_DIR ${CMAKE_SOURCE_DIR}/grammars)
 set(GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
+
+set(GRAMMAR_FILES
+    ${GRAMMAR_DIR}/vhdlLexer.g4
+    ${GRAMMAR_DIR}/vhdlParser.g4
+)
 
 find_program(ANTLR4_EXECUTABLE antlr4 REQUIRED)
 
@@ -43,10 +48,10 @@ add_custom_command(
     COMMAND
         ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
     COMMAND
-        ${ANTLR4_EXECUTABLE} -Dlanguage=Cpp ${GRAMMAR_FILE} -lib
-        ${CMAKE_SOURCE_DIR}/grammars -o ${GENERATED_DIR} -no-listener -visitor
+        ${ANTLR4_EXECUTABLE} -Dlanguage=Cpp ${GRAMMAR_FILES} -lib ${GRAMMAR_DIR}
+        -o ${GENERATED_DIR} -no-listener -visitor
     DEPENDS
-        ${GRAMMAR_FILE}
+        ${GRAMMAR_FILES}
     COMMENT "Generating VHDL lexer and parser using ANTLR4"
     VERBATIM
 )

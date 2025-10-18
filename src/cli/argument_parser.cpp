@@ -33,12 +33,17 @@ ArgumentParser::ArgumentParser(std::span<char *> args)
 
 auto ArgumentParser::getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &
 {
-    return config_file_path;
+    return config_file_path_;
+}
+
+auto ArgumentParser::getInputPath() const noexcept -> const std::filesystem::path &
+{
+    return input_path_;
 }
 
 auto ArgumentParser::isFlagSet(ArgumentFlag flag) const noexcept -> bool
 {
-    return used_flags.test(static_cast<std::size_t>(flag));
+    return used_flags_.test(static_cast<std::size_t>(flag));
 }
 
 auto ArgumentParser::parseArguments(std::span<char *> args) -> void
@@ -50,7 +55,25 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
     program.add_epilog("For more information, visit the project documentation.\n"
                        "https://github.com/domi413/vhdl-fmt");
 
-    program.add_argument("input").help("VHDL file or directory to format").metavar("file.vhd");
+    program.add_argument("input")
+      .help("VHDL file or directory to format")
+      .metavar("file.vhd")
+      .action([this](const std::string &location) -> std::string {
+          const std::filesystem::path input_path{ location };
+
+          if (!std::filesystem::exists(input_path)) {
+              throw std::runtime_error(std::format("Input path does not exist: {}", location));
+          }
+
+          if (!std::filesystem::is_regular_file(input_path)
+              && !std::filesystem::is_directory(input_path)) {
+              throw std::runtime_error(
+                std::format("Input path is not a regular file or directory: {}", location));
+          }
+
+          input_path_ = std::filesystem::canonical(input_path);
+          return location;
+      });
 
     program.add_argument("-w", std::string(FLAG_WRITE))
       .help("Overwrites the input file with formatted content")
@@ -77,7 +100,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
                 std::format("Configuration path is not a regular file: {}", location));
           }
 
-          config_file_path = std::filesystem::canonical(config_path);
+          config_file_path_ = std::filesystem::canonical(config_path);
           return location;
       });
 
@@ -94,8 +117,8 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
 
         program.parse_args(c_args);
 
-        used_flags.set(static_cast<std::size_t>(ArgumentFlag::WRITE), program.is_used(FLAG_WRITE));
-        used_flags.set(static_cast<std::size_t>(ArgumentFlag::CHECK), program.is_used(FLAG_CHECK));
+        used_flags_.set(static_cast<std::size_t>(ArgumentFlag::WRITE), program.is_used(FLAG_WRITE));
+        used_flags_.set(static_cast<std::size_t>(ArgumentFlag::CHECK), program.is_used(FLAG_CHECK));
 
     } catch (const std::exception &err) {
         std::cerr << std::format("Error parsing arguments: {}\n", err.what());

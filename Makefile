@@ -28,7 +28,7 @@ $(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
 
 $(CONAN_STAMP): conanfile.txt
 	@echo "Running Conan ($(BUILD_TYPE))..."
-	@$(VENV_BIN)conan install . \
+	@conan install . \
 		-pr=clang.profile \
 		--build=missing \
 		-s build_type=$(BUILD_TYPE)
@@ -41,6 +41,9 @@ run: $(BUILD_STAMP)
 
 test: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
+
+test-verbose: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET) --verbose
 
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache

@@ -2,6 +2,7 @@
 #include "CommonTokenStream.h"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
+#include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitor.hpp"
@@ -44,8 +45,9 @@ TEST_CASE("Parse entity ports into AST", "[integration][ports]")
     builder::Assembler builder(design.units);
     builder::Translator translator(builder, tokens);
     builder::Visitor visitor(translator);
+    builder::adapter::AntlrVoidAdapter adapter(visitor);
 
-    visitor.walk(tree);
+    tree->accept(&adapter);
 
     // --- Verify AST ---
     REQUIRE(design.units.size() == 1);

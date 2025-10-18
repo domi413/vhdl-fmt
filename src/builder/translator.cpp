@@ -1,13 +1,8 @@
 #include "translator.hpp"
 
-#include "ParserRuleContext.h"
-#include "Token.h"
-#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
-#include "vhdlLexer.h"
 #include "vhdlParser.h"
 
-#include <cstddef>
 #include <vector>
 
 namespace builder {
@@ -23,27 +18,36 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
   -> ast::GenericParam &
 {
     auto &param = spawn<ast::GenericParam>(ctx);
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        param.names.push_back(id_ctx->getText());
+    const auto &ids = ctx->identifier_list()->identifier();
+    param.names.reserve(ids.size());
+
+    for (auto *id_ctx : ids) {
+        param.names.emplace_back(id_ctx->getText());
     }
 
-    param.type = ctx->subtype_indication()->getText();
-    if (ctx->expression() != nullptr) {
-        param.init = ctx->expression()->getText();
+    if (auto *stype = ctx->subtype_indication()) {
+        param.type = stype->getText();
     }
+
+    if (auto *expr = ctx->expression()) {
+        param.init = expr->getText();
+    }
+
     return param;
 }
 
 auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port &
 {
     auto &port = spawn<ast::Port>(ctx);
+    const auto &ids = ctx->identifier_list()->identifier();
+    port.names.reserve(ids.size());
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        port.names.push_back(id_ctx->getText());
+    for (auto *id_ctx : ids) {
+        port.names.emplace_back(id_ctx->getText());
     }
 
-    if (ctx->signal_mode() != nullptr) {
-        port.mode = ctx->signal_mode()->getText();
+    if (auto *mode = ctx->signal_mode()) {
+        port.mode = mode->getText();
     }
 
     if (auto *stype = ctx->subtype_indication()) {
@@ -52,9 +56,8 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         }
     }
 
-    // Optional initializer
-    if (ctx->expression() != nullptr) {
-        port.init = ctx->expression()->getText();
+    if (auto *expr = ctx->expression()) {
+        port.init = expr->getText();
     }
 
     return port;
@@ -69,46 +72,4 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range
 
     return range;
 }
-
-void Translator::attachComments(ast::Node &node, const antlr4::ParserRuleContext *ctx)
-{
-    if (ctx == nullptr) {
-        return;
-    }
-    auto &cm = node.getComments();
-    auto kind = [](const antlr4::Token *t) -> ast::Comment::Kind {
-        return t->getType() == vhdlLexer::COMMENT ? ast::Comment::Kind::LINE
-                                                  : ast::Comment::Kind::BLOCK;
-    };
-    const auto push
-      = [&](const antlr4::Token *t, std::vector<ast::Comment> &dst, bool is_inline) -> void {
-        if (!t) {
-            return;
-        }
-        const std::size_t idx{ t->getTokenIndex() };
-        if (consumed_comment_token_indices.contains(idx)) {
-            return;
-        }
-        consumed_comment_token_indices.insert(idx);
-        dst.push_back({ t->getText(), kind(t), static_cast<int>(t->getLine()), is_inline });
-    };
-
-    // Leading: everything hidden to the left of start (consume all)
-    for (const auto *t : tokens.getHiddenTokensToLeft(ctx->getStart()->getTokenIndex())) {
-        push(t, cm.leading, false);
-    }
-
-    // Trailing: only inline. Standalone comments are left
-    // unconsumed here so the next node will pick them up as leading.
-    const std::size_t stop_line = ctx->getStop()->getLine();
-    for (const auto *t : tokens.getHiddenTokensToRight(ctx->getStop()->getTokenIndex())) {
-        if (t == nullptr) {
-            continue;
-        }
-        if (t->getLine() == stop_line) {
-            push(t, cm.trailing, true);
-        }
-    }
-}
-
 } // namespace builder

@@ -136,13 +136,15 @@ jobs:
           source venv/bin/activate
           conan profile detect --force
 
-      - name: Build
-        run: make
-
       - name: Check formatting
         run: |
           source venv/bin/activate
           make check-format
+
+      - name: Build
+        run: |
+          source venv/bin/activate
+          make
 
       - name: Run lint
         run: |

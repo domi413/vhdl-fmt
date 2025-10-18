@@ -8,9 +8,19 @@
 
 namespace builder::adapter {
 
+/// @brief Base visitor for CST traversals.
+///
+/// Provides generic traversal utilities used by ANTLR-generated visitors.
+/// Wraps recursive walking and dispatching through an `AntlrVoidAdapter`
+/// that forwards calls into this visitor.
 class BaseVoidVisitor : public VoidVisitor
 {
   protected:
+    /// @brief Dispatch a single node to this visitor.
+    ///
+    /// Creates an `AntlrVoidAdapter` to adapt between ANTLR's visitor API
+    /// and the concrete visitor implementation, then invokes `accept()`
+    /// on the provided node.
     void dispatch(antlr4::tree::ParseTree *node)
     {
         if (node == nullptr) {
@@ -20,6 +30,10 @@ class BaseVoidVisitor : public VoidVisitor
         node->accept(&adapter);
     }
 
+    /// @brief Walk all children of a node.
+    ///
+    /// Iterates over each child in the parse tree and recursively
+    /// dispatches them using `AntlrVoidAdapter`.
     void walk(antlr4::tree::ParseTree *node)
     {
         if (node == nullptr) {

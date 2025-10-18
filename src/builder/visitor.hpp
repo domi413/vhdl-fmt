@@ -3,29 +3,21 @@
 
 #include "builder/adapter/base_void_visitor.hpp"
 #include "translator.hpp"
-#include "tree/ParseTree.h"
 #include "vhdlParser.h"
 
 namespace builder {
 
-/**
- * @brief Traverses ANTLR contexts (CST nodes).
- *
- * The `Visitor` walks the parse tree produced by the ANTLR4 VHDL grammar
- * and delegates semantic node creation to `Translator`.
- *
- * Responsibilities:
- *  - Traverse ANTLR contexts (CST nodes)
- *  - Route subtrees to the correct AST construction functions
- *  - Maintain traversal structure (e.g., visitEntity, visitPort)
- *  - Pure traversal logic; no AST construction occurs here directly
- */
+/// @brief CST visitor that builds AST nodes via `Translator`.
+///
+/// Walks the ANTLR4 VHDL parse tree and delegates node construction
+/// to the associated `Translator`. Contains traversal logic only.
 class Visitor : public adapter::BaseVoidVisitor
 {
-    Translator &translator;
+    Translator &translator_; ///< Translator used for node creation.
 
   public:
-    explicit Visitor(Translator &t) : translator(t) {};
+    /// @brief Create a visitor bound to a translator.
+    explicit Visitor(Translator &t) : translator_(t) {}
 
     ~Visitor() override = default;
     Visitor(const Visitor &) = delete;
@@ -33,8 +25,7 @@ class Visitor : public adapter::BaseVoidVisitor
     Visitor(Visitor &&) = delete;
     auto operator=(Visitor &&) -> Visitor & = delete;
 
-    void walk(antlr4::tree::ParseTree *ctx) { adapter::BaseVoidVisitor::walk(ctx); }
-
+    // Node visitors
     void visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx) override;
     void visitGenericClause(vhdlParser::Generic_clauseContext *ctx) override;
     void visitPortClause(vhdlParser::Port_clauseContext *ctx) override;

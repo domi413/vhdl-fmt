@@ -2,77 +2,79 @@
 #define BUILDER_ASSEMBLY_ASSEMBLER_HPP
 
 #include "ast/node.hpp"
-#include "builder/assembly/scope.hpp"
 #include "builder/assembly/sink.hpp"
 
 #include <cassert>
 #include <concepts>
 #include <memory>
+#include <utility>
 #include <vector>
 
 namespace builder {
 
-/**
- * @brief Assembles AST nodes into hierarchical structures.
- *
- * The `Assembler` manages node creation and insertion into active
- * AST containers (sinks). It provides scoped control over where new
- * nodes are appended during AST assembly.
- *
- * Responsibilities:
- *  - Spawn and insert new AST nodes
- *  - Manage nested insertion scopes via `with` / `into`
- *  - Ensure sink stack integrity during construction
- *
- * Contains no parsing or traversal logic.
- */
-struct Assembler
+/// @brief Hierarchical AST node assembler.
+///
+/// Manages scoped insertion of `ast::Node`-derived objects into
+/// heterogeneously-typed containers (e.g. `std::vector<std::unique_ptr<T>>`).
+class Assembler
 {
-    using Node = ast::Node;
-    using NodePtr = std::unique_ptr<Node>;
-
-    // Attach to any node container (e.g. DesignFile.units)
-    explicit Assembler(std::vector<std::unique_ptr<ast::Node>> &sink)
+  public:
+    /// @brief Initialize assembler with a root sink (e.g. `DesignFile.units`).
+    template<typename Vec>
+    explicit Assembler(Vec &root)
     {
-        this->sinks.push_back(std::make_unique<SinkImpl<ast::Node>>(sink));
+        pushSink(root);
     }
 
-    ~Assembler() noexcept { assert(this->sinks.size() <= 1 && "Unclosed sinks remain!"); }
+    ~Assembler() noexcept { assert(sinks_.size() == 1 && "Unclosed sinks remain!"); }
 
     Assembler(const Assembler &) = delete;
     auto operator=(const Assembler &) -> Assembler & = delete;
     Assembler(Assembler &&) = delete;
     auto operator=(Assembler &&) -> Assembler & = delete;
 
-    // Spawn node and insert into current sink
-    template<typename T, typename... Args>
+    /// @brief Create and insert a new node into the active sink.
+    /// @return Reference to the created node.
+    template<std::derived_from<ast::Node> T>
     [[nodiscard]]
-    auto spawn(Args &&...args) -> T &
+    auto spawn() -> T &
     {
-        static_assert(std::derived_from<T, Node>, "T must derive from ast::Node");
-        assert(!this->sinks.empty() && "No active sink");
-
-        auto node{ std::make_unique<T>(std::forward<Args>(args)...) };
+        assert(!sinks_.empty() && "No active sink!");
+        auto node = std::make_unique<T>();
         T &ref = *node;
-        this->sinks.back()->push(std::move(node));
+        sinks_.back()->push(std::move(node));
         return ref;
     }
 
-    template<typename Vec>
-    auto with(Vec &vec) -> SlotGuard<Vec>
-    {
-        return SlotGuard<Vec>(this->sinks, vec);
-    }
-
+    /// @brief Temporarily redirect insertions into another container.
     template<typename Vec, typename Fn>
     void into(Vec &vec, Fn &&fn)
     {
-        auto g = with(vec);
+        pushSink(vec);
         std::forward<Fn>(fn)();
+        sinks_.pop_back();
     }
 
   private:
-    std::vector<std::unique_ptr<ISink>> sinks; // stack of active sinks
+    /// @brief Stack of active sinks.
+    std::vector<std::unique_ptr<ISink>> sinks_;
+
+    /// @brief Push a new sink for the given container.
+    template<typename T>
+    void pushSink(std::vector<std::unique_ptr<T>> &vec)
+    {
+        static_assert(std::derived_from<T, ast::Node>,
+                      "Sink element type must derive from ast::Node");
+        sinks_.push_back(std::make_unique<Sink<T>>(vec));
+    }
+
+    template<typename Slot>
+    void pushSink(std::unique_ptr<Slot> &slot)
+    {
+        static_assert(std::derived_from<Slot, ast::Node>,
+                      "Sink slot type must derive from ast::Node");
+        sinks_.push_back(std::make_unique<SingleSink<Slot>>(slot));
+    }
 };
 
 } // namespace builder

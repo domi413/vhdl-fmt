@@ -3,53 +3,90 @@
 
 #include "ast/visitor.hpp"
 
-#include <cstdint>
+#include <cstddef>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace ast {
 
-struct Comment
+struct Comments
 {
-    enum class Kind : std::uint8_t
-    {
-        LINE,
-        BLOCK
-    };
-
     std::string text;
-    Kind kind;
-    int line{ 0 };
-    bool is_inline{ false };
 };
 
+struct Newlines
+{
+    std::size_t breaks{ 1 };
+};
+
+/// @brief A variant representing either a comment or a newline to preserve order.
+using Trivia = std::variant<Comments, Newlines>;
+
+/// @brief Base class for all AST nodes.
 struct Node
 {
     Node() = default;
     virtual ~Node() = default;
+
     Node(const Node &) = default;
     auto operator=(const Node &) -> Node & = default;
     Node(Node &&) = default;
     auto operator=(Node &&) -> Node & = default;
 
-    struct NodeComments
+    /// @brief Container for leading and trailing trivia (Newlines are only counted leading).
+    struct NodeTrivia
     {
-        std::vector<Comment> leading;
-        std::vector<Comment> trailing;
+        std::vector<Trivia> leading;
+        std::vector<Comments> trailing;
     };
 
+    /// @brief Accept a visitor for dynamic dispatch.
     virtual void accept(Visitor &v) const = 0;
 
-    auto getComments() -> NodeComments & { return comments.emplace(); }
+    /// @brief Create and return this node’s comment block.
+    auto emplaceTrivia() -> NodeTrivia & { return trivia_.emplace(); }
+
+    /// @brief Return attached comments if present.
     [[nodiscard]]
-    auto tryGetComments() const -> const std::optional<NodeComments> &
+    auto tryGetTrivia() const -> const std::optional<NodeTrivia> &
     {
-        return this->comments;
+        return trivia_;
+    }
+
+    /// @brief Check if this node has any trivia attached.
+    [[nodiscard]]
+    auto hasTrivia() const -> bool
+    {
+        return trivia_.has_value();
+    }
+
+    /// @brief Return leading trivia (comments + newlines) if present, else empty.
+    [[nodiscard]]
+    auto leading() const -> const std::vector<Trivia> &
+    {
+        static const auto e = std::vector<Trivia>{};
+        return trivia_ ? trivia_->leading : e;
+    }
+
+    /// @brief Return trailing comments if present, else empty.
+    [[nodiscard]]
+    auto trailing() const -> const std::vector<Comments> &
+    {
+        static const auto e = std::vector<Comments>{};
+        return trivia_ ? trivia_->trailing : e;
     }
 
   private:
-    std::optional<NodeComments> comments;
+    std::optional<NodeTrivia> trivia_;
+};
+
+/// @brief CRTP base class to simplify visitor pattern implementation.
+template<typename Derived, typename Base = Node>
+struct Visitable : Base
+{
+    void accept(Visitor &v) const override { v.visit(static_cast<const Derived &>(*this)); }
 };
 
 } // namespace ast

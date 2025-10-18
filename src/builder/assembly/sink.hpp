@@ -1,5 +1,5 @@
-#ifndef BUILDER_ASSEMBLY_BUILDER_SINK_HPP
-#define BUILDER_ASSEMBLY_BUILDER_SINK_HPP
+#ifndef BUILDER_ASSEMBLY_SINK_HPP
+#define BUILDER_ASSEMBLY_SINK_HPP
 
 #include "ast/node.hpp"
 
@@ -9,43 +9,64 @@
 
 namespace builder {
 
+/// @brief Abstract interface for AST node sinks.
+///
+/// Provides a uniform way to accept `std::unique_ptr<ast::Node>` objects,
+/// regardless of their concrete container type.
 struct ISink
 {
-    using Node = ast::Node;
-    using NodePtr = std::unique_ptr<Node>;
-
+    /// @brief Default constructor required for derived sink initialization.
     ISink() = default;
     virtual ~ISink() = default;
+
     ISink(const ISink &) = delete;
     auto operator=(const ISink &) -> ISink & = delete;
     ISink(ISink &&) = delete;
     auto operator=(ISink &&) -> ISink & = delete;
 
-    virtual void push(NodePtr n) = 0;
+    /// @brief Insert a node into the underlying container.
+    virtual void push(std::unique_ptr<ast::Node>) = 0;
 };
 
-template<typename T>
-struct SinkImpl : ISink
+/// @brief Type-specific sink for containers of derived nodes.
+///
+/// Adapts a `std::vector<std::unique_ptr<ElemT>>` to the `ISink` interface,
+/// casting incoming `ast::Node` pointers to the correct element type before insertion.
+template<typename ElemT>
+struct Sink : ISink
 {
-    explicit SinkImpl(std::vector<std::unique_ptr<T>> &v) : vec(v) {}
+    /// @brief Bind this sink to an external node container.
+    explicit Sink(std::vector<std::unique_ptr<ElemT>> &v) : vec_(v) {}
 
-    ~SinkImpl() override = default;
-    SinkImpl(const SinkImpl &) = delete;
-    auto operator=(const SinkImpl &) -> SinkImpl & = delete;
-    SinkImpl(SinkImpl &&) = delete;
-    auto operator=(SinkImpl &&) -> SinkImpl & = delete;
-
-    void push(NodePtr n) override
+    /// @brief Store a node in the bound container after casting.
+    void push(std::unique_ptr<ast::Node> n) override
     {
-        auto *casted{ dynamic_cast<T *>(n.release()) };
-        assert(casted && "Wrong node type pushed into sink!");
-        this->vec.emplace_back(casted);
+        auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));
+        vec_.emplace_back(std::move(casted));
     }
 
   private:
-    std::vector<std::unique_ptr<T>> &vec;
+    /// @brief Reference to the target container.
+    std::vector<std::unique_ptr<ElemT>> &vec_;
+};
+
+/// @brief Type-specific sink for a single unique_ptr<ElemT> "slot".
+template<typename ElemT>
+struct SingleSink : ISink
+{
+    explicit SingleSink(std::unique_ptr<ElemT> &slot) : slot_(slot) {}
+
+    void push(std::unique_ptr<ast::Node> n) override
+    {
+        assert(!slot_ && "SingleSink already occupied");
+        auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));
+        slot_ = std::move(casted);
+    }
+
+  private:
+    std::unique_ptr<ElemT> &slot_;
 };
 
 } // namespace builder
 
-#endif /* BUILDER_ASSEMBLY_BUILDER_SINK_HPP */
+#endif /* BUILDER_ASSEMBLY_SINK_HPP */
