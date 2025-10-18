@@ -70,6 +70,7 @@ class Translator
     }
 
     ~Translator() = default;
+
     Translator(const Translator &) = delete;
     auto operator=(const Translator &) -> Translator & = delete;
     Translator(Translator &&) = delete;

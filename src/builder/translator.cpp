@@ -115,6 +115,8 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port &
 {
     auto &port = spawn<ast::Port>(ctx);
+    const auto &ids = ctx->identifier_list()->identifier();
+    port.names.reserve(ids.size());
 
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         port.names.emplace_back(id_ctx->getText());
@@ -215,5 +217,4 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range
 
     return range;
 }
-
 } // namespace builder
