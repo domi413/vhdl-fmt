@@ -12,10 +12,9 @@
 namespace ast {
 
 // Abstract base for all declarations
-struct Declaration : Visitable<Declaration>
+struct Declaration : Node
 {
     std::vector<std::string> names;
-    virtual ~Declaration() = default;
 };
 
 // Constant declaration: constant WIDTH : integer := 8;

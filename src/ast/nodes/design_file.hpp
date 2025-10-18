@@ -8,10 +8,8 @@
 
 namespace ast {
 
-struct DesignUnit : Visitable<DesignUnit>
-{
-    virtual ~DesignUnit() = default;
-};
+struct DesignUnit : Node
+{};
 
 struct DesignFile : Visitable<DesignFile>
 {

@@ -9,10 +9,8 @@
 
 namespace ast {
 
-struct Statement : Visitable<Statement>
-{
-    virtual ~Statement() = default;
-};
+struct Statement : Node
+{};
 
 // Concurrent signal assignment
 struct ConcurrentAssign : Visitable<ConcurrentAssign, Statement>

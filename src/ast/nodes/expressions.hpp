@@ -8,10 +8,8 @@
 
 namespace ast {
 
-struct Expr : Visitable<Expr>
-{
-    virtual ~Expr() = default;
-};
+struct Expr : Node
+{};
 
 struct TokenExpr : Visitable<TokenExpr, Expr>
 {

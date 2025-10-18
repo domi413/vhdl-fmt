@@ -24,16 +24,16 @@ struct Newlines
 /// @brief A variant representing either a comment or a newline to preserve order.
 using Trivia = std::variant<Comments, Newlines>;
 
-/// @brief Base class for all AST nodes.
+/// @brief Abstract base class for all AST nodes.
 struct Node
 {
     Node() = default;
     virtual ~Node() = default;
 
-    Node(const Node &) = default;
-    auto operator=(const Node &) -> Node & = default;
-    Node(Node &&) = default;
-    auto operator=(Node &&) -> Node & = default;
+    Node(const Node &) = delete;
+    auto operator=(const Node &) -> Node & = delete;
+    Node(Node &&) = delete;
+    auto operator=(Node &&) -> Node & = delete;
 
     /// @brief Container for leading and trailing trivia (Newlines are only counted leading).
     struct NodeTrivia
