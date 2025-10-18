@@ -6,6 +6,8 @@
 #include "ast/nodes/ranges.hpp"
 #include "vhdlParser.h"
 
+#include <ParserRuleContext.h>
+
 namespace builder {
 
 // ---------------------- Design units ----------------------
@@ -89,16 +91,6 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
     into(clause.ports, [&] {
         for (auto *decl : iface->interface_port_declaration()) {
             auto &port = makeSignalPort(decl);
-
-            if (auto *expr = decl->expression()) {
-                into(port.default_expr, [&] { dispatch_(expr); });
-            }
-
-            if (auto *stype = decl->subtype_indication()) {
-                if (auto *constraint = stype->constraint()) {
-                    into(port.constraints, [&] { dispatch_(constraint); });
-                }
-            }
         }
     });
 
@@ -136,7 +128,15 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
     }
 
     if (auto *stype = ctx->subtype_indication()) {
-        port.type_name = stype->getText();
+        port.type_name = stype->selected_name(0)->getText();
+
+        if (auto *constraint = stype->constraint()) {
+            into(port.constraints, [&] { dispatch_(constraint); });
+        }
+    }
+
+    if (auto *expr = ctx->expression()) {
+        into(port.default_expr, [&] { dispatch_(expr); });
     }
 
     return port;
@@ -152,7 +152,7 @@ auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
     }
 
     if (auto *stype = ctx->subtype_indication()) {
-        decl.type_name = stype->getText();
+        decl.type_name = stype->selected_name(0)->getText();
     }
 
     if (auto *expr = ctx->expression()) {
@@ -171,7 +171,7 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
     }
 
     if (auto *stype = ctx->subtype_indication()) {
-        decl.type_name = stype->getText();
+        decl.type_name = stype->selected_name(0)->getText();
     }
 
     decl.has_bus_kw = false;
@@ -186,6 +186,12 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
             if (auto *constraint = stype->constraint()) {
                 dispatch_(constraint);
             }
+        }
+    });
+
+    into(decl.init_expr, [&] {
+        if (auto *expr = ctx->expression()) {
+            dispatch_(expr);
         }
     });
 

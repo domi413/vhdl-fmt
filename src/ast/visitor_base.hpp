@@ -80,6 +80,7 @@ class BaseVisitor : public Visitor
     void visit(const SignalDecl &node) override
     {
         dispatchAll(node.constraints);
+        dispatch(node.init_expr);
         walk(static_cast<const Declaration &>(node));
     }
 
@@ -91,8 +92,8 @@ class BaseVisitor : public Visitor
 
     void visit(const Port &node) override
     {
-        dispatch(node.default_expr);
         dispatchAll(node.constraints);
+        dispatch(node.default_expr);
         walk(static_cast<const Declaration &>(node));
     }
 

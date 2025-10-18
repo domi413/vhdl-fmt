@@ -24,12 +24,13 @@ struct ConstantDecl : Visitable<ConstantDecl, Declaration>
     std::optional<std::string> init_expr;
 };
 
-// Signal declaration: signal clk : std_logic;
+// Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
 struct SignalDecl : Visitable<SignalDecl, Declaration>
 {
     std::string type_name;
     bool has_bus_kw{ false };
     std::vector<std::unique_ptr<Range>> constraints;
+    std::unique_ptr<Expr> init_expr;
 };
 
 // Generic parameter inside GENERIC clause
