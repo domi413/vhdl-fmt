@@ -87,7 +87,7 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
     }
     into(clause.ports, [&] {
         for (auto *decl : iface->interface_port_declaration()) {
-            auto &port = makeSignalPort(decl);
+            makeSignalPort(decl);
         }
     });
 
@@ -155,7 +155,7 @@ auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
     }
 
     if (auto *expr = ctx->expression()) {
-        decl.init_expr = expr->getText();
+        into(decl.init_expr, [&] { dispatch_(expr); });
     }
 
     return decl;
@@ -180,19 +180,15 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
         }
     }
 
-    into(decl.constraints, [&] {
-        if (auto *stype = ctx->subtype_indication()) {
-            if (auto *constraint = stype->constraint()) {
-                dispatch_(constraint);
-            }
+    if (auto *stype = ctx->subtype_indication()) {
+        if (auto *constraint = stype->constraint()) {
+            into(decl.constraints, [&] { dispatch_(constraint); });
         }
-    });
+    }
 
-    into(decl.init_expr, [&] {
-        if (auto *expr = ctx->expression()) {
-            dispatch_(expr);
-        }
-    });
+    if (auto *expr = ctx->expression()) {
+        into(decl.init_expr, [&] { dispatch_(expr); });
+    }
 
     return decl;
 }
@@ -203,17 +199,13 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range
 
     range.direction = ctx->direction()->getText();
 
-    into(range.left, [&] {
-        if (auto *left = ctx->simple_expression(0)) {
-            dispatch_(left);
-        }
-    });
+    if (auto *left = ctx->simple_expression(0)) {
+        into(range.left, [&] { dispatch_(left); });
+    }
 
-    into(range.right, [&] {
-        if (auto *right = ctx->simple_expression(1)) {
-            dispatch_(right);
-        }
-    });
+    if (auto *right = ctx->simple_expression(1)) {
+        into(range.right, [&] { dispatch_(right); });
+    }
 
     return range;
 }

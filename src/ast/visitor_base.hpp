@@ -75,7 +75,10 @@ class BaseVisitor : public Visitor
         (void)node; // abstract
     }
 
-    void visit(const ConstantDecl &node) override { walk(static_cast<const Declaration &>(node)); }
+    void visit(const ConstantDecl &node) override { 
+        dispatch(node.init_expr);
+        walk(static_cast<const Declaration &>(node)); 
+    }
 
     void visit(const SignalDecl &node) override
     {

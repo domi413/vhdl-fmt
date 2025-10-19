@@ -5,7 +5,6 @@
 #include "nodes/ranges.hpp"
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -21,7 +20,7 @@ struct Declaration : Node
 struct ConstantDecl : Visitable<ConstantDecl, Declaration>
 {
     std::string type_name;
-    std::optional<std::string> init_expr;
+    std::unique_ptr<Expr> init_expr;
 };
 
 // Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
