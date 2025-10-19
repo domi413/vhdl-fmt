@@ -58,6 +58,8 @@ auto main(int argc, char *argv[]) -> int
         builder::adapter::AntlrVoidAdapter adapter(visitor);
         tree->accept(&adapter);
 
+        // std::cout << tree->toStringTree(&parser, true) << '\n';
+
         // -- AST printing for debugging --
         emit::DebugPrinter printer(std::cout);
         root.accept(printer);
