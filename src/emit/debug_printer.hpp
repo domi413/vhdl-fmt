@@ -32,8 +32,11 @@ class DebugPrinter : public ast::BaseVisitor
     void visit(const ast::PortClause &node) override;
     void visit(const ast::GenericParam &node) override;
     void visit(const ast::Port &node) override;
-    void visit(const ast::SignalDecl &node) override;
     void visit(const ast::Range &node) override;
+
+    // Declarations
+    void visit(const ast::SignalDecl &node) override;
+    void visit(const ast::ConstantDecl &node) override;
 
     // Expressions
     void visit(const ast::TokenExpr &node) override;

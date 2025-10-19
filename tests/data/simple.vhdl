@@ -19,6 +19,7 @@ architecture rtl of ExampleEntity is
   signal temp : std_logic_vector(7 downto 0);
   signal sum  : integer := 4 + 2;
   signal v : std_logic_vector(7 downto 0) := (others => '0');
+  constant WORD_SIZE : integer := 32;
 begin
   -- Architecture body (left intentionally empty)
 end rtl;

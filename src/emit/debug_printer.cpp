@@ -211,6 +211,23 @@ void DebugPrinter::visit(const ast::SignalDecl &node)
     walk(node);
 }
 
+void DebugPrinter::visit(const ast::ConstantDecl &node)
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < node.names.size(); ++i) {
+        if (i > 0) {
+            oss << ", ";
+        }
+        oss << node.names[i];
+    }
+    oss << " : " << node.type_name;
+
+    emitNodeLike(node, "ConstantDecl", oss.str());
+
+    const IndentGuard _{ indent_ };
+    walk(node);
+}
+
 void DebugPrinter::visit(const ast::Range &node)
 {
     emitNodeLike(node, "Range", node.direction);
