@@ -75,9 +75,10 @@ class BaseVisitor : public Visitor
         (void)node; // abstract
     }
 
-    void visit(const ConstantDecl &node) override { 
+    void visit(const ConstantDecl &node) override
+    {
         dispatch(node.init_expr);
-        walk(static_cast<const Declaration &>(node)); 
+        walk(static_cast<const Declaration &>(node));
     }
 
     void visit(const SignalDecl &node) override
@@ -161,13 +162,23 @@ class BaseVisitor : public Visitor
         walk(static_cast<const Expr &>(node));
     }
 
-    // ---------------------------------------------------------------------
-    // Ranges
-    // ---------------------------------------------------------------------
-    void visit(const Range &node) override
+    void visit(const UnaryExpr &node) override
+    {
+        dispatch(node.value);
+        walk(static_cast<const Expr &>(node));
+    }
+
+    void visit(const BinaryExpr &node) override
     {
         dispatch(node.left);
         dispatch(node.right);
+        walk(static_cast<const Expr &>(node));
+    }
+
+    void visit(const ParenExpr &node) override
+    {
+        dispatch(node.inner);
+        walk(static_cast<const Expr &>(node));
     }
 };
 

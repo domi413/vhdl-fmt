@@ -21,8 +21,9 @@ struct Process;
 struct Expr;
 struct TokenExpr;
 struct GroupExpr;
-
-struct Range;
+struct UnaryExpr;
+struct BinaryExpr;
+struct ParenExpr;
 
 struct GenericClause;
 struct PortClause;
@@ -72,9 +73,9 @@ class Visitor
     virtual void visit(const Expr &) = 0;
     virtual void visit(const TokenExpr &node) = 0;
     virtual void visit(const GroupExpr &node) = 0;
-
-    // Ranges
-    virtual void visit(const Range &) = 0;
+    virtual void visit(const UnaryExpr &node) = 0;
+    virtual void visit(const BinaryExpr &node) = 0;
+    virtual void visit(const ParenExpr &node) = 0;
 };
 
 } // namespace ast

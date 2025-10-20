@@ -43,6 +43,14 @@ class Visitor : public adapter::BaseVoidVisitor
     // Expressions
     void visitExpression(vhdlParser::ExpressionContext *ctx) override;
     void visitSimpleExpression(vhdlParser::Simple_expressionContext *ctx) override;
+    void visitAggregate(vhdlParser::AggregateContext *ctx) override;
+    void visitRelation(vhdlParser::RelationContext *ctx) override;
+    void visitTerm(vhdlParser::TermContext *ctx) override;
+    void visitFactor(vhdlParser::FactorContext *ctx) override;
+    void visitPrimary(vhdlParser::PrimaryContext *ctx) override;
+    void visitShiftExpression(vhdlParser::Shift_expressionContext *ctx) override;
+    void visitChoices(vhdlParser::ChoicesContext *ctx) override;
+    void visitChoice(vhdlParser::ChoiceContext *ctx) override;
 };
 
 } // namespace builder

@@ -6,7 +6,6 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/entity.hpp"
 #include "ast/nodes/expressions.hpp"
-#include "ast/nodes/ranges.hpp"
 #include "ast/visitor_base.hpp"
 
 #include <cstddef>
@@ -32,7 +31,6 @@ class DebugPrinter : public ast::BaseVisitor
     void visit(const ast::PortClause &node) override;
     void visit(const ast::GenericParam &node) override;
     void visit(const ast::Port &node) override;
-    void visit(const ast::Range &node) override;
 
     // Declarations
     void visit(const ast::SignalDecl &node) override;
@@ -41,6 +39,9 @@ class DebugPrinter : public ast::BaseVisitor
     // Expressions
     void visit(const ast::TokenExpr &node) override;
     void visit(const ast::GroupExpr &node) override;
+    void visit(const ast::UnaryExpr &node) override;
+    void visit(const ast::BinaryExpr &node) override;
+    void visit(const ast::ParenExpr &node) override;
 
   private:
     std::ostream &out_;
@@ -61,7 +62,24 @@ class DebugPrinter : public ast::BaseVisitor
     static auto countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t;
 
     template<class NodeT>
-    void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra);
+    void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra)
+    {
+        const std::size_t newlines = countNewlines(node.leading());
+        printNodeHeader(node, extra, pretty_name, newlines);
+
+        const IndentGuard _{ indent_ };
+
+        // Leading comments
+        std::vector<ast::Comments> leading_comments;
+        for (const auto &t : node.leading()) {
+            if (const auto *c = std::get_if<ast::Comments>(&t)) {
+                leading_comments.push_back(*c);
+            }
+        }
+
+        printCommentLines(leading_comments, "(^) ");
+        printCommentLines(node.trailing(), "(>) ");
+    }
 
     struct IndentGuard
     {

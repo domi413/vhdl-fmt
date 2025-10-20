@@ -2,7 +2,7 @@
 #define AST_NODES_DECLARATIONS_HPP
 
 #include "ast/node.hpp"
-#include "nodes/ranges.hpp"
+#include "nodes/expressions.hpp"
 
 #include <memory>
 #include <string>
@@ -28,7 +28,7 @@ struct SignalDecl : Visitable<SignalDecl, Declaration>
 {
     std::string type_name;
     bool has_bus_kw{ false };
-    std::vector<std::unique_ptr<Range>> constraints;
+    std::vector<std::unique_ptr<BinaryExpr>> constraints;
     std::unique_ptr<Expr> init_expr;
 };
 
@@ -45,7 +45,7 @@ struct Port : Visitable<Port, Declaration>
     std::string mode; // "in" / "out"
     std::string type_name;
     std::unique_ptr<Expr> default_expr;
-    std::vector<std::unique_ptr<Range>> constraints;
+    std::vector<std::unique_ptr<BinaryExpr>> constraints;
 };
 
 } // namespace ast

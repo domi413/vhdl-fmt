@@ -4,8 +4,6 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/entity.hpp"
-#include "ast/nodes/expressions.hpp"
-#include "ast/nodes/ranges.hpp"
 #include "ast/nodes/statements.hpp"
 
 #include <cstddef>
@@ -70,28 +68,6 @@ auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &leading) -> std
         }
     }
     return total;
-}
-
-template<class NodeT>
-void DebugPrinter::emitNodeLike(const NodeT &node,
-                                std::string_view pretty_name,
-                                const std::string &extra)
-{
-    const std::size_t newlines = countNewlines(node.leading());
-    printNodeHeader(node, extra, pretty_name, newlines);
-
-    const IndentGuard _{ indent_ };
-
-    // Leading comments
-    std::vector<ast::Comments> leading_comments;
-    for (const auto &t : node.leading()) {
-        if (const auto *c = std::get_if<ast::Comments>(&t)) {
-            leading_comments.push_back(*c);
-        }
-    }
-
-    printCommentLines(leading_comments, "(^) ");
-    printCommentLines(node.trailing(), "(>) ");
 }
 
 // ---- Visitor methods ----
@@ -226,36 +202,6 @@ void DebugPrinter::visit(const ast::ConstantDecl &node)
 
     const IndentGuard _{ indent_ };
     walk(node);
-}
-
-void DebugPrinter::visit(const ast::Range &node)
-{
-    emitNodeLike(node, "Range", node.direction);
-    const IndentGuard _{ indent_ };
-
-    if (node.left) {
-        printLine("left:");
-        const IndentGuard _{ indent_ };
-        node.left->accept(*this);
-    }
-
-    if (node.right) {
-        printLine("right:");
-        const IndentGuard _{ indent_ };
-        node.right->accept(*this);
-    }
-}
-
-void DebugPrinter::visit(const ast::TokenExpr &node)
-{
-    emitNodeLike(node, "TokenExpr", node.text);
-}
-
-void DebugPrinter::visit(const ast::GroupExpr &node)
-{
-    emitNodeLike(node, "GroupExpr", "");
-    const IndentGuard _{ indent_ };
-    dispatchAll(node.children);
 }
 
 } // namespace emit

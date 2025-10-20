@@ -5,7 +5,6 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
 #include "ast/nodes/expressions.hpp"
-#include "ast/nodes/ranges.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "tree/ParseTree.h"
@@ -55,12 +54,6 @@ class Translator
         assembler_.into(dest, std::forward<Fn>(fn));
     }
 
-    /**
-     *  TODO(dyb): This is currently a hack to tokenize expressions.
-     *  This should later be removed for proper expression handling.
-     */
-    auto makeTokenizedExpr(antlr4::ParserRuleContext *ctx) -> ast::Expr &;
-
   public:
     Translator(Assembler &ass, TriviaBinder &tv, antlr4::CommonTokenStream &tokens) :
       assembler_(ass),
@@ -99,11 +92,19 @@ class Translator
     auto makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl &;
 
     // Constraints
-    auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range &;
+    auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::BinaryExpr &;
 
     // Expressions
     auto makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr &;
     auto makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr &;
+    auto makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr &;
+    auto makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr &;
+    auto makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr &;
+    auto makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr &;
+    auto makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr &;
+    auto makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast::Expr &;
+    auto makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr &;
+    auto makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr &;
 };
 
 } // namespace builder

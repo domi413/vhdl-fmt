@@ -2,7 +2,6 @@
 
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
-#include "ast/nodes/ranges.hpp"
 #include "vhdlParser.h"
 
 namespace builder {
@@ -193,20 +192,4 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
     return decl;
 }
 
-auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Range &
-{
-    auto &range = spawn<ast::Range>(ctx);
-
-    range.direction = ctx->direction()->getText();
-
-    if (auto *left = ctx->simple_expression(0)) {
-        into(range.left, [&] { dispatch_(left); });
-    }
-
-    if (auto *right = ctx->simple_expression(1)) {
-        into(range.right, [&] { dispatch_(right); });
-    }
-
-    return range;
-}
 } // namespace builder
