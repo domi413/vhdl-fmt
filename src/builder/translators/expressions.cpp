@@ -169,11 +169,12 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr &
         return makeSimpleExpr(ctx->simple_expression());
     }
 
-    if (ctx->discrete_range() != nullptr) {
-        // For a quick win, keep it as a token (you can later map to your Range AST if you want)
-        auto &tok = spawn<ast::TokenExpr>(ctx);
-        tok.text = ctx->discrete_range()->getText();
-        return tok;
+    if (auto *d_range = ctx->discrete_range()) {
+        if (auto *range = d_range->range_decl()) {
+            if (auto *exp_range = range->explicit_range()) {
+                return makeRange(exp_range);
+            }
+        }
     }
 
     // Fallback
