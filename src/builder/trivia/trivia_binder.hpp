@@ -9,9 +9,7 @@
 #include "builder/trivia/newline_sink.hpp"
 #include "vhdlLexer.h"
 
-#include <algorithm>
 #include <cstddef>
-#include <string_view>
 
 namespace builder {
 
@@ -72,13 +70,6 @@ class TriviaBinder
     static constexpr auto isDefault(const antlr4::Token *t) noexcept -> bool
     {
         return (t != nullptr) && t->getChannel() == vhdlLexer::DEFAULT_TOKEN_CHANNEL;
-    }
-
-    [[nodiscard]]
-    static constexpr auto countLineBreaks(std::string_view s) noexcept -> std::size_t
-    {
-        const auto n = static_cast<std::size_t>(std::ranges::count(s, '\n'));
-        return std::max<std::size_t>(1, n);
     }
 
     [[nodiscard]]

@@ -24,7 +24,7 @@ void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_
         }
 
         if (isNewline(token)) {
-            linebreaks += countLineBreaks(token->getText());
+            ++linebreaks;
             continue;
         }
 
