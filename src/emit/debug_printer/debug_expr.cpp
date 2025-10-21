@@ -1,5 +1,4 @@
 #include "ast/nodes/expressions.hpp"
-
 #include "emit/debug_printer.hpp"
 
 namespace emit {
