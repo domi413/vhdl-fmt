@@ -61,10 +61,10 @@ class Translator
     auto operator=(Translator &&) -> Translator & = delete;
 
     template<Traversal T>
-    void attachTraversal(T &trav)
+    void attachTraversal(T &traversal)
     {
-        dispatch_ = [&trav](antlr4::tree::ParseTree *node) { trav.dispatch(node); };
-        walk_ = [&trav](antlr4::tree::ParseTree *node) { trav.walk(node); };
+        dispatch_ = [&traversal](antlr4::tree::ParseTree *node) { traversal.dispatch(node); };
+        walk_ = [&traversal](antlr4::tree::ParseTree *node) { traversal.walk(node); };
     }
 
     // Design units
