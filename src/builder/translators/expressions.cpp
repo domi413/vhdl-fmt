@@ -3,6 +3,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+// NOLINTBEGIN(misc-no-recursion)
+
 namespace builder {
 
 void Translator::makeExpr(vhdlParser::ExpressionContext *ctx)
@@ -102,7 +104,7 @@ void Translator::makeFactor(vhdlParser::FactorContext *ctx)
         return;
     }
 
-    if (ctx->NOT()) {
+    if (ctx->NOT() != nullptr) {
         spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
             un.op = "not";
             into(un.value, [&] { makePrimary(ctx->primary(0)); });
@@ -203,3 +205,5 @@ void Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx)
 }
 
 } // namespace builder
+
+// NOLINTEND(misc-no-recursion)

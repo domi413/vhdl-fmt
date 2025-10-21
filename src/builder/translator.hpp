@@ -2,8 +2,6 @@
 #define BUILDER_TRANSLATOR_HPP
 
 #include "ParserRuleContext.h"
-#include "ast/nodes/declarations.hpp"
-#include "ast/nodes/entity.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "tree/ParseTree.h"
