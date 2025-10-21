@@ -29,7 +29,7 @@ class Translator
 
     /// @brief Spawn a new AST node of type T, binding trivia from the given context.
     template<typename T, typename F>
-    void spawn(antlr4::ParserRuleContext *ctx, bool trivia, F &&fn)
+    void spawn(const antlr4::ParserRuleContext *ctx, bool trivia, F &&fn)
     {
         auto &node = assembler_.spawn<T>();
         if (trivia) {
