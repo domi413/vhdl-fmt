@@ -67,16 +67,17 @@ endif
 
 # make lint LINT_FILES=header/source to lint either headers or sources
 lint:
+	@echo "Linting with $(LINT_CPUS) cores"
 	@if [ -z "$(SOURCES_TO_LINT)" ]; then \
 		echo "No files to lint (LINT_FILES='$(LINT_FILES)')."; \
 	else \
 		if [ "$(LINT_FILES)" != "header" ]; then \
-			echo "Running clang-tidy on source files with $(LINT_CPUS) cores..."; \
+			echo "Running clang-tidy on source files..."; \
 		fi; \
 		run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES_TO_LINT); \
 		 \
 		if [ "$(LINT_FILES)" = "header" ] || [ -z "$(LINT_FILES)" ]; then \
-			echo "Running clang-tidy on headers with $(LINT_CPUS) cores..."; \
+			echo "Running clang-tidy on headers..."; \
 			echo "$(SOURCES_TO_LINT)" | \
 			xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS); \
 		fi; \
