@@ -1,5 +1,4 @@
 #include "builder/visitor.hpp"
-
 #include "vhdlParser.h"
 
 namespace builder {

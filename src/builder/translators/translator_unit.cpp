@@ -1,6 +1,5 @@
-#include "builder/translator.hpp"
-
 #include "ast/nodes/entity.hpp"
+#include "builder/translator.hpp"
 #include "vhdlParser.h"
 
 namespace builder {
