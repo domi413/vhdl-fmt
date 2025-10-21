@@ -4,7 +4,6 @@
 #include "ParserRuleContext.h"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/entity.hpp"
-#include "ast/nodes/expressions.hpp"
 #include "builder/assembly/assembler.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "tree/ParseTree.h"
@@ -31,20 +30,14 @@ class Translator
     std::function<void(antlr4::tree::ParseTree *)> walk_;
 
     /// @brief Spawn a new AST node of type T, binding trivia from the given context.
-    template<typename T>
-    auto spawn(antlr4::ParserRuleContext *ctx) -> T &
+    template<typename T, typename F>
+    void spawn(antlr4::ParserRuleContext *ctx, bool trivia, F &&fn)
     {
         auto &node = assembler_.spawn<T>();
-        trivia_.bind(node, ctx);
-        return node;
-    }
-
-    /// @brief Spawn a new AST node of type T without binding trivia.
-    template<typename T>
-    auto spawn() -> T &
-    {
-        auto &node = assembler_.spawn<T>();
-        return node;
+        if (trivia) {
+            trivia_.bind(node, ctx);
+        }
+        std::forward<F>(fn)(node);
     }
 
     /// @brief Helper to populate a destination container via a lambda.
@@ -77,34 +70,31 @@ class Translator
     }
 
     // Design units
-    auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &;
-    auto makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture &;
+    void makeEntity(vhdlParser::Entity_declarationContext *ctx);
+    void makeArchitecture(vhdlParser::Architecture_bodyContext *ctx);
 
     // Clauses
-    auto makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause &;
-    auto makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause &;
+    void makeGenericClause(vhdlParser::Generic_clauseContext *ctx);
+    void makePortClause(vhdlParser::Port_clauseContext *ctx);
 
     // Declarations
-    auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
-      -> ast::GenericParam &;
-    auto makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port &;
-    auto makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) -> ast::ConstantDecl &;
-    auto makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl &;
-
-    // Constraints
-    auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::BinaryExpr &;
+    void makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx);
+    void makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx);
+    void makeConstantDecl(vhdlParser::Constant_declarationContext *ctx);
+    void makeSignalDecl(vhdlParser::Signal_declarationContext *ctx);
 
     // Expressions
-    auto makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr &;
-    auto makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr &;
-    auto makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr &;
-    auto makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr &;
-    auto makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr &;
-    auto makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr &;
-    auto makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr &;
-    auto makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast::Expr &;
-    auto makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr &;
-    auto makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr &;
+    void makeExpr(vhdlParser::ExpressionContext *ctx);
+    void makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx);
+    void makeAggregate(vhdlParser::AggregateContext *ctx);
+    void makeRelation(vhdlParser::RelationContext *ctx);
+    void makeTerm(vhdlParser::TermContext *ctx);
+    void makeFactor(vhdlParser::FactorContext *ctx);
+    void makePrimary(vhdlParser::PrimaryContext *ctx);
+    void makeShiftExpr(vhdlParser::Shift_expressionContext *ctx);
+    void makeChoices(vhdlParser::ChoicesContext *ctx);
+    void makeChoice(vhdlParser::ChoiceContext *ctx);
+    void makeRange(vhdlParser::Explicit_rangeContext *ctx);
 };
 
 } // namespace builder

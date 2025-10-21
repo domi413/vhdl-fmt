@@ -9,12 +9,12 @@ namespace builder {
 // -----------------------------------------------------------------------------
 void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 {
-    auto &entity = translator_.makeEntity(ctx);
+    translator_.makeEntity(ctx);
 }
 
 void Visitor::visitArchitectureBody(vhdlParser::Architecture_bodyContext *ctx)
 {
-    auto &arch = translator_.makeArchitecture(ctx);
+    translator_.makeArchitecture(ctx);
 }
 
 // -----------------------------------------------------------------------------
@@ -22,12 +22,12 @@ void Visitor::visitArchitectureBody(vhdlParser::Architecture_bodyContext *ctx)
 // -----------------------------------------------------------------------------
 void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
-    auto &clause = translator_.makeGenericClause(ctx);
+    translator_.makeGenericClause(ctx);
 }
 
 void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
 {
-    auto &clause = translator_.makePortClause(ctx);
+    translator_.makePortClause(ctx);
 }
 
 // -----------------------------------------------------------------------------

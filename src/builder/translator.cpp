@@ -8,188 +8,169 @@ namespace builder {
 
 // ---------------------- Design units ----------------------
 
-auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity &
+void Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx)
 {
-    auto &entity = spawn<ast::Entity>(ctx);
-    entity.name = ctx->identifier(0)->getText();
+    spawn<ast::Entity>(ctx, true, [&](auto &entity) {
+        entity.name = ctx->identifier(0)->getText();
 
-    // Optional end label (ENTITY ... END ENTITY <id>)
-    if (ctx->identifier().size() > 1) {
-        entity.end_label = ctx->identifier(1)->getText();
-    }
-
-    if (auto *header = ctx->entity_header()) {
-        if (auto *gen_clause = header->generic_clause()) {
-            into(entity.generic_clause, [&] { dispatch_(gen_clause); });
+        // Optional end label (ENTITY ... END ENTITY <id>)
+        if (ctx->identifier().size() > 1) {
+            entity.end_label = ctx->identifier(1)->getText();
         }
-        if (auto *port_clause = header->port_clause()) {
-            into(entity.port_clause, [&] { dispatch_(port_clause); });
-        }
-    }
 
-    return entity;
+        if (auto *header = ctx->entity_header()) {
+            if (auto *gen_clause = header->generic_clause()) {
+                into(entity.generic_clause, [&] { dispatch_(gen_clause); });
+            }
+            if (auto *port_clause = header->port_clause()) {
+                into(entity.port_clause, [&] { dispatch_(port_clause); });
+            }
+        }
+    });
 }
 
-auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture &
+void Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx)
 {
-    auto &arch = spawn<ast::Architecture>(ctx);
-    arch.name = ctx->identifier(0)->getText();
-    arch.entity_name = ctx->identifier(1)->getText();
+    spawn<ast::Architecture>(ctx, true, [&](auto &arch) {
+        arch.name = ctx->identifier(0)->getText();
+        arch.entity_name = ctx->identifier(1)->getText();
 
-    if (auto *decl_part = ctx->architecture_declarative_part()) {
-        into(arch.decls, [&] { dispatch_(decl_part); });
-    }
+        if (auto *decl_part = ctx->architecture_declarative_part()) {
+            into(arch.decls, [&] { dispatch_(decl_part); });
+        }
 
-    if (auto *stmt_part = ctx->architecture_statement_part()) {
-        into(arch.stmts, [&] { dispatch_(stmt_part); });
-    }
-
-    return arch;
+        if (auto *stmt_part = ctx->architecture_statement_part()) {
+            into(arch.stmts, [&] { dispatch_(stmt_part); });
+        }
+    });
 }
 
 // ------------------------ Clauses -------------------------
 
-auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause &
+void Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
-    auto &clause = spawn<ast::GenericClause>(ctx);
+    spawn<ast::GenericClause>(ctx, true, [&](auto &clause) {
+        auto *list = ctx->generic_list();
 
-    auto *list = ctx->generic_list();
-
-    if (list == nullptr) {
-        return clause;
-    }
-
-    into(clause.generics, [&] {
-        for (auto *decl : list->interface_constant_declaration()) {
-            auto &param = makeGenericParam(decl);
-
-            if (auto *expr = decl->expression()) {
-                into(param.default_expr, [&] { dispatch_(expr); });
-            }
+        if (list == nullptr) {
+            return;
         }
-    });
 
-    return clause;
+        into(clause.generics, [&] {
+            for (auto *decl : list->interface_constant_declaration()) {
+                makeGenericParam(decl);
+            }
+        });
+    });
 }
 
-auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause &
+void Translator::makePortClause(vhdlParser::Port_clauseContext *ctx)
 {
-    auto &clause = spawn<ast::PortClause>(ctx);
-
-    auto *list = ctx->port_list();
-    if (list == nullptr) {
-        return clause;
-    }
-    auto *iface = list->interface_port_list();
-    if (iface == nullptr) {
-        return clause;
-    }
-    into(clause.ports, [&] {
-        for (auto *decl : iface->interface_port_declaration()) {
-            makeSignalPort(decl);
+    spawn<ast::PortClause>(ctx, true, [&](auto &clause) {
+        auto *list = ctx->port_list();
+        if (list == nullptr) {
+            return;
         }
+        auto *iface = list->interface_port_list();
+        if (iface == nullptr) {
+            return;
+        }
+        into(clause.ports, [&] {
+            for (auto *decl : iface->interface_port_declaration()) {
+                makeSignalPort(decl);
+            }
+        });
     });
-
-    return clause;
 }
 
 // ---------------------- Declarations ----------------------
 
-auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
-  -> ast::GenericParam &
+void Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
 {
-    auto &param = spawn<ast::GenericParam>(ctx);
+    spawn<ast::GenericParam>(ctx, true, [&](auto &param) {
+        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+            param.names.emplace_back(id_ctx->getText());
+        }
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        param.names.emplace_back(id_ctx->getText());
-    }
-
-    if (auto *stype = ctx->subtype_indication()) {
-        param.type_name = stype->getText();
-    }
-
-    return param;
+        if (auto *stype = ctx->subtype_indication()) {
+            param.type_name = stype->getText();
+        }
+    });
 }
 
-auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port &
+void Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx)
 {
-    auto &port = spawn<ast::Port>(ctx);
-    const auto &ids = ctx->identifier_list()->identifier();
-    port.names.reserve(ids.size());
+    spawn<ast::Port>(ctx, true, [&](auto &port) {
+        const auto &ids = ctx->identifier_list()->identifier();
+        port.names.reserve(ids.size());
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        port.names.emplace_back(id_ctx->getText());
-    }
-
-    if (auto *mode = ctx->signal_mode()) {
-        port.mode = mode->getText();
-    }
-
-    if (auto *stype = ctx->subtype_indication()) {
-        port.type_name = stype->selected_name(0)->getText();
-
-        if (auto *constraint = stype->constraint()) {
-            into(port.constraints, [&] { dispatch_(constraint); });
+        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+            port.names.emplace_back(id_ctx->getText());
         }
-    }
 
-    if (auto *expr = ctx->expression()) {
-        into(port.default_expr, [&] { dispatch_(expr); });
-    }
+        if (auto *mode = ctx->signal_mode()) {
+            port.mode = mode->getText();
+        }
 
-    return port;
+        if (auto *stype = ctx->subtype_indication()) {
+            port.type_name = stype->selected_name(0)->getText();
+
+            if (auto *constraint = stype->constraint()) {
+                into(port.constraints, [&] { dispatch_(constraint); });
+            }
+        }
+
+        if (auto *expr = ctx->expression()) {
+            into(port.default_expr, [&] { dispatch_(expr); });
+        }
+    });
 }
 
-auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
-  -> ast::ConstantDecl &
+void Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
 {
-    auto &decl = spawn<ast::ConstantDecl>(ctx);
+    spawn<ast::ConstantDecl>(ctx, true, [&](auto &decl) {
+        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+            decl.names.emplace_back(id_ctx->getText());
+        }
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        decl.names.emplace_back(id_ctx->getText());
-    }
+        if (auto *stype = ctx->subtype_indication()) {
+            decl.type_name = stype->selected_name(0)->getText();
+        }
 
-    if (auto *stype = ctx->subtype_indication()) {
-        decl.type_name = stype->selected_name(0)->getText();
-    }
-
-    if (auto *expr = ctx->expression()) {
-        into(decl.init_expr, [&] { dispatch_(expr); });
-    }
-
-    return decl;
+        if (auto *expr = ctx->expression()) {
+            into(decl.init_expr, [&] { dispatch_(expr); });
+        }
+    });
 }
 
-auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl &
+void Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx)
 {
-    auto &decl = spawn<ast::SignalDecl>(ctx);
-
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        decl.names.emplace_back(id_ctx->getText());
-    }
-
-    if (auto *stype = ctx->subtype_indication()) {
-        decl.type_name = stype->selected_name(0)->getText();
-    }
-
-    decl.has_bus_kw = false;
-    if (auto *kind = ctx->signal_kind()) {
-        if (kind->BUS() != nullptr) {
-            decl.has_bus_kw = true;
+    spawn<ast::SignalDecl>(ctx, true, [&](auto &decl) {
+        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+            decl.names.emplace_back(id_ctx->getText());
         }
-    }
 
-    if (auto *stype = ctx->subtype_indication()) {
-        if (auto *constraint = stype->constraint()) {
-            into(decl.constraints, [&] { dispatch_(constraint); });
+        if (auto *stype = ctx->subtype_indication()) {
+            decl.type_name = stype->selected_name(0)->getText();
         }
-    }
 
-    if (auto *expr = ctx->expression()) {
-        into(decl.init_expr, [&] { dispatch_(expr); });
-    }
+        decl.has_bus_kw = false;
+        if (auto *kind = ctx->signal_kind()) {
+            if (kind->BUS() != nullptr) {
+                decl.has_bus_kw = true;
+            }
+        }
 
-    return decl;
+        if (auto *stype = ctx->subtype_indication()) {
+            if (auto *constraint = stype->constraint()) {
+                into(decl.constraints, [&] { dispatch_(constraint); });
+            }
+        }
+
+        if (auto *expr = ctx->expression()) {
+            into(decl.init_expr, [&] { dispatch_(expr); });
+        }
+    });
 }
 
 } // namespace builder

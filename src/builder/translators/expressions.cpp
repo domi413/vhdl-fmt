@@ -5,216 +5,201 @@
 
 namespace builder {
 
-auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr &
+void Translator::makeExpr(vhdlParser::ExpressionContext *ctx)
 {
-    // Single relation — descend directly.
     if (ctx->relation().size() == 1) {
-        return makeRelation(ctx->relation(0));
+        makeRelation(ctx->relation(0));
+        return;
     }
 
-    // Otherwise: fold left-associatively
-    auto &lhs = makeRelation(ctx->relation(0));
-    for (size_t i = 0; i < ctx->logical_operator().size(); ++i) {
-        auto &bin = spawn<ast::BinaryExpr>(ctx);
-        bin.op = ctx->logical_operator(i)->getText();
-        into(bin.left, [&] { dispatch_(ctx->relation(i)); });
-        into(bin.right, [&] { dispatch_(ctx->relation(i + 1)); });
-        return bin; // left-assoc -> outermost node
-    }
-
-    return lhs;
+    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
+        bin.op = ctx->logical_operator(0)->getText();
+        into(bin.left, [&] { makeRelation(ctx->relation(0)); });
+        into(bin.right, [&] { makeRelation(ctx->relation(1)); });
+    });
 }
 
-auto Translator::makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr &
+void Translator::makeRelation(vhdlParser::RelationContext *ctx)
 {
     if (ctx->relational_operator() == nullptr) {
-        return makeShiftExpr(ctx->shift_expression(0));
+        makeShiftExpr(ctx->shift_expression(0));
+        return;
     }
 
-    auto &bin = spawn<ast::BinaryExpr>(ctx);
-    bin.op = ctx->relational_operator()->getText();
-    into(bin.left, [&] { dispatch_(ctx->shift_expression(0)); });
-    into(bin.right, [&] { dispatch_(ctx->shift_expression(1)); });
-    return bin;
+    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
+        bin.op = ctx->relational_operator()->getText();
+        into(bin.left, [&] { makeShiftExpr(ctx->shift_expression(0)); });
+        into(bin.right, [&] { makeShiftExpr(ctx->shift_expression(1)); });
+    });
 }
 
-auto Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast::Expr &
+void Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx)
 {
     if (ctx->shift_operator() == nullptr) {
-        return makeSimpleExpr(ctx->simple_expression(0));
+        makeSimpleExpr(ctx->simple_expression(0));
+        return;
     }
 
-    auto &bin = spawn<ast::BinaryExpr>(ctx);
-    bin.op = ctx->shift_operator()->getText();
-    into(bin.left, [&] { dispatch_(ctx->simple_expression(0)); });
-    into(bin.right, [&] { dispatch_(ctx->simple_expression(1)); });
-    return bin;
+    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
+        bin.op = ctx->shift_operator()->getText();
+        into(bin.left, [&] { makeSimpleExpr(ctx->simple_expression(0)); });
+        into(bin.right, [&] { makeSimpleExpr(ctx->simple_expression(1)); });
+    });
 }
 
-auto Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr &
+void Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx)
 {
-    // unary +/- at start
     if ((ctx->PLUS() != nullptr) || (ctx->MINUS() != nullptr)) {
-        auto &un = spawn<ast::UnaryExpr>(ctx);
-        un.op = (ctx->PLUS() != nullptr) ? "+" : "-";
-        into(un.value, [&] { dispatch_(ctx->term(0)); });
-        return un;
+        spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
+            un.op = ctx->PLUS() ? "+" : "-";
+            into(un.value, [&] { makeTerm(ctx->term(0)); });
+        });
+        return;
     }
 
-    // first term
     if (ctx->adding_operator().empty()) {
-        return makeTerm(ctx->term(0));
+        makeTerm(ctx->term(0));
+        return;
     }
 
-    // left-assoc fold
-    auto &bin = spawn<ast::BinaryExpr>(ctx);
-    bin.op = ctx->adding_operator(0)->getText();
-    into(bin.left, [&] { dispatch_(ctx->term(0)); });
-    into(bin.right, [&] { dispatch_(ctx->term(1)); });
-    return bin;
+    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
+        bin.op = ctx->adding_operator(0)->getText();
+        into(bin.left, [&] { makeTerm(ctx->term(0)); });
+        into(bin.right, [&] { makeTerm(ctx->term(1)); });
+    });
 }
 
-auto Translator::makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr &
+void Translator::makeTerm(vhdlParser::TermContext *ctx)
 {
     if (ctx->multiplying_operator().empty()) {
-        return makeFactor(ctx->factor(0));
+        makeFactor(ctx->factor(0));
+        return;
     }
 
-    auto &bin = spawn<ast::BinaryExpr>(ctx);
-    bin.op = ctx->multiplying_operator(0)->getText();
-    into(bin.left, [&] { dispatch_(ctx->factor(0)); });
-    into(bin.right, [&] { dispatch_(ctx->factor(1)); });
-    return bin;
+    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
+        bin.op = ctx->multiplying_operator(0)->getText();
+        into(bin.left, [&] { makeFactor(ctx->factor(0)); });
+        into(bin.right, [&] { makeFactor(ctx->factor(1)); });
+    });
 }
 
-auto Translator::makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr &
+void Translator::makeFactor(vhdlParser::FactorContext *ctx)
 {
-    // Power operator: a ** b
     if (ctx->DOUBLESTAR() != nullptr) {
-        auto &bin = spawn<ast::BinaryExpr>(ctx);
-        bin.op = "**";
-        into(bin.left, [&] { dispatch_(ctx->primary(0)); });
-        into(bin.right, [&] { dispatch_(ctx->primary(1)); });
-        return bin;
+        spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
+            bin.op = "**";
+            into(bin.left, [&] { makePrimary(ctx->primary(0)); });
+            into(bin.right, [&] { makePrimary(ctx->primary(1)); });
+        });
+        return;
     }
 
-    // Unary: abs or not
     if (ctx->ABS() != nullptr) {
-        auto &un = spawn<ast::UnaryExpr>(ctx);
-        un.op = "abs";
-        into(un.value, [&] { dispatch_(ctx->primary(0)); });
-        return un;
-    }
-    if (ctx->NOT() != nullptr) {
-        auto &un = spawn<ast::UnaryExpr>(ctx);
-        un.op = "not";
-        into(un.value, [&] { dispatch_(ctx->primary(0)); });
-        return un;
+        spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
+            un.op = "abs";
+            into(un.value, [&] { makePrimary(ctx->primary(0)); });
+        });
+        return;
     }
 
-    return makePrimary(ctx->primary(0));
+    if (ctx->NOT()) {
+        spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
+            un.op = "not";
+            into(un.value, [&] { makePrimary(ctx->primary(0)); });
+        });
+        return;
+    }
+
+    makePrimary(ctx->primary(0));
 }
 
-auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr &
-{
-    auto &group = spawn<ast::GroupExpr>(ctx);
-    into(group.children, [&] {
-        for (auto *elem : ctx->element_association()) {
-            auto &assoc = spawn<ast::BinaryExpr>(ctx);
-            assoc.op = "=>";
-
-            if (elem->choices()) {
-                into(assoc.left, [&] { makeChoices(elem->choices()); });
-            }
-
-            if (elem->expression()) {
-                into(assoc.right, [&] { dispatch_(elem->expression()); });
-            }
-        }
-    });
-    return group;
-}
-
-auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr &
-{
-    // Multiple alternatives: choice ('|' choice)*
-    if (ctx->choice().size() == 1) {
-        return makeChoice(ctx->choice(0));
-    }
-
-    auto &grp = spawn<ast::GroupExpr>(ctx);
-    into(grp.children, [&] {
-        for (auto *ch : ctx->choice()) {
-            makeChoice(ch);
-        }
-    });
-    return grp;
-}
-
-auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr &
-{
-    if (ctx->OTHERS() != nullptr) {
-        auto &tok = spawn<ast::TokenExpr>(ctx);
-        tok.text = "others";
-        return tok;
-    }
-
-    if (ctx->identifier() != nullptr) {
-        auto &tok = spawn<ast::TokenExpr>(ctx);
-        tok.text = ctx->identifier()->getText();
-        return tok;
-    }
-
-    if (ctx->simple_expression() != nullptr) {
-        return makeSimpleExpr(ctx->simple_expression());
-    }
-
-    if (auto *d_range = ctx->discrete_range()) {
-        if (auto *range = d_range->range_decl()) {
-            if (auto *exp_range = range->explicit_range()) {
-                return makeRange(exp_range);
-            }
-        }
-    }
-
-    // Fallback
-    auto &tok = spawn<ast::TokenExpr>(ctx);
-    tok.text = ctx->getText();
-    return tok;
-}
-
-auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr &
+void Translator::makePrimary(vhdlParser::PrimaryContext *ctx)
 {
     if (ctx->expression() != nullptr) {
-        auto &paren = spawn<ast::ParenExpr>(ctx);
-        into(paren.inner, [&] { dispatch_(ctx->expression()); });
-        return paren;
+        spawn<ast::ParenExpr>(
+          ctx, true, [&](auto &p) { into(p.inner, [&] { makeExpr(ctx->expression()); }); });
+        return;
     }
 
     if (ctx->aggregate() != nullptr) {
-        return makeAggregate(ctx->aggregate());
+        makeAggregate(ctx->aggregate());
+        return;
     }
 
-    auto &tok = spawn<ast::TokenExpr>(ctx);
-    tok.text = ctx->getText();
-    return tok;
+    spawn<ast::TokenExpr>(ctx, true, [&](auto &tok) { tok.text = ctx->getText(); });
 }
 
-auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::BinaryExpr &
+void Translator::makeAggregate(vhdlParser::AggregateContext *ctx)
 {
-    auto &range = spawn<ast::BinaryExpr>(ctx);
+    spawn<ast::GroupExpr>(ctx, true, [&](auto &group) {
+        into(group.children, [&] {
+            for (auto *elem : ctx->element_association()) {
+                spawn<ast::BinaryExpr>(ctx, true, [&](auto &assoc) {
+                    assoc.op = "=>";
+                    if (elem->choices()) {
+                        into(assoc.left, [&] { makeChoices(elem->choices()); });
+                    }
+                    if (elem->expression()) {
+                        into(assoc.right, [&] { makeExpr(elem->expression()); });
+                    }
+                });
+            }
+        });
+    });
+}
 
-    range.op = ctx->direction()->getText();
-
-    if (auto *left = ctx->simple_expression(0)) {
-        into(range.left, [&] { dispatch_(left); });
+void Translator::makeChoices(vhdlParser::ChoicesContext *ctx)
+{
+    if (ctx->choice().size() == 1) {
+        makeChoice(ctx->choice(0));
+        return;
     }
 
-    if (auto *right = ctx->simple_expression(1)) {
-        into(range.right, [&] { dispatch_(right); });
+    spawn<ast::GroupExpr>(ctx, true, [&](auto &grp) {
+        into(grp.children, [&] {
+            for (auto *ch : ctx->choice()) {
+                makeChoice(ch);
+            }
+        });
+    });
+}
+
+void Translator::makeChoice(vhdlParser::ChoiceContext *ctx)
+{
+    if (ctx->OTHERS() != nullptr) {
+        spawn<ast::TokenExpr>(ctx, true, [&](auto &t) { t.text = "others"; });
+        return;
     }
 
-    return range;
+    if (ctx->identifier() != nullptr) {
+        spawn<ast::TokenExpr>(ctx, true, [&](auto &t) { t.text = ctx->identifier()->getText(); });
+        return;
+    }
+
+    if (ctx->simple_expression() != nullptr) {
+        makeSimpleExpr(ctx->simple_expression());
+        return;
+    }
+
+    if (auto *dr = ctx->discrete_range()) {
+        if (auto *rd = dr->range_decl()) {
+            if (auto *er = rd->explicit_range()) {
+                makeRange(er);
+                return;
+            }
+        }
+    }
+
+    spawn<ast::TokenExpr>(ctx, true, [&](auto &t) { t.text = ctx->getText(); });
+}
+
+void Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx)
+{
+    spawn<ast::BinaryExpr>(ctx, true, [&](auto &range) {
+        range.op = ctx->direction()->getText();
+        into(range.left, [&] { dispatch_(ctx->simple_expression(0)); });
+        into(range.right, [&] { dispatch_(ctx->simple_expression(1)); });
+    });
 }
 
 } // namespace builder
