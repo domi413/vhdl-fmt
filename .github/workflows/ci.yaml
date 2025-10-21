@@ -71,9 +71,63 @@ jobs:
           verbose: true
           use_cspell_files: false
 
-  lint:
+  formatter:
     runs-on: ubuntu-latest
-    name: Build, Lint, Format Check and Test
+    name: Formatter Check
+    timeout-minutes: 10
+    container:
+      image: archlinux:base-devel
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/uv/
+          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+          restore-keys: |
+            uv-cache-${{ runner.os }}-v1
+            uv-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          pacman -Sy --needed --noconfirm \
+              base-devel \
+              clang \
+              git \
+              make \
+              uv \
+
+          # Create venv and install python packages
+          uv venv venv
+          source venv/bin/activate
+
+          uv pip install gersemi
+
+      - name: Check formatting
+        run: |
+          source venv/bin/activate
+          make check-format
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build
     timeout-minutes: 10
     container:
       image: archlinux:base-devel
@@ -129,27 +183,240 @@ jobs:
           uv venv venv
           source venv/bin/activate
 
-          uv pip install conan gersemi
+          uv pip install conan
 
       - name: Setup Conan profile
         run: |
           source venv/bin/activate
           conan profile detect --force
 
-      - name: Check formatting
+      - name: Build
         run: |
           source venv/bin/activate
-          make check-format
+          make
+
+  lint-header:
+    runs-on: ubuntu-latest
+    name: Lint Headers
+    timeout-minutes: 10
+    container:
+      image: archlinux:base-devel
+
+    needs: build
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/uv/
+          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+          restore-keys: |
+            uv-cache-${{ runner.os }}-v1
+            uv-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          pacman -Sy --needed --noconfirm \
+              base-devel \
+              clang \
+              cmake \
+              git \
+              make \
+              ninja \
+              uv \
+
+          # Create venv and install python packages
+          uv venv venv
+          source venv/bin/activate
+
+          uv pip install conan
+
+      - name: Setup Conan profile
+        run: |
+          source venv/bin/activate
+          conan profile detect --force
 
       - name: Build
         run: |
           source venv/bin/activate
           make
 
-      - name: Run lint
+      - name: Run lint on headers
         run: |
           source venv/bin/activate
-          make lint
+          make lint LINT_FILES=header
+
+  lint-sources:
+    runs-on: ubuntu-latest
+    name: Lint Sources
+    timeout-minutes: 10
+    container:
+      image: archlinux:base-devel
+
+    needs: build
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/uv/
+          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+          restore-keys: |
+            uv-cache-${{ runner.os }}-v1
+            uv-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          pacman -Sy --needed --noconfirm \
+              base-devel \
+              clang \
+              cmake \
+              git \
+              make \
+              ninja \
+              uv \
+
+          # Create venv and install python packages
+          uv venv venv
+          source venv/bin/activate
+
+          uv pip install conan
+
+      - name: Setup Conan profile
+        run: |
+          source venv/bin/activate
+          conan profile detect --force
+
+      - name: Build
+        run: |
+          source venv/bin/activate
+          make
+
+      - name: Run lint on sources
+        run: |
+          source venv/bin/activate
+          make lint LINT_FILES=source
+
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    timeout-minutes: 10
+    container:
+      image: archlinux:base-devel
+
+    needs: build
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/pacman/pkg
+            /home/aur/.cache/yay
+            /home/aur/yay
+          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
+          restore-keys: |
+            arch-deps-${{ runner.os }}-v1
+            arch-deps-${{ runner.os }}-
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.local/share/uv/
+          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+          restore-keys: |
+            uv-cache-${{ runner.os }}-v1
+            uv-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          pacman -Sy --needed --noconfirm \
+              base-devel \
+              clang \
+              cmake \
+              git \
+              make \
+              ninja \
+              uv \
+
+          # Create venv and install python packages
+          uv venv venv
+          source venv/bin/activate
+
+          uv pip install conan
+
+      - name: Setup Conan profile
+        run: |
+          source venv/bin/activate
+          conan profile detect --force
+
+      - name: Build
+        run: |
+          source venv/bin/activate
+          make
 
       - name: Run tests
         run: make test
