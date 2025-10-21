@@ -6,6 +6,7 @@ Checks: >
   *,
   -altera-*,
   -llvmlibc-*,
+  -llvm-prefer-static-over-anonymous-namespace,
   -fuchsia-default-arguments-calls,
   -fuchsia-overloaded-operator,
   -fuchsia-trailing-return,
