@@ -39,6 +39,12 @@ void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_
         }
     }
 
+    // Push any remaining paragraph breaks (2+ newlines = 1+ blank lines)
+    // We only capture these to preserve intentional grouping, not every single newline
+    if (linebreaks >= 2) {
+        newlines_.push(dst, linebreaks);
+    }
+
     // Iteration went backward - restore to source order
     std::ranges::reverse(dst.leading);
 }

@@ -16,13 +16,16 @@ struct Comments
     std::string text;
 };
 
-struct Newlines
+/// @brief Represents intentional vertical spacing (1+ blank lines) between code elements.
+/// Only captured when there are 2+ newlines (which creates 1+ visible blank lines).
+/// Used to preserve user's intentional grouping while allowing the formatter to normalize spacing.
+struct ParagraphBreak
 {
-    std::size_t breaks{ 1 };
+    std::size_t blank_lines{ 1 }; ///< Number of visible blank lines
 };
 
-/// @brief A variant representing either a comment or a newline to preserve order.
-using Trivia = std::variant<Comments, Newlines>;
+/// @brief A variant representing either a comment or a paragraph break to preserve order.
+using Trivia = std::variant<Comments, ParagraphBreak>;
 
 /// @brief Abstract base class for all AST nodes.
 struct Node

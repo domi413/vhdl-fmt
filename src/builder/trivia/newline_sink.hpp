@@ -8,19 +8,22 @@
 
 namespace builder {
 
-/// @brief Appends newline trivia (aggregated line breaks) to a node.
+/// @brief Appends paragraph break trivia to a node.
+/// Only called when there are 2+ newlines (creating 1+ visible blank lines).
 class NewlineSink
 {
   public:
-    /// @brief Push newline trivia into the node’s trivia list if any breaks exist.
-    constexpr void push(ast::Node::NodeTrivia &dst, std::size_t breaks)
+    /// @brief Push paragraph break trivia. Expects newline_count >= 2.
+    constexpr void push(ast::Node::NodeTrivia &dst, std::size_t newline_count)
     {
-        if (breaks == 0) {
+        if (newline_count < 2) {
             return;
         }
 
-        ast::Newlines n{ breaks };
-        dst.leading.emplace_back(n);
+        // Convert newline count to blank line count
+        const std::size_t blank_lines = newline_count - 1;
+        ast::ParagraphBreak pb{ blank_lines };
+        dst.leading.emplace_back(pb);
     }
 };
 

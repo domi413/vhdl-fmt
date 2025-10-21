@@ -53,32 +53,29 @@ class DebugPrinter : public ast::BaseVisitor
     void printNodeHeader(const ast::Node &n,
                          const std::string &extra,
                          std::string_view name_override,
-                         std::size_t trailing_breaks) const;
+                         std::size_t leading_breaks) const;
+
+    void printTriviaStream(const std::vector<ast::Trivia> &trivia, std::string_view prefix) const;
 
     void printCommentLines(const std::vector<ast::Comments> &comments,
                            std::string_view prefix) const;
 
-    [[nodiscard]]
-    static auto countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t;
-
     template<class NodeT>
     void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra)
     {
-        const std::size_t newlines = countNewlines(node.leading());
-        printNodeHeader(node, extra, pretty_name, newlines);
+        printNodeHeader(node, extra, pretty_name, 0);
 
         const IndentGuard _{ indent_ };
 
-        // Leading comments
-        std::vector<ast::Comments> leading_comments;
-        for (const auto &t : node.leading()) {
-            if (const auto *c = std::get_if<ast::Comments>(&t)) {
-                leading_comments.push_back(*c);
-            }
+        // Print leading trivia stream (newlines + comments in order)
+        if (!node.leading().empty()) {
+            printTriviaStream(node.leading(), "↓");
         }
 
-        printCommentLines(leading_comments, "(^) ");
-        printCommentLines(node.trailing(), "(>) ");
+        // Print trailing comments (inline comments)
+        if (!node.trailing().empty()) {
+            printCommentLines(node.trailing(), "→");
+        }
     }
 
     struct IndentGuard

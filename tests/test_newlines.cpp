@@ -53,9 +53,10 @@ auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> Counts
     return std::ranges::fold_left(tv, Counts{}, [](Counts c, const ast::Trivia &t) -> Counts {
         if (std::holds_alternative<ast::Comments>(t)) {
             ++c.comments;
-        } else if (const auto *nl = std::get_if<ast::Newlines>(&t)) {
+        } else if (const auto *pb = std::get_if<ast::ParagraphBreak>(&t)) {
             ++c.newlines_items;
-            c.newline_breaks += nl->breaks;
+            // Convert blank_lines back to breaks for compatibility (breaks = blank_lines + 1)
+            c.newline_breaks += pb->blank_lines + 1;
         }
 
         return c;
@@ -83,13 +84,13 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
 
     const auto &lead = entity->tryGetTrivia().value_or(ast::Node::NodeTrivia{}).leading;
 
-    // Expect: Comment("A"), Newlines(1), Comment("B")
+    // Expect: Comment("A"), ParagraphBreak(1 blank line), Comment("B")
     REQUIRE(std::holds_alternative<ast::Comments>(lead[0]));
-    REQUIRE(std::holds_alternative<ast::Newlines>(lead[1]));
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(lead[1]));
     REQUIRE(std::holds_alternative<ast::Comments>(lead[2]));
 
-    if (std::holds_alternative<ast::Newlines>(lead[1])) {
-        const auto &nl = std::get<ast::Newlines>(lead[1]);
-        REQUIRE(nl.breaks == 2); // 2 breaks = 1 blank line
+    if (std::holds_alternative<ast::ParagraphBreak>(lead[1])) {
+        const auto &pb = std::get<ast::ParagraphBreak>(lead[1]);
+        REQUIRE(pb.blank_lines == 1); // 1 blank line
     }
 }

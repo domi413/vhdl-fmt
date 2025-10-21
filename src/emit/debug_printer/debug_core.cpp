@@ -25,17 +25,36 @@ void DebugPrinter::printLine(std::string_view s) const
 void DebugPrinter::printNodeHeader(const ast::Node &n,
                                    const std::string &extra,
                                    std::string_view name_override,
-                                   std::size_t trailing_breaks) const
+                                   std::size_t leading_breaks) const
 {
     printIndent();
     out_ << (!name_override.empty() ? std::string{ name_override } : typeid(n).name());
     if (!extra.empty()) {
         out_ << " [" << extra << "]";
     }
-    if (trailing_breaks > 0U) {
-        out_ << " (" << trailing_breaks << R"([\n]))";
+    if (leading_breaks > 0U) {
+        out_ << " (" << leading_breaks << R"([\n]))";
     }
     out_ << '\n';
+}
+
+void DebugPrinter::printTriviaStream(const std::vector<ast::Trivia> &trivia,
+                                     std::string_view prefix) const
+{
+    for (const auto &t : trivia) {
+        if (const auto *pb = std::get_if<ast::ParagraphBreak>(&t)) {
+            printIndent();
+            out_
+              << prefix
+              << " [paragraph break: "
+              << pb->blank_lines
+              << (pb->blank_lines == 1 ? " blank line]" : " blank lines]")
+              << '\n';
+        } else if (const auto *c = std::get_if<ast::Comments>(&t)) {
+            printIndent();
+            out_ << prefix << " " << c->text << '\n';
+        }
+    }
 }
 
 void DebugPrinter::printCommentLines(const std::vector<ast::Comments> &comments,
@@ -44,21 +63,10 @@ void DebugPrinter::printCommentLines(const std::vector<ast::Comments> &comments,
     for (const auto &comment : comments) {
         printIndent();
         if (!prefix.empty()) {
-            out_ << prefix;
+            out_ << prefix << " ";
         }
         out_ << comment.text << '\n';
     }
-}
-
-auto DebugPrinter::countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t
-{
-    std::size_t total = 0;
-    for (const auto &t : leading) {
-        if (const auto *nl = std::get_if<ast::Newlines>(&t)) {
-            total += nl->breaks;
-        }
-    }
-    return total;
 }
 
 } // namespace emit
