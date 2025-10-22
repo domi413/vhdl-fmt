@@ -63,7 +63,7 @@ LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
 LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
-GERSEMI_FLAGS = --diff --color --list-expansion=favour-expansion --no-warn-about-unknown-commands
+GERSEMI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
 
 # Function to check for tool existence
 # Usage: $(call check_tool, tool_name)
@@ -110,7 +110,7 @@ check-format:
 	$(call check_tool,$(CLANG_FORMAT_CMD))
 	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Checking code formatting..."
-	@if $(CLANG_FORMAT_CMD) --dry-run --Werror $(SOURCES) && $(GERSEMI_CMD) --check $(GERSEMI_FLAGS) $(SOURCES_CMAKE); then \
+	@if $(CLANG_FORMAT_CMD) --dry-run --Werror $(SOURCES) && $(GERSEMI_CMD) --check --diff --color $(GERSEMI_FLAGS) $(SOURCES_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
