@@ -91,7 +91,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make check-format
 
   build:
@@ -114,12 +114,12 @@ jobs:
 
       - name: Setup Conan profile
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           conan profile detect --force
 
       - name: Build
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make
 
   lint-header:
@@ -143,17 +143,17 @@ jobs:
 
       - name: Setup Conan profile
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           conan profile detect --force
 
       - name: Build
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make
 
       - name: Run lint on headers
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make lint LINT_FILES=header
 
   lint-sources:
@@ -177,17 +177,17 @@ jobs:
 
       - name: Setup Conan profile
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           conan profile detect --force
 
       - name: Build
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make
 
       - name: Run lint on sources
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make lint LINT_FILES=source
 
   test:
@@ -211,12 +211,12 @@ jobs:
 
       - name: Setup Conan profile
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           conan profile detect --force
 
       - name: Build
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           make
 
       - name: Run tests

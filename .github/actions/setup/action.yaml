@@ -1,17 +1,17 @@
-name: 'Setup CI Environment'
+name: "Setup CI Environment"
 
 inputs:
   install_conan:
-    description: 'Whether to install conan'
+    description: "Whether to install conan"
     required: false
-    default: 'false'
+    default: "false"
   install_gersemi:
-    description: 'Whether to install gersemi'
+    description: "Whether to install gersemi"
     required: false
-    default: 'false'
+    default: "false"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Cache dependencies
       uses: actions/cache@v4
@@ -57,13 +57,13 @@ runs:
             uv \
 
         # Create venv and install python packages
-        uv venv venv
-        source venv/bin/activate
+        uv venv
+        source .venv/bin/activate
 
         if [ "${{ inputs.install_conan }}" = "true" ]; then
           uv pip install conan
         fi
 
         if [ "${{ inputs.install_gersemi }}" = "true" ]; then
-          uv pip install gersemi
+          uv pip install gersemi==0.19.3 colorama
         fi

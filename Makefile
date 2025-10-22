@@ -57,21 +57,13 @@ CLANG_TIDY_CMD := clang-tidy
 RUN_CLANG_TIDY_CMD := run-clang-tidy
 CLANG_FORMAT_CMD := clang-format
 CONAN_CMD := conan
-
-# Detect gersemi location
-ifeq ($(shell test -f venv/bin/activate && echo yes),yes)
-	GERSEMI_CMD := gersemi
-	GERSEMI_SOURCE := venv
-else
-	GERSEMI_CMD := gersemi
-	GERSEMI_SOURCE := system
-endif
+GERSEMI_CMD := gersemi
 
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
 LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
-GERSEMI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
+GERSEMI_FLAGS = --diff --color --list-expansion=favour-expansion --no-warn-about-unknown-commands
 
 # Function to check for tool existence
 # Usage: $(call check_tool, tool_name)
@@ -115,7 +107,6 @@ lint:
 	@echo "✓ Linting complete"
 
 check-format:
-	@echo "Using gersemi from $(GERSEMI_SOURCE): $(GERSEMI_CMD)"
 	$(call check_tool,$(CLANG_FORMAT_CMD))
 	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Checking code formatting..."
@@ -126,7 +117,6 @@ check-format:
 	fi
 
 format:
-	@echo "Using gersemi from $(GERSEMI_SOURCE): $(GERSEMI_CMD)"
 	$(call check_tool,$(CLANG_FORMAT_CMD))
 	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Formatting code..."
