@@ -14,12 +14,6 @@ BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 SOURCES := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
 SOURCES_CMAKE := $(shell find src tests . -name 'CMakeLists.txt')
 
-ifeq ($(wildcard venv/bin),venv/bin)
-	VENV_BIN := venv/bin/
-else
-	VENV_BIN :=
-endif
-
 # -----------------------------
 # Build Targets
 # -----------------------------
@@ -62,8 +56,16 @@ clean:
 CLANG_TIDY_CMD := clang-tidy
 RUN_CLANG_TIDY_CMD := run-clang-tidy
 CLANG_FORMAT_CMD := clang-format
-GERSEMI_CMD := $(VENV_BIN)gersemi
 CONAN_CMD := conan
+
+# Detect gersemi location
+ifeq ($(shell test -f venv/bin/activate && echo yes),yes)
+	GERSEMI_CMD := gersemi
+	GERSEMI_SOURCE := venv
+else
+	GERSEMI_CMD := gersemi
+	GERSEMI_SOURCE := system
+endif
 
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
 LINT_TIDY_FLAGS = -warnings-as-errors='*'
@@ -113,6 +115,7 @@ lint:
 	@echo "✓ Linting complete"
 
 check-format:
+	@echo "Using gersemi from $(GERSEMI_SOURCE): $(GERSEMI_CMD)"
 	$(call check_tool,$(CLANG_FORMAT_CMD))
 	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Checking code formatting..."
@@ -123,6 +126,7 @@ check-format:
 	fi
 
 format:
+	@echo "Using gersemi from $(GERSEMI_SOURCE): $(GERSEMI_CMD)"
 	$(call check_tool,$(CLANG_FORMAT_CMD))
 	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Formatting code..."
