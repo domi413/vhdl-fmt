@@ -62,14 +62,14 @@ clean:
 CLANG_TIDY_CMD := clang-tidy
 RUN_CLANG_TIDY_CMD := run-clang-tidy
 CLANG_FORMAT_CMD := clang-format
-GERMESI_CMD := $(VENV_BIN)gersemi
+GERSEMI_CMD := $(VENV_BIN)gersemi
 CONAN_CMD := conan
 
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
 LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
-GERMESI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
+GERSEMI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
 
 # Function to check for tool existence
 # Usage: $(call check_tool, tool_name)
@@ -114,9 +114,9 @@ lint:
 
 check-format:
 	$(call check_tool,$(CLANG_FORMAT_CMD))
-	$(call check_tool,$(GERMESI_CMD))
+	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Checking code formatting..."
-	@if $(CLANG_FORMAT_CMD) --dry-run --Werror $(SOURCES) && $(GERMESI_CMD) --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
+	@if $(CLANG_FORMAT_CMD) --dry-run --Werror $(SOURCES) && $(GERSEMI_CMD) --check $(GERSEMI_FLAGS) $(SOURCES_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
@@ -124,10 +124,10 @@ check-format:
 
 format:
 	$(call check_tool,$(CLANG_FORMAT_CMD))
-	$(call check_tool,$(GERMESI_CMD))
+	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Formatting code..."
 	@$(CLANG_FORMAT_CMD) -i $(SOURCES)
-	@$(GERMESI_CMD) -i $(GERMESI_FLAGS) $(SOURCES_CMAKE)
+	@$(GERSEMI_CMD) -i $(GERSEMI_FLAGS) $(SOURCES_CMAKE)
 	@echo "✓ Code formatting complete"
 
 sort-dictionary:
