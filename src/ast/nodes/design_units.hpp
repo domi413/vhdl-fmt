@@ -12,7 +12,7 @@
 
 namespace ast {
 
-struct DesignUnit : Node
+struct DesignUnit : Visitable<DesignUnit>
 {
   protected:
     DesignUnit() = default;

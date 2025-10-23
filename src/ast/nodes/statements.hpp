@@ -9,7 +9,7 @@
 
 namespace ast {
 
-struct Statement : Node
+struct Statement :  Visitable<Statement>
 {
   protected:
     Statement() = default;

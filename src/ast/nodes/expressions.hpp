@@ -10,7 +10,7 @@
 namespace ast {
 
 /// Base class for all expression nodes.
-struct Expr : Node
+struct Expr :  Visitable<Expr>
 {
   protected:
     Expr() = default;

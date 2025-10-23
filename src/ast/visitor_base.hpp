@@ -108,7 +108,7 @@ class BaseVisitor : public Visitor<ReturnType>
         dispatch(node.port_clause);
         dispatchAll(node.decls);
         dispatchAll(node.stmts);
-        walk(static_cast<const DesignUnit &>(node));
+        return walk(static_cast<const DesignUnit &>(node));
     }
 
     auto visit(const Architecture &node) -> ReturnType override

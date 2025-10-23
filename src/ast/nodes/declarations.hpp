@@ -11,7 +11,7 @@
 namespace ast {
 
 // Abstract base for all declarations
-struct Declaration : Node
+struct Declaration :  Visitable<Declaration>
 {
     std::vector<std::string> names;
 
