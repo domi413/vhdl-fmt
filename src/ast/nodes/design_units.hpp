@@ -1,6 +1,7 @@
 #ifndef AST_NODES_ENTITY_HPP
 #define AST_NODES_ENTITY_HPP
 
+#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/statements.hpp"
 

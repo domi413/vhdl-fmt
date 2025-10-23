@@ -31,7 +31,7 @@ auto DebugPrinter::visit(const ast::Entity &node) -> void
         const IndentGuard _{ indent_ };
         for (const auto &d : node.decls) {
             if (d) {
-                d->accept(*this);
+                dispatch(d);
             }
         }
     }
@@ -41,7 +41,7 @@ auto DebugPrinter::visit(const ast::Entity &node) -> void
         const IndentGuard _{ indent_ };
         for (const auto &s : node.stmts) {
             if (s) {
-                s->accept(*this);
+                dispatch(s);
             }
         }
     }

@@ -73,15 +73,10 @@ class BaseVisitor : public Visitor<ReturnType>
     // ---------------------------------------------------------------------
     // Core hierarchy
     // ---------------------------------------------------------------------
-    auto visit(const Node &node) -> ReturnType override
-    {
-        (void)node; // abstract root, nothing to traverse
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
-        }
+    auto visit(const DesignFile &node) -> ReturnType override { 
+        dispatchAll(node.units);
+        return ReturnType{};
     }
-
-    auto visit(const DesignFile &node) -> ReturnType override { return dispatchAll(node.units); }
 
     auto visit(const DesignUnit &node) -> ReturnType override
     {
@@ -89,6 +84,36 @@ class BaseVisitor : public Visitor<ReturnType>
         if constexpr (!std::is_void_v<ReturnType>) {
             return ReturnType{};
         }
+    }
+
+    // ---------------------------------------------------------------------
+    // Structural clauses (Entity / Architecture)
+    // ---------------------------------------------------------------------
+    auto visit(const GenericClause &node) -> ReturnType override
+    {
+        dispatchAll(node.generics);
+        return ReturnType{};
+    }
+
+    auto visit(const PortClause &node) -> ReturnType override { 
+        dispatchAll(node.ports); 
+        return ReturnType{};
+    }
+
+    auto visit(const Entity &node) -> ReturnType override
+    {
+        dispatch(node.generic_clause);
+        dispatch(node.port_clause);
+        dispatchAll(node.decls);
+        dispatchAll(node.stmts);
+        walk(static_cast<const DesignUnit &>(node));
+    }
+
+    auto visit(const Architecture &node) -> ReturnType override
+    {
+        dispatchAll(node.decls);
+        dispatchAll(node.stmts);
+        return walk(static_cast<const DesignUnit &>(node));
     }
 
     // ---------------------------------------------------------------------
@@ -126,30 +151,6 @@ class BaseVisitor : public Visitor<ReturnType>
         dispatchAll(node.constraints);
         dispatch(node.default_expr);
         return walk(static_cast<const Declaration &>(node));
-    }
-
-    // ---------------------------------------------------------------------
-    // Structural clauses (Entity / Architecture)
-    // ---------------------------------------------------------------------
-    auto visit(const GenericClause &node) -> ReturnType override
-    {
-        return dispatchAll(node.generics);
-    }
-
-    auto visit(const PortClause &node) -> ReturnType override { return dispatchAll(node.ports); }
-
-    auto visit(const Entity &node) -> ReturnType override
-    {
-        dispatch(node.generic_clause);
-        dispatch(node.port_clause);
-        dispatchAll(node.decls);
-        return dispatchAll(node.stmts);
-    }
-
-    auto visit(const Architecture &node) -> ReturnType override
-    {
-        dispatchAll(node.decls);
-        return dispatchAll(node.stmts);
     }
 
     // ---------------------------------------------------------------------

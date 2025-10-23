@@ -50,7 +50,6 @@ class Visitor
     auto operator=(Visitor &&) -> Visitor & = delete;
 
     // Core hierarchy
-    virtual auto visit(const Node &) -> ReturnType = 0;
     virtual auto visit(const DesignFile &) -> ReturnType = 0;
     virtual auto visit(const DesignUnit &) -> ReturnType = 0;
 

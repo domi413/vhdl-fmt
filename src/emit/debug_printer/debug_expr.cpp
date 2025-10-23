@@ -23,7 +23,7 @@ auto DebugPrinter::visit(const ast::UnaryExpr &node) -> void
     if (node.value) {
         printLine("value:");
         const IndentGuard _{ indent_ };
-        node.value->accept(*this);
+        dispatch(node.value);
     }
 }
 
@@ -35,13 +35,13 @@ auto DebugPrinter::visit(const ast::BinaryExpr &node) -> void
     if (node.left) {
         printLine("left:");
         const IndentGuard _{ indent_ };
-        node.left->accept(*this);
+        dispatch(node.left);
     }
 
     if (node.right) {
         printLine("right:");
         const IndentGuard _{ indent_ };
-        node.right->accept(*this);
+        dispatch(node.right);
     }
 }
 
@@ -53,7 +53,7 @@ auto DebugPrinter::visit(const ast::ParenExpr &node) -> void
     if (node.inner) {
         printLine("inner:");
         const IndentGuard _{ indent_ };
-        node.inner->accept(*this);
+        dispatch(node.inner);
     }
 }
 
