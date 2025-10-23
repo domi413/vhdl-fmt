@@ -36,8 +36,6 @@ struct Architecture;
 /// Concrete visitors implement these to perform operations
 /// such as formatting, analysis, or transformation.
 ///
-/// @tparam ReturnType The type returned by visit methods (void by default)
-template<typename ReturnType = void>
 class Visitor
 {
   public:
@@ -50,34 +48,34 @@ class Visitor
     auto operator=(Visitor &&) -> Visitor & = delete;
 
     // Core hierarchy
-    virtual auto visit(const DesignFile &) -> ReturnType = 0;
-    virtual auto visit(const DesignUnit &) -> ReturnType = 0;
+    virtual void visit(const DesignFile &) = 0;
+    virtual void visit(const DesignUnit &) = 0;
 
     // Declarations
-    virtual auto visit(const Declaration &) -> ReturnType = 0;
-    virtual auto visit(const ConstantDecl &) -> ReturnType = 0;
-    virtual auto visit(const SignalDecl &) -> ReturnType = 0;
-    virtual auto visit(const GenericParam &) -> ReturnType = 0;
-    virtual auto visit(const Port &) -> ReturnType = 0;
+    virtual void visit(const Declaration &) = 0;
+    virtual void visit(const ConstantDecl &) = 0;
+    virtual void visit(const SignalDecl &) = 0;
+    virtual void visit(const GenericParam &) = 0;
+    virtual void visit(const Port &) = 0;
 
     // Structural clauses (used inside Entity/Architecture)
-    virtual auto visit(const GenericClause &) -> ReturnType = 0;
-    virtual auto visit(const PortClause &) -> ReturnType = 0;
-    virtual auto visit(const Entity &) -> ReturnType = 0;
-    virtual auto visit(const Architecture &) -> ReturnType = 0;
+    virtual void visit(const GenericClause &) = 0;
+    virtual void visit(const PortClause &) = 0;
+    virtual void visit(const Entity &) = 0;
+    virtual void visit(const Architecture &) = 0;
 
     // Statements
-    virtual auto visit(const Statement &) -> ReturnType = 0;
-    virtual auto visit(const ConcurrentAssign &) -> ReturnType = 0;
-    virtual auto visit(const Process &) -> ReturnType = 0;
+    virtual void visit(const Statement &) = 0;
+    virtual void visit(const ConcurrentAssign &) = 0;
+    virtual void visit(const Process &) = 0;
 
     // Expressions
-    virtual auto visit(const Expr &) -> ReturnType = 0;
-    virtual auto visit(const TokenExpr &node) -> ReturnType = 0;
-    virtual auto visit(const GroupExpr &node) -> ReturnType = 0;
-    virtual auto visit(const UnaryExpr &node) -> ReturnType = 0;
-    virtual auto visit(const BinaryExpr &node) -> ReturnType = 0;
-    virtual auto visit(const ParenExpr &node) -> ReturnType = 0;
+    virtual void visit(const Expr &) = 0;
+    virtual void visit(const TokenExpr &node) = 0;
+    virtual void visit(const GroupExpr &node) = 0;
+    virtual void visit(const UnaryExpr &node) = 0;
+    virtual void visit(const BinaryExpr &node) = 0;
+    virtual void visit(const ParenExpr &node) = 0;
 };
 
 } // namespace ast

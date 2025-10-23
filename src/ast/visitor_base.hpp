@@ -23,204 +23,159 @@ concept AstNode = std::derived_from<T, ast::Node>;
 /// Provides traversal logic for visiting all child nodes.
 /// Derived visitors can override specific `visit()` methods to customize behavior,
 /// and call `walk(node)` to resume default traversal.
-///
-/// @tparam ReturnType The type returned by visit methods (void by default)
-template<typename ReturnType = void>
-class BaseVisitor : public Visitor<ReturnType>
+class BaseVisitor : public Visitor
 {
   protected:
     /// @brief Safely visit a node if it exists.
     template<AstNode T>
-    auto dispatch(const std::unique_ptr<T> &node) -> ReturnType
+    void dispatch(const std::unique_ptr<T> &node)
     {
         if (node) {
-            if constexpr (std::is_void_v<ReturnType>) {
-                node->accept(*this);
-            } else {
-                return node->template accept<ReturnType>(*this);
-            }
-        }
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
+            node->accept(*this);
         }
     }
 
     /// @brief Visit all elements of a vector of nodes.
     template<AstNode T>
-    auto dispatchAll(const std::vector<std::unique_ptr<T>> &vec) -> ReturnType
+    void dispatchAll(const std::vector<std::unique_ptr<T>> &vec)
     {
-        if constexpr (std::is_void_v<ReturnType>) {
-            for (const auto &node : vec) {
-                dispatch(node);
-            }
-        } else {
-            ReturnType result{};
-            for (const auto &node : vec) {
-                result = dispatch(node);
-            }
-            return result;
+        for (const auto &node : vec) {
+            dispatch(node);
         }
     }
 
     /// @brief Continue default traversal manually.
     template<AstNode T>
-    auto walk(const T &node) -> ReturnType
+    void walk(const T &node)
     {
-        return this->BaseVisitor::visit(node);
+        this->BaseVisitor::visit(node);
     }
 
   public:
     // ---------------------------------------------------------------------
     // Core hierarchy
     // ---------------------------------------------------------------------
-    auto visit(const DesignFile &node) -> ReturnType override
-    {
-        dispatchAll(node.units);
-        return ReturnType{};
-    }
+    void visit(const DesignFile &node) override { dispatchAll(node.units); }
 
-    auto visit(const DesignUnit &node) -> ReturnType override
+    void visit(const DesignUnit &node) override
     {
         (void)node; // abstract
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
-        }
     }
 
     // ---------------------------------------------------------------------
     // Structural clauses (Entity / Architecture)
     // ---------------------------------------------------------------------
-    auto visit(const GenericClause &node) -> ReturnType override
-    {
-        dispatchAll(node.generics);
-        return ReturnType{};
-    }
+    void visit(const GenericClause &node) override { dispatchAll(node.generics); }
 
-    auto visit(const PortClause &node) -> ReturnType override
-    {
-        dispatchAll(node.ports);
-        return ReturnType{};
-    }
+    void visit(const PortClause &node) override { dispatchAll(node.ports); }
 
-    auto visit(const Entity &node) -> ReturnType override
+    void visit(const Entity &node) override
     {
         dispatch(node.generic_clause);
         dispatch(node.port_clause);
         dispatchAll(node.decls);
         dispatchAll(node.stmts);
-        return walk(static_cast<const DesignUnit &>(node));
+        walk(static_cast<const DesignUnit &>(node));
     }
 
-    auto visit(const Architecture &node) -> ReturnType override
+    void visit(const Architecture &node) override
     {
         dispatchAll(node.decls);
         dispatchAll(node.stmts);
-        return walk(static_cast<const DesignUnit &>(node));
+        walk(static_cast<const DesignUnit &>(node));
     }
 
     // ---------------------------------------------------------------------
     // Declarations
     // ---------------------------------------------------------------------
-    auto visit(const Declaration &node) -> ReturnType override
+    void visit(const Declaration &node) override
     {
         (void)node; // abstract
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
-        }
     }
 
-    auto visit(const ConstantDecl &node) -> ReturnType override
+    void visit(const ConstantDecl &node) override
     {
         dispatch(node.init_expr);
-        return walk(static_cast<const Declaration &>(node));
+        walk(static_cast<const Declaration &>(node));
     }
 
-    auto visit(const SignalDecl &node) -> ReturnType override
+    void visit(const SignalDecl &node) override
     {
         dispatchAll(node.constraints);
         dispatch(node.init_expr);
-        return walk(static_cast<const Declaration &>(node));
+        walk(static_cast<const Declaration &>(node));
     }
 
-    auto visit(const GenericParam &node) -> ReturnType override
+    void visit(const GenericParam &node) override
     {
         dispatch(node.default_expr);
-        return walk(static_cast<const Declaration &>(node));
+        walk(static_cast<const Declaration &>(node));
     }
 
-    auto visit(const Port &node) -> ReturnType override
+    void visit(const Port &node) override
     {
         dispatchAll(node.constraints);
         dispatch(node.default_expr);
-        return walk(static_cast<const Declaration &>(node));
+        walk(static_cast<const Declaration &>(node));
     }
 
     // ---------------------------------------------------------------------
     // Statements
     // ---------------------------------------------------------------------
-    auto visit(const Statement &node) -> ReturnType override
+    void visit(const Statement &node) override
     {
         (void)node; // abstract
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
-        }
     }
 
-    auto visit(const ConcurrentAssign &node) -> ReturnType override
+    void visit(const ConcurrentAssign &node) override
     {
         dispatch(node.target);
         dispatch(node.value);
-        return walk(static_cast<const Statement &>(node));
+        walk(static_cast<const Statement &>(node));
     }
 
-    auto visit(const Process &node) -> ReturnType override
+    void visit(const Process &node) override
     {
         dispatchAll(node.body);
-        return walk(static_cast<const Statement &>(node));
+        walk(static_cast<const Statement &>(node));
     }
 
     // ---------------------------------------------------------------------
     // Expressions
     // ---------------------------------------------------------------------
-    auto visit(const Expr &node) -> ReturnType override
+    void visit(const Expr &node) override
     {
         (void)node; // abstract
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
-        }
     }
 
-    auto visit(const TokenExpr &node) -> ReturnType override
+    void visit(const TokenExpr &node) override
     {
         (void)node; // leaf node, nothing to traverse
-        if constexpr (!std::is_void_v<ReturnType>) {
-            return ReturnType{};
-        }
     }
 
-    auto visit(const GroupExpr &node) -> ReturnType override
+    void visit(const GroupExpr &node) override
     {
         dispatchAll(node.children);
-        return walk(static_cast<const Expr &>(node));
+        walk(static_cast<const Expr &>(node));
     }
 
-    auto visit(const UnaryExpr &node) -> ReturnType override
+    void visit(const UnaryExpr &node) override
     {
         dispatch(node.value);
-        return walk(static_cast<const Expr &>(node));
+        walk(static_cast<const Expr &>(node));
     }
 
-    auto visit(const BinaryExpr &node) -> ReturnType override
+    void visit(const BinaryExpr &node) override
     {
         dispatch(node.left);
         dispatch(node.right);
-        return walk(static_cast<const Expr &>(node));
+        walk(static_cast<const Expr &>(node));
     }
 
-    auto visit(const ParenExpr &node) -> ReturnType override
+    void visit(const ParenExpr &node) override
     {
         dispatch(node.inner);
-        return walk(static_cast<const Expr &>(node));
+        walk(static_cast<const Expr &>(node));
     }
 };
 
