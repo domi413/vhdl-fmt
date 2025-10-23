@@ -10,6 +10,7 @@ Checks: >
   -fuchsia-overloaded-operator,
   -fuchsia-trailing-return,
   -llvm-header-guard,
+  -llvm-prefer-static-over-anonymous-namespace,
   -readability-identifier-length,
 
 CheckOptions:
