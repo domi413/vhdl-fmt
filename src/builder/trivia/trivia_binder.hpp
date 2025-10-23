@@ -41,7 +41,7 @@ class TriviaBinder
     auto operator=(TriviaBinder &&) -> TriviaBinder & = delete;
 
     /// @brief Binds collected trivia to the specified AST node.
-    void bind(ast::Node &node, const antlr4::ParserRuleContext *ctx);
+    void bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ctx);
 
   private:
     struct AnchorToken

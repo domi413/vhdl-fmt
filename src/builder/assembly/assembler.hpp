@@ -35,7 +35,7 @@ class Assembler
 
     /// @brief Create and insert a new node into the active sink.
     /// @return Reference to the created node.
-    template<std::derived_from<ast::Node> T>
+    template<std::derived_from<ast::NodeBase> T>
     [[nodiscard]]
     auto spawn() -> T &
     {
@@ -63,7 +63,7 @@ class Assembler
     template<typename T>
     void pushSink(std::vector<std::unique_ptr<T>> &vec)
     {
-        static_assert(std::derived_from<T, ast::Node>,
+        static_assert(std::derived_from<T, ast::NodeBase>,
                       "Sink element type must derive from ast::Node");
         sinks_.push_back(std::make_unique<Sink<T>>(vec));
     }
@@ -71,7 +71,7 @@ class Assembler
     template<typename Slot>
     void pushSink(std::unique_ptr<Slot> &slot)
     {
-        static_assert(std::derived_from<Slot, ast::Node>,
+        static_assert(std::derived_from<Slot, ast::NodeBase>,
                       "Sink slot type must derive from ast::Node");
         sinks_.push_back(std::make_unique<SingleSink<Slot>>(slot));
     }

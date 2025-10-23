@@ -4,7 +4,7 @@
 namespace ast {
 
 // Forward declarations
-struct Node;
+struct NodeBase;
 struct DesignFile;
 struct DesignUnit;
 

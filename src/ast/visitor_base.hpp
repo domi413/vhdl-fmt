@@ -16,7 +16,7 @@
 namespace ast {
 
 template<typename T>
-concept AstNode = std::derived_from<T, ast::Node>;
+concept AstNode = std::derived_from<T, ast::NodeBase>;
 
 /// @brief Default recursive AST visitor.
 ///

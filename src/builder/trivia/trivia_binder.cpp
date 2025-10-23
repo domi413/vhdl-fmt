@@ -65,7 +65,7 @@ void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anch
     }
 }
 
-void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
+void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ctx)
 {
     if (ctx == nullptr) {
         return;

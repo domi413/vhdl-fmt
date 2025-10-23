@@ -22,7 +22,7 @@ void DebugPrinter::printLine(std::string_view s) const
     out_ << s << '\n';
 }
 
-void DebugPrinter::printNodeHeader(const ast::Node &n,
+void DebugPrinter::printNodeHeader(const ast::NodeBase &n,
                                    const std::string &extra,
                                    std::string_view name_override,
                                    std::size_t leading_breaks) const

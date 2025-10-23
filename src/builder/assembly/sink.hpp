@@ -25,7 +25,7 @@ struct ISink
     auto operator=(ISink &&) -> ISink & = delete;
 
     /// @brief Insert a node into the underlying container.
-    virtual void push(std::unique_ptr<ast::Node>) = 0;
+    virtual void push(std::unique_ptr<ast::NodeBase>) = 0;
 };
 
 /// @brief Type-specific sink for containers of derived nodes.
@@ -39,7 +39,7 @@ struct Sink : ISink
     explicit Sink(std::vector<std::unique_ptr<ElemT>> &v) : vec_(v) {}
 
     /// @brief Store a node in the bound container after casting.
-    void push(std::unique_ptr<ast::Node> n) override
+    void push(std::unique_ptr<ast::NodeBase> n) override
     {
         auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));
         vec_.emplace_back(std::move(casted));
@@ -56,7 +56,7 @@ struct SingleSink : ISink
 {
     explicit SingleSink(std::unique_ptr<ElemT> &slot) : slot_(slot) {}
 
-    void push(std::unique_ptr<ast::Node> n) override
+    void push(std::unique_ptr<ast::NodeBase> n) override
     {
         assert(!slot_ && "SingleSink already occupied");
         auto casted = std::unique_ptr<ElemT>(static_cast<ElemT *>(n.release()));

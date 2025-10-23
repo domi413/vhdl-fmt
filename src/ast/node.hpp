@@ -35,15 +35,15 @@ struct NodeTrivia
 };
 
 /// @brief Abstract base class for all AST nodes.
-struct Node
+struct NodeBase
 {
-    Node() = default;
-    virtual ~Node() = default;
+    NodeBase() = default;
+    virtual ~NodeBase() = default;
 
-    Node(const Node &) = delete;
-    auto operator=(const Node &) -> Node & = delete;
-    Node(Node &&) = delete;
-    auto operator=(Node &&) -> Node & = delete;
+    NodeBase(const NodeBase &) = delete;
+    auto operator=(const NodeBase &) -> NodeBase & = delete;
+    NodeBase(NodeBase &&) = delete;
+    auto operator=(NodeBase &&) -> NodeBase & = delete;
 
     /// @brief Accept a visitor for dynamic dispatch (void-returning visitors).
     virtual void accept(Visitor &v) const = 0;
@@ -86,7 +86,7 @@ struct Node
 };
 
 /// @brief CRTP base class to simplify visitor pattern implementation.
-template<typename Derived, typename Base = Node>
+template<typename Derived, typename Base = NodeBase>
 struct Visitable : Base
 {
     /// @brief Accept a void-returning visitor (satisfies Node's virtual method).

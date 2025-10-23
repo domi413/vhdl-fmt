@@ -50,7 +50,7 @@ class DebugPrinter : public ast::BaseVisitor
     void printIndent() const;
     void printLine(std::string_view s) const;
 
-    void printNodeHeader(const ast::Node &n,
+    void printNodeHeader(const ast::NodeBase &n,
                          const std::string &extra,
                          std::string_view name_override,
                          std::size_t leading_breaks) const;
