@@ -73,7 +73,8 @@ class BaseVisitor : public Visitor<ReturnType>
     // ---------------------------------------------------------------------
     // Core hierarchy
     // ---------------------------------------------------------------------
-    auto visit(const DesignFile &node) -> ReturnType override { 
+    auto visit(const DesignFile &node) -> ReturnType override
+    {
         dispatchAll(node.units);
         return ReturnType{};
     }
@@ -95,8 +96,9 @@ class BaseVisitor : public Visitor<ReturnType>
         return ReturnType{};
     }
 
-    auto visit(const PortClause &node) -> ReturnType override { 
-        dispatchAll(node.ports); 
+    auto visit(const PortClause &node) -> ReturnType override
+    {
+        dispatchAll(node.ports);
         return ReturnType{};
     }
 
