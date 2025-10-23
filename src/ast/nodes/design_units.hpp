@@ -2,7 +2,6 @@
 #define AST_NODES_ENTITY_HPP
 
 #include "ast/nodes/declarations.hpp"
-#include "ast/nodes/design_file.hpp"
 #include "ast/nodes/statements.hpp"
 
 #include <memory>
@@ -12,17 +11,23 @@
 
 namespace ast {
 
-struct GenericClause : Visitable<GenericClause>
+struct DesignUnit : Node
+{
+  protected:
+    DesignUnit() = default;
+};
+
+struct GenericClause final : Visitable<GenericClause>
 {
     std::vector<std::unique_ptr<GenericParam>> generics;
 };
 
-struct PortClause : Visitable<PortClause>
+struct PortClause final : Visitable<PortClause>
 {
     std::vector<std::unique_ptr<Port>> ports;
 };
 
-struct Entity : Visitable<Entity, DesignUnit>
+struct Entity final : Visitable<Entity, DesignUnit>
 {
     std::string name;
     std::unique_ptr<GenericClause> generic_clause;
@@ -32,7 +37,7 @@ struct Entity : Visitable<Entity, DesignUnit>
     std::optional<std::string> end_label;
 };
 
-struct Architecture : Visitable<Architecture, DesignUnit>
+struct Architecture final : Visitable<Architecture, DesignUnit>
 {
     std::string name;
     std::string entity_name;

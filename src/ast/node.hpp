@@ -91,10 +91,7 @@ template<typename Derived, typename Base = Node>
 struct Visitable : Base
 {
     /// @brief Accept a void-returning visitor (satisfies Node's virtual method).
-    void accept(Visitor<void> &v) const override
-    {
-        v.visit(static_cast<const Derived &>(*this));
-    }
+    void accept(Visitor<void> &v) const override { v.visit(static_cast<const Derived &>(*this)); }
 
     /// @brief Accept a visitor with arbitrary return type (for compile-time dispatch).
     template<typename ReturnType>

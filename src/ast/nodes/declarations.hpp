@@ -20,14 +20,14 @@ struct Declaration : Node
 };
 
 // Constant declaration: constant WIDTH : integer := 8;
-struct ConstantDecl : Visitable<ConstantDecl, Declaration>
+struct ConstantDecl final : Visitable<ConstantDecl, Declaration>
 {
     std::string type_name;
     std::unique_ptr<Expr> init_expr;
 };
 
 // Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
-struct SignalDecl : Visitable<SignalDecl, Declaration>
+struct SignalDecl final : Visitable<SignalDecl, Declaration>
 {
     std::string type_name;
     bool has_bus_kw{ false };
@@ -36,14 +36,14 @@ struct SignalDecl : Visitable<SignalDecl, Declaration>
 };
 
 // Generic parameter inside GENERIC clause
-struct GenericParam : Visitable<GenericParam, Declaration>
+struct GenericParam final : Visitable<GenericParam, Declaration>
 {
     std::string type_name;
     std::unique_ptr<Expr> default_expr;
 };
 
 // Port entry inside PORT clause
-struct Port : Visitable<Port, Declaration>
+struct Port final : Visitable<Port, Declaration>
 {
     std::string mode; // "in" / "out"
     std::string type_name;

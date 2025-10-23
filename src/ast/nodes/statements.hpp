@@ -23,7 +23,7 @@ struct ConcurrentAssign : Visitable<ConcurrentAssign, Statement>
 };
 
 // Simplified process statement
-struct Process : Visitable<Process, Statement>
+struct Process final : Visitable<Process, Statement>
 {
     std::vector<std::string> sensitivity_list;
     std::vector<std::unique_ptr<Statement>> body;

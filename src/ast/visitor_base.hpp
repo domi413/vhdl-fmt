@@ -4,7 +4,7 @@
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
-#include "ast/nodes/entity.hpp"
+#include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
 #include "ast/visitor.hpp"
@@ -81,10 +81,7 @@ class BaseVisitor : public Visitor<ReturnType>
         }
     }
 
-    auto visit(const DesignFile &node) -> ReturnType override
-    {
-        return dispatchAll(node.units);
-    }
+    auto visit(const DesignFile &node) -> ReturnType override { return dispatchAll(node.units); }
 
     auto visit(const DesignUnit &node) -> ReturnType override
     {
@@ -139,10 +136,7 @@ class BaseVisitor : public Visitor<ReturnType>
         return dispatchAll(node.generics);
     }
 
-    auto visit(const PortClause &node) -> ReturnType override
-    {
-        return dispatchAll(node.ports);
-    }
+    auto visit(const PortClause &node) -> ReturnType override { return dispatchAll(node.ports); }
 
     auto visit(const Entity &node) -> ReturnType override
     {
