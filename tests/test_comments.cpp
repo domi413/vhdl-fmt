@@ -83,7 +83,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    const auto &leading_trivia = entity->tryGetTrivia().value_or(ast::Node::NodeTrivia{}).leading;
+    const auto &leading_trivia = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;
     const auto texts = leadingComments(leading_trivia);
 
     REQUIRE(texts.size() == 2);
@@ -111,7 +111,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE(entity->generic_clause->generics.size() == 1);
 
     const auto &g = *entity->generic_clause->generics[0];
-    const auto &c = g.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
+    const auto &c = g.tryGetTrivia().value_or(ast::NodeTrivia{});
 
     const auto lead = leadingComments(c.leading);
     const auto trail = trailingComments(c.trailing);
@@ -146,7 +146,7 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
 
     {
         const auto &clk = *entity->port_clause->ports[0];
-        const auto &cm = clk.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
+        const auto &cm = clk.tryGetTrivia().value_or(ast::NodeTrivia{});
         const auto lead = leadingComments(cm.leading);
         const auto trail = trailingComments(cm.trailing);
         REQUIRE_FALSE(lead.empty());
@@ -156,7 +156,7 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     }
     {
         const auto &rst = *entity->port_clause->ports[1];
-        const auto &cm = rst.tryGetTrivia().value_or(ast::Node::NodeTrivia{});
+        const auto &cm = rst.tryGetTrivia().value_or(ast::NodeTrivia{});
         const auto lead = leadingComments(cm.leading);
         const auto trail = trailingComments(cm.trailing);
         REQUIRE_FALSE(lead.empty());

@@ -75,8 +75,8 @@ class TriviaBinder
     [[nodiscard]]
     auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;
 
-    void collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_index);
-    void collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken &anchor);
+    void collectLeading(ast::NodeTrivia &dst, std::size_t start_index);
+    void collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anchor);
 };
 
 } // namespace builder

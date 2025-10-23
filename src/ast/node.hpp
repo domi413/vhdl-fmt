@@ -27,6 +27,13 @@ struct ParagraphBreak
 /// @brief A variant representing either a comment or a paragraph break to preserve order.
 using Trivia = std::variant<Comments, ParagraphBreak>;
 
+/// @brief Container for leading and trailing trivia (Newlines are only counted leading).
+struct NodeTrivia
+{
+    std::vector<Trivia> leading;
+    std::vector<Comments> trailing;
+};
+
 /// @brief Abstract base class for all AST nodes.
 struct Node
 {
@@ -37,13 +44,6 @@ struct Node
     auto operator=(const Node &) -> Node & = delete;
     Node(Node &&) = delete;
     auto operator=(Node &&) -> Node & = delete;
-
-    /// @brief Container for leading and trailing trivia (Newlines are only counted leading).
-    struct NodeTrivia
-    {
-        std::vector<Trivia> leading;
-        std::vector<Comments> trailing;
-    };
 
     /// @brief Accept a visitor for dynamic dispatch (void-returning visitors).
     virtual void accept(Visitor &v) const = 0;

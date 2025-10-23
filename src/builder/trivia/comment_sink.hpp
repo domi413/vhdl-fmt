@@ -17,7 +17,7 @@ class CommentSink
     CommentSink() = default;
 
     /// @brief Push a comment token into the node’s comment list, unless already added.
-    void push(ast::Node::NodeTrivia &dst, bool to_leading, const antlr4::Token *t)
+    void push(ast::NodeTrivia &dst, bool to_leading, const antlr4::Token *t)
     {
         if (t == nullptr) {
             return;

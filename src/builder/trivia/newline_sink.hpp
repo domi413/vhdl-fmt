@@ -14,7 +14,7 @@ class NewlineSink
 {
   public:
     /// @brief Push paragraph break trivia. Expects newline_count >= 2.
-    constexpr void push(ast::Node::NodeTrivia &dst, std::size_t newline_count)
+    constexpr void push(ast::NodeTrivia &dst, std::size_t newline_count)
     {
         if (newline_count < 2) {
             return;

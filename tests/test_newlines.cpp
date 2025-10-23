@@ -82,7 +82,7 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
-    const auto &lead = entity->tryGetTrivia().value_or(ast::Node::NodeTrivia{}).leading;
+    const auto &lead = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;
 
     // Expect: Comment("A"), ParagraphBreak(1 blank line), Comment("B")
     REQUIRE(std::holds_alternative<ast::Comments>(lead[0]));

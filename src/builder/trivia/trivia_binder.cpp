@@ -10,7 +10,7 @@
 
 namespace builder {
 
-void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_index)
+void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t start_index)
 {
     // Tokens are given in source order
     const auto &hidden = tokens_.getHiddenTokensToLeft(start_index);
@@ -49,7 +49,7 @@ void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_
     std::ranges::reverse(dst.leading);
 }
 
-void TriviaBinder::collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken &anchor)
+void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anchor)
 {
     // Collect trailing comments that appear on the same line as the anchor
     const auto hidden = tokens_.getHiddenTokensToRight(anchor.index);
