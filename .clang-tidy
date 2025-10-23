@@ -13,6 +13,10 @@ Checks: >
   -readability-identifier-length,
 
 CheckOptions:
+  # Linter rule options
+  - key: modernize-use-trailing-return-type.TransformLambdas
+    value: all_except_auto
+
   # Types use PascalCase: MyClass
   - key: readability-identifier-naming.ClassCase
     value: "CamelCase"
