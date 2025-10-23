@@ -43,6 +43,10 @@ class DebugPrinter : public ast::VisitorBase<DebugPrinter, void>
     void operator()(const ast::BinaryExpr &node);
     void operator()(const ast::ParenExpr &node);
 
+    // Statements
+    void operator()(const ast::ConcurrentAssign &node);
+    void operator()(const ast::Process &node);
+
   private:
     std::ostream &out_;
     std::uint8_t indent_{ 0 };
