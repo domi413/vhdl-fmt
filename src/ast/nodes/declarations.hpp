@@ -6,28 +6,40 @@
 
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace ast {
 
-// Abstract base for all declarations
-struct Declaration : Visitable<Declaration>
+// Forward declarations
+struct ConstantDecl;
+struct SignalDecl;
+struct GenericParam;
+struct Port;
+
+/// Variant type for all declarations
+using Declaration = std::variant<
+    ConstantDecl,
+    SignalDecl,
+    GenericParam,
+    Port
+>;
+
+// Base data common to all declarations
+struct DeclBase : NodeBase
 {
     std::vector<std::string> names;
-
-  protected:
-    Declaration() = default;
 };
 
 // Constant declaration: constant WIDTH : integer := 8;
-struct ConstantDecl final : Visitable<ConstantDecl, Declaration>
+struct ConstantDecl : DeclBase
 {
     std::string type_name;
     std::unique_ptr<Expr> init_expr;
 };
 
 // Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
-struct SignalDecl final : Visitable<SignalDecl, Declaration>
+struct SignalDecl : DeclBase
 {
     std::string type_name;
     bool has_bus_kw{ false };
@@ -36,14 +48,14 @@ struct SignalDecl final : Visitable<SignalDecl, Declaration>
 };
 
 // Generic parameter inside GENERIC clause
-struct GenericParam final : Visitable<GenericParam, Declaration>
+struct GenericParam : DeclBase
 {
     std::string type_name;
     std::unique_ptr<Expr> default_expr;
 };
 
 // Port entry inside PORT clause
-struct Port final : Visitable<Port, Declaration>
+struct Port : DeclBase
 {
     std::string mode; // "in" / "out"
     std::string type_name;

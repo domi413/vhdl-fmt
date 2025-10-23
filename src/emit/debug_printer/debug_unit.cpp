@@ -7,65 +7,53 @@
 
 namespace emit {
 
-auto DebugPrinter::visit(const ast::DesignFile &node) -> void
+auto DebugPrinter::operator()(const ast::DesignFile &node) -> void
 {
     emitNodeLike(node, "DesignFile", "");
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.units);
 }
 
-auto DebugPrinter::visit(const ast::Entity &node) -> void
+auto DebugPrinter::operator()(const ast::Entity &node) -> void
 {
     emitNodeLike(node, "Entity", node.name);
     const IndentGuard _{ indent_ };
-
-    if (node.generic_clause) {
-        node.generic_clause->accept(*this);
-    }
-    if (node.port_clause) {
-        node.port_clause->accept(*this);
-    }
+    visit(node.generic_clause);
+    visit(node.port_clause);
 
     if (!node.decls.empty()) {
         printLine("Declarations:");
         const IndentGuard _{ indent_ };
-        for (const auto &d : node.decls) {
-            if (d) {
-                dispatch(d);
-            }
-        }
+        visit(node.decls);
     }
 
     if (!node.stmts.empty()) {
         printLine("Statements:");
         const IndentGuard _{ indent_ };
-        for (const auto &s : node.stmts) {
-            if (s) {
-                dispatch(s);
-            }
-        }
+        visit(node.stmts);
     }
 }
 
-auto DebugPrinter::visit(const ast::Architecture &node) -> void
+auto DebugPrinter::operator()(const ast::Architecture &node) -> void
 {
     emitNodeLike(node, "Architecture", node.name + " of " + node.entity_name);
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.decls);
+    visit(node.stmts);
 }
 
-auto DebugPrinter::visit(const ast::GenericClause &node) -> void
+auto DebugPrinter::operator()(const ast::GenericClause &node) -> void
 {
     emitNodeLike(node, "GenericClause", "");
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.generics);
 }
 
-auto DebugPrinter::visit(const ast::PortClause &node) -> void
+auto DebugPrinter::operator()(const ast::PortClause &node) -> void
 {
     emitNodeLike(node, "PortClause", "");
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.ports);
 }
 
 } // namespace emit

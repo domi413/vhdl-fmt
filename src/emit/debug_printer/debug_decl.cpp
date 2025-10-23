@@ -9,7 +9,7 @@
 
 namespace emit {
 
-auto DebugPrinter::visit(const ast::GenericParam &node) -> void
+auto DebugPrinter::operator()(const ast::GenericParam &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
@@ -19,10 +19,10 @@ auto DebugPrinter::visit(const ast::GenericParam &node) -> void
     emitNodeLike(node, "GenericParam", oss.str());
 
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.default_expr);
 }
 
-auto DebugPrinter::visit(const ast::Port &node) -> void
+auto DebugPrinter::operator()(const ast::Port &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
@@ -41,10 +41,11 @@ auto DebugPrinter::visit(const ast::Port &node) -> void
     emitNodeLike(node, "Port", oss.str());
 
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.default_expr);
+    visit(node.constraints);
 }
 
-auto DebugPrinter::visit(const ast::SignalDecl &node) -> void
+auto DebugPrinter::operator()(const ast::SignalDecl &node) -> void
 {
     std::ostringstream oss;
     for (size_t i = 0; i < node.names.size(); ++i) {
@@ -60,10 +61,11 @@ auto DebugPrinter::visit(const ast::SignalDecl &node) -> void
     emitNodeLike(node, "SignalDecl", oss.str());
 
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.init_expr);
+    visit(node.constraints);
 }
 
-auto DebugPrinter::visit(const ast::ConstantDecl &node) -> void
+auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void
 {
     std::ostringstream oss;
     for (size_t i = 0; i < node.names.size(); ++i) {
@@ -77,7 +79,7 @@ auto DebugPrinter::visit(const ast::ConstantDecl &node) -> void
     emitNodeLike(node, "ConstantDecl", oss.str());
 
     const IndentGuard _{ indent_ };
-    walk(node);
+    visit(node.init_expr);
 }
 
 } // namespace emit

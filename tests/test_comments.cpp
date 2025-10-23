@@ -80,7 +80,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
     const auto &leading_trivia = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;
@@ -106,7 +106,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->generic_clause->generics.size() == 1);
 
@@ -140,7 +140,7 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause->ports.size() == 2);
 

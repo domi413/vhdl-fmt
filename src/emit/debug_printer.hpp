@@ -6,7 +6,7 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
-#include "ast/visitor_base.hpp"
+#include "ast/visitor.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -18,30 +18,30 @@
 namespace emit {
 
 /// @brief AST debug printer. Traverses the AST and prints its structure with indentation.
-class DebugPrinter : public ast::BaseVisitor
+class DebugPrinter : public ast::VisitorBase<DebugPrinter, void>
 {
   public:
     explicit DebugPrinter(std::ostream &out) : out_(out) {}
 
     // Node visitors
-    auto visit(const ast::DesignFile &node) -> void override;
-    auto visit(const ast::Entity &node) -> void override;
-    auto visit(const ast::Architecture &node) -> void override;
-    auto visit(const ast::GenericClause &node) -> void override;
-    auto visit(const ast::PortClause &node) -> void override;
-    auto visit(const ast::GenericParam &node) -> void override;
-    auto visit(const ast::Port &node) -> void override;
+    void operator()(const ast::DesignFile &node);
+    void operator()(const ast::Entity &node);
+    void operator()(const ast::Architecture &node);
+    void operator()(const ast::GenericClause &node);
+    void operator()(const ast::PortClause &node);
+    void operator()(const ast::GenericParam &node);
+    void operator()(const ast::Port &node);
 
     // Declarations
-    auto visit(const ast::SignalDecl &node) -> void override;
-    auto visit(const ast::ConstantDecl &node) -> void override;
+    void operator()(const ast::SignalDecl &node);
+    void operator()(const ast::ConstantDecl &node);
 
     // Expressions
-    auto visit(const ast::TokenExpr &node) -> void override;
-    auto visit(const ast::GroupExpr &node) -> void override;
-    auto visit(const ast::UnaryExpr &node) -> void override;
-    auto visit(const ast::BinaryExpr &node) -> void override;
-    auto visit(const ast::ParenExpr &node) -> void override;
+    void operator()(const ast::TokenExpr &node);
+    void operator()(const ast::GroupExpr &node);
+    void operator()(const ast::UnaryExpr &node);
+    void operator()(const ast::BinaryExpr &node);
+    void operator()(const ast::ParenExpr &node);
 
   private:
     std::ostream &out_;

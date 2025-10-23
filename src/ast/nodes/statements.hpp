@@ -5,25 +5,31 @@
 #include "ast/nodes/expressions.hpp"
 
 #include <memory>
+#include <string>
+#include <variant>
 #include <vector>
 
 namespace ast {
 
-struct Statement : Visitable<Statement>
-{
-  protected:
-    Statement() = default;
-};
+// Forward declarations
+struct ConcurrentAssign;
+struct Process;
+
+/// Variant type for all statements
+using Statement = std::variant<
+    ConcurrentAssign,
+    Process
+>;
 
 // Concurrent signal assignment
-struct ConcurrentAssign : Visitable<ConcurrentAssign, Statement>
+struct ConcurrentAssign : NodeBase
 {
     std::unique_ptr<Expr> target;
     std::unique_ptr<Expr> value;
 };
 
 // Simplified process statement
-struct Process final : Visitable<Process, Statement>
+struct Process : NodeBase
 {
     std::vector<std::string> sensitivity_list;
     std::vector<std::unique_ptr<Statement>> body;

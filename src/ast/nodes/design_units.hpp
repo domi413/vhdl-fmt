@@ -8,27 +8,32 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace ast {
 
-struct DesignUnit : Visitable<DesignUnit>
-{
-  protected:
-    DesignUnit() = default;
-};
+// Forward declarations
+struct Entity;
+struct Architecture;
 
-struct GenericClause final : Visitable<GenericClause>
+/// Variant type for all design units
+using DesignUnit = std::variant<
+    Entity,
+    Architecture
+>;
+
+struct GenericClause : NodeBase
 {
     std::vector<std::unique_ptr<GenericParam>> generics;
 };
 
-struct PortClause final : Visitable<PortClause>
+struct PortClause : NodeBase
 {
     std::vector<std::unique_ptr<Port>> ports;
 };
 
-struct Entity final : Visitable<Entity, DesignUnit>
+struct Entity : NodeBase
 {
     std::string name;
     std::unique_ptr<GenericClause> generic_clause;
@@ -38,7 +43,7 @@ struct Entity final : Visitable<Entity, DesignUnit>
     std::optional<std::string> end_label;
 };
 
-struct Architecture final : Visitable<Architecture, DesignUnit>
+struct Architecture : NodeBase
 {
     std::string name;
     std::string entity_name;

@@ -1,8 +1,6 @@
 #ifndef AST_NODE_HPP
 #define AST_NODE_HPP
 
-#include "ast/visitor.hpp"
-
 #include <cstddef>
 #include <optional>
 #include <string>
@@ -45,9 +43,6 @@ struct NodeBase
     NodeBase(NodeBase &&) = delete;
     auto operator=(NodeBase &&) -> NodeBase & = delete;
 
-    /// @brief Accept a visitor for dynamic dispatch (void-returning visitors).
-    virtual void accept(Visitor &v) const = 0;
-
     /// @brief Create and return this node's comment block.
     auto emplaceTrivia() -> NodeTrivia & { return trivia_.emplace(); }
 
@@ -83,14 +78,6 @@ struct NodeBase
 
   private:
     std::optional<NodeTrivia> trivia_;
-};
-
-/// @brief CRTP base class to simplify visitor pattern implementation.
-template<typename Derived, typename Base = NodeBase>
-struct Visitable : Base
-{
-    /// @brief Accept a void-returning visitor (satisfies Node's virtual method).
-    void accept(Visitor &v) const override { v.visit(static_cast<const Derived &>(*this)); }
 };
 
 } // namespace ast

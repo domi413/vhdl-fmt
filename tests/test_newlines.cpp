@@ -79,7 +79,7 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = dynamic_cast<ast::Entity *>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
     REQUIRE(entity != nullptr);
 
     const auto &lead = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;

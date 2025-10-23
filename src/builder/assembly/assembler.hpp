@@ -64,7 +64,7 @@ class Assembler
     void pushSink(std::vector<std::unique_ptr<T>> &vec)
     {
         static_assert(std::derived_from<T, ast::NodeBase>,
-                      "Sink element type must derive from ast::Node");
+                      "Sink element type must derive from ast::NodeBase");
         sinks_.push_back(std::make_unique<Sink<T>>(vec));
     }
 
@@ -72,7 +72,7 @@ class Assembler
     void pushSink(std::unique_ptr<Slot> &slot)
     {
         static_assert(std::derived_from<Slot, ast::NodeBase>,
-                      "Sink slot type must derive from ast::Node");
+                      "Sink slot type must derive from ast::NodeBase");
         sinks_.push_back(std::make_unique<SingleSink<Slot>>(slot));
     }
 };

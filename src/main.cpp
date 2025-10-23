@@ -62,7 +62,7 @@ auto main(int argc, char *argv[]) -> int
 
         // -- AST printing for debugging --
         emit::DebugPrinter printer(std::cout);
-        root.accept(printer);
+        printer.visit(root);
 
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << '\n';

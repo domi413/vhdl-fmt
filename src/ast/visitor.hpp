@@ -1,82 +1,94 @@
 #ifndef AST_VISITOR_HPP
 #define AST_VISITOR_HPP
 
+#include "nodes/design_file.hpp"
+
+#include <memory>
+#include <variant>
+#include <vector>
+
 namespace ast {
 
-// Forward declarations
-struct NodeBase;
-struct DesignFile;
-struct DesignUnit;
-
-struct Declaration;
-struct ConstantDecl;
-struct SignalDecl;
-struct GenericParam;
-struct Port;
-
-struct Statement;
-struct ConcurrentAssign;
-struct Process;
-
-struct Expr;
-struct TokenExpr;
-struct GroupExpr;
-struct UnaryExpr;
-struct BinaryExpr;
-struct ParenExpr;
-
-struct GenericClause;
-struct PortClause;
-struct Entity;
-struct Architecture;
-
-/// @brief Abstract interface for visiting AST nodes.
+/// @brief Base class for stateful visitors that need to traverse the AST
 ///
-/// Defines the entry points for all visitable node types.
-/// Concrete visitors implement these to perform operations
-/// such as formatting, analysis, or transformation.
+/// Example usage:
+///   struct MyFormatter : VisitorBase<MyFormatter> {
+///       std::string output;
 ///
-class Visitor
+///       void operator()(const TokenExpr& e) {
+///           output += e.text;
+///       }
+///   };
+template<typename Derived, typename ReturnType = void>
+class VisitorBase
 {
   public:
-    Visitor() = default;
-    virtual ~Visitor() = default;
+    /// @brief Visit a DesignFile by visiting all its units
+    void visit(const ast::DesignFile &design) { visit(design.units); }
 
-    Visitor(const Visitor &) = delete;
-    auto operator=(const Visitor &) -> Visitor & = delete;
-    Visitor(Visitor &&) = delete;
-    auto operator=(Visitor &&) -> Visitor & = delete;
+  protected:
+    /// @brief Visit a variant node, dispatching to the appropriate operator()
+    template<typename... Ts>
+    auto visit(const std::variant<Ts...> &node) -> ReturnType
+    {
+        return std::visit(
+          [this](const auto &n) -> decltype(auto) { return static_cast<Derived &>(*this)(n); },
+          node);
+    }
 
-    // Core hierarchy
-    virtual void visit(const DesignFile &) = 0;
-    virtual void visit(const DesignUnit &) = 0;
+    /// @brief Visit a unique_ptr to a variant node
+    template<typename... Ts>
+    auto visit(const std::unique_ptr<std::variant<Ts...>> &node) -> ReturnType
+    {
+        if (node) {
+            return visit(*node);
+        }
+        return ReturnType{}; // default-constructed value if null
+    }
 
-    // Declarations
-    virtual void visit(const Declaration &) = 0;
-    virtual void visit(const ConstantDecl &) = 0;
-    virtual void visit(const SignalDecl &) = 0;
-    virtual void visit(const GenericParam &) = 0;
-    virtual void visit(const Port &) = 0;
+    /// @brief Visit a unique_ptr to a non-variant type
+    template<typename T>
+    auto visit(const std::unique_ptr<T> &node) -> decltype(auto)
+    {
+        if (node) {
+            return static_cast<Derived &>(*this)(*node);
+        }
+    }
 
-    // Structural clauses (used inside Entity/Architecture)
-    virtual void visit(const GenericClause &) = 0;
-    virtual void visit(const PortClause &) = 0;
-    virtual void visit(const Entity &) = 0;
-    virtual void visit(const Architecture &) = 0;
+    /// @brief Visit a vector of nodes
+    template<typename T>
+    auto visit(const std::vector<T> &nodes) -> std::vector<ReturnType>
+        requires(!std::is_void_v<ReturnType>)
+    {
+        std::vector<ReturnType> results;
+        results.reserve(nodes.size());
+        for (const auto &node : nodes) {
+            results.push_back(visit(node));
+        }
+        return results;
+    }
 
-    // Statements
-    virtual void visit(const Statement &) = 0;
-    virtual void visit(const ConcurrentAssign &) = 0;
-    virtual void visit(const Process &) = 0;
-
-    // Expressions
-    virtual void visit(const Expr &) = 0;
-    virtual void visit(const TokenExpr &node) = 0;
-    virtual void visit(const GroupExpr &node) = 0;
-    virtual void visit(const UnaryExpr &node) = 0;
-    virtual void visit(const BinaryExpr &node) = 0;
-    virtual void visit(const ParenExpr &node) = 0;
+    /// @brief Visit a vector of nodes when ReturnType is void
+    template<typename T>
+    void visit(const std::vector<T> &nodes)
+        requires(std::is_void_v<ReturnType>)
+    {
+        for (const auto &node : nodes) {
+            visit(node);
+        }
+    }
 };
+
+/// @brief Type-trait to check if a variant contains a specific type
+template<typename T, typename Variant>
+struct variant_contains;
+
+template<typename T, typename... Ts>
+struct variant_contains<T, std::variant<Ts...>> : std::disjunction<std::is_same<T, Ts>...>
+{};
+
+template<typename T, typename Variant>
+inline constexpr bool VARIANT_CONTAINS_V = variant_contains<T, Variant>::value;
 
 } // namespace ast
 
