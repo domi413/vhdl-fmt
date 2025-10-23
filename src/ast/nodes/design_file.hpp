@@ -9,7 +9,10 @@
 namespace ast {
 
 struct DesignUnit : Node
-{};
+{
+  protected:
+    DesignUnit() = default;
+};
 
 struct DesignFile : Visitable<DesignFile>
 {

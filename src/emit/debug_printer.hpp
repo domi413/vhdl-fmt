@@ -18,30 +18,30 @@
 namespace emit {
 
 /// @brief AST debug printer. Traverses the AST and prints its structure with indentation.
-class DebugPrinter : public ast::BaseVisitor
+class DebugPrinter : public ast::BaseVisitor<void>
 {
   public:
     explicit DebugPrinter(std::ostream &out) : out_(out) {}
 
     // Node visitors
-    void visit(const ast::DesignFile &node) override;
-    void visit(const ast::Entity &node) override;
-    void visit(const ast::Architecture &node) override;
-    void visit(const ast::GenericClause &node) override;
-    void visit(const ast::PortClause &node) override;
-    void visit(const ast::GenericParam &node) override;
-    void visit(const ast::Port &node) override;
+    auto visit(const ast::DesignFile &node) -> void override;
+    auto visit(const ast::Entity &node) -> void override;
+    auto visit(const ast::Architecture &node) -> void override;
+    auto visit(const ast::GenericClause &node) -> void override;
+    auto visit(const ast::PortClause &node) -> void override;
+    auto visit(const ast::GenericParam &node) -> void override;
+    auto visit(const ast::Port &node) -> void override;
 
     // Declarations
-    void visit(const ast::SignalDecl &node) override;
-    void visit(const ast::ConstantDecl &node) override;
+    auto visit(const ast::SignalDecl &node) -> void override;
+    auto visit(const ast::ConstantDecl &node) -> void override;
 
     // Expressions
-    void visit(const ast::TokenExpr &node) override;
-    void visit(const ast::GroupExpr &node) override;
-    void visit(const ast::UnaryExpr &node) override;
-    void visit(const ast::BinaryExpr &node) override;
-    void visit(const ast::ParenExpr &node) override;
+    auto visit(const ast::TokenExpr &node) -> void override;
+    auto visit(const ast::GroupExpr &node) -> void override;
+    auto visit(const ast::UnaryExpr &node) -> void override;
+    auto visit(const ast::BinaryExpr &node) -> void override;
+    auto visit(const ast::ParenExpr &node) -> void override;
 
   private:
     std::ostream &out_;

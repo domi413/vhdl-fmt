@@ -9,7 +9,7 @@
 
 namespace emit {
 
-void DebugPrinter::visit(const ast::GenericParam &node)
+auto DebugPrinter::visit(const ast::GenericParam &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
@@ -22,7 +22,7 @@ void DebugPrinter::visit(const ast::GenericParam &node)
     walk(node);
 }
 
-void DebugPrinter::visit(const ast::Port &node)
+auto DebugPrinter::visit(const ast::Port &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
@@ -44,7 +44,7 @@ void DebugPrinter::visit(const ast::Port &node)
     walk(node);
 }
 
-void DebugPrinter::visit(const ast::SignalDecl &node)
+auto DebugPrinter::visit(const ast::SignalDecl &node) -> void
 {
     std::ostringstream oss;
     for (size_t i = 0; i < node.names.size(); ++i) {
@@ -63,7 +63,7 @@ void DebugPrinter::visit(const ast::SignalDecl &node)
     walk(node);
 }
 
-void DebugPrinter::visit(const ast::ConstantDecl &node)
+auto DebugPrinter::visit(const ast::ConstantDecl &node) -> void
 {
     std::ostringstream oss;
     for (size_t i = 0; i < node.names.size(); ++i) {

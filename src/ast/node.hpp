@@ -45,10 +45,11 @@ struct Node
         std::vector<Comments> trailing;
     };
 
-    /// @brief Accept a visitor for dynamic dispatch.
-    virtual void accept(Visitor &v) const = 0;
+    /// @brief Accept a visitor for dynamic dispatch (void-returning visitors).
+    /// This is the primary interface for runtime polymorphism.
+    virtual void accept(Visitor<void> &v) const = 0;
 
-    /// @brief Create and return this node’s comment block.
+    /// @brief Create and return this node's comment block.
     auto emplaceTrivia() -> NodeTrivia & { return trivia_.emplace(); }
 
     /// @brief Return attached comments if present.
@@ -89,7 +90,18 @@ struct Node
 template<typename Derived, typename Base = Node>
 struct Visitable : Base
 {
-    void accept(Visitor &v) const override { v.visit(static_cast<const Derived &>(*this)); }
+    /// @brief Accept a void-returning visitor (satisfies Node's virtual method).
+    void accept(Visitor<void> &v) const override
+    {
+        v.visit(static_cast<const Derived &>(*this));
+    }
+
+    /// @brief Accept a visitor with arbitrary return type (for compile-time dispatch).
+    template<typename ReturnType>
+    auto accept(Visitor<ReturnType> &v) const -> ReturnType
+    {
+        return v.visit(static_cast<const Derived &>(*this));
+    }
 };
 
 } // namespace ast

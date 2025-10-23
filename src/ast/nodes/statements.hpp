@@ -10,7 +10,10 @@
 namespace ast {
 
 struct Statement : Node
-{};
+{
+  protected:
+    Statement() = default;
+};
 
 // Concurrent signal assignment
 struct ConcurrentAssign : Visitable<ConcurrentAssign, Statement>

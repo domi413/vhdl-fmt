@@ -11,7 +11,10 @@ namespace ast {
 
 /// Base class for all expression nodes.
 struct Expr : Node
-{};
+{
+  protected:
+    Expr() = default;
+};
 
 /// Single token: literal, identifier, or operator.
 struct TokenExpr : Visitable<TokenExpr, Expr>

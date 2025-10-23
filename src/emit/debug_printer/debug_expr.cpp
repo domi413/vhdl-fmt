@@ -3,19 +3,19 @@
 
 namespace emit {
 
-void DebugPrinter::visit(const ast::TokenExpr &node)
+auto DebugPrinter::visit(const ast::TokenExpr &node) -> void
 {
     emitNodeLike(node, "TokenExpr", node.text);
 }
 
-void DebugPrinter::visit(const ast::GroupExpr &node)
+auto DebugPrinter::visit(const ast::GroupExpr &node) -> void
 {
     emitNodeLike(node, "GroupExpr", "");
     const IndentGuard _{ indent_ };
     dispatchAll(node.children);
 }
 
-void DebugPrinter::visit(const ast::UnaryExpr &node)
+auto DebugPrinter::visit(const ast::UnaryExpr &node) -> void
 {
     emitNodeLike(node, "UnaryExpr", node.op);
     const IndentGuard _{ indent_ };
@@ -27,7 +27,7 @@ void DebugPrinter::visit(const ast::UnaryExpr &node)
     }
 }
 
-void DebugPrinter::visit(const ast::BinaryExpr &node)
+auto DebugPrinter::visit(const ast::BinaryExpr &node) -> void
 {
     emitNodeLike(node, "BinaryExpr", node.op);
     const IndentGuard _{ indent_ };
@@ -45,7 +45,7 @@ void DebugPrinter::visit(const ast::BinaryExpr &node)
     }
 }
 
-void DebugPrinter::visit(const ast::ParenExpr &node)
+auto DebugPrinter::visit(const ast::ParenExpr &node) -> void
 {
     emitNodeLike(node, "ParenExpr", "");
     const IndentGuard _{ indent_ };

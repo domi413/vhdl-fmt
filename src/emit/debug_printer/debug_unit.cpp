@@ -7,14 +7,14 @@
 
 namespace emit {
 
-void DebugPrinter::visit(const ast::DesignFile &node)
+auto DebugPrinter::visit(const ast::DesignFile &node) -> void
 {
     emitNodeLike(node, "DesignFile", "");
     const IndentGuard _{ indent_ };
     walk(node);
 }
 
-void DebugPrinter::visit(const ast::Entity &node)
+auto DebugPrinter::visit(const ast::Entity &node) -> void
 {
     emitNodeLike(node, "Entity", node.name);
     const IndentGuard _{ indent_ };
@@ -47,21 +47,21 @@ void DebugPrinter::visit(const ast::Entity &node)
     }
 }
 
-void DebugPrinter::visit(const ast::Architecture &node)
+auto DebugPrinter::visit(const ast::Architecture &node) -> void
 {
     emitNodeLike(node, "Architecture", node.name + " of " + node.entity_name);
     const IndentGuard _{ indent_ };
     walk(node);
 }
 
-void DebugPrinter::visit(const ast::GenericClause &node)
+auto DebugPrinter::visit(const ast::GenericClause &node) -> void
 {
     emitNodeLike(node, "GenericClause", "");
     const IndentGuard _{ indent_ };
     walk(node);
 }
 
-void DebugPrinter::visit(const ast::PortClause &node)
+auto DebugPrinter::visit(const ast::PortClause &node) -> void
 {
     emitNodeLike(node, "PortClause", "");
     const IndentGuard _{ indent_ };

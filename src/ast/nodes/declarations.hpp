@@ -14,6 +14,9 @@ namespace ast {
 struct Declaration : Node
 {
     std::vector<std::string> names;
+
+  protected:
+    Declaration() = default;
 };
 
 // Constant declaration: constant WIDTH : integer := 8;
