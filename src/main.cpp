@@ -1,10 +1,8 @@
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
 #include "ast/nodes/design_file.hpp"
-#include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
-#include "builder/visitor.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
 #include "emit/debug_printer.hpp"
@@ -53,9 +51,7 @@ auto main(int argc, char *argv[]) -> int
         builder::TriviaBinder trivia(tokens);
         builder::Translator translator(trivia, tokens);
         translator.setUnitsDestination(root.units);
-        builder::Visitor visitor(translator);
-        builder::adapter::AntlrVoidAdapter adapter(visitor);
-        tree->accept(&adapter);
+        translator.buildDesignFile(tree);
 
         // std::cout << tree->toStringTree(&parser, true) << '\n';
 

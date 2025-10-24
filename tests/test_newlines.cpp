@@ -3,10 +3,8 @@
 #include "ast/node.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "builder/adapter/antlr_void_adapter.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
-#include "builder/visitor.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
@@ -33,9 +31,7 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     builder::TriviaBinder trivia(tokens);
     builder::Translator translator(trivia, tokens);
     translator.setUnitsDestination(design->units);
-    builder::Visitor visitor(translator);
-    builder::adapter::AntlrVoidAdapter adapter(visitor);
-    tree->accept(&adapter);
+    translator.buildDesignFile(tree);
     return design;
 }
 

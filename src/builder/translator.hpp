@@ -4,32 +4,18 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/trivia/trivia_binder.hpp"
-#include "tree/ParseTree.h"
 #include "vhdlParser.h"
 
 #include <CommonTokenStream.h>
-#include <concepts>
-#include <functional>
 
 namespace builder {
-
-template<typename T>
-concept Traversal = requires(T t, antlr4::tree::ParseTree *node) {
-    { t.dispatch(node) } -> std::same_as<void>;
-    { t.walk(node) } -> std::same_as<void>;
-};
 
 class Translator
 {
     std::vector<ast::DesignUnit> *units_{ nullptr }; ///< Destination for top-level design units
-    std::vector<ast::Declaration> *decls_{ nullptr }; ///< Destination for declarations (signals, constants, etc.)
-    std::vector<ast::Statement> *stmts_{ nullptr }; ///< Destination for statements
     TriviaBinder &trivia_;
     antlr4::CommonTokenStream &tokens_;
-    std::function<void(antlr4::tree::ParseTree *)> dispatch_;
-    std::function<void(antlr4::tree::ParseTree *)> walk_;
 
     /// @brief Helper to create a boxed expression
     template<typename T = ast::Expr>
@@ -49,33 +35,8 @@ class Translator
     /// @brief Set the destination vector for design units
     void setUnitsDestination(std::vector<ast::DesignUnit> &units) { units_ = &units; }
 
-    /// @brief Set the destination vector for declarations (used when building entity/architecture bodies)
-    void setDeclsDestination(std::vector<ast::Declaration> &decls) { decls_ = &decls; }
-    
-    /// @brief Clear the declarations destination
-    void clearDeclsDestination() { decls_ = nullptr; }
-
-    /// @brief Set the destination vector for statements (used when building architecture/process bodies)
-    void setStmtsDestination(std::vector<ast::Statement> &stmts) { stmts_ = &stmts; }
-    
-    /// @brief Clear the statements destination
-    void clearStmtsDestination() { stmts_ = nullptr; }
-
-    /// @brief Push a declaration to the current destination (if set)
-    void pushDecl(ast::Declaration &&decl)
-    {
-        if (decls_ != nullptr) {
-            decls_->push_back(std::move(decl));
-        }
-    }
-
-    /// @brief Push a statement to the current destination (if set)
-    void pushStmt(ast::Statement &&stmt)
-    {
-        if (stmts_ != nullptr) {
-            stmts_->push_back(std::move(stmt));
-        }
-    }
+    /// @brief Build the entire design file by walking the CST
+    void buildDesignFile(vhdlParser::Design_fileContext *ctx);
 
     ~Translator() = default;
 
@@ -83,13 +44,6 @@ class Translator
     auto operator=(const Translator &) -> Translator & = delete;
     Translator(Translator &&) = delete;
     auto operator=(Translator &&) -> Translator & = delete;
-
-    template<Traversal T>
-    void attachTraversal(T &traversal)
-    {
-        dispatch_ = [&traversal](antlr4::tree::ParseTree *node) { traversal.dispatch(node); };
-        walk_ = [&traversal](antlr4::tree::ParseTree *node) { traversal.walk(node); };
-    }
 
     // Design units - return by value
     [[nodiscard]]

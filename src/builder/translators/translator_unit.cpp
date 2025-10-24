@@ -4,6 +4,33 @@
 
 namespace builder {
 
+// ---------------------- Top-level ----------------------
+
+void Translator::buildDesignFile(vhdlParser::Design_fileContext *ctx)
+{
+    for (auto *unit_ctx : ctx->design_unit()) {
+        auto *lib_unit = unit_ctx->library_unit();
+        if (lib_unit == nullptr) {
+            continue;
+        }
+
+        // Check primary units (entity_declaration | configuration_declaration | package_declaration)
+        if (auto *primary = lib_unit->primary_unit()) {
+            if (auto *entity_ctx = primary->entity_declaration()) {
+                (void)makeEntity(entity_ctx);
+            }
+            // TODO(translator): Handle configuration_declaration and package_declaration
+        }
+        // Check secondary units (architecture_body | package_body)
+        else if (auto *secondary = lib_unit->secondary_unit()) {
+            if (auto *arch_ctx = secondary->architecture_body()) {
+                (void)makeArchitecture(arch_ctx);
+            }
+            // TODO(translator): Handle package_body
+        }
+    }
+}
+
 // ---------------------- Design units ----------------------
 
 auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity
@@ -43,16 +70,22 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
     arch.name = ctx->identifier(0)->getText();
     arch.entity_name = ctx->identifier(1)->getText();
 
+    // Walk declarative part and collect declarations directly
     if (auto *decl_part = ctx->architecture_declarative_part()) {
-        setDeclsDestination(arch.decls);
-        walk_(decl_part);
-        clearDeclsDestination();
+        for (auto *item : decl_part->block_declarative_item()) {
+            if (auto *const_ctx = item->constant_declaration()) {
+                arch.decls.push_back(makeConstantDecl(const_ctx));
+            } else if (auto *sig_ctx = item->signal_declaration()) {
+                arch.decls.push_back(makeSignalDecl(sig_ctx));
+            }
+            // Add more declaration types as needed (variables, types, subprograms, etc.)
+        }
     }
 
+    // TODO(user): Walk statement part similarly when statement support is added
     if (auto *stmt_part = ctx->architecture_statement_part()) {
-        setStmtsDestination(arch.stmts);
-        walk_(stmt_part);
-        clearStmtsDestination();
+        // For now, just acknowledge it exists
+        (void)stmt_part;
     }
     
     // Push to destination if set
