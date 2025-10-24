@@ -1,21 +1,14 @@
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
 #include "ast/nodes/design_file.hpp"
-#include "builder/translator.hpp"
-#include "builder/trivia/trivia_binder.hpp"
+#include "builder/ast_builder.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
 #include "emit/debug_printer.hpp"
-#include "vhdlLexer.h"
-#include "vhdlParser.h"
 
 #include <cstddef>
 #include <cstdlib>
 #include <exception>
-#include <fstream>
 #include <iostream>
 #include <span>
-#include <stdexcept>
 
 /// The main entry point of the program
 auto main(int argc, char *argv[]) -> int
@@ -30,31 +23,11 @@ auto main(int argc, char *argv[]) -> int
         // Call the formatter and pass the flag status & config object
         // formatter{ argparser.getFlags(), config_reader.readConfigFile() };
 
-        std::ifstream in(argparser.getInputPath());
-        if (!in) {
-            throw std::runtime_error("Failed to open input file: "
-                                     + argparser.getInputPath().string());
-        }
+        // Build AST from input file
+        builder::AstBuilder ast_builder;
+        ast::DesignFile root = ast_builder.buildFromFile(argparser.getInputPath());
 
-        // Note that these pipelines should be abstracted away into separate classes
-        // -- CST construction --
-        antlr4::ANTLRInputStream input(in);
-        vhdlLexer lexer(&input);
-        antlr4::CommonTokenStream tokens(&lexer);
-        tokens.fill();
-
-        vhdlParser parser(&tokens);
-        auto *tree = parser.design_file();
-
-        // -- AST construction --
-        ast::DesignFile root;
-        builder::TriviaBinder trivia(tokens);
-        builder::Translator translator(trivia, tokens);
-        translator.buildDesignFile(root, tree);
-
-        // std::cout << tree->toStringTree(&parser, true) << '\n';
-
-        // -- AST printing for debugging --
+        // Print AST for debugging
         emit::DebugPrinter printer(std::cout);
         printer.visit(root);
 

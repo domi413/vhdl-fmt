@@ -1,13 +1,8 @@
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "builder/translator.hpp"
-#include "builder/trivia/trivia_binder.hpp"
-#include "vhdlLexer.h"
-#include "vhdlParser.h"
+#include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
@@ -22,19 +17,8 @@ namespace {
 
 auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
 {
-    antlr4::ANTLRInputStream input(vhdl_code);
-    vhdlLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    vhdlParser parser(&tokens);
-
-    auto *tree = parser.design_file();
-
-    auto design = std::make_unique<ast::DesignFile>();
-    builder::TriviaBinder trivia(tokens);
-    builder::Translator translator(trivia, tokens);
-    translator.buildDesignFile(*design, tree);
-
-    return design;
+    builder::AstBuilder ast_builder;
+    return std::make_unique<ast::DesignFile>(ast_builder.buildFromString(vhdl_code));
 }
 
 // Extract only comment texts from LEADING (vector<Trivia>)
