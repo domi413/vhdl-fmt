@@ -65,7 +65,7 @@ auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
-                                        | std::views::join_with(std::string_view{ "; " }));
+                                        | std::views::join_with(std::string_view{ ", " }));
     oss << " : " << node.type_name;
 
     emitNodeLike(node, "ConstantDecl", oss.str());
