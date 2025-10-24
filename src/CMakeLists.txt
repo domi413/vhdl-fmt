@@ -1,6 +1,3 @@
-# Propagate includes to submodules
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
 # Submodules
 add_subdirectory(ast)
 add_subdirectory(cli)

@@ -1,6 +1,18 @@
-file(GLOB_RECURSE BUILDER_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+add_library(
+    builder
+    STATIC
+        ast_builder.cpp
+        translators/translator_decl.cpp
+        translators/translator_expr.cpp
+        translators/translator_unit.cpp
+        trivia/trivia_binder.cpp
+)
 
-add_library(builder STATIC ${BUILDER_SOURCES})
+target_include_directories(
+    builder
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/src
+)
 
 target_link_libraries(
     builder

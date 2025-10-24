@@ -1,12 +1,21 @@
 add_library(ast INTERFACE)
 
-file(GLOB_RECURSE AST_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-
-target_include_directories(ast INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(
+    ast
+    INTERFACE
+        ${CMAKE_SOURCE_DIR}/src
+)
 
 target_sources(
     ast
     INTERFACE
         FILE_SET HEADERS
-        FILES ${AST_HEADERS}
+        FILES
+            node.hpp
+            visitor.hpp
+            nodes/declarations.hpp
+            nodes/design_file.hpp
+            nodes/design_units.hpp
+            nodes/expressions.hpp
+            nodes/statements.hpp
 )
