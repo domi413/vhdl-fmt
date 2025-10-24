@@ -129,7 +129,7 @@ jobs:
           uv venv venv
           source venv/bin/activate
 
-          uv pip install conan gersemi
+          uv pip install conan gersemi==0.19.3
 
       - name: Setup Conan profile
         run: |
