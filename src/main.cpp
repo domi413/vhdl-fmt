@@ -50,8 +50,7 @@ auto main(int argc, char *argv[]) -> int
         ast::DesignFile root;
         builder::TriviaBinder trivia(tokens);
         builder::Translator translator(trivia, tokens);
-        translator.setUnitsDestination(root.units);
-        translator.buildDesignFile(tree);
+        translator.buildDesignFile(root, tree);
 
         // std::cout << tree->toStringTree(&parser, true) << '\n';
 

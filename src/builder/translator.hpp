@@ -2,6 +2,7 @@
 #define BUILDER_TRANSLATOR_HPP
 
 #include "ast/nodes/declarations.hpp"
+#include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "builder/trivia/trivia_binder.hpp"
@@ -13,7 +14,6 @@ namespace builder {
 
 class Translator
 {
-    std::vector<ast::DesignUnit> *units_{ nullptr }; ///< Destination for top-level design units
     TriviaBinder &trivia_;
     antlr4::CommonTokenStream &tokens_;
 
@@ -32,11 +32,8 @@ class Translator
     {
     }
 
-    /// @brief Set the destination vector for design units
-    void setUnitsDestination(std::vector<ast::DesignUnit> &units) { units_ = &units; }
-
     /// @brief Build the entire design file by walking the CST
-    void buildDesignFile(vhdlParser::Design_fileContext *ctx);
+    void buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileContext *ctx);
 
     ~Translator() = default;
 

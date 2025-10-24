@@ -6,7 +6,7 @@ namespace builder {
 
 // ---------------------- Top-level ----------------------
 
-void Translator::buildDesignFile(vhdlParser::Design_fileContext *ctx)
+void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileContext *ctx)
 {
     for (auto *unit_ctx : ctx->design_unit()) {
         auto *lib_unit = unit_ctx->library_unit();
@@ -17,14 +17,14 @@ void Translator::buildDesignFile(vhdlParser::Design_fileContext *ctx)
         // Check primary units (entity_declaration | configuration_declaration | package_declaration)
         if (auto *primary = lib_unit->primary_unit()) {
             if (auto *entity_ctx = primary->entity_declaration()) {
-                (void)makeEntity(entity_ctx);
+                dest.units.emplace_back(makeEntity(entity_ctx));
             }
             // TODO(translator): Handle configuration_declaration and package_declaration
         }
         // Check secondary units (architecture_body | package_body)
         else if (auto *secondary = lib_unit->secondary_unit()) {
             if (auto *arch_ctx = secondary->architecture_body()) {
-                (void)makeArchitecture(arch_ctx);
+                dest.units.push_back(makeArchitecture(arch_ctx));
             }
             // TODO(translator): Handle package_body
         }
@@ -54,11 +54,6 @@ auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::
         }
     }
     
-    // Push to destination if set
-    if (units_ != nullptr) {
-        units_->emplace_back(std::move(entity));
-    }
-    
     return entity;
 }
 
@@ -86,11 +81,6 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
     if (auto *stmt_part = ctx->architecture_statement_part()) {
         // For now, just acknowledge it exists
         (void)stmt_part;
-    }
-    
-    // Push to destination if set
-    if (units_ != nullptr) {
-        units_->push_back(std::move(arch));
     }
     
     return arch;

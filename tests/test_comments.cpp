@@ -32,10 +32,8 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     auto design = std::make_unique<ast::DesignFile>();
     builder::TriviaBinder trivia(tokens);
     builder::Translator translator(trivia, tokens);
-    translator.setUnitsDestination(design->units);
-    translator.buildDesignFile(tree);
+    translator.buildDesignFile(*design, tree);
 
-    return design;
     return design;
 }
 
