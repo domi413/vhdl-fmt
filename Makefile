@@ -1,4 +1,4 @@
-.PHONY: all run clean conan test
+.PHONY: all run clean conan test test-rerun test-verbose
 
 # Default preset, override with `make BUILD_TYPE=Release`
 BUILD_TYPE ?= Debug
@@ -40,6 +40,9 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET) --output-on-failure
+
+test-rerun: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
 
 test-verbose: $(BUILD_STAMP)
