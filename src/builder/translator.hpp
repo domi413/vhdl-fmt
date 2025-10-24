@@ -26,9 +26,7 @@ class Translator
     }
 
   public:
-    Translator(TriviaBinder &tv, antlr4::CommonTokenStream &tokens) :
-      trivia_(tv),
-      tokens_(tokens)
+    Translator(TriviaBinder &tv, antlr4::CommonTokenStream &tokens) : trivia_(tv), tokens_(tokens)
     {
     }
 

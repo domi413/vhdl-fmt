@@ -15,10 +15,7 @@ struct ConcurrentAssign;
 struct Process;
 
 /// Variant type for all statements
-using Statement = std::variant<
-    ConcurrentAssign,
-    Process
->;
+using Statement = std::variant<ConcurrentAssign, Process>;
 
 // Concurrent signal assignment
 struct ConcurrentAssign : NodeBase

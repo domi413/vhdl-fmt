@@ -51,7 +51,7 @@ TEST_CASE("Architecture captures signal declarations", "[declarations][architect
 
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
-    
+
     auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 2);
@@ -86,7 +86,7 @@ TEST_CASE("Architecture captures constant declarations", "[declarations][archite
 
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
-    
+
     auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 2);
@@ -123,7 +123,7 @@ TEST_CASE("Architecture captures mixed declarations", "[declarations][architectu
 
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
-    
+
     auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 4);
@@ -137,13 +137,13 @@ TEST_CASE("Architecture captures mixed declarations", "[declarations][architectu
     // Verify names
     auto *sig1 = std::get_if<ast::SignalDecl>(&arch->decls[0]);
     REQUIRE(sig1->names[0] == "clk");
-    
+
     auto *const1 = std::get_if<ast::ConstantDecl>(&arch->decls[1]);
     REQUIRE(const1->names[0] == "MAX");
-    
+
     auto *sig2 = std::get_if<ast::SignalDecl>(&arch->decls[2]);
     REQUIRE(sig2->names[0] == "data");
-    
+
     auto *const2 = std::get_if<ast::ConstantDecl>(&arch->decls[3]);
     REQUIRE(const2->names[0] == "MIN");
 }
@@ -159,7 +159,7 @@ TEST_CASE("Architecture with no declarations", "[declarations][architecture]")
 
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
-    
+
     auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.empty());

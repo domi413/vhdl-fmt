@@ -14,7 +14,8 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
             continue;
         }
 
-        // Check primary units (entity_declaration | configuration_declaration | package_declaration)
+        // Check primary units (entity_declaration | configuration_declaration |
+        // package_declaration)
         if (auto *primary = lib_unit->primary_unit()) {
             if (auto *entity_ctx = primary->entity_declaration()) {
                 dest.units.emplace_back(makeEntity(entity_ctx));
@@ -37,7 +38,7 @@ auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::
 {
     ast::Entity entity;
     trivia_.bind(entity, ctx);
-    
+
     entity.name = ctx->identifier(0)->getText();
 
     // Optional end label (ENTITY ... END ENTITY <id>)
@@ -53,7 +54,7 @@ auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::
             entity.port_clause = makePortClause(port_clause);
         }
     }
-    
+
     return entity;
 }
 
@@ -61,7 +62,7 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
 {
     ast::Architecture arch;
     trivia_.bind(arch, ctx);
-    
+
     arch.name = ctx->identifier(0)->getText();
     arch.entity_name = ctx->identifier(1)->getText();
 
@@ -82,7 +83,7 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
         // For now, just acknowledge it exists
         (void)stmt_part;
     }
-    
+
     return arch;
 }
 
@@ -92,7 +93,7 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
 {
     ast::GenericClause clause;
     trivia_.bind(clause, ctx);
-    
+
     auto *list = ctx->generic_list();
     if (list == nullptr) {
         return clause;
@@ -101,7 +102,7 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
     for (auto *decl : list->interface_constant_declaration()) {
         clause.generics.push_back(makeGenericParam(decl));
     }
-    
+
     return clause;
 }
 
@@ -109,21 +110,21 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
 {
     ast::PortClause clause;
     trivia_.bind(clause, ctx);
-    
+
     auto *list = ctx->port_list();
     if (list == nullptr) {
         return clause;
     }
-    
+
     auto *iface = list->interface_port_list();
     if (iface == nullptr) {
         return clause;
     }
-    
+
     for (auto *decl : iface->interface_port_declaration()) {
         clause.ports.push_back(makeSignalPort(decl));
     }
-    
+
     return clause;
 }
 

@@ -31,7 +31,7 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     builder::TriviaBinder trivia(tokens);
     builder::Translator translator(trivia, tokens);
     translator.buildDesignFile(*design, tree);
-    
+
     return design;
 }
 

@@ -18,12 +18,7 @@ struct GenericParam;
 struct Port;
 
 /// Variant type for all declarations
-using Declaration = std::variant<
-    ConstantDecl,
-    SignalDecl,
-    GenericParam,
-    Port
->;
+using Declaration = std::variant<ConstantDecl, SignalDecl, GenericParam, Port>;
 
 // Base data common to all declarations
 struct DeclBase : NodeBase

@@ -22,13 +22,7 @@ template<typename T>
 using Box = std::unique_ptr<T>;
 
 /// Variant type for all expressions (holds values, not pointers)
-using Expr = std::variant<
-    TokenExpr,
-    GroupExpr,
-    UnaryExpr,
-    BinaryExpr,
-    ParenExpr
->;
+using Expr = std::variant<TokenExpr, GroupExpr, UnaryExpr, BinaryExpr, ParenExpr>;
 
 /// Single token: literal, identifier, or operator.
 struct TokenExpr : NodeBase

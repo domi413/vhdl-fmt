@@ -17,10 +17,7 @@ struct Entity;
 struct Architecture;
 
 /// Variant type for all design units (holds values, not pointers)
-using DesignUnit = std::variant<
-    Entity,
-    Architecture
->;
+using DesignUnit = std::variant<Entity, Architecture>;
 
 struct GenericClause : NodeBase
 {

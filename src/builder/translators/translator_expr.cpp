@@ -137,22 +137,22 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
 {
     ast::GroupExpr group;
     trivia_.bind(group, ctx);
-    
+
     for (auto *elem : ctx->element_association()) {
         ast::BinaryExpr assoc;
         trivia_.bind(assoc, elem);
         assoc.op = "=>";
-        
+
         if (elem->choices() != nullptr) {
             assoc.left = box(makeChoices(elem->choices()));
         }
         if (elem->expression() != nullptr) {
             assoc.right = box(makeExpr(elem->expression()));
         }
-        
+
         group.children.push_back(std::move(assoc));
     }
-    
+
     return group;
 }
 

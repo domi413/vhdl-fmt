@@ -9,7 +9,7 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 {
     ast::GenericParam param;
     trivia_.bind(param, ctx);
-    
+
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         param.names.emplace_back(id_ctx->getText());
     }
@@ -17,7 +17,7 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
     if (auto *stype = ctx->subtype_indication()) {
         param.type_name = stype->getText();
     }
-    
+
     return param;
 }
 
@@ -25,7 +25,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
 {
     ast::Port port;
     trivia_.bind(port, ctx);
-    
+
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         port.names.emplace_back(id_ctx->getText());
     }
@@ -47,16 +47,15 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
     if (auto *expr = ctx->expression()) {
         port.default_expr = makeExpr(expr);
     }
-    
+
     return port;
 }
 
-auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
-  -> ast::ConstantDecl
+auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) -> ast::ConstantDecl
 {
     ast::ConstantDecl decl;
     trivia_.bind(decl, ctx);
-    
+
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         decl.names.emplace_back(id_ctx->getText());
     }
@@ -68,7 +67,7 @@ auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
     if (auto *expr = ctx->expression()) {
         decl.init_expr = makeExpr(expr);
     }
-    
+
     return decl;
 }
 
@@ -76,7 +75,7 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
 {
     ast::SignalDecl decl;
     trivia_.bind(decl, ctx);
-    
+
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         decl.names.emplace_back(id_ctx->getText());
     }
@@ -103,7 +102,7 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
     if (auto *expr = ctx->expression()) {
         decl.init_expr = makeExpr(expr);
     }
-    
+
     return decl;
 }
 
