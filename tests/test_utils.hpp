@@ -21,7 +21,7 @@ namespace test_utils {
 /// @return Unique pointer to populated DesignFile AST
 inline auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
 {
-    return std::make_unique<ast::DesignFile>(builder::AstBuilder::buildFromString(vhdl_code));
+    return std::make_unique<ast::DesignFile>(builder::buildFromString(vhdl_code));
 }
 
 /// @brief Extract comment texts from leading trivia (vector<Trivia>)

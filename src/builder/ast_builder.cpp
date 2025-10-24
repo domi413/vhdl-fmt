@@ -17,16 +17,16 @@
 
 namespace builder {
 
-auto AstBuilder::buildFromFile(const std::filesystem::path &path) -> ast::DesignFile
+auto buildFromFile(const std::filesystem::path &path) -> ast::DesignFile
 {
     std::ifstream file(path);
     if (!file) {
         throw std::runtime_error("Failed to open input file: " + path.string());
     }
-    return AstBuilder::buildFromStream(file);
+    return buildFromStream(file);
 }
 
-auto AstBuilder::buildFromStream(std::istream &input) -> ast::DesignFile
+auto buildFromStream(std::istream &input) -> ast::DesignFile
 {
     // CST construction
     antlr4::ANTLRInputStream antlr_input(input);
@@ -46,7 +46,7 @@ auto AstBuilder::buildFromStream(std::istream &input) -> ast::DesignFile
     return root;
 }
 
-auto AstBuilder::buildFromString(const std::string &vhdl_code) -> ast::DesignFile
+auto buildFromString(const std::string &vhdl_code) -> ast::DesignFile
 {
     std::istringstream stream(vhdl_code);
     return buildFromStream(stream);
