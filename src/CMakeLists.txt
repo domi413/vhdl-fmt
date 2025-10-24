@@ -12,14 +12,9 @@ target_link_libraries(
     vhdl_formatter
     PRIVATE
         ast
-        common
         cli
         builder
         emit
-        vhdl_generated
-        argparse::argparse
-        fmt::fmt
-        spdlog::spdlog
 )
 
 target_compile_options(
