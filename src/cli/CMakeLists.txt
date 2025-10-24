@@ -11,7 +11,7 @@ target_link_libraries(
     cli
     PUBLIC
         common
+        yaml-cpp::yaml-cpp
     PRIVATE
         argparse::argparse
-        yaml-cpp::yaml-cpp
 )
