@@ -1,21 +1,14 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "builder/ast_builder.hpp"
+#include "test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <string>
 #include <variant>
 
-namespace {
-
-auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
-{
-    return std::make_unique<ast::DesignFile>(builder::AstBuilder::buildFromString(vhdl_code));
-}
-
-} // namespace
+using test_utils::buildAstFromSource;
 
 // -----------------------------------------------------------------------------
 // Architecture declarations: signals and constants

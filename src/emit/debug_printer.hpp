@@ -23,7 +23,7 @@ class DebugPrinter : public ast::VisitorBase<DebugPrinter, void>
 {
   public:
     explicit DebugPrinter(std::ostream &out) : out_(out) {}
-    
+
     DebugPrinter(const DebugPrinter &) = delete;
     auto operator=(const DebugPrinter &) -> DebugPrinter & = delete;
     DebugPrinter(DebugPrinter &&) = delete;

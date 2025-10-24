@@ -2,48 +2,18 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "builder/ast_builder.hpp"
+#include "test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <optional>
-#include <ranges>
 #include <string>
-#include <string_view>
 #include <variant>
 #include <vector>
 
-namespace {
-
-auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
-{
-    return std::make_unique<ast::DesignFile>(builder::AstBuilder::buildFromString(vhdl_code));
-}
-
-// Extract only comment texts from LEADING (vector<Trivia>)
-auto leadingComments(const std::vector<ast::Trivia> &tv) -> std::vector<std::string_view>
-{
-    return tv
-         | std::views::filter(
-             [](const ast::Trivia &t) -> bool { return std::holds_alternative<ast::Comments>(t); })
-         | std::views::transform([](const ast::Trivia &t) -> std::string_view {
-               return std::get<ast::Comments>(t).text;
-           })
-         | std::ranges::to<std::vector<std::string_view>>();
-}
-
-// Extract texts from TRAILING (vector<CommentTrivia>)
-auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vector<std::string_view>
-{
-    std::vector<std::string_view> out;
-    out.reserve(tv.size());
-    for (const auto &c : tv) {
-        out.push_back(c.text);
-    }
-    return out;
-}
-
-} // namespace
+using test_utils::buildAstFromSource;
+using test_utils::leadingComments;
+using test_utils::trailingComments;
 
 // -----------------------------------------------------------------------------
 // Entity-level leading comments
