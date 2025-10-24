@@ -1,3 +1,4 @@
+#include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
@@ -25,7 +26,7 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
         // Check secondary units (architecture_body | package_body)
         else if (auto *secondary = lib_unit->secondary_unit()) {
             if (auto *arch_ctx = secondary->architecture_body()) {
-                dest.units.push_back(makeArchitecture(arch_ctx));
+                dest.units.emplace_back(makeArchitecture(arch_ctx));
             }
             // TODO(translator): Handle package_body
         }
@@ -70,9 +71,9 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
     if (auto *decl_part = ctx->architecture_declarative_part()) {
         for (auto *item : decl_part->block_declarative_item()) {
             if (auto *const_ctx = item->constant_declaration()) {
-                arch.decls.push_back(makeConstantDecl(const_ctx));
+                arch.decls.emplace_back(makeConstantDecl(const_ctx));
             } else if (auto *sig_ctx = item->signal_declaration()) {
-                arch.decls.push_back(makeSignalDecl(sig_ctx));
+                arch.decls.emplace_back(makeSignalDecl(sig_ctx));
             }
             // Add more declaration types as needed (variables, types, subprograms, etc.)
         }

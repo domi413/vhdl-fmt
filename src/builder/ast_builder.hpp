@@ -16,34 +16,26 @@ namespace builder {
 class AstBuilder
 {
   public:
-    AstBuilder() = default;
-    ~AstBuilder() = default;
-
-    AstBuilder(const AstBuilder &) = delete;
-    auto operator=(const AstBuilder &) -> AstBuilder & = delete;
-    AstBuilder(AstBuilder &&) = delete;
-    auto operator=(AstBuilder &&) -> AstBuilder & = delete;
-
     /// @brief Build AST from a file path
     /// @param path Path to VHDL source file
     /// @return Populated DesignFile AST
     /// @throws std::runtime_error if file cannot be opened or parsed
     [[nodiscard]]
-    auto buildFromFile(const std::filesystem::path &path) -> ast::DesignFile;
+    static auto buildFromFile(const std::filesystem::path &path) -> ast::DesignFile;
 
     /// @brief Build AST from an input stream
     /// @param input Input stream containing VHDL source code
     /// @return Populated DesignFile AST
     /// @throws std::runtime_error if parsing fails
     [[nodiscard]]
-    auto buildFromStream(std::istream &input) -> ast::DesignFile;
+    static auto buildFromStream(std::istream &input) -> ast::DesignFile;
 
     /// @brief Build AST from a string
     /// @param vhdl_code VHDL source code as string
     /// @return Populated DesignFile AST
     /// @throws std::runtime_error if parsing fails
     [[nodiscard]]
-    auto buildFromString(const std::string &vhdl_code) -> ast::DesignFile;
+    static auto buildFromString(const std::string &vhdl_code) -> ast::DesignFile;
 };
 
 } // namespace builder

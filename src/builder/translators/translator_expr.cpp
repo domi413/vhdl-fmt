@@ -2,6 +2,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <utility>
+
 // NOLINTBEGIN(misc-no-recursion)
 
 namespace builder {
@@ -150,7 +152,7 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
             assoc.right = box(makeExpr(elem->expression()));
         }
 
-        group.children.push_back(std::move(assoc));
+        group.children.emplace_back(std::move(assoc));
     }
 
     return group;
@@ -165,7 +167,7 @@ auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
     ast::GroupExpr grp;
     trivia_.bind(grp, ctx);
     for (auto *ch : ctx->choice()) {
-        grp.children.push_back(makeChoice(ch));
+        grp.children.emplace_back(makeChoice(ch));
     }
     return grp;
 }

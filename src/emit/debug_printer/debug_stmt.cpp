@@ -1,6 +1,8 @@
 #include "ast/nodes/statements.hpp"
 #include "emit/debug_printer.hpp"
 
+// NOLINTBEGIN(misc-no-recursion)
+
 namespace emit {
 
 auto DebugPrinter::operator()(const ast::ConcurrentAssign &node) -> void
@@ -20,3 +22,5 @@ auto DebugPrinter::operator()(const ast::Process &node) -> void
 }
 
 } // namespace emit
+
+// NOLINTEND(misc-no-recursion)

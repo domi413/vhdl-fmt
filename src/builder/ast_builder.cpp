@@ -8,9 +8,12 @@
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
+#include <filesystem>
 #include <fstream>
+#include <istream>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 namespace builder {
 
@@ -20,7 +23,7 @@ auto AstBuilder::buildFromFile(const std::filesystem::path &path) -> ast::Design
     if (!file) {
         throw std::runtime_error("Failed to open input file: " + path.string());
     }
-    return buildFromStream(file);
+    return AstBuilder::buildFromStream(file);
 }
 
 auto AstBuilder::buildFromStream(std::istream &input) -> ast::DesignFile

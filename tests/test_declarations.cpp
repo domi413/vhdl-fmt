@@ -1,4 +1,3 @@
-#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
@@ -13,8 +12,7 @@ namespace {
 
 auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
 {
-    builder::AstBuilder ast_builder;
-    return std::make_unique<ast::DesignFile>(ast_builder.buildFromString(vhdl_code));
+    return std::make_unique<ast::DesignFile>(builder::AstBuilder::buildFromString(vhdl_code));
 }
 
 } // namespace
@@ -36,12 +34,12 @@ TEST_CASE("Architecture captures signal declarations", "[declarations][architect
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
+    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 2);
 
     // First signal: temp
-    auto *signal1 = std::get_if<ast::SignalDecl>(&arch->decls[0]);
+    auto *signal1 = std::get_if<ast::SignalDecl>(arch->decls.data());
     REQUIRE(signal1 != nullptr);
     REQUIRE(signal1->names.size() == 1);
     REQUIRE(signal1->names[0] == "temp");
@@ -71,12 +69,12 @@ TEST_CASE("Architecture captures constant declarations", "[declarations][archite
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
+    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 2);
 
     // First constant: WIDTH
-    auto *const1 = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
+    auto *const1 = std::get_if<ast::ConstantDecl>(arch->decls.data());
     REQUIRE(const1 != nullptr);
     REQUIRE(const1->names.size() == 1);
     REQUIRE(const1->names[0] == "WIDTH");
@@ -108,7 +106,7 @@ TEST_CASE("Architecture captures mixed declarations", "[declarations][architectu
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
+    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 4);
 
@@ -119,7 +117,7 @@ TEST_CASE("Architecture captures mixed declarations", "[declarations][architectu
     REQUIRE(std::holds_alternative<ast::ConstantDecl>(arch->decls[3]));
 
     // Verify names
-    auto *sig1 = std::get_if<ast::SignalDecl>(&arch->decls[0]);
+    auto *sig1 = std::get_if<ast::SignalDecl>(arch->decls.data());
     REQUIRE(sig1->names[0] == "clk");
 
     auto *const1 = std::get_if<ast::ConstantDecl>(&arch->decls[1]);
@@ -144,7 +142,7 @@ TEST_CASE("Architecture with no declarations", "[declarations][architecture]")
     auto design = buildAstFromSource(vhdl);
     REQUIRE(design->units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
+    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.empty());
 }
@@ -160,11 +158,11 @@ TEST_CASE("Signal with multiple names", "[declarations][signal]")
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
+    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 
-    auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
+    auto *signal = std::get_if<ast::SignalDecl>(arch->decls.data());
     REQUIRE(signal != nullptr);
     REQUIRE(signal->names.size() == 3);
     REQUIRE(signal->names[0] == "clk");
@@ -184,11 +182,11 @@ TEST_CASE("Constant with multiple names", "[declarations][constant]")
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *arch = std::get_if<ast::Architecture>(design->units.data() + 1);
+    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 
-    auto *constant = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
+    auto *constant = std::get_if<ast::ConstantDecl>(arch->decls.data());
     REQUIRE(constant != nullptr);
     REQUIRE(constant->names.size() == 3);
     REQUIRE(constant->names[0] == "MIN");

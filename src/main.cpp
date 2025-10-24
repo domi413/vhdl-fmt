@@ -24,8 +24,7 @@ auto main(int argc, char *argv[]) -> int
         // formatter{ argparser.getFlags(), config_reader.readConfigFile() };
 
         // Build AST from input file
-        builder::AstBuilder ast_builder;
-        ast::DesignFile root = ast_builder.buildFromFile(argparser.getInputPath());
+        const ast::DesignFile root = builder::AstBuilder::buildFromFile(argparser.getInputPath());
 
         // Print AST for debugging
         emit::DebugPrinter printer(std::cout);

@@ -6,6 +6,7 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
+#include "ast/nodes/statements.hpp"
 #include "ast/visitor.hpp"
 
 #include <cstddef>
@@ -22,6 +23,12 @@ class DebugPrinter : public ast::VisitorBase<DebugPrinter, void>
 {
   public:
     explicit DebugPrinter(std::ostream &out) : out_(out) {}
+    
+    DebugPrinter(const DebugPrinter &) = delete;
+    auto operator=(const DebugPrinter &) -> DebugPrinter & = delete;
+    DebugPrinter(DebugPrinter &&) = delete;
+    auto operator=(DebugPrinter &&) -> DebugPrinter & = delete;
+    ~DebugPrinter() = default;
 
     // Node visitors
     void operator()(const ast::DesignFile &node);

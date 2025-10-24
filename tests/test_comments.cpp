@@ -17,8 +17,7 @@ namespace {
 
 auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
 {
-    builder::AstBuilder ast_builder;
-    return std::make_unique<ast::DesignFile>(ast_builder.buildFromString(vhdl_code));
+    return std::make_unique<ast::DesignFile>(builder::AstBuilder::buildFromString(vhdl_code));
 }
 
 // Extract only comment texts from LEADING (vector<Trivia>)

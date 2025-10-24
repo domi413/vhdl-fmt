@@ -1,9 +1,12 @@
 #ifndef AST_VISITOR_HPP
 #define AST_VISITOR_HPP
 
+#include "node.hpp"
 #include "nodes/design_file.hpp"
 
 #include <memory>
+#include <optional>
+#include <type_traits>
 #include <variant>
 #include <vector>
 
