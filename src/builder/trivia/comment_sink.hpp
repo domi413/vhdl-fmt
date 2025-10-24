@@ -11,7 +11,7 @@
 namespace builder {
 
 /// @brief Appends comment trivia to a node, with global de-duplication by token index.
-class CommentSink
+class CommentSink final
 {
   public:
     CommentSink() = default;

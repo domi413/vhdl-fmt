@@ -12,7 +12,7 @@
 
 namespace builder {
 
-class Translator
+class Translator final
 {
     TriviaBinder &trivia_;
     antlr4::CommonTokenStream &tokens_;

@@ -10,7 +10,7 @@ namespace builder {
 
 /// @brief Appends paragraph break trivia to a node.
 /// Only called when there are 2+ newlines (creating 1+ visible blank lines).
-class NewlineSink
+class NewlineSink final
 {
   public:
     /// @brief Push paragraph break trivia. Expects newline_count >= 2.

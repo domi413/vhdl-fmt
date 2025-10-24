@@ -28,7 +28,7 @@ namespace builder {
 /// The resulting trivia stream maintains the original ordering of comments
 /// and newlines exactly as they appear in the source, enabling precise
 /// round-tripping and faithful pretty-printing.
-class TriviaBinder
+class TriviaBinder final
 {
   public:
     explicit TriviaBinder(antlr4::CommonTokenStream &ts) noexcept : tokens_(ts) {}
