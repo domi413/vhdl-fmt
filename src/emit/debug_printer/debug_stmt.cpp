@@ -2,7 +2,9 @@
 #include "emit/debug_printer.hpp"
 
 #include <cstddef>
+#include <ranges>
 #include <string>
+#include <string_view>
 
 // NOLINTBEGIN(misc-no-recursion)
 
@@ -29,16 +31,16 @@ auto DebugPrinter::operator()(const ast::ConcurrentAssign &node) -> void
 auto DebugPrinter::operator()(const ast::Process &node) -> void
 {
     std::string extra = node.label ? "[" + *node.label + "]" : "";
+
     if (!node.sensitivity_list.empty()) {
+        const auto joined_list = std::ranges::to<std::string>(
+          node.sensitivity_list | std::views::join_with(std::string_view{ ', ' }));
+
         extra += " (";
-        for (size_t i = 0; i < node.sensitivity_list.size(); ++i) {
-            if (i > 0) {
-                extra += ", ";
-            }
-            extra += node.sensitivity_list[i];
-        }
+        extra += joined_list;
         extra += ")";
     }
+
     emitNodeLike(node, "Process", extra);
     const IndentGuard _{ indent_ };
     visit(node.body);
