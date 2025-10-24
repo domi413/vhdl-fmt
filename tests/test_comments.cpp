@@ -31,7 +31,9 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 
-    const auto texts = leadingComments(entity->trivia->leading);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
+    const auto &trivia = entity->trivia.value();
+    const auto texts = leadingComments(trivia.leading);
 
     REQUIRE(texts.size() == 2);
     REQUIRE(texts.front().contains("License text"));
@@ -60,8 +62,10 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     const auto &g = entity->generic_clause.generics[0];
     REQUIRE(g.trivia.has_value());
 
-    const auto lead = leadingComments(g.trivia->leading);
-    const auto trail = trailingComments(g.trivia->trailing);
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
+    const auto &trivia = g.trivia.value();
+    const auto lead = leadingComments(trivia.leading);
+    const auto trail = trailingComments(trivia.trailing);
 
     REQUIRE_FALSE(lead.empty());
     REQUIRE(lead.front().contains("Leading for CONST_V"));
@@ -94,8 +98,10 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     {
         const auto &clk = entity->port_clause.ports[0];
         REQUIRE(clk.trivia.has_value());
-        const auto lead = leadingComments(clk.trivia->leading);
-        const auto trail = trailingComments(clk.trivia->trailing);
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
+        const auto &trivia = clk.trivia.value();
+        const auto lead = leadingComments(trivia.leading);
+        const auto trail = trailingComments(trivia.trailing);
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Clock input"));
         REQUIRE_FALSE(trail.empty());
@@ -104,8 +110,10 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     {
         const auto &rst = entity->port_clause.ports[1];
         REQUIRE(rst.trivia.has_value());
-        const auto lead = leadingComments(rst.trivia->leading);
-        const auto trail = trailingComments(rst.trivia->trailing);
+        // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
+        const auto &trivia = rst.trivia.value();
+        const auto lead = leadingComments(trivia.leading);
+        const auto trail = trailingComments(trivia.trailing);
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Reset input"));
         REQUIRE_FALSE(trail.empty());

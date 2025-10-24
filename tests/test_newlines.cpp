@@ -28,7 +28,9 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 
-    const auto &lead = entity->trivia->leading;
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
+    const auto &trivia = entity->trivia.value();
+    const auto &lead = trivia.leading;
 
     // Expect: Comment("A"), ParagraphBreak(1 blank line), Comment("B")
     REQUIRE(std::holds_alternative<ast::Comments>(lead[0]));
