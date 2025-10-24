@@ -4,7 +4,6 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/adapter/antlr_void_adapter.hpp"
-#include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "builder/visitor.hpp"
@@ -15,7 +14,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include <cstddef>
 #include <memory>
-#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -32,9 +30,9 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     auto *tree = parser.design_file();
 
     auto design = std::make_unique<ast::DesignFile>();
-    builder::Assembler assembler(design->units);
     builder::TriviaBinder trivia(tokens);
-    builder::Translator translator(assembler, trivia, tokens);
+    builder::Translator translator(trivia, tokens);
+    translator.setUnitsDestination(design->units);
     builder::Visitor visitor(translator);
     builder::adapter::AntlrVoidAdapter adapter(visitor);
     tree->accept(&adapter);
@@ -79,7 +77,7 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
 
     const auto &lead = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;

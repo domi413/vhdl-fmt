@@ -36,7 +36,7 @@ class VisitorBase
           node);
     }
 
-    /// @brief Visit a unique_ptr to a variant node
+    /// @brief Visit a unique_ptr to a variant node (or Box<variant>)
     template<typename... Ts>
     auto visit(const std::unique_ptr<std::variant<Ts...>> &node) -> ReturnType
     {
@@ -46,13 +46,42 @@ class VisitorBase
         return ReturnType{}; // default-constructed value if null
     }
 
-    /// @brief Visit a unique_ptr to a non-variant type
+    /// @brief Visit a unique_ptr to a non-variant type (or Box<T>)
     template<typename T>
     auto visit(const std::unique_ptr<T> &node) -> decltype(auto)
     {
         if (node) {
             return static_cast<Derived &>(*this)(*node);
         }
+    }
+
+    /// @brief Visit an optional value
+    template<typename T>
+    auto visit(const std::optional<T> &node) -> decltype(auto)
+        requires(!std::is_void_v<ReturnType>)
+    {
+        if (node) {
+            return visit(*node);
+        }
+        return ReturnType{};
+    }
+
+    /// @brief Visit an optional value (void version)
+    template<typename T>
+    void visit(const std::optional<T> &node)
+        requires(std::is_void_v<ReturnType>)
+    {
+        if (node) {
+            visit(*node);
+        }
+    }
+
+    /// @brief Visit a concrete node (not in a variant, not in a container)
+    template<typename T>
+    auto visit(const T &node) -> decltype(auto)
+        requires std::is_base_of_v<NodeBase, T>
+    {
+        return static_cast<Derived &>(*this)(node);
     }
 
     /// @brief Visit a vector of nodes

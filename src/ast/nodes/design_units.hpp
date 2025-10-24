@@ -5,7 +5,6 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/statements.hpp"
 
-#include <memory>
 #include <optional>
 #include <string>
 #include <variant>
@@ -17,7 +16,7 @@ namespace ast {
 struct Entity;
 struct Architecture;
 
-/// Variant type for all design units
+/// Variant type for all design units (holds values, not pointers)
 using DesignUnit = std::variant<
     Entity,
     Architecture
@@ -25,21 +24,21 @@ using DesignUnit = std::variant<
 
 struct GenericClause : NodeBase
 {
-    std::vector<std::unique_ptr<GenericParam>> generics;
+    std::vector<GenericParam> generics;
 };
 
 struct PortClause : NodeBase
 {
-    std::vector<std::unique_ptr<Port>> ports;
+    std::vector<Port> ports;
 };
 
 struct Entity : NodeBase
 {
     std::string name;
-    std::unique_ptr<GenericClause> generic_clause;
-    std::unique_ptr<PortClause> port_clause;
-    std::vector<std::unique_ptr<Declaration>> decls;
-    std::vector<std::unique_ptr<Statement>> stmts;
+    GenericClause generic_clause;
+    PortClause port_clause;
+    std::vector<Declaration> decls;
+    std::vector<Statement> stmts;
     std::optional<std::string> end_label;
 };
 
@@ -47,8 +46,8 @@ struct Architecture : NodeBase
 {
     std::string name;
     std::string entity_name;
-    std::vector<std::unique_ptr<Declaration>> decls;
-    std::vector<std::unique_ptr<Statement>> stmts;
+    std::vector<Declaration> decls;
+    std::vector<Statement> stmts;
 };
 
 } // namespace ast

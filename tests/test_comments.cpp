@@ -5,7 +5,6 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/adapter/antlr_void_adapter.hpp"
-#include "builder/assembly/assembler.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "builder/visitor.hpp"
@@ -33,9 +32,9 @@ auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::De
     auto *tree = parser.design_file();
 
     auto design = std::make_unique<ast::DesignFile>();
-    builder::Assembler assembler(design->units);
     builder::TriviaBinder trivia(tokens);
-    builder::Translator translator(assembler, trivia, tokens);
+    builder::Translator translator(trivia, tokens);
+    translator.setUnitsDestination(design->units);
     builder::Visitor visitor(translator);
     builder::adapter::AntlrVoidAdapter adapter(visitor);
 
@@ -80,7 +79,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
 
     const auto &leading_trivia = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;
@@ -106,11 +105,11 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause->generics.size() == 1);
+    REQUIRE(entity->generic_clause.generics.size() == 1);
 
-    const auto &g = *entity->generic_clause->generics[0];
+    const auto &g = entity->generic_clause.generics[0];
     const auto &c = g.tryGetTrivia().value_or(ast::NodeTrivia{});
 
     const auto lead = leadingComments(c.leading);
@@ -140,12 +139,12 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     )";
 
     auto design = buildAstFromSource(vhdl);
-    auto *entity = std::get_if<ast::Entity>(design->units[0].get());
+    auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause->ports.size() == 2);
+    REQUIRE(entity->port_clause.ports.size() == 2);
 
     {
-        const auto &clk = *entity->port_clause->ports[0];
+        const auto &clk = entity->port_clause.ports[0];
         const auto &cm = clk.tryGetTrivia().value_or(ast::NodeTrivia{});
         const auto lead = leadingComments(cm.leading);
         const auto trail = trailingComments(cm.trailing);
@@ -155,7 +154,7 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
         REQUIRE(trail.front().contains("inline clock"));
     }
     {
-        const auto &rst = *entity->port_clause->ports[1];
+        const auto &rst = entity->port_clause.ports[1];
         const auto &cm = rst.tryGetTrivia().value_or(ast::NodeTrivia{});
         const auto lead = leadingComments(cm.leading);
         const auto trail = trailingComments(cm.trailing);

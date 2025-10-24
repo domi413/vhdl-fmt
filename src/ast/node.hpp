@@ -38,10 +38,10 @@ struct NodeBase
     NodeBase() = default;
     virtual ~NodeBase() = default;
 
-    NodeBase(const NodeBase &) = delete;
-    auto operator=(const NodeBase &) -> NodeBase & = delete;
-    NodeBase(NodeBase &&) = delete;
-    auto operator=(NodeBase &&) -> NodeBase & = delete;
+    NodeBase(const NodeBase &) = default;
+    auto operator=(const NodeBase &) -> NodeBase & = default;
+    NodeBase(NodeBase &&) = default;
+    auto operator=(NodeBase &&) -> NodeBase & = default;
 
     /// @brief Create and return this node's comment block.
     auto emplaceTrivia() -> NodeTrivia & { return trivia_.emplace(); }

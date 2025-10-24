@@ -4,7 +4,6 @@
 #include "ast/node.hpp"
 #include "ast/nodes/expressions.hpp"
 
-#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
@@ -24,15 +23,15 @@ using Statement = std::variant<
 // Concurrent signal assignment
 struct ConcurrentAssign : NodeBase
 {
-    std::unique_ptr<Expr> target;
-    std::unique_ptr<Expr> value;
+    Expr target;
+    Expr value;
 };
 
 // Simplified process statement
 struct Process : NodeBase
 {
     std::vector<std::string> sensitivity_list;
-    std::vector<std::unique_ptr<Statement>> body;
+    std::vector<Statement> body;
 };
 
 } // namespace ast

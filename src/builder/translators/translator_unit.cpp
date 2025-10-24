@@ -6,79 +6,102 @@ namespace builder {
 
 // ---------------------- Design units ----------------------
 
-void Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx)
+auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity
 {
-    spawn<ast::Entity>(ctx, true, [&](auto &entity) {
-        entity.name = ctx->identifier(0)->getText();
+    ast::Entity entity;
+    trivia_.bind(entity, ctx);
+    
+    entity.name = ctx->identifier(0)->getText();
 
-        // Optional end label (ENTITY ... END ENTITY <id>)
-        if (ctx->identifier().size() > 1) {
-            entity.end_label = ctx->identifier(1)->getText();
-        }
+    // Optional end label (ENTITY ... END ENTITY <id>)
+    if (ctx->identifier().size() > 1) {
+        entity.end_label = ctx->identifier(1)->getText();
+    }
 
-        if (auto *header = ctx->entity_header()) {
-            if (auto *gen_clause = header->generic_clause()) {
-                into(entity.generic_clause, [&] { dispatch_(gen_clause); });
-            }
-            if (auto *port_clause = header->port_clause()) {
-                into(entity.port_clause, [&] { dispatch_(port_clause); });
-            }
+    if (auto *header = ctx->entity_header()) {
+        if (auto *gen_clause = header->generic_clause()) {
+            entity.generic_clause = makeGenericClause(gen_clause);
         }
-    });
+        if (auto *port_clause = header->port_clause()) {
+            entity.port_clause = makePortClause(port_clause);
+        }
+    }
+    
+    // Push to destination if set
+    if (units_ != nullptr) {
+        units_->emplace_back(std::move(entity));
+    }
+    
+    return entity;
 }
 
-void Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx)
+auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture
 {
-    spawn<ast::Architecture>(ctx, true, [&](auto &arch) {
-        arch.name = ctx->identifier(0)->getText();
-        arch.entity_name = ctx->identifier(1)->getText();
+    ast::Architecture arch;
+    trivia_.bind(arch, ctx);
+    
+    arch.name = ctx->identifier(0)->getText();
+    arch.entity_name = ctx->identifier(1)->getText();
 
-        if (auto *decl_part = ctx->architecture_declarative_part()) {
-            into(arch.decls, [&] { dispatch_(decl_part); });
-        }
+    if (auto *decl_part = ctx->architecture_declarative_part()) {
+        setDeclsDestination(arch.decls);
+        walk_(decl_part);
+        clearDeclsDestination();
+    }
 
-        if (auto *stmt_part = ctx->architecture_statement_part()) {
-            into(arch.stmts, [&] { dispatch_(stmt_part); });
-        }
-    });
+    if (auto *stmt_part = ctx->architecture_statement_part()) {
+        setStmtsDestination(arch.stmts);
+        walk_(stmt_part);
+        clearStmtsDestination();
+    }
+    
+    // Push to destination if set
+    if (units_ != nullptr) {
+        units_->push_back(std::move(arch));
+    }
+    
+    return arch;
 }
 
 // ------------------------ Clauses -------------------------
 
-void Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx)
+auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause
 {
-    spawn<ast::GenericClause>(ctx, true, [&](auto &clause) {
-        auto *list = ctx->generic_list();
+    ast::GenericClause clause;
+    trivia_.bind(clause, ctx);
+    
+    auto *list = ctx->generic_list();
+    if (list == nullptr) {
+        return clause;
+    }
 
-        if (list == nullptr) {
-            return;
-        }
-
-        into(clause.generics, [&] {
-            for (auto *decl : list->interface_constant_declaration()) {
-                makeGenericParam(decl);
-            }
-        });
-    });
+    for (auto *decl : list->interface_constant_declaration()) {
+        clause.generics.push_back(makeGenericParam(decl));
+    }
+    
+    return clause;
 }
 
-void Translator::makePortClause(vhdlParser::Port_clauseContext *ctx)
+auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause
 {
-    spawn<ast::PortClause>(ctx, true, [&](auto &clause) {
-        auto *list = ctx->port_list();
-        if (list == nullptr) {
-            return;
-        }
-        auto *iface = list->interface_port_list();
-        if (iface == nullptr) {
-            return;
-        }
-        into(clause.ports, [&] {
-            for (auto *decl : iface->interface_port_declaration()) {
-                makeSignalPort(decl);
-            }
-        });
-    });
+    ast::PortClause clause;
+    trivia_.bind(clause, ctx);
+    
+    auto *list = ctx->port_list();
+    if (list == nullptr) {
+        return clause;
+    }
+    
+    auto *iface = list->interface_port_list();
+    if (iface == nullptr) {
+        return clause;
+    }
+    
+    for (auto *decl : iface->interface_port_declaration()) {
+        clause.ports.push_back(makeSignalPort(decl));
+    }
+    
+    return clause;
 }
 
 } // namespace builder

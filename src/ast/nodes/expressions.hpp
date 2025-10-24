@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace ast {
@@ -16,7 +17,11 @@ struct UnaryExpr;
 struct BinaryExpr;
 struct ParenExpr;
 
-/// Variant type for all expressions
+/// Helper alias for boxed recursive types
+template<typename T>
+using Box = std::unique_ptr<T>;
+
+/// Variant type for all expressions (holds values, not pointers)
 using Expr = std::variant<
     TokenExpr,
     GroupExpr,
@@ -34,28 +39,28 @@ struct TokenExpr : NodeBase
 /// Aggregate or grouped list of expressions (e.g. `(others => '0')`).
 struct GroupExpr : NodeBase
 {
-    std::vector<std::unique_ptr<Expr>> children; ///< Ordered child expressions.
+    std::vector<Expr> children; ///< Ordered child expressions.
 };
 
 /// Unary expression (e.g. `-a`, `not ready`).
 struct UnaryExpr : NodeBase
 {
-    std::string op;              ///< Unary operator symbol.
-    std::unique_ptr<Expr> value; ///< Operand expression.
+    std::string op;  ///< Unary operator symbol.
+    Box<Expr> value; ///< Operand expression (boxed for recursion).
 };
 
 /// Binary expression (e.g. `a + b`, `x downto 0`).
 struct BinaryExpr : NodeBase
 {
-    std::unique_ptr<Expr> left;  ///< Left operand.
-    std::string op;              ///< Binary operator symbol.
-    std::unique_ptr<Expr> right; ///< Right operand.
+    Box<Expr> left;  ///< Left operand (boxed for recursion).
+    std::string op;  ///< Binary operator symbol.
+    Box<Expr> right; ///< Right operand (boxed for recursion).
 };
 
 /// Explicit parentheses around an expression (e.g. `(a + b)`).
 struct ParenExpr : NodeBase
 {
-    std::unique_ptr<Expr> inner; ///< Inner expression inside parentheses.
+    Box<Expr> inner; ///< Inner expression inside parentheses (boxed for recursion).
 };
 
 } // namespace ast

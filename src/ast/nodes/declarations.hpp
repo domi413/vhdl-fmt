@@ -4,7 +4,7 @@
 #include "ast/node.hpp"
 #include "nodes/expressions.hpp"
 
-#include <memory>
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -35,7 +35,7 @@ struct DeclBase : NodeBase
 struct ConstantDecl : DeclBase
 {
     std::string type_name;
-    std::unique_ptr<Expr> init_expr;
+    std::optional<Expr> init_expr;
 };
 
 // Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
@@ -43,15 +43,15 @@ struct SignalDecl : DeclBase
 {
     std::string type_name;
     bool has_bus_kw{ false };
-    std::vector<std::unique_ptr<BinaryExpr>> constraints;
-    std::unique_ptr<Expr> init_expr;
+    std::vector<BinaryExpr> constraints;
+    std::optional<Expr> init_expr;
 };
 
 // Generic parameter inside GENERIC clause
 struct GenericParam : DeclBase
 {
     std::string type_name;
-    std::unique_ptr<Expr> default_expr;
+    std::optional<Expr> default_expr;
 };
 
 // Port entry inside PORT clause
@@ -59,8 +59,8 @@ struct Port : DeclBase
 {
     std::string mode; // "in" / "out"
     std::string type_name;
-    std::unique_ptr<Expr> default_expr;
-    std::vector<std::unique_ptr<BinaryExpr>> constraints;
+    std::optional<Expr> default_expr;
+    std::vector<BinaryExpr> constraints;
 };
 
 } // namespace ast

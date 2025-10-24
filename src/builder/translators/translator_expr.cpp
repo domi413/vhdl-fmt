@@ -6,201 +6,212 @@
 
 namespace builder {
 
-void Translator::makeExpr(vhdlParser::ExpressionContext *ctx)
+auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr
 {
     if (ctx->relation().size() == 1) {
-        makeRelation(ctx->relation(0));
-        return;
+        return makeRelation(ctx->relation(0));
     }
 
-    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
-        bin.op = ctx->logical_operator(0)->getText();
-        into(bin.left, [&] { makeRelation(ctx->relation(0)); });
-        into(bin.right, [&] { makeRelation(ctx->relation(1)); });
-    });
+    ast::BinaryExpr bin;
+    trivia_.bind(bin, ctx);
+    bin.op = ctx->logical_operator(0)->getText();
+    bin.left = box(makeRelation(ctx->relation(0)));
+    bin.right = box(makeRelation(ctx->relation(1)));
+    return bin;
 }
 
-void Translator::makeRelation(vhdlParser::RelationContext *ctx)
+auto Translator::makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr
 {
     if (ctx->relational_operator() == nullptr) {
-        makeShiftExpr(ctx->shift_expression(0));
-        return;
+        return makeShiftExpr(ctx->shift_expression(0));
     }
 
-    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
-        bin.op = ctx->relational_operator()->getText();
-        into(bin.left, [&] { makeShiftExpr(ctx->shift_expression(0)); });
-        into(bin.right, [&] { makeShiftExpr(ctx->shift_expression(1)); });
-    });
+    ast::BinaryExpr bin;
+    trivia_.bind(bin, ctx);
+    bin.op = ctx->relational_operator()->getText();
+    bin.left = box(makeShiftExpr(ctx->shift_expression(0)));
+    bin.right = box(makeShiftExpr(ctx->shift_expression(1)));
+    return bin;
 }
 
-void Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx)
+auto Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast::Expr
 {
     if (ctx->shift_operator() == nullptr) {
-        makeSimpleExpr(ctx->simple_expression(0));
-        return;
+        return makeSimpleExpr(ctx->simple_expression(0));
     }
 
-    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
-        bin.op = ctx->shift_operator()->getText();
-        into(bin.left, [&] { makeSimpleExpr(ctx->simple_expression(0)); });
-        into(bin.right, [&] { makeSimpleExpr(ctx->simple_expression(1)); });
-    });
+    ast::BinaryExpr bin;
+    trivia_.bind(bin, ctx);
+    bin.op = ctx->shift_operator()->getText();
+    bin.left = box(makeSimpleExpr(ctx->simple_expression(0)));
+    bin.right = box(makeSimpleExpr(ctx->simple_expression(1)));
+    return bin;
 }
 
-void Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx)
+auto Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr
 {
     if ((ctx->PLUS() != nullptr) || (ctx->MINUS() != nullptr)) {
-        spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
-            un.op = ctx->PLUS() ? "+" : "-";
-            into(un.value, [&] { makeTerm(ctx->term(0)); });
-        });
-        return;
+        ast::UnaryExpr un;
+        trivia_.bind(un, ctx);
+        un.op = (ctx->PLUS() != nullptr) ? "+" : "-";
+        un.value = box(makeTerm(ctx->term(0)));
+        return un;
     }
 
     if (ctx->adding_operator().empty()) {
-        makeTerm(ctx->term(0));
-        return;
+        return makeTerm(ctx->term(0));
     }
 
-    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
-        bin.op = ctx->adding_operator(0)->getText();
-        into(bin.left, [&] { makeTerm(ctx->term(0)); });
-        into(bin.right, [&] { makeTerm(ctx->term(1)); });
-    });
+    ast::BinaryExpr bin;
+    trivia_.bind(bin, ctx);
+    bin.op = ctx->adding_operator(0)->getText();
+    bin.left = box(makeTerm(ctx->term(0)));
+    bin.right = box(makeTerm(ctx->term(1)));
+    return bin;
 }
 
-void Translator::makeTerm(vhdlParser::TermContext *ctx)
+auto Translator::makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr
 {
     if (ctx->multiplying_operator().empty()) {
-        makeFactor(ctx->factor(0));
-        return;
+        return makeFactor(ctx->factor(0));
     }
 
-    spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
-        bin.op = ctx->multiplying_operator(0)->getText();
-        into(bin.left, [&] { makeFactor(ctx->factor(0)); });
-        into(bin.right, [&] { makeFactor(ctx->factor(1)); });
-    });
+    ast::BinaryExpr bin;
+    trivia_.bind(bin, ctx);
+    bin.op = ctx->multiplying_operator(0)->getText();
+    bin.left = box(makeFactor(ctx->factor(0)));
+    bin.right = box(makeFactor(ctx->factor(1)));
+    return bin;
 }
 
-void Translator::makeFactor(vhdlParser::FactorContext *ctx)
+auto Translator::makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr
 {
     if (ctx->DOUBLESTAR() != nullptr) {
-        spawn<ast::BinaryExpr>(ctx, true, [&](auto &bin) {
-            bin.op = "**";
-            into(bin.left, [&] { makePrimary(ctx->primary(0)); });
-            into(bin.right, [&] { makePrimary(ctx->primary(1)); });
-        });
-        return;
+        ast::BinaryExpr bin;
+        trivia_.bind(bin, ctx);
+        bin.op = "**";
+        bin.left = box(makePrimary(ctx->primary(0)));
+        bin.right = box(makePrimary(ctx->primary(1)));
+        return bin;
     }
 
     if (ctx->ABS() != nullptr) {
-        spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
-            un.op = "abs";
-            into(un.value, [&] { makePrimary(ctx->primary(0)); });
-        });
-        return;
+        ast::UnaryExpr un;
+        trivia_.bind(un, ctx);
+        un.op = "abs";
+        un.value = box(makePrimary(ctx->primary(0)));
+        return un;
     }
 
     if (ctx->NOT() != nullptr) {
-        spawn<ast::UnaryExpr>(ctx, true, [&](auto &un) {
-            un.op = "not";
-            into(un.value, [&] { makePrimary(ctx->primary(0)); });
-        });
-        return;
+        ast::UnaryExpr un;
+        trivia_.bind(un, ctx);
+        un.op = "not";
+        un.value = box(makePrimary(ctx->primary(0)));
+        return un;
     }
 
-    makePrimary(ctx->primary(0));
+    return makePrimary(ctx->primary(0));
 }
 
-void Translator::makePrimary(vhdlParser::PrimaryContext *ctx)
+auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
 {
     if (ctx->expression() != nullptr) {
-        spawn<ast::ParenExpr>(
-          ctx, true, [&](auto &p) { into(p.inner, [&] { makeExpr(ctx->expression()); }); });
-        return;
+        ast::ParenExpr paren;
+        trivia_.bind(paren, ctx);
+        paren.inner = box(makeExpr(ctx->expression()));
+        return paren;
     }
 
     if (ctx->aggregate() != nullptr) {
-        makeAggregate(ctx->aggregate());
-        return;
+        return makeAggregate(ctx->aggregate());
     }
 
-    spawn<ast::TokenExpr>(ctx, true, [&](auto &tok) { tok.text = ctx->getText(); });
+    ast::TokenExpr tok;
+    trivia_.bind(tok, ctx);
+    tok.text = ctx->getText();
+    return tok;
 }
 
-void Translator::makeAggregate(vhdlParser::AggregateContext *ctx)
+auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
 {
-    spawn<ast::GroupExpr>(ctx, true, [&](auto &group) {
-        into(group.children, [&] {
-            for (auto *elem : ctx->element_association()) {
-                spawn<ast::BinaryExpr>(ctx, true, [&](auto &assoc) {
-                    assoc.op = "=>";
-                    if (elem->choices()) {
-                        into(assoc.left, [&] { makeChoices(elem->choices()); });
-                    }
-                    if (elem->expression()) {
-                        into(assoc.right, [&] { makeExpr(elem->expression()); });
-                    }
-                });
-            }
-        });
-    });
+    ast::GroupExpr group;
+    trivia_.bind(group, ctx);
+    
+    for (auto *elem : ctx->element_association()) {
+        ast::BinaryExpr assoc;
+        trivia_.bind(assoc, elem);
+        assoc.op = "=>";
+        
+        if (elem->choices() != nullptr) {
+            assoc.left = box(makeChoices(elem->choices()));
+        }
+        if (elem->expression() != nullptr) {
+            assoc.right = box(makeExpr(elem->expression()));
+        }
+        
+        group.children.push_back(std::move(assoc));
+    }
+    
+    return group;
 }
 
-void Translator::makeChoices(vhdlParser::ChoicesContext *ctx)
+auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
 {
     if (ctx->choice().size() == 1) {
-        makeChoice(ctx->choice(0));
-        return;
+        return makeChoice(ctx->choice(0));
     }
 
-    spawn<ast::GroupExpr>(ctx, true, [&](auto &grp) {
-        into(grp.children, [&] {
-            for (auto *ch : ctx->choice()) {
-                makeChoice(ch);
-            }
-        });
-    });
+    ast::GroupExpr grp;
+    trivia_.bind(grp, ctx);
+    for (auto *ch : ctx->choice()) {
+        grp.children.push_back(makeChoice(ch));
+    }
+    return grp;
 }
 
-void Translator::makeChoice(vhdlParser::ChoiceContext *ctx)
+auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
 {
     if (ctx->OTHERS() != nullptr) {
-        spawn<ast::TokenExpr>(ctx, true, [&](auto &t) { t.text = "others"; });
-        return;
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = "others";
+        return tok;
     }
 
     if (ctx->identifier() != nullptr) {
-        spawn<ast::TokenExpr>(ctx, true, [&](auto &t) { t.text = ctx->identifier()->getText(); });
-        return;
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = ctx->identifier()->getText();
+        return tok;
     }
 
     if (ctx->simple_expression() != nullptr) {
-        makeSimpleExpr(ctx->simple_expression());
-        return;
+        return makeSimpleExpr(ctx->simple_expression());
     }
 
     if (auto *dr = ctx->discrete_range()) {
         if (auto *rd = dr->range_decl()) {
             if (auto *er = rd->explicit_range()) {
-                makeRange(er);
-                return;
+                return makeRange(er);
             }
         }
     }
 
-    spawn<ast::TokenExpr>(ctx, true, [&](auto &t) { t.text = ctx->getText(); });
+    ast::TokenExpr tok;
+    trivia_.bind(tok, ctx);
+    tok.text = ctx->getText();
+    return tok;
 }
 
-void Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx)
+auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr
 {
-    spawn<ast::BinaryExpr>(ctx, true, [&](auto &range) {
-        range.op = ctx->direction()->getText();
-        into(range.left, [&] { dispatch_(ctx->simple_expression(0)); });
-        into(range.right, [&] { dispatch_(ctx->simple_expression(1)); });
-    });
+    ast::BinaryExpr range;
+    trivia_.bind(range, ctx);
+    range.op = ctx->direction()->getText();
+    range.left = box(makeSimpleExpr(ctx->simple_expression(0)));
+    range.right = box(makeSimpleExpr(ctx->simple_expression(1)));
+    return range;
 }
 
 } // namespace builder

@@ -4,14 +4,13 @@
 #include "ast/node.hpp"
 #include "ast/nodes/design_units.hpp"
 
-#include <memory>
 #include <vector>
 
 namespace ast {
 
 struct DesignFile : NodeBase
 {
-    std::vector<std::unique_ptr<DesignUnit>> units;
+    std::vector<DesignUnit> units;
 };
 
 } // namespace ast

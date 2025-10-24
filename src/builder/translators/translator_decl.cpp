@@ -4,92 +4,105 @@
 
 namespace builder {
 
-void Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
+auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
+  -> ast::GenericParam
 {
-    spawn<ast::GenericParam>(ctx, true, [&](auto &param) {
-        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-            param.names.emplace_back(id_ctx->getText());
-        }
+    ast::GenericParam param;
+    trivia_.bind(param, ctx);
+    
+    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+        param.names.emplace_back(id_ctx->getText());
+    }
 
-        if (auto *stype = ctx->subtype_indication()) {
-            param.type_name = stype->getText();
-        }
-    });
+    if (auto *stype = ctx->subtype_indication()) {
+        param.type_name = stype->getText();
+    }
+    
+    return param;
 }
 
-void Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx)
+auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port
 {
-    spawn<ast::Port>(ctx, true, [&](auto &port) {
-        const auto &ids = ctx->identifier_list()->identifier();
-        port.names.reserve(ids.size());
+    ast::Port port;
+    trivia_.bind(port, ctx);
+    
+    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+        port.names.emplace_back(id_ctx->getText());
+    }
 
-        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-            port.names.emplace_back(id_ctx->getText());
+    if (auto *mode = ctx->signal_mode()) {
+        port.mode = mode->getText();
+    }
+
+    if (auto *stype = ctx->subtype_indication()) {
+        port.type_name = stype->selected_name(0)->getText();
+
+        if (auto *constraint = stype->constraint()) {
+            // Process constraints - for now walk() to handle nested rules
+            walk_(constraint);
         }
+    }
 
-        if (auto *mode = ctx->signal_mode()) {
-            port.mode = mode->getText();
-        }
-
-        if (auto *stype = ctx->subtype_indication()) {
-            port.type_name = stype->selected_name(0)->getText();
-
-            if (auto *constraint = stype->constraint()) {
-                into(port.constraints, [&] { dispatch_(constraint); });
-            }
-        }
-
-        if (auto *expr = ctx->expression()) {
-            into(port.default_expr, [&] { dispatch_(expr); });
-        }
-    });
+    if (auto *expr = ctx->expression()) {
+        port.default_expr = makeExpr(expr);
+    }
+    
+    return port;
 }
 
-void Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
+auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx)
+  -> ast::ConstantDecl
 {
-    spawn<ast::ConstantDecl>(ctx, true, [&](auto &decl) {
-        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-            decl.names.emplace_back(id_ctx->getText());
-        }
+    ast::ConstantDecl decl;
+    trivia_.bind(decl, ctx);
+    
+    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+        decl.names.emplace_back(id_ctx->getText());
+    }
 
-        if (auto *stype = ctx->subtype_indication()) {
-            decl.type_name = stype->selected_name(0)->getText();
-        }
+    if (auto *stype = ctx->subtype_indication()) {
+        decl.type_name = stype->selected_name(0)->getText();
+    }
 
-        if (auto *expr = ctx->expression()) {
-            into(decl.init_expr, [&] { dispatch_(expr); });
-        }
-    });
+    if (auto *expr = ctx->expression()) {
+        decl.init_expr = makeExpr(expr);
+    }
+    
+    return decl;
 }
 
-void Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx)
+auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl
 {
-    spawn<ast::SignalDecl>(ctx, true, [&](auto &decl) {
-        for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-            decl.names.emplace_back(id_ctx->getText());
-        }
+    ast::SignalDecl decl;
+    trivia_.bind(decl, ctx);
+    
+    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
+        decl.names.emplace_back(id_ctx->getText());
+    }
 
-        if (auto *stype = ctx->subtype_indication()) {
-            decl.type_name = stype->selected_name(0)->getText();
-        }
+    if (auto *stype = ctx->subtype_indication()) {
+        decl.type_name = stype->selected_name(0)->getText();
+    }
 
-        decl.has_bus_kw = false;
-        if (auto *kind = ctx->signal_kind()) {
-            if (kind->BUS() != nullptr) {
-                decl.has_bus_kw = true;
-            }
+    decl.has_bus_kw = false;
+    if (auto *kind = ctx->signal_kind()) {
+        if (kind->BUS() != nullptr) {
+            decl.has_bus_kw = true;
         }
+    }
 
-        if (auto *stype = ctx->subtype_indication()) {
-            if (auto *constraint = stype->constraint()) {
-                into(decl.constraints, [&] { dispatch_(constraint); });
-            }
+    if (auto *stype = ctx->subtype_indication()) {
+        if (auto *constraint = stype->constraint()) {
+            // Process constraints - for now walk() to handle nested rules
+            walk_(constraint);
         }
+    }
 
-        if (auto *expr = ctx->expression()) {
-            into(decl.init_expr, [&] { dispatch_(expr); });
-        }
-    });
+    if (auto *expr = ctx->expression()) {
+        decl.init_expr = makeExpr(expr);
+    }
+    
+    return decl;
 }
 
 } // namespace builder

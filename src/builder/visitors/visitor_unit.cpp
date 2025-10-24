@@ -7,24 +7,26 @@ namespace builder {
 
 void Visitor::visitEntityDeclaration(vhdlParser::Entity_declarationContext *ctx)
 {
-    translator_.makeEntity(ctx);
+    // Return value needs to be collected by the caller
+    // For now, we need a way to add it to the root
+    (void)translator_.makeEntity(ctx);
 }
 
 void Visitor::visitArchitectureBody(vhdlParser::Architecture_bodyContext *ctx)
 {
-    translator_.makeArchitecture(ctx);
+    (void)translator_.makeArchitecture(ctx);
 }
 
 // ------------------------ Clauses -------------------------
 
 void Visitor::visitGenericClause(vhdlParser::Generic_clauseContext *ctx)
 {
-    translator_.makeGenericClause(ctx);
+    (void)translator_.makeGenericClause(ctx);
 }
 
 void Visitor::visitPortClause(vhdlParser::Port_clauseContext *ctx)
 {
-    translator_.makePortClause(ctx);
+    (void)translator_.makePortClause(ctx);
 }
 
 } // namespace builder
