@@ -28,7 +28,7 @@ target_link_libraries(
 target_compile_options(
     vhdl_formatter
     PRIVATE
-        -O3 # TODO: We should disable this optimization for debug builds.
+        $<$<CONFIG:Release>:-O3>
         # -O3 -ffast-math # lossy floating-point optimizations
         # -flto=full # Apparently, this could improve performance by around 10%
         -Wall
