@@ -29,9 +29,9 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     auto design = buildAstFromSource(vhdl);
     auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
+    REQUIRE(entity->trivia.has_value());
 
-    const auto &leading_trivia = entity->tryGetTrivia().value_or(ast::NodeTrivia{}).leading;
-    const auto texts = leadingComments(leading_trivia);
+    const auto texts = leadingComments(entity->trivia->leading);
 
     REQUIRE(texts.size() == 2);
     REQUIRE(texts.front().contains("License text"));
@@ -58,10 +58,10 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE(entity->generic_clause.generics.size() == 1);
 
     const auto &g = entity->generic_clause.generics[0];
-    const auto &c = g.tryGetTrivia().value_or(ast::NodeTrivia{});
+    REQUIRE(g.trivia.has_value());
 
-    const auto lead = leadingComments(c.leading);
-    const auto trail = trailingComments(c.trailing);
+    const auto lead = leadingComments(g.trivia->leading);
+    const auto trail = trailingComments(g.trivia->trailing);
 
     REQUIRE_FALSE(lead.empty());
     REQUIRE(lead.front().contains("Leading for CONST_V"));
@@ -93,9 +93,9 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
 
     {
         const auto &clk = entity->port_clause.ports[0];
-        const auto &cm = clk.tryGetTrivia().value_or(ast::NodeTrivia{});
-        const auto lead = leadingComments(cm.leading);
-        const auto trail = trailingComments(cm.trailing);
+        REQUIRE(clk.trivia.has_value());
+        const auto lead = leadingComments(clk.trivia->leading);
+        const auto trail = trailingComments(clk.trivia->trailing);
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Clock input"));
         REQUIRE_FALSE(trail.empty());
@@ -103,9 +103,9 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     }
     {
         const auto &rst = entity->port_clause.ports[1];
-        const auto &cm = rst.tryGetTrivia().value_or(ast::NodeTrivia{});
-        const auto lead = leadingComments(cm.leading);
-        const auto trail = trailingComments(cm.trailing);
+        REQUIRE(rst.trivia.has_value());
+        const auto lead = leadingComments(rst.trivia->leading);
+        const auto trail = trailingComments(rst.trivia->trailing);
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Reset input"));
         REQUIRE_FALSE(trail.empty());

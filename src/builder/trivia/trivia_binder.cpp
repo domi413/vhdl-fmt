@@ -71,14 +71,14 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
         return;
     }
 
-    auto &comment = node.emplaceTrivia();
+    auto &trivia = node.trivia.emplace();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
     const AnchorToken stop{ .index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex()),
                             .line = ctx->getStop()->getLine() };
 
-    collectLeading(comment, start_index);
-    collectTrailing(comment, stop);
+    collectLeading(trivia, start_index);
+    collectTrailing(trivia, stop);
 }
 
 auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t

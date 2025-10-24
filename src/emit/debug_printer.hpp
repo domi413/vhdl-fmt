@@ -79,13 +79,13 @@ class DebugPrinter : public ast::VisitorBase<DebugPrinter, void>
         const IndentGuard _{ indent_ };
 
         // Print leading trivia stream (newlines + comments in order)
-        if (!node.leading().empty()) {
-            printTriviaStream(node.leading(), "↓");
+        if (node.trivia && !node.trivia->leading.empty()) {
+            printTriviaStream(node.trivia->leading, "↓");
         }
 
         // Print trailing comments (inline comments)
-        if (!node.trailing().empty()) {
-            printCommentLines(node.trailing(), "→");
+        if (node.trivia && !node.trivia->trailing.empty()) {
+            printCommentLines(node.trivia->trailing, "→");
         }
     }
 
