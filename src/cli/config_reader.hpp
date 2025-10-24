@@ -8,8 +8,6 @@
 #include <optional>
 #include <string>
 #include <utility>
-#include <yaml-cpp/node/convert.h>     // NOLINT(misc-include-cleaner)
-#include <yaml-cpp/node/detail/impl.h> // NOLINT(misc-include-cleaner)
 #include <yaml-cpp/node/node.h>
 
 namespace cli {

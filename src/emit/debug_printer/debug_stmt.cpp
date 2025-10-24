@@ -1,6 +1,7 @@
 #include "ast/nodes/statements.hpp"
 #include "emit/debug_printer.hpp"
 
+#include <cstddef>
 #include <string>
 
 // NOLINTBEGIN(misc-no-recursion)

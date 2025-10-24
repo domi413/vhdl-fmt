@@ -17,6 +17,7 @@
 #include <yaml-cpp/exceptions.h>
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/node/parse.h>
+#include <yaml-cpp/yaml.h> // IWYU pragma: keep
 
 namespace cli {
 
