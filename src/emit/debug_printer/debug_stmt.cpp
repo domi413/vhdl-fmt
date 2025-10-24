@@ -34,7 +34,7 @@ auto DebugPrinter::operator()(const ast::Process &node) -> void
 
     if (!node.sensitivity_list.empty()) {
         const auto joined_list = std::ranges::to<std::string>(
-          node.sensitivity_list | std::views::join_with(std::string_view{ ', ' }));
+          node.sensitivity_list | std::views::join_with(std::string_view{ ", " }));
 
         extra += " (";
         extra += joined_list;
