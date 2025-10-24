@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <optional>
+#include <ranges>
 #include <type_traits>
 #include <variant>
 #include <vector>
@@ -13,6 +14,9 @@
 namespace ast {
 
 /// @brief Base class for stateful visitors that need to traverse the AST
+///
+/// Implements CRTP pattern for compile-time polymorphism. Derived classes
+/// must implement operator() for each concrete AST node type they handle.
 ///
 /// Example usage:
 ///   struct MyFormatter : VisitorBase<MyFormatter> {
@@ -34,93 +38,62 @@ class VisitorBase
     template<typename... Ts>
     auto visit(const std::variant<Ts...> &node) -> ReturnType
     {
-        return std::visit(
-          [this](const auto &n) -> decltype(auto) { return static_cast<Derived &>(*this)(n); },
-          node);
+        return std::visit([this](const auto &n) -> ReturnType { return derived()(n); }, node);
     }
 
-    /// @brief Visit a unique_ptr to a variant node (or Box<variant>)
-    template<typename... Ts>
-    auto visit(const std::unique_ptr<std::variant<Ts...>> &node) -> ReturnType
-    {
-        if (node) {
-            return visit(*node);
-        }
-        return ReturnType{}; // default-constructed value if null
-    }
-
-    /// @brief Visit a unique_ptr to a non-variant type (or Box<T>)
+    /// @brief Visit a Box<T> (unique_ptr), calling operator() if non-null
     template<typename T>
-    auto visit(const std::unique_ptr<T> &node) -> decltype(auto)
+    auto visit(const std::unique_ptr<T> &node) -> ReturnType
     {
-        if (node) {
-            return static_cast<Derived &>(*this)(*node);
+        if constexpr (std::is_void_v<ReturnType>) {
+            if (node) {
+                visit(*node);
+            }
+        } else {
+            return node ? visit(*node) : ReturnType{};
         }
     }
 
-    /// @brief Visit an optional value
+    /// @brief Visit an optional value, calling operator() if present
     template<typename T>
-    auto visit(const std::optional<T> &node) -> decltype(auto)
-        requires(!std::is_void_v<ReturnType>)
+    auto visit(const std::optional<T> &node) -> ReturnType
     {
-        if (node) {
-            return visit(*node);
-        }
-        return ReturnType{};
-    }
-
-    /// @brief Visit an optional value (void version)
-    template<typename T>
-    void visit(const std::optional<T> &node)
-        requires(std::is_void_v<ReturnType>)
-    {
-        if (node) {
-            visit(*node);
+        if constexpr (std::is_void_v<ReturnType>) {
+            if (node) {
+                visit(*node);
+            }
+        } else {
+            return node ? visit(*node) : ReturnType{};
         }
     }
 
-    /// @brief Visit a concrete node (not in a variant, not in a container)
+    /// @brief Visit a concrete node (delegates to derived class operator())
     template<typename T>
-    auto visit(const T &node) -> decltype(auto)
         requires std::is_base_of_v<NodeBase, T>
+    auto visit(const T &node) -> ReturnType
     {
-        return static_cast<Derived &>(*this)(node);
+        return derived()(node);
     }
 
     /// @brief Visit a vector of nodes
     template<typename T>
-    auto visit(const std::vector<T> &nodes) -> std::vector<ReturnType>
-        requires(!std::is_void_v<ReturnType>)
+    auto visit(const std::vector<T> &nodes)
+      -> std::conditional_t<std::is_void_v<ReturnType>, void, std::vector<ReturnType>>
     {
-        std::vector<ReturnType> results;
-        results.reserve(nodes.size());
-        for (const auto &node : nodes) {
-            results.push_back(visit(node));
+        if constexpr (std::is_void_v<ReturnType>) {
+            for (const auto &node : nodes) {
+                visit(node);
+            }
+        } else {
+            return nodes
+                 | std::views::transform([this](const T &n) { return visit(n); })
+                 | std::ranges::to<std::vector>();
         }
-        return results;
     }
 
-    /// @brief Visit a vector of nodes when ReturnType is void
-    template<typename T>
-    void visit(const std::vector<T> &nodes)
-        requires(std::is_void_v<ReturnType>)
-    {
-        for (const auto &node : nodes) {
-            visit(node);
-        }
-    }
+  private:
+    auto derived() -> Derived & { return static_cast<Derived &>(*this); }
 };
-
-/// @brief Type-trait to check if a variant contains a specific type
-template<typename T, typename Variant>
-struct variant_contains;
-
-template<typename T, typename... Ts>
-struct variant_contains<T, std::variant<Ts...>> : std::disjunction<std::is_same<T, Ts>...>
-{};
-
-template<typename T, typename Variant>
-inline constexpr bool VARIANT_CONTAINS_V = variant_contains<T, Variant>::value;
 
 } // namespace ast
 
