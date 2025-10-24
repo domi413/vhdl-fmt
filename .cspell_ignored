@@ -1,12 +1,14 @@
 absl
 antlr
 antlr4
+bugprone
 conanfile
 domi
 doublestar
 flto
 germesi
 gersemi
+nolintnextline
 subnature
 vhdl
 wconversion
