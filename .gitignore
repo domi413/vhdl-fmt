@@ -34,3 +34,4 @@ build/generated/
 # ---------------------------
 .vscode/
 .idea/
+.github/copilot-instructions.md
