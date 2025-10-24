@@ -1,11 +1,9 @@
 #include "ast/nodes/declarations.hpp"
 #include "emit/debug_printer.hpp"
 
-#include <cstddef>
 #include <ranges>
 #include <sstream>
 #include <string>
-#include <vector>
 
 namespace emit {
 
