@@ -50,9 +50,16 @@ class DebugPrinter : public ast::VisitorBase<DebugPrinter, void>
     void operator()(const ast::BinaryExpr &node);
     void operator()(const ast::ParenExpr &node);
 
-    // Statements
+    // Concurrent Statements
     void operator()(const ast::ConcurrentAssign &node);
     void operator()(const ast::Process &node);
+
+    // Sequential Statements
+    void operator()(const ast::SequentialAssign &node);
+    void operator()(const ast::IfStatement &node);
+    void operator()(const ast::CaseStatement &node);
+    void operator()(const ast::ForLoop &node);
+    void operator()(const ast::WhileLoop &node);
 
   private:
     std::ostream &out_;

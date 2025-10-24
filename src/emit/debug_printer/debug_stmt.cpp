@@ -1,24 +1,176 @@
 #include "ast/nodes/statements.hpp"
 #include "emit/debug_printer.hpp"
 
+#include <string>
+
 // NOLINTBEGIN(misc-no-recursion)
 
 namespace emit {
 
+// Concurrent Statements
+
 auto DebugPrinter::operator()(const ast::ConcurrentAssign &node) -> void
 {
-    emitNodeLike(node, "ConcurrentAssign", "");
+    emitNodeLike(node, "ConcurrentAssign", "<=");
     const IndentGuard _{ indent_ };
-    visit(node.target);
-    visit(node.value);
+    printLine("target:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.target);
+    }
+    printLine("value:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.value);
+    }
 }
 
 auto DebugPrinter::operator()(const ast::Process &node) -> void
 {
-    emitNodeLike(node, "Process", "");
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    if (!node.sensitivity_list.empty()) {
+        extra += " (";
+        for (size_t i = 0; i < node.sensitivity_list.size(); ++i) {
+            if (i > 0) {
+                extra += ", ";
+            }
+            extra += node.sensitivity_list[i];
+        }
+        extra += ")";
+    }
+    emitNodeLike(node, "Process", extra);
     const IndentGuard _{ indent_ };
     visit(node.body);
-    // visit(node.sensitivity_list);
+}
+
+// Sequential Statements
+
+auto DebugPrinter::operator()(const ast::SequentialAssign &node) -> void
+{
+    emitNodeLike(node, "SequentialAssign", ":=");
+    const IndentGuard _{ indent_ };
+    printLine("target:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.target);
+    }
+    printLine("value:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.value);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::IfStatement &node) -> void
+{
+    emitNodeLike(node, "IfStatement", "");
+    const IndentGuard _{ indent_ };
+
+    // If branch
+    printLine("if:");
+    {
+        const IndentGuard _{ indent_ };
+        printLine("condition:");
+        {
+            const IndentGuard _{ indent_ };
+            visit(node.if_branch.condition);
+        }
+        printLine("then:");
+        {
+            const IndentGuard _{ indent_ };
+            visit(node.if_branch.body);
+        }
+    }
+
+    // Elsif branches
+    for (const auto &elsif : node.elsif_branches) {
+        printLine("elsif:");
+        {
+            const IndentGuard _{ indent_ };
+            printLine("condition:");
+            {
+                const IndentGuard _{ indent_ };
+                visit(elsif.condition);
+            }
+            printLine("then:");
+            {
+                const IndentGuard _{ indent_ };
+                visit(elsif.body);
+            }
+        }
+    }
+
+    // Else branch
+    if (node.else_branch) {
+        printLine("else:");
+        const IndentGuard _{ indent_ };
+        visit(node.else_branch->body);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::CaseStatement &node) -> void
+{
+    emitNodeLike(node, "CaseStatement", "");
+    const IndentGuard _{ indent_ };
+
+    printLine("selector:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.selector);
+    }
+
+    for (const auto &when : node.when_clauses) {
+        printLine("when:");
+        {
+            const IndentGuard _{ indent_ };
+            printLine("choices:");
+            {
+                const IndentGuard _{ indent_ };
+                visit(when.choices);
+            }
+            printLine("body:");
+            {
+                const IndentGuard _{ indent_ };
+                visit(when.body);
+            }
+        }
+    }
+}
+
+auto DebugPrinter::operator()(const ast::ForLoop &node) -> void
+{
+    emitNodeLike(node, "ForLoop", "[" + node.iterator + "]");
+    const IndentGuard _{ indent_ };
+
+    printLine("range:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.range);
+    }
+
+    printLine("body:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.body);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::WhileLoop &node) -> void
+{
+    emitNodeLike(node, "WhileLoop", "");
+    const IndentGuard _{ indent_ };
+
+    printLine("condition:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.condition);
+    }
+
+    printLine("body:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.body);
+    }
 }
 
 } // namespace emit

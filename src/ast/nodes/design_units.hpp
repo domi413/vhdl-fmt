@@ -35,7 +35,7 @@ struct Entity : NodeBase
     GenericClause generic_clause;
     PortClause port_clause;
     std::vector<Declaration> decls;
-    std::vector<Statement> stmts;
+    std::vector<ConcurrentStatement> stmts;
     std::optional<std::string> end_label;
 };
 
@@ -44,7 +44,7 @@ struct Architecture : NodeBase
     std::string name;
     std::string entity_name;
     std::vector<Declaration> decls;
-    std::vector<Statement> stmts;
+    std::vector<ConcurrentStatement> stmts;
 };
 
 } // namespace ast
