@@ -47,13 +47,9 @@ auto DebugPrinter::operator()(const ast::Port &node) -> void
 
 auto DebugPrinter::operator()(const ast::SignalDecl &node) -> void
 {
-    std::ostringstream oss;
-    for (size_t i = 0; i < node.names.size(); ++i) {
-        if (i > 0) {
-            oss << ", ";
-        }
-        oss << node.names[i];
-    }
+    std::ostringstream oss{};
+    oss << std::ranges::to<std::string>(node.names
+                                        | std::views::join_with(std::string_view{ ", " }));
     oss << " : " << node.type_name;
     if (node.has_bus_kw) {
         oss << " [bus]";
@@ -68,12 +64,8 @@ auto DebugPrinter::operator()(const ast::SignalDecl &node) -> void
 auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void
 {
     std::ostringstream oss;
-    for (size_t i = 0; i < node.names.size(); ++i) {
-        if (i > 0) {
-            oss << ", ";
-        }
-        oss << node.names[i];
-    }
+    oss << std::ranges::to<std::string>(node.names
+                                        | std::views::join_with(std::string_view{ "; " }));
     oss << " : " << node.type_name;
 
     emitNodeLike(node, "ConstantDecl", oss.str());
