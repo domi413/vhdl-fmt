@@ -1,10 +1,6 @@
 add_library(ast INTERFACE)
 
-target_include_directories(
-    ast
-    INTERFACE
-        ${CMAKE_SOURCE_DIR}/src
-)
+target_include_directories(ast INTERFACE ${CMAKE_SOURCE_DIR}/src)
 
 target_sources(
     ast

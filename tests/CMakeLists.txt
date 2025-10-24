@@ -1,9 +1,9 @@
 add_executable(
     tests
-        test_comments.cpp
-        test_config_reader.cpp
-        test_declarations.cpp
-        test_newlines.cpp
+    test_comments.cpp
+    test_config_reader.cpp
+    test_declarations.cpp
+    test_newlines.cpp
 )
 
 target_link_libraries(
