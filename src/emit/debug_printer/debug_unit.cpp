@@ -18,8 +18,8 @@ auto DebugPrinter::operator()(const ast::Entity &node) -> void
 {
     emitNodeLike(node, "Entity", node.name);
     const IndentGuard _{ indent_ };
-    (*this)(node.generic_clause);
-    (*this)(node.port_clause);
+    visit(node.generic_clause);
+    visit(node.port_clause);
 
     if (!node.decls.empty()) {
         printLine("Declarations:");

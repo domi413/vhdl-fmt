@@ -4,14 +4,19 @@
 #include "node.hpp"
 #include "nodes/design_file.hpp"
 
-#include <memory>
-#include <optional>
 #include <ranges>
 #include <type_traits>
 #include <variant>
 #include <vector>
 
 namespace ast {
+
+/// @brief Concept for types that can be treated as nullable wrappers
+template<typename T>
+concept NullableWrapper = requires(const T &wrapper) {
+    { *wrapper };                                             // Can dereference
+    { wrapper.operator bool() } -> std::convertible_to<bool>; // Can check if null
+};
 
 /// @brief Base class for stateful visitors that need to traverse the AST
 ///
@@ -41,29 +46,16 @@ class VisitorBase
         return std::visit([this](const auto &n) -> ReturnType { return derived()(n); }, node);
     }
 
-    /// @brief Visit a Box<T> (unique_ptr), calling operator() if non-null
-    template<typename T>
-    auto visit(const std::unique_ptr<T> &node) -> ReturnType
+    /// @brief Visit an optional or nullable wrapper (optional<T>, unique_ptr<T>)
+    template<NullableWrapper T>
+    auto visit(const T &wrapper) -> ReturnType
     {
         if constexpr (std::is_void_v<ReturnType>) {
-            if (node) {
-                visit(*node);
+            if (wrapper) {
+                visit(*wrapper);
             }
         } else {
-            return node ? visit(*node) : ReturnType{};
-        }
-    }
-
-    /// @brief Visit an optional value, calling operator() if present
-    template<typename T>
-    auto visit(const std::optional<T> &node) -> ReturnType
-    {
-        if constexpr (std::is_void_v<ReturnType>) {
-            if (node) {
-                visit(*node);
-            }
-        } else {
-            return node ? visit(*node) : ReturnType{};
+            return wrapper ? visit(*wrapper) : ReturnType{};
         }
     }
 
