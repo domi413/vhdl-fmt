@@ -9,7 +9,6 @@
 #include <cstddef>
 #include <memory>
 #include <ranges>
-#include <string>
 #include <string_view>
 #include <variant>
 #include <vector>
@@ -19,7 +18,7 @@ namespace test_utils {
 /// @brief Build AST from VHDL source code string
 /// @param vhdl_code VHDL source code
 /// @return Unique pointer to populated DesignFile AST
-inline auto buildAstFromSource(const std::string &vhdl_code) -> std::unique_ptr<ast::DesignFile>
+inline auto buildAstFromSource(std::string_view vhdl_code) -> std::unique_ptr<ast::DesignFile>
 {
     return std::make_unique<ast::DesignFile>(builder::buildFromString(vhdl_code));
 }

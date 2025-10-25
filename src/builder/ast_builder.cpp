@@ -14,6 +14,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 namespace builder {
 
@@ -46,9 +47,9 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     return root;
 }
 
-auto buildFromString(const std::string &vhdl_code) -> ast::DesignFile
+auto buildFromString(std::string_view &vhdl_code) -> ast::DesignFile
 {
-    std::istringstream stream(vhdl_code);
+    std::istringstream stream(static_cast<std::string>(vhdl_code));
     return buildFromStream(stream);
 }
 

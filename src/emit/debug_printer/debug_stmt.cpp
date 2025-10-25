@@ -1,7 +1,6 @@
 #include "ast/nodes/statements.hpp"
 #include "emit/debug_printer.hpp"
 
-#include <cstddef>
 #include <ranges>
 #include <string>
 #include <string_view>

@@ -1,15 +1,9 @@
-#include "ast/node.hpp"
-#include "ast/nodes/declarations.hpp"
-#include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
-#include <optional>
-#include <string>
+#include <string_view>
 #include <variant>
-#include <vector>
 
 using test_utils::buildAstFromSource;
 using test_utils::leadingComments;
@@ -20,13 +14,13 @@ using test_utils::trailingComments;
 // -----------------------------------------------------------------------------
 TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
 {
-    const std::string vhdl = R"(
+    constexpr std::string_view VHDL_FILE = R"(
         -- License text
         -- Entity declaration for a simple counter
         entity MyEntity is end MyEntity;
     )";
 
-    auto design = buildAstFromSource(vhdl);
+    auto design = buildAstFromSource(VHDL_FILE);
     auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
@@ -45,7 +39,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
 // -----------------------------------------------------------------------------
 TEST_CASE("Generic captures both leading and inline comments", "[comments][generic]")
 {
-    const std::string vhdl = R"(
+    constexpr std::string_view VHDL_FILE = R"(
         entity Example is
             generic (
                 -- Leading for CONST_V
@@ -54,7 +48,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
         end Example;
     )";
 
-    auto design = buildAstFromSource(vhdl);
+    auto design = buildAstFromSource(VHDL_FILE);
     auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->generic_clause.generics.size() == 1);
@@ -79,7 +73,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
 // -----------------------------------------------------------------------------
 TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
 {
-    const std::string vhdl = R"(
+    constexpr std::string_view VHDL_FILE = R"(
         entity Example is
             port (
                 -- Clock input
@@ -90,7 +84,7 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
         end Example;
     )";
 
-    auto design = buildAstFromSource(vhdl);
+    auto design = buildAstFromSource(VHDL_FILE);
     auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 2);

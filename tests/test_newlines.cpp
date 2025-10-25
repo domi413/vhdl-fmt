@@ -5,7 +5,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
-#include <string>
+#include <string_view>
 #include <variant>
 
 using test_utils::buildAstFromSource;
@@ -16,14 +16,14 @@ using test_utils::buildAstFromSource;
 TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia][leading]")
 {
     // One blank *source* line between two leading comments.
-    const std::string vhdl = R"(
+    constexpr std::string_view VHDL_FILE = R"(
         -- A
 
         -- B
         entity E is end E;
     )";
 
-    auto design = buildAstFromSource(vhdl);
+    auto design = buildAstFromSource(VHDL_FILE);
     auto *entity = std::get_if<ast::Entity>(design->units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());

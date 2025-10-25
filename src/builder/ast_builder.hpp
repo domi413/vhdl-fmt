@@ -5,7 +5,7 @@
 
 #include <filesystem>
 #include <istream>
-#include <string>
+#include <string_view>
 
 namespace builder {
 
@@ -32,7 +32,7 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile;
 /// @return Populated DesignFile AST
 /// @throws std::runtime_error if parsing fails
 [[nodiscard]]
-auto buildFromString(const std::string &vhdl_code) -> ast::DesignFile;
+auto buildFromString(std::string_view &vhdl_code) -> ast::DesignFile;
 
 } // namespace builder
 

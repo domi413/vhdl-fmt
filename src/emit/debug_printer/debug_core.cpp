@@ -25,16 +25,19 @@ void DebugPrinter::printLine(std::string_view s) const
 void DebugPrinter::printNodeHeader(const ast::NodeBase &n,
                                    const std::string &extra,
                                    std::string_view name_override,
-                                   std::size_t leading_breaks) const
+                                   const std::size_t leading_breaks) const
 {
     printIndent();
     out_ << (!name_override.empty() ? std::string{ name_override } : typeid(n).name());
+
     if (!extra.empty()) {
         out_ << " [" << extra << "]";
     }
+
     if (leading_breaks > 0U) {
         out_ << " (" << leading_breaks << R"([\n]))";
     }
+
     out_ << '\n';
 }
 
@@ -62,9 +65,11 @@ void DebugPrinter::printCommentLines(const std::vector<ast::Comments> &comments,
 {
     for (const auto &comment : comments) {
         printIndent();
+
         if (!prefix.empty()) {
             out_ << prefix << " ";
         }
+
         out_ << comment.text << '\n';
     }
 }
