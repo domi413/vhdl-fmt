@@ -138,20 +138,20 @@ TEST_CASE("ConfigReader with invalid configuration parameters", "[config]")
     cli::ConfigReader reader{ temp_path };
     const auto result = reader.readConfigFile();
 
-    INFO("Description: " << description);
-    INFO("Content: " << content);
+    INFO(std::format("Description: {}", description));
+    INFO(std::format("Content: {}", content));
 
     if (result.has_value()) {
         INFO("Unexpectedly succeeded - config was accepted");
         const auto &config = result.value();
-        INFO("Line length: " << static_cast<int>(config.line_config.line_length));
-        INFO("Indent size: " << static_cast<int>(config.line_config.indent_size));
+        INFO(std::format("Line length: {}", static_cast<int>(config.line_config.line_length)));
+        INFO(std::format("Indent size: {}", static_cast<int>(config.line_config.indent_size)));
     }
 
     REQUIRE_FALSE(result.has_value());
     const auto &error = result.error();
-    INFO("Expected: " << expected_error);
-    INFO("Actual: " << error.message);
+    INFO(std::format("Expected: {}", expected_error));
+    INFO(std::format("Actual: {}", error.message));
     REQUIRE(error.message.contains(expected_error));
 
     // Cleanup

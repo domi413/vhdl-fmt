@@ -26,7 +26,7 @@ constexpr std::string_view FLAG_LOCATION{ "--location" };
 
 } // namespace
 
-ArgumentParser::ArgumentParser(std::span<char *> args)
+ArgumentParser::ArgumentParser(std::span<const char *const> args)
 {
     parseArguments(args);
 }
@@ -46,7 +46,7 @@ auto ArgumentParser::isFlagSet(ArgumentFlag flag) const noexcept -> bool
     return used_flags_.test(static_cast<std::size_t>(flag));
 }
 
-auto ArgumentParser::parseArguments(std::span<char *> args) -> void
+auto ArgumentParser::parseArguments(std::span<const char *const> args) -> void
 {
     argparse::ArgumentParser program{ std::string(common::PROJECT_NAME),
                                       std::string(common::PROJECT_VERSION) };
@@ -107,10 +107,8 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
         c_args.reserve(args.size());
 
         // parse_args expects a c-style array
-        for (const auto *arg : args) {
-            if (arg != nullptr) {
-                c_args.emplace_back(arg);
-            }
+        for (const auto *const arg : args) {
+            c_args.emplace_back(arg);
         }
 
         program.parse_args(c_args);

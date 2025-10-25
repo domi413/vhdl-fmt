@@ -42,6 +42,9 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET) --output-on-failure
+
+test-rerun-failed: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
 
 test-verbose: $(BUILD_STAMP)

@@ -20,7 +20,7 @@ enum class ArgumentFlag : std::uint8_t
 class ArgumentParser final
 {
   public:
-    explicit ArgumentParser(std::span<char *> args);
+    explicit ArgumentParser(std::span<const char *const> args);
 
     [[nodiscard]]
     auto getConfigPath() const noexcept -> const std::optional<std::filesystem::path> &;
@@ -32,7 +32,7 @@ class ArgumentParser final
     auto isFlagSet(ArgumentFlag flag) const noexcept -> bool;
 
   private:
-    auto parseArguments(std::span<char *> args) -> void;
+    auto parseArguments(std::span<const char *const> args) -> void;
 
     std::optional<std::filesystem::path> config_file_path_;
     std::filesystem::path input_path_;

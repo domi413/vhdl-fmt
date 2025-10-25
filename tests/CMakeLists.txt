@@ -1,5 +1,6 @@
 add_executable(
     tests
+    test_argument_parser.cpp
     test_comments.cpp
     test_config_reader.cpp
     test_declarations.cpp

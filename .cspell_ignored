@@ -3,6 +3,7 @@ antlr
 antlr4
 bugprone
 conanfile
+cppcoreguidelines
 domi
 doublestar
 flto
