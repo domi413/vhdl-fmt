@@ -144,8 +144,8 @@ TEST_CASE("ConfigReader with invalid configuration parameters", "[config]")
     if (result.has_value()) {
         INFO("Unexpectedly succeeded - config was accepted");
         const auto &config = result.value();
-        INFO(std::format("Line length: {}", static_cast<int>(config.line_config.line_length)));
-        INFO(std::format("Indent size: {}", static_cast<int>(config.line_config.indent_size)));
+        INFO(std::format("Line length: {}", config.line_config.line_length));
+        INFO(std::format("Indent size: {}", config.line_config.indent_size));
     }
 
     REQUIRE_FALSE(result.has_value());
