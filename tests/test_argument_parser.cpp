@@ -58,6 +58,7 @@ TEST_CASE("ArgumentParser with valid arguments including all options", "[argumen
 
     REQUIRE(parser.getInputPath() == std::filesystem::canonical(temp_input));
     REQUIRE(parser.getConfigPath().has_value());
+    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) -> Is checked on line 60
     REQUIRE(parser.getConfigPath().value() == std::filesystem::canonical(temp_config));
     REQUIRE(parser.isFlagSet(cli::ArgumentFlag::WRITE));
     REQUIRE(parser.isFlagSet(cli::ArgumentFlag::CHECK));
