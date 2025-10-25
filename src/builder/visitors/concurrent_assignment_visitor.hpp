@@ -34,11 +34,8 @@ class ConcurrentAssignmentVisitor
     }
 
   private:
-    friend class TypedVisitor<ConcurrentAssignmentVisitor, ast::ConcurrentAssign>;
-
-    // Handle conditional signal assignment
-    std::any visitConditional_signal_assignment(
-      vhdlParser::Conditional_signal_assignmentContext *ctx) override
+    auto visitConditional_signal_assignment(
+      vhdlParser::Conditional_signal_assignmentContext *ctx) -> std::any override
     {
         ast::ConcurrentAssign assign;
 
@@ -62,9 +59,8 @@ class ConcurrentAssignmentVisitor
         return {};
     }
 
-    // Handle selected signal assignment
-    std::any visitSelected_signal_assignment(
-      vhdlParser::Selected_signal_assignmentContext *ctx) override
+    auto visitSelected_signal_assignment(
+      vhdlParser::Selected_signal_assignmentContext *ctx) -> std::any override
     {
         ast::ConcurrentAssign assign;
 

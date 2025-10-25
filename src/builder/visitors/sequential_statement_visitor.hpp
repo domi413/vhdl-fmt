@@ -36,37 +36,33 @@ class SequentialStatementVisitor
     }
 
   private:
-    friend class TypedVisitor<SequentialStatementVisitor, ast::SequentialStatement>;
-
-    // Override ANTLR's generated visit methods for each statement type
-    // Each method is type-safe and sets the result directly
-    std::any visitSignal_assignment_statement(
-      vhdlParser::Signal_assignment_statementContext *ctx) override
+    auto visitSignal_assignment_statement(
+      vhdlParser::Signal_assignment_statementContext *ctx) -> std::any override
     {
         setResult(trans_.makeSequentialAssign(ctx));
         return {};
     }
 
-    std::any visitVariable_assignment_statement(
-      vhdlParser::Variable_assignment_statementContext *ctx) override
+    auto visitVariable_assignment_statement(
+      vhdlParser::Variable_assignment_statementContext *ctx) -> std::any override
     {
         setResult(trans_.makeVariableAssign(ctx));
         return {};
     }
 
-    std::any visitIf_statement(vhdlParser::If_statementContext *ctx) override
+    auto visitIf_statement(vhdlParser::If_statementContext *ctx) -> std::any override
     {
         setResult(trans_.makeIfStatement(ctx));
         return {};
     }
 
-    std::any visitCase_statement(vhdlParser::Case_statementContext *ctx) override
+    auto visitCase_statement(vhdlParser::Case_statementContext *ctx) -> std::any override
     {
         setResult(trans_.makeCaseStatement(ctx));
         return {};
     }
 
-    std::any visitLoop_statement(vhdlParser::Loop_statementContext *ctx) override
+    auto visitLoop_statement(vhdlParser::Loop_statementContext *ctx) -> std::any override
     {
         if (auto *iter = ctx->iteration_scheme()) {
             if (iter->parameter_specification() != nullptr) {
