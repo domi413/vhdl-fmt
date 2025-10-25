@@ -58,7 +58,7 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
     program.add_argument("input")
       .help("VHDL file or directory to format")
       .metavar("file.vhd")
-      .action([this](const std::string &location) -> std::string {
+      .action([this](std::string_view location) -> void {
           const std::filesystem::path input_path{ location };
 
           if (!std::filesystem::exists(input_path)) {
@@ -72,22 +72,21 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
           }
 
           input_path_ = std::filesystem::canonical(input_path);
-          return location;
       });
 
-    program.add_argument("-w", std::string(FLAG_WRITE))
+    program.add_argument("-w", FLAG_WRITE)
       .help("Overwrites the input file with formatted content")
       .default_value(false)
       .implicit_value(true);
 
-    program.add_argument("-c", std::string(FLAG_CHECK))
+    program.add_argument("-c", FLAG_CHECK)
       .help("Checks if the file is formatted correctly without modifying it")
       .default_value(false)
       .implicit_value(true);
 
-    program.add_argument("-l", std::string(FLAG_LOCATION))
+    program.add_argument("-l", FLAG_LOCATION)
       .help("Path to the configuration file (e.g., /path/to/vhdl-fmt.yaml)")
-      .action([this](const std::string &location) -> std::string {
+      .action([this](std::string_view location) -> void {
           const std::filesystem::path config_path{ location };
 
           if (!std::filesystem::exists(config_path)) {
@@ -101,7 +100,6 @@ auto ArgumentParser::parseArguments(std::span<char *> args) -> void
           }
 
           config_file_path_ = std::filesystem::canonical(config_path);
-          return location;
       });
 
     try {

@@ -23,12 +23,12 @@ void DebugPrinter::printLine(std::string_view s) const
 }
 
 void DebugPrinter::printNodeHeader(const ast::NodeBase &n,
-                                   const std::string &extra,
+                                   std::string_view extra,
                                    std::string_view name_override,
                                    const std::size_t leading_breaks) const
 {
     printIndent();
-    out_ << (!name_override.empty() ? std::string{ name_override } : typeid(n).name());
+    out_ << (!name_override.empty() ? std::string_view{ name_override } : typeid(n).name());
 
     if (!extra.empty()) {
         out_ << " [" << extra << "]";

@@ -174,7 +174,7 @@ SCENARIO("ConfigReader handles configuration file reading")
     GIVEN("An invalid configuration parameter")
     {
         auto [description, content, expected_error]
-          = GENERATE(table<std::string, std::string, std::string>({
+          = GENERATE(table<std::string_view, std::string, std::string_view>({
             { "line length too small",
              "line_length: 9\n",                                         "Line length must be between 10 and 200"          },
             { "line length too large",

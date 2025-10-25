@@ -12,7 +12,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iosfwd>
-#include <string>
 #include <string_view>
 #include <vector>
 
@@ -69,7 +68,7 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
     void printLine(std::string_view s) const;
 
     void printNodeHeader(const ast::NodeBase &n,
-                         const std::string &extra,
+                         std::string_view extra,
                          std::string_view name_override,
                          std::size_t leading_breaks) const;
 
@@ -79,7 +78,7 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
                            std::string_view prefix) const;
 
     template<class NodeT>
-    void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra)
+    void emitNodeLike(const NodeT &node, std::string_view pretty_name, std::string_view extra)
     {
         printNodeHeader(node, extra, pretty_name, 0);
 

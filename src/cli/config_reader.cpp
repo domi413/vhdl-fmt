@@ -97,7 +97,7 @@ inline auto getNestedNode(const YAML::Node &parent, std::string_view path) -> YA
         return YAML::Node{};
     }
 
-    const YAML::Node node = parent[std::string{ path }];
+    const YAML::Node node = parent[path];
     return isValid(node) ? node : YAML::Node{};
 }
 
@@ -137,7 +137,7 @@ inline auto parseAndMapYamlValue(const YAML::Node &node,
                                  const std::array<std::pair<std::string_view, T>, N> &map,
                                  std::string_view error_context) -> std::optional<T>
 {
-    if (auto value_str = tryParseYaml<std::string>(node[std::string{ key }], key)) {
+    if (auto value_str = tryParseYaml<std::string>(node[key], key)) {
         return mapValueToConfig(*value_str, map, error_context);
     }
     return std::nullopt;
@@ -268,7 +268,7 @@ auto ConfigReader::readPortMapConfig(const YAML::Node &root_node,
 
     if (isValid(port_map_node)) {
         for (const auto &[key, member_ptr] : PORT_MAP_ASSIGNMENTS_MAP) {
-            if (auto value = tryParseYaml<bool>(port_map_node[std::string{ key }], key)) {
+            if (auto value = tryParseYaml<bool>(port_map_node[key], key)) {
                 port_map.*member_ptr = *value;
             }
         }
@@ -288,7 +288,7 @@ auto ConfigReader::readDeclarationConfig(const YAML::Node &root_node,
 
     if (isValid(declarations_node)) {
         for (const auto &[key, member_ptr] : DECLARATION_ASSIGNMENTS_MAP) {
-            if (auto value = tryParseYaml<bool>(declarations_node[std::string{ key }], key)) {
+            if (auto value = tryParseYaml<bool>(declarations_node[key], key)) {
                 declarations.*member_ptr = *value;
             }
         }
