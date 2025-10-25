@@ -8,14 +8,6 @@
 
 namespace builder {
 
-namespace {
-auto tryMakeSequentialStatement(Translator &trans, vhdlParser::Sequential_statementContext *stmt)
-  -> std::optional<ast::SequentialStatement>
-{
-    return SequentialStatementVisitor::translate(trans, stmt);
-}
-} // anonymous namespace
-
 auto Translator::makeConcurrentAssign(
   vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
 {
@@ -191,7 +183,7 @@ auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::
     // Extract sequential statements
     if (auto *stmt_part = ctx->process_statement_part()) {
         for (auto *stmt : stmt_part->sequential_statement()) {
-            if (auto result = tryMakeSequentialStatement(*this, stmt)) {
+            if (auto result = SequentialStatementVisitor::translate(*this, stmt)) {
                 proc.body.emplace_back(std::move(*result));
             }
         }
@@ -266,7 +258,7 @@ auto Translator::makeSequenceOfStatements(vhdlParser::Sequence_of_statementsCont
     std::vector<ast::SequentialStatement> statements;
 
     for (auto *stmt : ctx->sequential_statement()) {
-        if (auto result = tryMakeSequentialStatement(*this, stmt)) {
+        if (auto result = SequentialStatementVisitor::translate(*this, stmt)) {
             statements.emplace_back(std::move(*result));
         }
     }
