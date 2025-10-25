@@ -1,8 +1,10 @@
-#pragma once
+#ifndef BUILDER_TYPED_VISITOR_HPP
+#define BUILDER_TYPED_VISITOR_HPP
 
 #include "vhdlParserBaseVisitor.h"
 
 #include <optional>
+#include <tree/ParseTree.h>
 
 namespace builder {
 
@@ -11,12 +13,6 @@ namespace builder {
 // This template provides a type-safe wrapper around ANTLR's visitor pattern.
 // Instead of returning std::any everywhere, you specify your actual return type
 // and use setResult() to populate it in a type-safe manner.
-//
-// Benefits:
-// ✓ Type safety: Compile-time checking of return types
-// ✓ Clean API: Public translate() returns the actual type, not std::any
-// ✓ Zero overhead: Uses ANTLR's existing virtual dispatch
-// ✓ Reusable: Works for any ANTLR visitor pattern
 //
 // Usage pattern:
 //   class MyVisitor : public TypedVisitor<MyVisitor, MyReturnType> {
@@ -40,7 +36,7 @@ class TypedVisitor : public vhdlParserBaseVisitor
     // Not copyable - visitors are single-use with reference members
     TypedVisitor(const TypedVisitor &) = delete;
     auto operator=(const TypedVisitor &) -> TypedVisitor & = delete;
-    
+
     // Not movable - no need to move, used immediately after construction
     TypedVisitor(TypedVisitor &&) = delete;
     auto operator=(TypedVisitor &&) -> TypedVisitor & = delete;
@@ -53,12 +49,12 @@ class TypedVisitor : public vhdlParserBaseVisitor
     auto translate(antlr4::tree::ParseTree *tree) -> std::optional<ReturnType>
     {
         result_value_.reset();
-        visit(tree); // ANTLR's dispatch magic happens here
+        visit(tree); // ANTLR's dispatch happens here
         return std::move(result_value_);
     }
 
   protected:
-    // Protected constructor - only derived classes can instantiate
+    // Only derived classes should instantiate
     TypedVisitor() = default;
 
     // Type-safe result setter - called by derived class visit methods
@@ -71,3 +67,5 @@ class TypedVisitor : public vhdlParserBaseVisitor
 };
 
 } // namespace builder
+
+#endif // BUILDER_TYPED_VISITOR_HPP

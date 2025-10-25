@@ -1,10 +1,15 @@
-#pragma once
+#ifndef BUILDER_CONCURRENT_ASSIGNMENT_VISITOR_HPP
+#define BUILDER_CONCURRENT_ASSIGNMENT_VISITOR_HPP
 
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
 #include "builder/typed_visitor.hpp"
 #include "builder/visitors/target_visitor.hpp"
+#include "vhdlParser.h"
 
+#include <any>
+#include <optional>
+#include <utility>
 namespace builder {
 
 // CRTP-based visitor for concurrent signal assignments
@@ -16,7 +21,7 @@ namespace builder {
 //
 // Usage:
 //   auto assign = ConcurrentAssignmentVisitor::translate(translator, ctx);
-class ConcurrentAssignmentVisitor
+class ConcurrentAssignmentVisitor final
   : public TypedVisitor<ConcurrentAssignmentVisitor, ast::ConcurrentAssign>
 {
     Translator &trans_;
@@ -34,8 +39,8 @@ class ConcurrentAssignmentVisitor
     }
 
   private:
-    auto visitConditional_signal_assignment(
-      vhdlParser::Conditional_signal_assignmentContext *ctx) -> std::any override
+    auto visitConditional_signal_assignment(vhdlParser::Conditional_signal_assignmentContext *ctx)
+      -> std::any override
     {
         ast::ConcurrentAssign assign;
 
@@ -59,8 +64,8 @@ class ConcurrentAssignmentVisitor
         return {};
     }
 
-    auto visitSelected_signal_assignment(
-      vhdlParser::Selected_signal_assignmentContext *ctx) -> std::any override
+    auto visitSelected_signal_assignment(vhdlParser::Selected_signal_assignmentContext *ctx)
+      -> std::any override
     {
         ast::ConcurrentAssign assign;
 
@@ -88,3 +93,5 @@ class ConcurrentAssignmentVisitor
 };
 
 } // namespace builder
+
+#endif // BUILDER_CONCURRENT_ASSIGNMENT_VISITOR_HPP

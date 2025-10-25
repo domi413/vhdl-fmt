@@ -1,9 +1,14 @@
+#include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
 #include "builder/visitors/concurrent_assignment_visitor.hpp"
 #include "builder/visitors/sequential_statement_visitor.hpp"
 #include "builder/visitors/target_visitor.hpp"
 #include "vhdlParser.h"
+
+#include <cstddef>
+#include <utility>
+#include <vector>
 
 // NOLINTBEGIN(misc-no-recursion)
 
@@ -16,7 +21,7 @@ auto Translator::makeConcurrentAssign(
         trivia_.bind(*result, ctx);
         return std::move(*result);
     }
-    
+
     // Fallback: return empty assignment if visitor didn't handle it
     ast::ConcurrentAssign assign;
     trivia_.bind(assign, ctx);
@@ -80,7 +85,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
 
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
     // If there's an else, the last sequence doesn't have a condition
-    size_t num_elsif = conditions.size() - 1;
+    const size_t num_elsif = conditions.size() - 1;
 
     for (size_t i = 0; i < num_elsif; ++i) {
         ast::IfStatement::Branch elsif_branch;

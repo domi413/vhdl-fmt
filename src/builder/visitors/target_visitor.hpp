@@ -1,8 +1,13 @@
-#pragma once
+#ifndef BUILDER_TARGET_VISITOR_HPP
+#define BUILDER_TARGET_VISITOR_HPP
 
 #include "ast/nodes/expressions.hpp"
 #include "builder/translator.hpp"
 #include "builder/typed_visitor.hpp"
+#include "vhdlParser.h"
+
+#include <any>
+#include <optional>
 
 namespace builder {
 
@@ -31,17 +36,15 @@ class TargetVisitor : public TypedVisitor<TargetVisitor, ast::Expr>
     }
 
   private:
-    friend class TypedVisitor<TargetVisitor, ast::Expr>;
-
     // Target can be a name
-    std::any visitName(vhdlParser::NameContext *ctx) override
+    auto visitName(vhdlParser::NameContext *ctx) -> std::any override
     {
         setResult(trans_.makeName(ctx));
         return {};
     }
 
     // Target can be an aggregate
-    std::any visitAggregate(vhdlParser::AggregateContext *ctx) override
+    auto visitAggregate(vhdlParser::AggregateContext *ctx) -> std::any override
     {
         setResult(trans_.makeAggregate(ctx));
         return {};
@@ -49,3 +52,5 @@ class TargetVisitor : public TypedVisitor<TargetVisitor, ast::Expr>
 };
 
 } // namespace builder
+
+#endif // BUILDER_TARGET_VISITOR_HPP

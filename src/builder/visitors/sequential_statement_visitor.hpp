@@ -1,8 +1,13 @@
-#pragma once
+#ifndef BUILDER_SEQUENTIAL_STATEMENT_VISITOR_HPP
+#define BUILDER_SEQUENTIAL_STATEMENT_VISITOR_HPP
 
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
 #include "builder/typed_visitor.hpp"
+#include "vhdlParser.h"
+
+#include <any>
+#include <optional>
 
 namespace builder {
 
@@ -19,7 +24,7 @@ namespace builder {
 // The visitor automatically dispatches to the correct visitXXX() method
 // based on the parse tree node type, and each method returns the proper
 // AST statement type directly.
-class SequentialStatementVisitor
+class SequentialStatementVisitor final
   : public TypedVisitor<SequentialStatementVisitor, ast::SequentialStatement>
 {
     Translator &trans_;
@@ -36,15 +41,15 @@ class SequentialStatementVisitor
     }
 
   private:
-    auto visitSignal_assignment_statement(
-      vhdlParser::Signal_assignment_statementContext *ctx) -> std::any override
+    auto visitSignal_assignment_statement(vhdlParser::Signal_assignment_statementContext *ctx)
+      -> std::any override
     {
         setResult(trans_.makeSequentialAssign(ctx));
         return {};
     }
 
-    auto visitVariable_assignment_statement(
-      vhdlParser::Variable_assignment_statementContext *ctx) -> std::any override
+    auto visitVariable_assignment_statement(vhdlParser::Variable_assignment_statementContext *ctx)
+      -> std::any override
     {
         setResult(trans_.makeVariableAssign(ctx));
         return {};
@@ -80,3 +85,5 @@ class SequentialStatementVisitor
 };
 
 } // namespace builder
+
+#endif // BUILDER_SEQUENTIAL_STATEMENT_VISITOR_HPP

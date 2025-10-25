@@ -5,10 +5,12 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
+#include "ast/nodes/statements.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "vhdlParser.h"
 
 #include <CommonTokenStream.h>
+#include <vector>
 
 namespace builder {
 
