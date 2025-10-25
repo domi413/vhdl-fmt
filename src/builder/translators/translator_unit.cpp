@@ -75,14 +75,20 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
             } else if (auto *sig_ctx = item->signal_declaration()) {
                 arch.decls.emplace_back(makeSignalDecl(sig_ctx));
             }
-            // Add more declaration types as needed (variables, types, subprograms, etc.)
+            // TODO(user): Add more declaration types as needed (variables, types, subprograms, etc.)
         }
     }
 
-    // TODO(user): Walk statement part similarly when statement support is added
+    // Walk statement part and collect concurrent statements
     if (auto *stmt_part = ctx->architecture_statement_part()) {
-        // For now, just acknowledge it exists
-        (void)stmt_part;
+        for (auto *stmt : stmt_part->architecture_statement()) {
+            if (auto *proc = stmt->process_statement()) {
+                arch.stmts.emplace_back(makeProcess(proc));
+            } else if (auto *sig_assign = stmt->concurrent_signal_assignment_statement()) {
+                arch.stmts.emplace_back(makeConcurrentAssign(sig_assign));
+            }
+            // TODO(user): Add more concurrent statement types (component instantiation, generate, etc.)
+        }
     }
 
     return arch;

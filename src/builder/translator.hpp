@@ -63,6 +63,30 @@ class Translator final
     [[nodiscard]]
     auto makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl;
 
+    // Statements - return by value
+    [[nodiscard]]
+    auto makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_statementContext *ctx)
+      -> ast::ConcurrentAssign;
+    [[nodiscard]]
+    auto makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
+      -> ast::SequentialAssign;
+    [[nodiscard]]
+    auto makeVariableAssign(vhdlParser::Variable_assignment_statementContext *ctx)
+      -> ast::SequentialAssign;
+    [[nodiscard]]
+    auto makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::IfStatement;
+    [[nodiscard]]
+    auto makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> ast::CaseStatement;
+    [[nodiscard]]
+    auto makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::Process;
+    [[nodiscard]]
+    auto makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::ForLoop;
+    [[nodiscard]]
+    auto makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::WhileLoop;
+    [[nodiscard]]
+    auto makeSequenceOfStatements(vhdlParser::Sequence_of_statementsContext *ctx)
+      -> std::vector<ast::SequentialStatement>;
+
     // Expressions - return by value
     [[nodiscard]]
     auto makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr;
@@ -86,6 +110,8 @@ class Translator final
     auto makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr;
     [[nodiscard]]
     auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeName(vhdlParser::NameContext *ctx) -> ast::Expr;
 };
 
 } // namespace builder

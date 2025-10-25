@@ -4,6 +4,7 @@ add_library(
     ast_builder.cpp
     translators/translator_decl.cpp
     translators/translator_expr.cpp
+    translators/translator_stmt.cpp
     translators/translator_unit.cpp
     trivia/trivia_binder.cpp
 )

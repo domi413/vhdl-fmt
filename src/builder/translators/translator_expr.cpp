@@ -129,10 +129,90 @@ auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
         return makeAggregate(ctx->aggregate());
     }
 
+    if (auto *name_ctx = ctx->name()) {
+        return makeName(name_ctx);
+    }
+
     ast::TokenExpr tok;
     trivia_.bind(tok, ctx);
     tok.text = ctx->getText();
     return tok;
+}
+
+auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
+{
+    // Base name (identifier or string literal)
+    ast::Expr base;
+    if (ctx->identifier() != nullptr) {
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = ctx->identifier()->getText();
+        base = tok;
+    } else if (ctx->STRING_LITERAL() != nullptr) {
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = ctx->STRING_LITERAL()->getText();
+        base = tok;
+    } else {
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = ctx->getText();
+        return tok;
+    }
+
+    // Process name_parts (selections, slices, function calls, attributes)
+    for (auto *part : ctx->name_part()) {
+        if (auto *slice = part->slice_name_part()) {
+            // This is a slice: name(range)
+            ast::BinaryExpr slice_expr;
+            trivia_.bind(slice_expr, part);
+            slice_expr.op = "()"; // Use () as operator for slice/index
+            slice_expr.left = box(std::move(base));
+            if (auto *dr = slice->discrete_range()) {
+                if (auto *rd = dr->range_decl()) {
+                    if (auto *er = rd->explicit_range()) {
+                        slice_expr.right = box(makeRange(er));
+                    } else {
+                        // It's a name-based range
+                        ast::TokenExpr tok;
+                        trivia_.bind(tok, rd);
+                        tok.text = rd->getText();
+                        slice_expr.right = box(ast::Expr{ std::move(tok) });
+                    }
+                } else if (auto *subtype = dr->subtype_indication()) {
+                    ast::TokenExpr tok;
+                    trivia_.bind(tok, subtype);
+                    tok.text = subtype->getText();
+                    slice_expr.right = box(ast::Expr{ std::move(tok) });
+                }
+            }
+            base = ast::Expr{ std::move(slice_expr) };
+        } else if (auto *selected = part->selected_name_part()) {
+            // This is a selection: name.suffix
+            ast::BinaryExpr sel_expr;
+            trivia_.bind(sel_expr, part);
+            sel_expr.op = ".";
+            sel_expr.left = box(std::move(base));
+            ast::TokenExpr tok;
+            trivia_.bind(tok, part);
+            tok.text = part->getText().substr(1); // Remove leading dot
+            sel_expr.right = box(ast::Expr{ std::move(tok) });
+            base = ast::Expr{ std::move(sel_expr) };
+        } else {
+            // For function calls, indexed names, and attributes, just append as text for now
+            ast::BinaryExpr call_expr;
+            trivia_.bind(call_expr, part);
+            call_expr.op = "()";
+            call_expr.left = box(std::move(base));
+            ast::TokenExpr tok;
+            trivia_.bind(tok, part);
+            tok.text = part->getText();
+            call_expr.right = box(ast::Expr{ std::move(tok) });
+            base = ast::Expr{ std::move(call_expr) };
+        }
+    }
+
+    return base;
 }
 
 auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
@@ -208,6 +288,11 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
 
 auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr
 {
+    // If there's no direction, it's just a simple expression (single value, not a range)
+    if (ctx->direction() == nullptr || ctx->simple_expression().size() < 2) {
+        return makeSimpleExpr(ctx->simple_expression(0));
+    }
+
     ast::BinaryExpr range;
     trivia_.bind(range, ctx);
     range.op = ctx->direction()->getText();
