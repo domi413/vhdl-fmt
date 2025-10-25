@@ -1,11 +1,11 @@
 #include "ast/nodes/design_units.hpp"
+#include "builder/ast_builder.hpp"
 #include "test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 #include <variant>
 
-using test_utils::buildAstFromSource;
 using test_utils::leadingComments;
 using test_utils::trailingComments;
 
@@ -20,8 +20,8 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
         entity MyEntity is end MyEntity;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design->units.data());
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 
@@ -48,8 +48,8 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
         end Example;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design->units.data());
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->generic_clause.generics.size() == 1);
 
@@ -84,8 +84,8 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
         end Example;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design->units.data());
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 2);
 

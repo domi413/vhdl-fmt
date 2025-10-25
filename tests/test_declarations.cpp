@@ -1,14 +1,11 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "test_utils.hpp"
+#include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
 #include <string_view>
 #include <variant>
-
-using test_utils::buildAstFromSource;
 
 // -----------------------------------------------------------------------------
 // Architecture declarations: signals and constants
@@ -24,10 +21,10 @@ TEST_CASE("Architecture captures signal declarations", "[declarations][architect
         end A;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    REQUIRE(design->units.size() == 2);
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 2);
 
@@ -59,10 +56,10 @@ TEST_CASE("Architecture captures constant declarations", "[declarations][archite
         end A;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    REQUIRE(design->units.size() == 2);
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 2);
 
@@ -96,10 +93,10 @@ TEST_CASE("Architecture captures mixed declarations", "[declarations][architectu
         end A;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    REQUIRE(design->units.size() == 2);
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 4);
 
@@ -132,10 +129,10 @@ TEST_CASE("Architecture with no declarations", "[declarations][architecture]")
         end A;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    REQUIRE(design->units.size() == 2);
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
 
-    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.empty());
 }
@@ -150,8 +147,8 @@ TEST_CASE("Signal with multiple names", "[declarations][signal]")
         end A;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 
@@ -174,8 +171,8 @@ TEST_CASE("Constant with multiple names", "[declarations][constant]")
         end A;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design->units[1]);
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 

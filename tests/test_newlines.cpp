@@ -1,14 +1,11 @@
 #include "ast/node.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "test_utils.hpp"
+#include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <memory>
 #include <string_view>
 #include <variant>
-
-using test_utils::buildAstFromSource;
 
 // -----------------------------------------------------------------------------
 // Leading trivia: pure blank lines between comments are preserved as Newlines
@@ -23,8 +20,8 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
         entity E is end E;
     )";
 
-    auto design = buildAstFromSource(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design->units.data());
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 

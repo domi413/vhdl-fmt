@@ -47,9 +47,9 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     return root;
 }
 
-auto buildFromString(std::string_view &vhdl_code) -> ast::DesignFile
+auto buildFromString(std::string_view vhdl_code) -> ast::DesignFile
 {
-    std::istringstream stream(static_cast<std::string>(vhdl_code));
+    std::istringstream stream{ std::string(vhdl_code) };
     return buildFromStream(stream);
 }
 
