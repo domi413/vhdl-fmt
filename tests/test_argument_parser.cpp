@@ -8,6 +8,7 @@
 #include <optional>
 #include <span>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace {
@@ -52,7 +53,7 @@ TEST_CASE("ArgumentParser with valid arguments including all options", "[argumen
     const auto c_args = createArgs(args);
     const std::span<const char *const> args_span{ c_args };
 
-    cli::ArgumentParser parser{ args_span };
+    const cli::ArgumentParser parser{ args_span };
 
     REQUIRE(parser.getInputPath() == std::filesystem::canonical(temp_input));
     REQUIRE(parser.getConfigPath().has_value());
@@ -82,7 +83,7 @@ TEST_CASE("ArgumentParser with valid arguments minimal options", "[argument_pars
     const auto c_args = createArgs(args);
     const std::span<const char *const> args_span{ c_args };
 
-    cli::ArgumentParser parser{ args_span };
+    const cli::ArgumentParser parser{ args_span };
 
     REQUIRE(parser.getInputPath() == std::filesystem::canonical(temp_input));
     REQUIRE_FALSE(parser.getConfigPath().has_value());
@@ -198,7 +199,7 @@ TEST_CASE("ArgumentParser with flags set correctly", "[argument_parser]")
     const auto c_args = createArgs(args);
     const std::span<const char *const> args_span(c_args);
 
-    cli::ArgumentParser parser{ args_span };
+    const cli::ArgumentParser parser{ args_span };
 
     INFO(std::format(
       "Expected WRITE: {}, got: {}", write_set, parser.isFlagSet(cli::ArgumentFlag::WRITE)));
