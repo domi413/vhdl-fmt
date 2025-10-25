@@ -34,30 +34,40 @@ namespace builder {
 template<typename Derived, typename ReturnType>
 class TypedVisitor : public vhdlParserBaseVisitor
 {
-  protected:
-    std::optional<ReturnType> result_;
-
-    // Protected constructor - only derived classes can instantiate
-    TypedVisitor() = default;
-
   public:
+    ~TypedVisitor() override = default;
+
+    // Not copyable - visitors are single-use with reference members
+    TypedVisitor(const TypedVisitor &) = delete;
+    auto operator=(const TypedVisitor &) -> TypedVisitor & = delete;
+    
+    // Not movable - no need to move, used immediately after construction
+    TypedVisitor(TypedVisitor &&) = delete;
+    auto operator=(TypedVisitor &&) -> TypedVisitor & = delete;
+
     // Main entry point: visit tree and return typed result
     //
     // This calls ANTLR's visit() which dispatches to visitXXX() methods.
     // The derived class's visitXXX() methods should call setResult() to
-    // populate result_ with the translated value.
+    // populate result with the translated value.
     auto translate(antlr4::tree::ParseTree *tree) -> std::optional<ReturnType>
     {
-        result_.reset();
+        result_value_.reset();
         visit(tree); // ANTLR's dispatch magic happens here
-        return std::move(result_);
+        return std::move(result_value_);
     }
 
   protected:
-    // Type-safe result setter - called by derived class visit methods
-    void setResult(ReturnType &&value) { result_ = std::move(value); }
+    // Protected constructor - only derived classes can instantiate
+    TypedVisitor() = default;
 
-    void setResult(const ReturnType &value) { result_ = value; }
+    // Type-safe result setter - called by derived class visit methods
+    void setResult(ReturnType &&value) { result_value_ = std::move(value); }
+
+    void setResult(const ReturnType &value) { result_value_ = value; }
+
+  private:
+    std::optional<ReturnType> result_value_;
 };
 
 } // namespace builder
