@@ -1,5 +1,6 @@
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
+#include "builder/visitors/concurrent_assignment_visitor.hpp"
 #include "builder/visitors/sequential_statement_visitor.hpp"
 #include "builder/visitors/target_visitor.hpp"
 #include "vhdlParser.h"
@@ -11,48 +12,14 @@ namespace builder {
 auto Translator::makeConcurrentAssign(
   vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
 {
+    if (auto result = ConcurrentAssignmentVisitor::translate(*this, ctx)) {
+        trivia_.bind(*result, ctx);
+        return std::move(*result);
+    }
+    
+    // Fallback: return empty assignment if visitor didn't handle it
     ast::ConcurrentAssign assign;
     trivia_.bind(assign, ctx);
-
-    // Handle conditional_signal_assignment
-    if (auto *cond = ctx->conditional_signal_assignment()) {
-        if (auto *target_ctx = cond->target()) {
-            if (auto target = TargetVisitor::translate(*this, target_ctx)) {
-                assign.target = std::move(*target);
-            }
-        }
-
-        // Get the waveform - for now we'll take the first waveform element's expression
-        if (auto *cond_wave = cond->conditional_waveforms()) {
-            if (auto *wave = cond_wave->waveform()) {
-                auto wave_elems = wave->waveform_element();
-                if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                    assign.value = makeExpr(wave_elems[0]->expression(0));
-                }
-            }
-        }
-    }
-    // Handle selected_signal_assignment
-    else if (auto *sel = ctx->selected_signal_assignment()) {
-        if (auto *target_ctx = sel->target()) {
-            if (auto target = TargetVisitor::translate(*this, target_ctx)) {
-                assign.target = std::move(*target);
-            }
-        }
-
-        // For selected assignments (with...select), we'll take the first waveform
-        // TODO(dyb): Handle full selected waveforms structure
-        if (auto *sel_waves = sel->selected_waveforms()) {
-            auto waves = sel_waves->waveform();
-            if (!waves.empty()) {
-                auto wave_elems = waves[0]->waveform_element();
-                if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                    assign.value = makeExpr(wave_elems[0]->expression(0));
-                }
-            }
-        }
-    }
-
     return assign;
 }
 
