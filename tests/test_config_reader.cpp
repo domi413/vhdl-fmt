@@ -9,7 +9,6 @@
 #include <format>
 #include <fstream>
 #include <optional>
-#include <string>
 #include <string_view>
 
 namespace {
@@ -21,7 +20,7 @@ constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem
 
 } // namespace
 
-TEST_CASE("ConfigReader with valid complete configuration file", "[config]")
+TEST_CASE("ConfigReader with valid complete configuration file")
 {
     const auto config_path = getConfigPath("valid_complete.yaml");
     cli::ConfigReader config_reader{ config_path };
@@ -44,7 +43,7 @@ TEST_CASE("ConfigReader with valid complete configuration file", "[config]")
     REQUIRE(config.casing.identifiers == common::CaseStyle::LOWER);
 }
 
-TEST_CASE("ConfigReader with empty configuration file", "[config]")
+TEST_CASE("ConfigReader with empty configuration file")
 {
     const auto config_path = getConfigPath("empty.yaml");
     cli::ConfigReader reader{ config_path };
@@ -67,7 +66,7 @@ TEST_CASE("ConfigReader with empty configuration file", "[config]")
     REQUIRE(config.casing.identifiers == common::CaseStyle::LOWER);
 }
 
-TEST_CASE("ConfigReader with non-existent configuration file", "[config]")
+TEST_CASE("ConfigReader with non-existent configuration file")
 {
     const auto config_path = getConfigPath("non_existent_file.yaml");
     cli::ConfigReader reader{ config_path };
@@ -79,7 +78,7 @@ TEST_CASE("ConfigReader with non-existent configuration file", "[config]")
     REQUIRE(error.message == "Config file does not exist at the defined location.");
 }
 
-TEST_CASE("ConfigReader with malformed YAML configuration file", "[config]")
+TEST_CASE("ConfigReader with malformed YAML configuration file")
 {
     const auto config_path = getConfigPath("malformed.yaml");
     cli::ConfigReader reader{ config_path };
@@ -91,11 +90,12 @@ TEST_CASE("ConfigReader with malformed YAML configuration file", "[config]")
     REQUIRE(error.message.contains("Error reading config file"));
 }
 
-TEST_CASE("ConfigReader with no config file path and no default config file", "[config]")
+TEST_CASE("ConfigReader with no config file path and no default config file")
 {
     // Temporarily change to a directory without vhdl-fmt.yaml
     const auto original_path = std::filesystem::current_path();
     const auto temp_dir = std::filesystem::temp_directory_path() / "test_no_config";
+
     std::filesystem::create_directories(temp_dir);
     std::filesystem::current_path(temp_dir);
 
@@ -115,25 +115,21 @@ TEST_CASE("ConfigReader with no config file path and no default config file", "[
     std::filesystem::remove_all(temp_dir);
 }
 
-TEST_CASE("ConfigReader with invalid configuration parameters", "[config]")
+TEST_CASE("ConfigReader with invalid configuration parameters")
 {
-    auto [description, content, expected_error]
-      = GENERATE(table<std::string_view, std::string_view, std::string_view>({
-        { "line length too small", "line_length: 9\n",               "Line length must be between 10 and 200"          },
-        { "line length too large", "line_length: 500\n",             "Line length must be between 10 and 200"          },
-        { "indent size too small",
-         "indentation:\n  size: 0\n",                                "Indent size must be between 1 and 16"            },
-        { "indent size too large",
-         "indentation:\n  size: 20\n",                               "Indent size must be between 1 and 16"            },
-        { "invalid indent style",
-         "indentation:\n  style: \"invalid_style\"\n",               "Invalid indentation style config: invalid_style" },
-        { "invalid end of line",
-         "end_of_line: \"invalid_eol\"\n",                           "Invalid end of line style config: invalid_eol"   },
-        { "invalid casing style",
-         "formatting:\n  casing:\n    keywords: \"invalid_case\"\n", "Invalid casing config: invalid_case"             }
+    // clang-format off
+    const auto [description, content, expected_error] = GENERATE(table<std::string_view, std::string_view, std::string_view>({
+        { "line length too small", "line_length: 9",                                         "Line length must be between 10 and 200"          },
+        { "line length too large", "line_length: 500",                                       "Line length must be between 10 and 200"          },
+        { "indent size too small", "indentation:\n  size: 0",                                "Indent size must be between 1 and 16"            },
+        { "indent size too large", "indentation:\n  size: 20",                               "Indent size must be between 1 and 16"            },
+        { "invalid indent style",  "indentation:\n  style: \"invalid_style\"",               "Invalid indentation style config: invalid_style" },
+        { "invalid end of line",   "end_of_line: \"invalid_eol\"",                           "Invalid end of line style config: invalid_eol"   },
+        { "invalid casing style",  "formatting:\n  casing:\n    keywords: \"invalid_case\"", "Invalid casing config: invalid_case"             }
     }));
+    // clang-format on
 
-    const auto temp_path = std::filesystem::temp_directory_path() / "test_invalid_config.yaml";
+    const auto temp_path = std::filesystem::temp_directory_path() / "test_valid_config.yaml";
     {
         std::ofstream temp_file{ temp_path };
         temp_file << content;
@@ -144,12 +140,14 @@ TEST_CASE("ConfigReader with invalid configuration parameters", "[config]")
 
     INFO("Description: " << description);
     INFO("Content: " << content);
+
     if (result.has_value()) {
         INFO("Unexpectedly succeeded - config was accepted");
         const auto &config = result.value();
         INFO("Line length: " << static_cast<int>(config.line_config.line_length));
         INFO("Indent size: " << static_cast<int>(config.line_config.indent_size));
     }
+
     REQUIRE_FALSE(result.has_value());
     const auto &error = result.error();
     INFO("Expected: " << expected_error);
@@ -160,18 +158,18 @@ TEST_CASE("ConfigReader with invalid configuration parameters", "[config]")
     std::filesystem::remove(temp_path);
 }
 
-TEST_CASE("ConfigReader with boundary values for line length and indent size", "[config]")
+TEST_CASE("ConfigReader with boundary values for line length and indent size")
 {
-    auto [description, content, expected_value, expected_field]
-      = GENERATE(table<std::string_view, std::string_view, std::uint8_t, std::string_view>({
-        { "line length minimum (10)",  "line_length: 10\n",          10,  "line_length" },
-        { "line length maximum (200)", "line_length: 200\n",         200, "line_length" },
-        { "indent size minimum (1)",   "indentation:\n  size: 1\n",  1,   "indent_size" },
-        { "indent size maximum (16)",  "indentation:\n  size: 16\n", 16,  "indent_size" }
+    const auto [content, expected_value, expected_field]
+      = GENERATE(table<std::string_view, std::uint8_t, std::string_view>({
+        { "line_length: 10",          10,  "line_length" },
+        { "line_length: 200",         200, "line_length" },
+        { "indentation:\n  size: 1",  1,   "indent_size" },
+        { "indentation:\n  size: 16", 16,  "indent_size" }
     }));
 
-    const auto temp_path = std::filesystem::temp_directory_path()
-                         / std::format("test_{}.yaml", std::to_string(expected_value));
+    const auto temp_path
+      = std::filesystem::temp_directory_path() / std::format("test_{}.yaml", expected_value);
     {
         std::ofstream temp_file{ temp_path };
         temp_file << content;
