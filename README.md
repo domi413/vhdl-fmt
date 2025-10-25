@@ -2,6 +2,8 @@
 
 > A fast, modern and configurable VHDL code formatter built to improve readability and consistency in your projects.
 
+** NOTE: The formatter does not work yet and is still under development.**
+
 ## Installation
 
 **TODO**
@@ -78,10 +80,10 @@ To ensure consistent code quality across contributions, the following tools are 
 - `clang` (`clang`, `clang-format`, `clang-tidy`)
 - `cmake`
 - `conan`
-- `germesi`
+- `gersemi`
 - `ninja`
 
 **NOTE:**
 
 - `clang` version 20 is required. This might not be the latest version on some Linux distributions.
-- `germesi` and `clang-format` are not strictly required for development, but the CI pipeline will fail if files are not formatted correctly.
+- `gersemi` and `clang-format` are not strictly required for development, but the CI pipeline will fail if files are not formatted correctly.
