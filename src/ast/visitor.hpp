@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include "nodes/design_file.hpp"
 
+#include <concepts>
 #include <ranges>
 #include <type_traits>
 #include <variant>
