@@ -75,7 +75,8 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
             } else if (auto *sig_ctx = item->signal_declaration()) {
                 arch.decls.emplace_back(makeSignalDecl(sig_ctx));
             }
-            // TODO(user): Add more declaration types as needed (variables, types, subprograms, etc.)
+            // TODO(user): Add more declaration types as needed (variables, types, subprograms,
+            // etc.)
         }
     }
 
@@ -87,7 +88,8 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
             } else if (auto *sig_assign = stmt->concurrent_signal_assignment_statement()) {
                 arch.stmts.emplace_back(makeConcurrentAssign(sig_assign));
             }
-            // TODO(user): Add more concurrent statement types (component instantiation, generate, etc.)
+            // TODO(user): Add more concurrent statement types (component instantiation, generate,
+            // etc.)
         }
     }
 

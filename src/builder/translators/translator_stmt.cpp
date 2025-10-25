@@ -1,13 +1,23 @@
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
+#include "builder/visitors/sequential_statement_visitor.hpp"
+#include "builder/visitors/target_visitor.hpp"
 #include "vhdlParser.h"
 
 // NOLINTBEGIN(misc-no-recursion)
 
 namespace builder {
 
-auto Translator::makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_statementContext *ctx)
-  -> ast::ConcurrentAssign
+namespace {
+auto tryMakeSequentialStatement(Translator &trans, vhdlParser::Sequential_statementContext *stmt)
+  -> std::optional<ast::SequentialStatement>
+{
+    return SequentialStatementVisitor::translate(trans, stmt);
+}
+} // anonymous namespace
+
+auto Translator::makeConcurrentAssign(
+  vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
 {
     ast::ConcurrentAssign assign;
     trivia_.bind(assign, ctx);
@@ -15,13 +25,8 @@ auto Translator::makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_s
     // Handle conditional_signal_assignment
     if (auto *cond = ctx->conditional_signal_assignment()) {
         if (auto *target_ctx = cond->target()) {
-            if (auto *name_ctx = target_ctx->name()) {
-                ast::TokenExpr tok;
-                trivia_.bind(tok, name_ctx);
-                tok.text = name_ctx->getText();
-                assign.target = tok;
-            } else if (auto *agg_ctx = target_ctx->aggregate()) {
-                assign.target = makeAggregate(agg_ctx);
+            if (auto target = TargetVisitor::translate(*this, target_ctx)) {
+                assign.target = std::move(*target);
             }
         }
 
@@ -29,7 +34,7 @@ auto Translator::makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_s
         if (auto *cond_wave = cond->conditional_waveforms()) {
             if (auto *wave = cond_wave->waveform()) {
                 auto wave_elems = wave->waveform_element();
-                if (!wave_elems.empty() && wave_elems[0]->expression().size() > 0) {
+                if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
                     assign.value = makeExpr(wave_elems[0]->expression(0));
                 }
             }
@@ -38,13 +43,8 @@ auto Translator::makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_s
     // Handle selected_signal_assignment
     else if (auto *sel = ctx->selected_signal_assignment()) {
         if (auto *target_ctx = sel->target()) {
-            if (auto *name_ctx = target_ctx->name()) {
-                ast::TokenExpr tok;
-                trivia_.bind(tok, name_ctx);
-                tok.text = name_ctx->getText();
-                assign.target = tok;
-            } else if (auto *agg_ctx = target_ctx->aggregate()) {
-                assign.target = makeAggregate(agg_ctx);
+            if (auto target = TargetVisitor::translate(*this, target_ctx)) {
+                assign.target = std::move(*target);
             }
         }
 
@@ -54,7 +54,7 @@ auto Translator::makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_s
             auto waves = sel_waves->waveform();
             if (!waves.empty()) {
                 auto wave_elems = waves[0]->waveform_element();
-                if (!wave_elems.empty() && wave_elems[0]->expression().size() > 0) {
+                if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
                     assign.value = makeExpr(wave_elems[0]->expression(0));
                 }
             }
@@ -71,19 +71,14 @@ auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementCon
     trivia_.bind(assign, ctx);
 
     if (auto *target_ctx = ctx->target()) {
-        if (auto *name_ctx = target_ctx->name()) {
-            ast::TokenExpr tok;
-            trivia_.bind(tok, name_ctx);
-            tok.text = name_ctx->getText();
-            assign.target = tok;
-        } else if (auto *agg_ctx = target_ctx->aggregate()) {
-            assign.target = makeAggregate(agg_ctx);
+        if (auto target = TargetVisitor::translate(*this, target_ctx)) {
+            assign.target = std::move(*target);
         }
     }
 
     if (auto *wave = ctx->waveform()) {
         auto wave_elems = wave->waveform_element();
-        if (!wave_elems.empty() && wave_elems[0]->expression().size() > 0) {
+        if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
             assign.value = makeExpr(wave_elems[0]->expression(0));
         }
     }
@@ -98,13 +93,8 @@ auto Translator::makeVariableAssign(vhdlParser::Variable_assignment_statementCon
     trivia_.bind(assign, ctx);
 
     if (auto *target_ctx = ctx->target()) {
-        if (auto *name_ctx = target_ctx->name()) {
-            ast::TokenExpr tok;
-            trivia_.bind(tok, name_ctx);
-            tok.text = name_ctx->getText();
-            assign.target = tok;
-        } else if (auto *agg_ctx = target_ctx->aggregate()) {
-            assign.target = makeAggregate(agg_ctx);
+        if (auto target = TargetVisitor::translate(*this, target_ctx)) {
+            assign.target = std::move(*target);
         }
     }
 
@@ -132,7 +122,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
     // If there's an else, the last sequence doesn't have a condition
     size_t num_elsif = conditions.size() - 1;
-    
+
     for (size_t i = 0; i < num_elsif; ++i) {
         ast::IfStatement::Branch elsif_branch;
         elsif_branch.condition = makeExpr(conditions[i + 1]->expression());
@@ -201,23 +191,8 @@ auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::
     // Extract sequential statements
     if (auto *stmt_part = ctx->process_statement_part()) {
         for (auto *stmt : stmt_part->sequential_statement()) {
-            if (auto *sig_assign = stmt->signal_assignment_statement()) {
-                proc.body.emplace_back(makeSequentialAssign(sig_assign));
-            } else if (auto *var_assign = stmt->variable_assignment_statement()) {
-                proc.body.emplace_back(makeVariableAssign(var_assign));
-            } else if (auto *if_stmt = stmt->if_statement()) {
-                proc.body.emplace_back(makeIfStatement(if_stmt));
-            } else if (auto *case_stmt = stmt->case_statement()) {
-                proc.body.emplace_back(makeCaseStatement(case_stmt));
-            } else if (auto *loop_stmt = stmt->loop_statement()) {
-                // Determine if it's a for or while loop
-                if (auto *iter = loop_stmt->iteration_scheme()) {
-                    if (iter->parameter_specification() != nullptr) {
-                        proc.body.emplace_back(makeForLoop(loop_stmt));
-                    } else if (iter->condition() != nullptr) {
-                        proc.body.emplace_back(makeWhileLoop(loop_stmt));
-                    }
-                }
+            if (auto result = tryMakeSequentialStatement(*this, stmt)) {
+                proc.body.emplace_back(std::move(*result));
             }
         }
     }
@@ -291,29 +266,9 @@ auto Translator::makeSequenceOfStatements(vhdlParser::Sequence_of_statementsCont
     std::vector<ast::SequentialStatement> statements;
 
     for (auto *stmt : ctx->sequential_statement()) {
-        if (auto *sig_assign = stmt->signal_assignment_statement()) {
-            statements.emplace_back(makeSequentialAssign(sig_assign));
-        } else if (auto *var_assign = stmt->variable_assignment_statement()) {
-            statements.emplace_back(makeVariableAssign(var_assign));
-        } else if (auto *if_stmt = stmt->if_statement()) {
-            statements.emplace_back(makeIfStatement(if_stmt));
-        } else if (auto *case_stmt = stmt->case_statement()) {
-            statements.emplace_back(makeCaseStatement(case_stmt));
-        } else if (auto *loop_stmt = stmt->loop_statement()) {
-            // Determine if it's a for or while loop
-            if (auto *iter = loop_stmt->iteration_scheme()) {
-                if (iter->parameter_specification() != nullptr) {
-                    statements.emplace_back(makeForLoop(loop_stmt));
-                } else if (iter->condition() != nullptr) {
-                    statements.emplace_back(makeWhileLoop(loop_stmt));
-                }
-            } else {
-                // Basic loop without iteration scheme - treat as while with no condition
-                // For now, we'll skip these or you could add a basic loop type
-                // statements.emplace_back(makeWhileLoop(loop_stmt));
-            }
+        if (auto result = tryMakeSequentialStatement(*this, stmt)) {
+            statements.emplace_back(std::move(*result));
         }
-        // TODO(dyb): Add other statement types as needed (wait, assert, report, etc.)
     }
 
     return statements;
