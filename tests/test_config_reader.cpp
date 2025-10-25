@@ -20,7 +20,7 @@ constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem
 
 } // namespace
 
-TEST_CASE("ConfigReader with valid complete configuration file")
+TEST_CASE("ConfigReader with valid complete configuration file", "[config]")
 {
     const auto config_path = getConfigPath("valid_complete.yaml");
     cli::ConfigReader config_reader{ config_path };
@@ -43,7 +43,7 @@ TEST_CASE("ConfigReader with valid complete configuration file")
     REQUIRE(config.casing.identifiers == common::CaseStyle::LOWER);
 }
 
-TEST_CASE("ConfigReader with empty configuration file")
+TEST_CASE("ConfigReader with empty configuration file", "[config]")
 {
     const auto config_path = getConfigPath("empty.yaml");
     cli::ConfigReader reader{ config_path };
@@ -66,7 +66,7 @@ TEST_CASE("ConfigReader with empty configuration file")
     REQUIRE(config.casing.identifiers == common::CaseStyle::LOWER);
 }
 
-TEST_CASE("ConfigReader with non-existent configuration file")
+TEST_CASE("ConfigReader with non-existent configuration file", "[config]")
 {
     const auto config_path = getConfigPath("non_existent_file.yaml");
     cli::ConfigReader reader{ config_path };
@@ -78,7 +78,7 @@ TEST_CASE("ConfigReader with non-existent configuration file")
     REQUIRE(error.message == "Config file does not exist at the defined location.");
 }
 
-TEST_CASE("ConfigReader with malformed YAML configuration file")
+TEST_CASE("ConfigReader with malformed YAML configuration file", "[config]")
 {
     const auto config_path = getConfigPath("malformed.yaml");
     cli::ConfigReader reader{ config_path };
@@ -90,7 +90,7 @@ TEST_CASE("ConfigReader with malformed YAML configuration file")
     REQUIRE(error.message.contains("Error reading config file"));
 }
 
-TEST_CASE("ConfigReader with no config file path and no default config file")
+TEST_CASE("ConfigReader with no config file path and no default config file", "[config]")
 {
     // Temporarily change to a directory without vhdl-fmt.yaml
     const auto original_path = std::filesystem::current_path();
@@ -115,7 +115,7 @@ TEST_CASE("ConfigReader with no config file path and no default config file")
     std::filesystem::remove_all(temp_dir);
 }
 
-TEST_CASE("ConfigReader with invalid configuration parameters")
+TEST_CASE("ConfigReader with invalid configuration parameters", "[config]")
 {
     // clang-format off
     const auto [description, content, expected_error] = GENERATE(table<std::string_view, std::string_view, std::string_view>({
@@ -158,7 +158,7 @@ TEST_CASE("ConfigReader with invalid configuration parameters")
     std::filesystem::remove(temp_path);
 }
 
-TEST_CASE("ConfigReader with boundary values for line length and indent size")
+TEST_CASE("ConfigReader with boundary values for line length and indent size", "[config]")
 {
     const auto [content, expected_value, expected_field]
       = GENERATE(table<std::string_view, std::uint8_t, std::string_view>({
