@@ -4,30 +4,61 @@
 #include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
-#include "ast/visitor_base.hpp"
+#include "ast/nodes/design_units.hpp"
+#include "ast/nodes/expressions.hpp"
+#include "ast/nodes/statements.hpp"
+#include "ast/visitor.hpp"
 
 #include <cstddef>
 #include <cstdint>
 #include <iosfwd>
-#include <iostream>
-#include <string>
 #include <string_view>
 #include <vector>
 
 namespace emit {
 
 /// @brief AST debug printer. Traverses the AST and prints its structure with indentation.
-class DebugPrinter : public ast::BaseVisitor
+class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
 {
   public:
     explicit DebugPrinter(std::ostream &out) : out_(out) {}
 
+    DebugPrinter(const DebugPrinter &) = delete;
+    auto operator=(const DebugPrinter &) -> DebugPrinter & = delete;
+    DebugPrinter(DebugPrinter &&) = delete;
+    auto operator=(DebugPrinter &&) -> DebugPrinter & = delete;
+    ~DebugPrinter() = default;
+
     // Node visitors
-    void visit(const ast::DesignFile &node) override;
-    void visit(const ast::Entity &node) override;
-    void visit(const ast::GenericParam &node) override;
-    void visit(const ast::Port &node) override;
-    void visit(const ast::Range &node) override;
+    void operator()(const ast::DesignFile &node);
+    void operator()(const ast::Entity &node);
+    void operator()(const ast::Architecture &node);
+    void operator()(const ast::GenericClause &node);
+    void operator()(const ast::PortClause &node);
+    void operator()(const ast::GenericParam &node);
+    void operator()(const ast::Port &node);
+
+    // Declarations
+    void operator()(const ast::SignalDecl &node);
+    void operator()(const ast::ConstantDecl &node);
+
+    // Expressions
+    void operator()(const ast::TokenExpr &node);
+    void operator()(const ast::GroupExpr &node);
+    void operator()(const ast::UnaryExpr &node);
+    void operator()(const ast::BinaryExpr &node);
+    void operator()(const ast::ParenExpr &node);
+
+    // Concurrent Statements
+    void operator()(const ast::ConcurrentAssign &node);
+    void operator()(const ast::Process &node);
+
+    // Sequential Statements
+    void operator()(const ast::SequentialAssign &node);
+    void operator()(const ast::IfStatement &node);
+    void operator()(const ast::CaseStatement &node);
+    void operator()(const ast::ForLoop &node);
+    void operator()(const ast::WhileLoop &node);
 
   private:
     std::ostream &out_;
@@ -36,22 +67,33 @@ class DebugPrinter : public ast::BaseVisitor
     void printIndent() const;
     void printLine(std::string_view s) const;
 
-    /// Print node header: `Name [extra] <(N[\n])>`.
-    void printNodeHeader(const ast::Node &n,
-                         const std::string &extra,
+    void printNodeHeader(const ast::NodeBase &n,
+                         std::string_view extra,
                          std::string_view name_override,
-                         std::size_t trailing_breaks) const;
+                         std::size_t leading_breaks) const;
 
-    /// Print only comment lines from a trivia sequence (prefix each line).
+    void printTriviaStream(const std::vector<ast::Trivia> &trivia, std::string_view prefix) const;
+
     void printCommentLines(const std::vector<ast::Comments> &comments,
                            std::string_view prefix) const;
 
-    /// Count total trailing newline breaks.
-    [[nodiscard]]
-    static auto countNewlines(const std::vector<ast::Trivia> &leading) -> std::size_t;
-
     template<class NodeT>
-    void emitNodeLike(const NodeT &node, std::string_view pretty_name, const std::string &extra);
+    void emitNodeLike(const NodeT &node, std::string_view pretty_name, std::string_view extra)
+    {
+        printNodeHeader(node, extra, pretty_name, 0);
+
+        const IndentGuard _{ indent_ };
+
+        // Print leading trivia stream (newlines + comments in order)
+        if (node.trivia && !node.trivia->leading.empty()) {
+            printTriviaStream(node.trivia->leading, "↓");
+        }
+
+        // Print trailing comments (inline comments)
+        if (node.trivia && !node.trivia->trailing.empty()) {
+            printCommentLines(node.trivia->trailing, "→");
+        }
+    }
 
     struct IndentGuard
     {

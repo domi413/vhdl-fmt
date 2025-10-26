@@ -9,9 +9,7 @@
 #include "builder/trivia/newline_sink.hpp"
 #include "vhdlLexer.h"
 
-#include <algorithm>
 #include <cstddef>
-#include <string_view>
 
 namespace builder {
 
@@ -30,7 +28,7 @@ namespace builder {
 /// The resulting trivia stream maintains the original ordering of comments
 /// and newlines exactly as they appear in the source, enabling precise
 /// round-tripping and faithful pretty-printing.
-class TriviaBinder
+class TriviaBinder final
 {
   public:
     explicit TriviaBinder(antlr4::CommonTokenStream &ts) noexcept : tokens_(ts) {}
@@ -43,7 +41,7 @@ class TriviaBinder
     auto operator=(TriviaBinder &&) -> TriviaBinder & = delete;
 
     /// @brief Binds collected trivia to the specified AST node.
-    void bind(ast::Node &node, const antlr4::ParserRuleContext *ctx);
+    void bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ctx);
 
   private:
     struct AnchorToken
@@ -75,17 +73,10 @@ class TriviaBinder
     }
 
     [[nodiscard]]
-    static constexpr auto countLineBreaks(const std::string_view s) noexcept -> std::size_t
-    {
-        const auto n = static_cast<std::size_t>(std::ranges::count(s, '\n'));
-        return std::max<std::size_t>(1, n);
-    }
-
-    [[nodiscard]]
     auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;
 
-    void collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_index);
-    void collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken &anchor);
+    void collectLeading(ast::NodeTrivia &dst, std::size_t start_index);
+    void collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anchor);
 };
 
 } // namespace builder

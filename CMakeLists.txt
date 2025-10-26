@@ -76,7 +76,8 @@ add_library(
 # Make sure ANTLR runs before building this library
 add_dependencies(vhdl_generated generate_vhdl_parser)
 
-target_include_directories(vhdl_generated PUBLIC ${GENERATED_DIR})
+# Mark generated headers as SYSTEM to suppress warnings in generated code
+target_include_directories(vhdl_generated SYSTEM PUBLIC ${GENERATED_DIR})
 target_link_libraries(vhdl_generated PUBLIC antlr4_static)
 
 # --------------------------------------------------------------------

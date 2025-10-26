@@ -2,39 +2,60 @@
 #define AST_NODES_DECLARATIONS_HPP
 
 #include "ast/node.hpp"
+#include "nodes/expressions.hpp"
 
-#include <memory>
+#include <optional>
 #include <string>
+#include <variant>
+#include <vector>
 
 namespace ast {
 
-struct GenericParam : Visitable<GenericParam>
+// Forward declarations
+struct ConstantDecl;
+struct SignalDecl;
+struct GenericParam;
+struct Port;
+
+/// Variant type for all declarations
+using Declaration = std::variant<ConstantDecl, SignalDecl, GenericParam, Port>;
+
+// Base data common to all declarations
+struct DeclBase : NodeBase
 {
-    std::string type;
     std::vector<std::string> names;
-    std::optional<std::string> init;
 };
 
-struct Range : Visitable<Range>
+// Constant declaration: constant WIDTH : integer := 8;
+struct ConstantDecl : DeclBase
 {
-    std::string left_expr;  // e.g. "DATA_WIDTH - 1"
-    std::string direction;  // "downto" or "to"
-    std::string right_expr; // e.g. "0"
+    std::string type_name;
+    std::optional<Expr> init_expr;
 };
 
-struct Port : Visitable<Port>
+// Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
+struct SignalDecl : DeclBase
 {
-    std::string mode, type;
-    std::vector<std::string> names;
-    std::vector<std::unique_ptr<ast::Range>> constraints;
-    std::optional<std::string> init;
+    std::string type_name;
+    bool has_bus_kw{ false };
+    std::vector<BinaryExpr> constraints;
+    std::optional<Expr> init_expr;
 };
 
-struct Entity : Visitable<Entity>
+// Generic parameter inside GENERIC clause
+struct GenericParam : DeclBase
 {
-    std::string name;
-    std::vector<std::unique_ptr<Port>> ports;
-    std::vector<std::unique_ptr<GenericParam>> generics;
+    std::string type_name;
+    std::optional<Expr> default_expr;
+};
+
+// Port entry inside PORT clause
+struct Port : DeclBase
+{
+    std::string mode; // "in" / "out"
+    std::string type_name;
+    std::optional<Expr> default_expr;
+    std::vector<BinaryExpr> constraints;
 };
 
 } // namespace ast

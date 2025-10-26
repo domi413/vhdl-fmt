@@ -1,11 +1,17 @@
-file(GLOB_RECURSE CLI_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+add_library(
+    cli
+    STATIC
+    argument_parser.cpp
+    config_reader.cpp
+)
 
-add_library(cli STATIC ${CLI_SOURCES})
+target_include_directories(cli PUBLIC ${CMAKE_SOURCE_DIR}/src)
 
 target_link_libraries(
     cli
     PUBLIC
-        argparse::argparse
+        common
         yaml-cpp::yaml-cpp
-        vhdl_generated
+    PRIVATE
+        argparse::argparse
 )

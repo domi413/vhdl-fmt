@@ -10,7 +10,7 @@
 
 namespace builder {
 
-void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_index)
+void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t start_index)
 {
     // Tokens are given in source order
     const auto &hidden = tokens_.getHiddenTokensToLeft(start_index);
@@ -24,7 +24,7 @@ void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_
         }
 
         if (isNewline(token)) {
-            linebreaks += countLineBreaks(token->getText());
+            ++linebreaks;
             continue;
         }
 
@@ -39,11 +39,17 @@ void TriviaBinder::collectLeading(ast::Node::NodeTrivia &dst, std::size_t start_
         }
     }
 
+    // Push any remaining paragraph breaks (2+ newlines = 1+ blank lines)
+    // We only capture these to preserve intentional grouping, not every single newline
+    if (linebreaks >= 2) {
+        newlines_.push(dst, linebreaks);
+    }
+
     // Iteration went backward - restore to source order
     std::ranges::reverse(dst.leading);
 }
 
-void TriviaBinder::collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken &anchor)
+void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anchor)
 {
     // Collect trailing comments that appear on the same line as the anchor
     const auto hidden = tokens_.getHiddenTokensToRight(anchor.index);
@@ -59,20 +65,20 @@ void TriviaBinder::collectTrailing(ast::Node::NodeTrivia &dst, const AnchorToken
     }
 }
 
-void TriviaBinder::bind(ast::Node &node, const antlr4::ParserRuleContext *ctx)
+void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ctx)
 {
     if (ctx == nullptr) {
         return;
     }
 
-    auto &comment = node.emplaceTrivia();
+    auto &trivia = node.trivia.emplace();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
     const AnchorToken stop{ .index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex()),
                             .line = ctx->getStop()->getLine() };
 
-    collectLeading(comment, start_index);
-    collectTrailing(comment, stop);
+    collectLeading(trivia, start_index);
+    collectTrailing(trivia, stop);
 }
 
 auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t

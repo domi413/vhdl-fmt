@@ -2,14 +2,15 @@
 #define AST_NODES_DESIGN_FILE_HPP
 
 #include "ast/node.hpp"
+#include "ast/nodes/design_units.hpp"
 
-#include <memory>
+#include <vector>
 
 namespace ast {
 
-struct DesignFile : Visitable<DesignFile>
+struct DesignFile : NodeBase
 {
-    std::vector<std::unique_ptr<Node>> units;
+    std::vector<DesignUnit> units;
 };
 
 } // namespace ast

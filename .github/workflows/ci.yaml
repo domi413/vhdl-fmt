@@ -74,7 +74,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: Build, Lint, Format Check and Test
-    timeout-minutes: 10
+    timeout-minutes: 15
     container:
       image: archlinux:base-devel
 
@@ -129,7 +129,7 @@ jobs:
           uv venv venv
           source venv/bin/activate
 
-          uv pip install conan gersemi
+          uv pip install conan gersemi==0.19.3
 
       - name: Setup Conan profile
         run: |

@@ -1,5 +1,8 @@
-.PHONY: all run clean conan test
+.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored
 
+# -----------------------------
+# Build Configuration
+# -----------------------------
 # Default preset, override with `make BUILD_TYPE=Release`
 BUILD_TYPE ?= Debug
 CMAKE_PRESET := conan-$(shell echo $(BUILD_TYPE) | tr A-Z a-z)
@@ -11,12 +14,9 @@ BUILD_STAMP := build/.build.$(BUILD_TYPE).stamp
 SOURCES := $(shell find src tests -name '*.cpp' -o -name '*.hpp')
 SOURCES_CMAKE := $(shell find src tests . -name 'CMakeLists.txt')
 
-ifeq ($(wildcard venv/bin),venv/bin)
-	VENV_BIN := venv/bin/
-else
-	VENV_BIN :=
-endif
-
+# -----------------------------
+# Build Targets
+# -----------------------------
 all: $(BUILD_STAMP)
 
 $(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
@@ -26,9 +26,11 @@ $(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
 	@touch $@
 	@echo "Build complete."
 
+CONAN_CMD := conan
 $(CONAN_STAMP): conanfile.txt
+	$(call check_tool,$(CONAN_CMD))
 	@echo "Running Conan ($(BUILD_TYPE))..."
-	@conan install . \
+	@$(CONAN_CMD) install . \
 		-pr=clang.profile \
 		--build=missing \
 		-s build_type=$(BUILD_TYPE)
@@ -40,6 +42,9 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/simple.vhdl
 
 test: $(BUILD_STAMP)
+	@ctest --preset $(CMAKE_PRESET) --output-on-failure
+
+test-rerun-failed: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
 
 test-verbose: $(BUILD_STAMP)
@@ -49,55 +54,77 @@ clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
 
 # -----------------------------
-# Utility targets
+# Utility Targets
 # -----------------------------
+CLANG_TIDY_CMD := clang-tidy
+RUN_CLANG_TIDY_CMD := run-clang-tidy
+CLANG_FORMAT_CMD := clang-format
+CONAN_CMD := conan
+GERSEMI_CMD := gersemi
+
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
 LINT_TIDY_FLAGS = -warnings-as-errors='*'
 LINT_CPUS ?= $(shell nproc)
 
-# Default to linting both sources and headers
+GERSEMI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
+
+# Function to check for tool existence
+# Usage: $(call check_tool, tool_name)
+define check_tool
+@if ! command -v $(1) > /dev/null 2>&1; then \
+	echo "Error: Required tool '$(1)' not found."; \
+	echo "Please ensure it is installed and available in your PATH."; \
+	exit 1; \
+fi
+endef
+
 SOURCES_TO_LINT := $(SOURCES)
 ifeq ($(LINT_FILES),source)
-    SOURCES_TO_LINT := $(shell find src tests -name '*.cpp')
+	SOURCES_TO_LINT := $(shell find src tests -name '*.cpp')
 endif
 
 ifeq ($(LINT_FILES),header)
-    SOURCES_TO_LINT := $(shell find src tests -name '*.hpp')
+	SOURCES_TO_LINT := $(shell find src tests -name '*.hpp')
 endif
 
-# make lint LINT_FILES=header/source to lint either headers or sources
+# Use `make lint LINT_FILES=header/source` to lint either one
 lint:
+	$(call check_tool,$(RUN_CLANG_TIDY_CMD))
+	$(call check_tool,$(CLANG_TIDY_CMD))
+	@echo "Linting with $(LINT_CPUS) cores"
 	@if [ -z "$(SOURCES_TO_LINT)" ]; then \
 		echo "No files to lint (LINT_FILES='$(LINT_FILES)')."; \
-	else \
-		if [ "$(LINT_FILES)" != "header" ]; then \
-			echo "Running clang-tidy on source files..."; \
-		fi; \
-		run-clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES_TO_LINT); \
-		 \
-		if [ "$(LINT_FILES)" = "header" ] || [ -z "$(LINT_FILES)" ]; then \
-			echo "Running clang-tidy on headers..."; \
-			echo "$(SOURCES_TO_LINT)" | \
-			xargs -r -P $(LINT_CPUS) -n 1 clang-tidy $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS); \
-		fi; \
+		exit 0; \
 	fi
+
+	@if [ "$(LINT_FILES)" = "source" ] || [ -z "$(LINT_FILES)" ]; then \
+		echo "Running clang-tidy on source files..."; \
+		$(RUN_CLANG_TIDY_CMD) $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $(SOURCES_TO_LINT) || exit 1; \
+	fi
+
+	@if [ "$(LINT_FILES)" = "header" ] || [ -z "$(LINT_FILES)" ]; then \
+		echo "Running clang-tidy on headers..."; \
+		echo "$(SOURCES_TO_LINT)" | xargs -r -P $(LINT_CPUS) -n 1 $(CLANG_TIDY_CMD) $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) || exit 1; \
+	fi
+
 	@echo "✓ Linting complete"
 
-
-GERMESI_FLAGS = --list-expansion=favour-expansion --no-warn-about-unknown-commands
-
 check-format:
+	$(call check_tool,$(CLANG_FORMAT_CMD))
+	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Checking code formatting..."
-	@if clang-format --dry-run --Werror $(SOURCES) && $(VENV_BIN)gersemi --check $(GERMESI_FLAGS) $(SOURCES_CMAKE); then \
+	@if $(CLANG_FORMAT_CMD) --dry-run --Werror $(SOURCES) && $(GERSEMI_CMD) --check --diff --color $(GERSEMI_FLAGS) $(SOURCES_CMAKE); then \
 		echo "✓ All files are properly formatted"; \
 	else \
 		exit 1; \
 	fi
 
 format:
+	$(call check_tool,$(CLANG_FORMAT_CMD))
+	$(call check_tool,$(GERSEMI_CMD))
 	@echo "Formatting code..."
-	@clang-format -i $(SOURCES)
-	@$(VENV_BIN)gersemi -i $(GERMESI_FLAGS) $(SOURCES_CMAKE)
+	@$(CLANG_FORMAT_CMD) -i $(SOURCES)
+	@$(GERSEMI_CMD) -i $(GERSEMI_FLAGS) $(SOURCES_CMAKE)
 	@echo "✓ Code formatting complete"
 
 sort-dictionary:

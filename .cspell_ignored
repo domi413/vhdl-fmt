@@ -1,11 +1,15 @@
 absl
 antlr
 antlr4
+bugprone
 conanfile
+cppcoreguidelines
 domi
+doublestar
 flto
 germesi
 gersemi
+nolintnextline
 subnature
 vhdl
 wconversion
@@ -16,7 +20,6 @@ wfloat
 wfor
 wmisleading
 wnon
-wnull
 woverloaded
 wped
 wpedantic

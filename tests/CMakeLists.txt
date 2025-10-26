@@ -1,6 +1,11 @@
-file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
-
-add_executable(tests ${TEST_SOURCES})
+add_executable(
+    tests
+    test_argument_parser.cpp
+    test_comments.cpp
+    test_config_reader.cpp
+    test_declarations.cpp
+    test_newlines.cpp
+)
 
 target_link_libraries(
     tests
@@ -10,8 +15,6 @@ target_link_libraries(
         builder
         cli
         emit
-        vhdl_generated
-        yaml-cpp::yaml-cpp
 )
 
 target_include_directories(

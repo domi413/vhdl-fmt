@@ -1,0 +1,187 @@
+#include "ast/nodes/declarations.hpp"
+#include "ast/nodes/design_file.hpp"
+#include "ast/nodes/design_units.hpp"
+#include "builder/ast_builder.hpp"
+
+#include <catch2/catch_test_macros.hpp>
+#include <string_view>
+#include <variant>
+
+// -----------------------------------------------------------------------------
+// Architecture declarations: signals and constants
+// -----------------------------------------------------------------------------
+TEST_CASE("Architecture captures signal declarations", "[declarations][architecture]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            signal temp : std_logic;
+            signal count : integer := 42;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
+
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 2);
+
+    // First signal: temp
+    auto *signal1 = std::get_if<ast::SignalDecl>(arch->decls.data());
+    REQUIRE(signal1 != nullptr);
+    REQUIRE(signal1->names.size() == 1);
+    REQUIRE(signal1->names[0] == "temp");
+    REQUIRE(signal1->type_name == "std_logic");
+    REQUIRE_FALSE(signal1->init_expr.has_value());
+
+    // Second signal: count with initialization
+    auto *signal2 = std::get_if<ast::SignalDecl>(&arch->decls[1]);
+    REQUIRE(signal2 != nullptr);
+    REQUIRE(signal2->names.size() == 1);
+    REQUIRE(signal2->names[0] == "count");
+    REQUIRE(signal2->type_name == "integer");
+    REQUIRE(signal2->init_expr.has_value());
+}
+
+TEST_CASE("Architecture captures constant declarations", "[declarations][architecture]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            constant WIDTH : integer := 8;
+            constant ENABLE : boolean := true;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
+
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 2);
+
+    // First constant: WIDTH
+    auto *const1 = std::get_if<ast::ConstantDecl>(arch->decls.data());
+    REQUIRE(const1 != nullptr);
+    REQUIRE(const1->names.size() == 1);
+    REQUIRE(const1->names[0] == "WIDTH");
+    REQUIRE(const1->type_name == "integer");
+    REQUIRE(const1->init_expr.has_value());
+
+    // Second constant: ENABLE
+    auto *const2 = std::get_if<ast::ConstantDecl>(&arch->decls[1]);
+    REQUIRE(const2 != nullptr);
+    REQUIRE(const2->names.size() == 1);
+    REQUIRE(const2->names[0] == "ENABLE");
+    REQUIRE(const2->type_name == "boolean");
+    REQUIRE(const2->init_expr.has_value());
+}
+
+TEST_CASE("Architecture captures mixed declarations", "[declarations][architecture]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            signal clk : std_logic;
+            constant MAX : integer := 100;
+            signal data : std_logic_vector(7 downto 0);
+            constant MIN : integer := 0;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
+
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 4);
+
+    // Verify types in order: signal, constant, signal, constant
+    REQUIRE(std::holds_alternative<ast::SignalDecl>(arch->decls[0]));
+    REQUIRE(std::holds_alternative<ast::ConstantDecl>(arch->decls[1]));
+    REQUIRE(std::holds_alternative<ast::SignalDecl>(arch->decls[2]));
+    REQUIRE(std::holds_alternative<ast::ConstantDecl>(arch->decls[3]));
+
+    // Verify names
+    auto *sig1 = std::get_if<ast::SignalDecl>(arch->decls.data());
+    REQUIRE(sig1->names[0] == "clk");
+
+    auto *const1 = std::get_if<ast::ConstantDecl>(&arch->decls[1]);
+    REQUIRE(const1->names[0] == "MAX");
+
+    auto *sig2 = std::get_if<ast::SignalDecl>(&arch->decls[2]);
+    REQUIRE(sig2->names[0] == "data");
+
+    auto *const2 = std::get_if<ast::ConstantDecl>(&arch->decls[3]);
+    REQUIRE(const2->names[0] == "MIN");
+}
+
+TEST_CASE("Architecture with no declarations", "[declarations][architecture]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 2);
+
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.empty());
+}
+
+TEST_CASE("Signal with multiple names", "[declarations][signal]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            signal clk, rst, enable : std_logic;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 1);
+
+    auto *signal = std::get_if<ast::SignalDecl>(arch->decls.data());
+    REQUIRE(signal != nullptr);
+    REQUIRE(signal->names.size() == 3);
+    REQUIRE(signal->names[0] == "clk");
+    REQUIRE(signal->names[1] == "rst");
+    REQUIRE(signal->names[2] == "enable");
+    REQUIRE(signal->type_name == "std_logic");
+}
+
+TEST_CASE("Constant with multiple names", "[declarations][constant]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            constant MIN, MAX, DEFAULT : integer := 42;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 1);
+
+    auto *constant = std::get_if<ast::ConstantDecl>(arch->decls.data());
+    REQUIRE(constant != nullptr);
+    REQUIRE(constant->names.size() == 3);
+    REQUIRE(constant->names[0] == "MIN");
+    REQUIRE(constant->names[1] == "MAX");
+    REQUIRE(constant->names[2] == "DEFAULT");
+    REQUIRE(constant->type_name == "integer");
+    REQUIRE(constant->init_expr.has_value());
+}

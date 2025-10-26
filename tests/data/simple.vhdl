@@ -1,26 +1,50 @@
--- Entity declaration for a simple counter module
-entity MyEntity is
-    generic (
-        -- Configuration constants
-        CONST_V      : integer := 42;           -- Example constant
-        DATA_WIDTH   : natural := 8;            -- Bit width of the counter
-        USE_RESET    : boolean := true;         -- Whether reset is used
-        INIT_VALUE   : integer := 0;            -- Initial counter value
-        CLOCK_FREQ   : real := 100.0e6;         -- 100 MHz clock frequency
-        DEVICE_FAMILY: string := "Generic"      -- Target device family
-    );
-    port (
-        -- Clock and Reset
-        clk      : in  std_logic;               -- System clock
-        rst_n    : in  std_logic;               -- Active-low reset
+-- Top-level entity for testing the AST builder
+entity ExampleEntity is
+  generic (
+    WIDTH      : integer := 8; 
+    ENABLE_LOG : boolean := true 
+  );
 
-        -- Enable and data interface
-        enable   : in  std_logic;               -- Enable counting
-        load     : in  std_logic;               -- Load input value
-        load_val : in  std_logic_vector(DATA_WIDTH-1 downto 0); -- Load data
+  port (
+    enable : in  std_logic := '1';
+    width  : in  integer := 8 + 4;
+    clk    : in  std_logic; 
+    rst_n  : in  std_logic; 
+    data_i : in  std_logic_vector(WIDTH-1 downto 0);
+    data_o : out std_logic_vector(WIDTH-1 downto 0)
+  );
+end ExampleEntity;
 
-        -- Counter output
-        count    : out std_logic_vector(DATA_WIDTH-1 downto 0); -- Counter output
-        overflow : out std_logic                -- Overflow flag
-    );
-end MyEntity;
+architecture rtl of ExampleEntity is
+  signal temp : std_logic_vector(7 downto 0);
+  signal sum  : integer := 4 + 2;
+  signal v : std_logic_vector(7 downto 0) := (others => '0');
+  constant WORD_SIZE : integer := 32;
+begin
+  -- Simple concurrent signal assignment
+  data_o <= data_i;
+  
+  -- Process with sensitivity list
+  process(clk, rst_n)
+  begin
+    if rst_n = '0' then
+      temp <= (others => '0');
+    elsif rising_edge(clk) then
+      temp <= data_i;
+    end if;
+  end process;
+  
+  -- Another process with case statement
+  process(temp)
+  begin
+    case temp(1 downto 0) is
+      when "00" =>
+        temp <= "00000001";
+      when "01" =>
+        temp <= "00000010";
+      when others =>
+        temp <= "00000011";
+    end case;
+  end process;
+  
+end rtl;
