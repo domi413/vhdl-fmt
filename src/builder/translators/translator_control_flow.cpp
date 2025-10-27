@@ -27,12 +27,10 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
 
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
     // If there's an else, the last sequence doesn't have a condition
-    const size_t num_elsif = conditions.size() - 1;
-
-    for (size_t i = 0; i < num_elsif; ++i) {
+    for (const size_t i : std::views::iota(size_t{1}, conditions.size())) {
         ast::IfStatement::Branch elsif_branch;
-        elsif_branch.condition = makeExpr(conditions[i + 1]->expression());
-        elsif_branch.body = makeSequenceOfStatements(sequences[i + 1]);
+        elsif_branch.condition = makeExpr(conditions[i]->expression());
+        elsif_branch.body = makeSequenceOfStatements(sequences[i]);
         stmt.elsif_branches.push_back(std::move(elsif_branch));
     }
 
