@@ -12,8 +12,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <iosfwd>
+#include <span>
 #include <string_view>
-#include <vector>
 
 namespace emit {
 
@@ -73,10 +73,9 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
                          std::string_view name_override,
                          std::size_t leading_breaks) const;
 
-    void printTriviaStream(const std::vector<ast::Trivia> &trivia, std::string_view prefix) const;
+    void printTriviaStream(std::span<const ast::Trivia> trivia, std::string_view prefix) const;
 
-    void printCommentLines(const std::vector<ast::Comments> &comments,
-                           std::string_view prefix) const;
+    void printCommentLines(std::span<const ast::Comments> comments, std::string_view prefix) const;
 
     template<class NodeT>
     void emitNodeLike(const NodeT &node, std::string_view pretty_name, std::string_view extra)

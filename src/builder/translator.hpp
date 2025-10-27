@@ -154,7 +154,7 @@ class Translator final
     /// @brief Helper to create and bind an AST node with trivia
     template<typename T, typename Ctx>
     [[nodiscard]]
-    auto make(Ctx *ctx) -> T
+    auto make(const Ctx *ctx) -> T
     {
         T node;
         trivia_.bind(node, ctx);
@@ -164,7 +164,8 @@ class Translator final
     /// @brief Helper to create binary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeBinary(const Ctx *ctx, const std::string_view op, ast::Expr left, ast::Expr right) -> ast::Expr
+    auto makeBinary(const Ctx *ctx, std::string_view op, ast::Expr left, ast::Expr right)
+      -> ast::Expr
     {
         ast::BinaryExpr bin;
         trivia_.bind(bin, ctx);
@@ -177,7 +178,7 @@ class Translator final
     /// @brief Helper to create unary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeUnary(const Ctx *ctx, const std::string_view op, ast::Expr value) -> ast::Expr
+    auto makeUnary(const Ctx *ctx, std::string_view op, ast::Expr value) -> ast::Expr
     {
         ast::UnaryExpr un;
         trivia_.bind(un, ctx);
@@ -189,7 +190,7 @@ class Translator final
     /// @brief Helper to create token expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeToken(const Ctx *ctx, const std::string_view text) -> ast::Expr
+    auto makeToken(const Ctx *ctx, std::string_view text) -> ast::Expr
     {
         ast::TokenExpr tok;
         trivia_.bind(tok, ctx);

@@ -4,10 +4,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
+#include <span>
 #include <string_view>
 #include <typeinfo>
 #include <variant>
-#include <vector>
 
 namespace emit {
 
@@ -41,7 +41,7 @@ void DebugPrinter::printNodeHeader(const ast::NodeBase &n,
     out_ << '\n';
 }
 
-void DebugPrinter::printTriviaStream(const std::vector<ast::Trivia> &trivia,
+void DebugPrinter::printTriviaStream(std::span<const ast::Trivia> trivia,
                                      std::string_view prefix) const
 {
     for (const auto &t : trivia) {
@@ -60,7 +60,7 @@ void DebugPrinter::printTriviaStream(const std::vector<ast::Trivia> &trivia,
     }
 }
 
-void DebugPrinter::printCommentLines(const std::vector<ast::Comments> &comments,
+void DebugPrinter::printCommentLines(std::span<const ast::Comments> comments,
                                      std::string_view prefix) const
 {
     for (const auto &comment : comments) {
