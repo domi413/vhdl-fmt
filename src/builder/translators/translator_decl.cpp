@@ -3,8 +3,6 @@
 #include "builder/visitors/constraint_visitor.hpp"
 #include "vhdlParser.h"
 
-#include <utility>
-
 namespace builder {
 
 auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
