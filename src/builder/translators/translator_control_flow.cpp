@@ -4,6 +4,7 @@
 #include "vhdlParser.h"
 
 #include <cstddef>
+#include <ranges>
 #include <utility>
 
 // NOLINTBEGIN(misc-no-recursion)
