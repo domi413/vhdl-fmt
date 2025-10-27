@@ -122,6 +122,21 @@ class Translator final
     [[nodiscard]]
     auto makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
       -> std::vector<ast::BinaryExpr>;
+
+  private:
+    // Helper methods for makeName - process different name part types
+    [[nodiscard]]
+    auto makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeCallExpr(ast::Expr base,
+                      vhdlParser::Function_call_or_indexed_name_partContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
+      -> ast::Expr;
+    [[nodiscard]]
+    auto makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr;
 };
 
 } // namespace builder

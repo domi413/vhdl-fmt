@@ -141,78 +141,192 @@ auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
 
 auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 {
-    // Base name (identifier or string literal)
-    ast::Expr base;
-    if (ctx->identifier() != nullptr) {
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = ctx->identifier()->getText();
-        base = tok;
-    } else if (ctx->STRING_LITERAL() != nullptr) {
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = ctx->STRING_LITERAL()->getText();
-        base = tok;
-    } else {
+    // For formatting: check if we have any structural parts (calls, slices, attributes)
+    // If not, just keep the whole name as a single token
+    bool has_structure = false;
+    for (auto *part : ctx->name_part()) {
+        if (part->function_call_or_indexed_name_part() != nullptr ||
+            part->slice_name_part() != nullptr || part->attribute_name_part() != nullptr) {
+            has_structure = true;
+            break;
+        }
+    }
+
+    if (!has_structure) {
+        // Simple name (possibly with dots like "rec.field") - keep as one token
         ast::TokenExpr tok;
         trivia_.bind(tok, ctx);
         tok.text = ctx->getText();
         return tok;
     }
 
-    // Process name_parts (selections, slices, function calls, attributes)
-    for (auto *part : ctx->name_part()) {
+    // Has structural parts - build up the base, then apply operations
+    // Start with the identifier/literal and consume any leading dot selections
+    std::string base_text;
+    if (ctx->identifier() != nullptr) {
+        base_text = ctx->identifier()->getText();
+    } else if (ctx->STRING_LITERAL() != nullptr) {
+        base_text = ctx->STRING_LITERAL()->getText();
+    } else {
+        // Shouldn't happen, but fallback
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = ctx->getText();
+        return tok;
+    }
+
+    // Consume consecutive selected_name_parts into base
+    size_t i = 0;
+    while (i < ctx->name_part().size() &&
+           ctx->name_part()[i]->selected_name_part() != nullptr) {
+        base_text += ctx->name_part()[i]->getText();
+        i++;
+    }
+
+    ast::TokenExpr base_tok;
+    trivia_.bind(base_tok, ctx);
+    base_tok.text = base_text;
+    ast::Expr base = base_tok;
+
+    // Process remaining structural parts
+    for (; i < ctx->name_part().size(); ++i) {
+        auto *part = ctx->name_part()[i];
+
         if (auto *slice = part->slice_name_part()) {
-            // This is a slice: name(range)
-            ast::BinaryExpr slice_expr;
-            trivia_.bind(slice_expr, part);
-            slice_expr.op = "()"; // Use () as operator for slice/index
-            slice_expr.left = box(std::move(base));
-            if (auto *dr = slice->discrete_range()) {
-                if (auto *rd = dr->range_decl()) {
-                    if (auto *er = rd->explicit_range()) {
-                        slice_expr.right = box(makeRange(er));
-                    } else {
-                        // It's a name-based range
-                        ast::TokenExpr tok;
-                        trivia_.bind(tok, rd);
-                        tok.text = rd->getText();
-                        slice_expr.right = box(ast::Expr{ std::move(tok) });
-                    }
-                } else if (auto *subtype = dr->subtype_indication()) {
-                    ast::TokenExpr tok;
-                    trivia_.bind(tok, subtype);
-                    tok.text = subtype->getText();
-                    slice_expr.right = box(ast::Expr{ std::move(tok) });
-                }
-            }
-            base = ast::Expr{ std::move(slice_expr) };
-        } else if (auto *selected = part->selected_name_part()) {
-            // This is a selection: name.suffix
-            ast::BinaryExpr sel_expr;
-            trivia_.bind(sel_expr, part);
-            sel_expr.op = ".";
-            sel_expr.left = box(std::move(base));
-            ast::TokenExpr tok;
-            trivia_.bind(tok, part);
-            tok.text = part->getText().substr(1); // Remove leading dot
-            sel_expr.right = box(ast::Expr{ std::move(tok) });
-            base = ast::Expr{ std::move(sel_expr) };
-        } else {
-            // For function calls, indexed names, and attributes, just append as text for now
-            ast::BinaryExpr call_expr;
-            trivia_.bind(call_expr, part);
-            call_expr.op = "()";
-            call_expr.left = box(std::move(base));
-            ast::TokenExpr tok;
-            trivia_.bind(tok, part);
-            tok.text = part->getText();
-            call_expr.right = box(ast::Expr{ std::move(tok) });
-            base = ast::Expr{ std::move(call_expr) };
+            base = makeSliceExpr(std::move(base), slice);
+        } else if (auto *call = part->function_call_or_indexed_name_part()) {
+            base = makeCallExpr(std::move(base), call);
+        } else if (auto *attr = part->attribute_name_part()) {
+            base = makeAttributeExpr(std::move(base), attr);
         }
+        // Ignore any remaining selected_name_parts (shouldn't happen after structure)
     }
 
     return base;
+}
+
+auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx)
+  -> ast::Expr
+{
+    ast::CallExpr slice_expr;
+    trivia_.bind(slice_expr, ctx);
+    slice_expr.callee = box(std::move(base));
+
+    if (auto *dr = ctx->discrete_range()) {
+        if (auto *rd = dr->range_decl()) {
+            if (auto *er = rd->explicit_range()) {
+                slice_expr.args = box(makeRange(er));
+            } else {
+                // It's a name-based range
+                ast::TokenExpr tok;
+                trivia_.bind(tok, rd);
+                tok.text = rd->getText();
+                slice_expr.args = box(ast::Expr{ std::move(tok) });
+            }
+        } else if (auto *subtype = dr->subtype_indication()) {
+            ast::TokenExpr tok;
+            trivia_.bind(tok, subtype);
+            tok.text = subtype->getText();
+            slice_expr.args = box(ast::Expr{ std::move(tok) });
+        }
+    }
+
+    return slice_expr;
+}
+
+auto Translator::makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx)
+  -> ast::Expr
+{
+    ast::BinaryExpr sel_expr;
+    trivia_.bind(sel_expr, ctx);
+    sel_expr.op = ".";
+    sel_expr.left = box(std::move(base));
+
+    ast::TokenExpr tok;
+    trivia_.bind(tok, ctx);
+    tok.text = ctx->getText().substr(1); // Remove leading dot
+    sel_expr.right = box(ast::Expr{ std::move(tok) });
+
+    return sel_expr;
+}
+
+auto Translator::makeCallExpr(ast::Expr base,
+                               vhdlParser::Function_call_or_indexed_name_partContext *ctx)
+  -> ast::Expr
+{
+    ast::CallExpr call_expr;
+    trivia_.bind(call_expr, ctx);
+    call_expr.callee = box(std::move(base));
+
+    // Parse the actual parameter part (association list)
+    if (auto *assoc_list = ctx->actual_parameter_part()) {
+        if (auto *list_ctx = assoc_list->association_list()) {
+            auto associations = list_ctx->association_element();
+
+            if (associations.size() == 1) {
+                // Single argument - extract it directly
+                call_expr.args = box(makeCallArgument(associations[0]));
+            } else {
+                // Multiple arguments - create a group
+                ast::GroupExpr group;
+                trivia_.bind(group, list_ctx);
+                for (auto *elem : associations) {
+                    group.children.push_back(makeCallArgument(elem));
+                }
+                call_expr.args = box(ast::Expr{ std::move(group) });
+            }
+        } else {
+            // Fallback: use raw text
+            ast::TokenExpr tok;
+            trivia_.bind(tok, ctx);
+            tok.text = ctx->getText();
+            call_expr.args = box(ast::Expr{ std::move(tok) });
+        }
+    }
+
+    return call_expr;
+}
+
+auto Translator::makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
+  -> ast::Expr
+{
+    ast::BinaryExpr attr_expr;
+    trivia_.bind(attr_expr, ctx);
+    attr_expr.op = "'";
+    attr_expr.left = box(std::move(base));
+
+    ast::TokenExpr tok;
+    trivia_.bind(tok, ctx);
+    tok.text = ctx->getText().substr(1); // Remove leading apostrophe
+    attr_expr.right = box(ast::Expr{ std::move(tok) });
+
+    return attr_expr;
+}
+
+auto Translator::makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr
+{
+    if (auto *actual = ctx->actual_part()) {
+        if (auto *designator = actual->actual_designator()) {
+            if (auto *expr = designator->expression()) {
+                return makeExpr(expr);
+            }
+            // OPEN keyword or other
+            ast::TokenExpr tok;
+            trivia_.bind(tok, designator);
+            tok.text = designator->getText();
+            return tok;
+        }
+        // Fallback
+        ast::TokenExpr tok;
+        trivia_.bind(tok, actual);
+        tok.text = actual->getText();
+        return tok;
+    }
+    // Empty - shouldn't happen
+    ast::TokenExpr tok;
+    trivia_.bind(tok, ctx);
+    tok.text = ctx->getText();
+    return tok;
 }
 
 auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr

@@ -5,6 +5,7 @@ add_executable(
     test_config_reader.cpp
     test_constraints.cpp
     test_declarations.cpp
+    test_expressions.cpp
     test_newlines.cpp
 )
 
