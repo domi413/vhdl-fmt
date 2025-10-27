@@ -19,7 +19,6 @@ class SequentialStatementVisitor final
   public:
     explicit SequentialStatementVisitor(Translator &trans) : trans_(trans) {}
 
-    // Static factory method for convenient usage
     static auto translate(Translator &trans, vhdlParser::Sequential_statementContext *ctx)
       -> std::optional<ast::SequentialStatement>
     {

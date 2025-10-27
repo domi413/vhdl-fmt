@@ -20,7 +20,6 @@ class ConcurrentAssignmentVisitor final
   public:
     explicit ConcurrentAssignmentVisitor(Translator &trans) : trans_(trans) {}
 
-    // Static factory method for convenient usage
     static auto translate(Translator &trans,
                           vhdlParser::Concurrent_signal_assignment_statementContext *ctx)
       -> std::optional<ast::ConcurrentAssign>
