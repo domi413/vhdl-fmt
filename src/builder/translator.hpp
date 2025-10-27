@@ -63,6 +63,14 @@ class Translator final
     auto makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_statementContext *ctx)
       -> ast::ConcurrentAssign;
     [[nodiscard]]
+    auto makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext *ctx)
+      -> ast::ConcurrentAssign;
+    [[nodiscard]]
+    auto makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext *ctx)
+      -> ast::ConcurrentAssign;
+    [[nodiscard]]
+    auto makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr;
+    [[nodiscard]]
     auto makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
       -> ast::SequentialAssign;
     [[nodiscard]]

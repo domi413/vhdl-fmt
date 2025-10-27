@@ -23,6 +23,60 @@ auto Translator::makeConcurrentAssign(
     return result;
 }
 
+auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext *ctx)
+  -> ast::ConcurrentAssign
+{
+    ast::ConcurrentAssign assign;
+    trivia_.bind(assign, ctx);
+
+    if (auto *target_ctx = ctx->target()) {
+        assign.target = makeTarget(target_ctx);
+    }
+
+    // Get the waveform - for now we'll take the first waveform element's expression
+    if (auto *cond_wave = ctx->conditional_waveforms()) {
+        if (auto *wave = cond_wave->waveform()) {
+            auto wave_elems = wave->waveform_element();
+            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
+                assign.value = makeExpr(wave_elems[0]->expression(0));
+            }
+        }
+    }
+
+    return assign;
+}
+
+auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext *ctx)
+  -> ast::ConcurrentAssign
+{
+    ast::ConcurrentAssign assign;
+    trivia_.bind(assign, ctx);
+
+    if (auto *target_ctx = ctx->target()) {
+        assign.target = makeTarget(target_ctx);
+    }
+
+    // For selected assignments (with...select), we'll take the first waveform
+    // TODO(dyb): Handle full selected waveforms structure
+    if (auto *sel_waves = ctx->selected_waveforms()) {
+        auto waves = sel_waves->waveform();
+        if (!waves.empty()) {
+            auto wave_elems = waves[0]->waveform_element();
+            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
+                assign.value = makeExpr(wave_elems[0]->expression(0));
+            }
+        }
+    }
+
+    return assign;
+}
+
+auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr
+{
+    TargetVisitor visitor{ *this };
+    return visitor.translate(ctx);
+}
+
 auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
   -> ast::SequentialAssign
 {
@@ -30,8 +84,7 @@ auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementCon
     trivia_.bind(assign, ctx);
 
     if (auto *target_ctx = ctx->target()) {
-        TargetVisitor visitor{ *this };
-        assign.target = visitor.translate(target_ctx);
+        assign.target = makeTarget(target_ctx);
     }
 
     if (auto *wave = ctx->waveform()) {
@@ -51,8 +104,7 @@ auto Translator::makeVariableAssign(vhdlParser::Variable_assignment_statementCon
     trivia_.bind(assign, ctx);
 
     if (auto *target_ctx = ctx->target()) {
-        TargetVisitor visitor{ *this };
-        assign.target = visitor.translate(target_ctx);
+        assign.target = makeTarget(target_ctx);
     }
 
     if (auto *expr = ctx->expression()) {
