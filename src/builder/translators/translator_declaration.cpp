@@ -1,8 +1,52 @@
 #include "ast/nodes/declarations.hpp"
+#include "ast/nodes/design_units.hpp"
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
 namespace builder {
+
+// ---------------------- Clauses ----------------------
+
+auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause
+{
+    ast::GenericClause clause;
+    trivia_.bind(clause, ctx);
+
+    auto *list = ctx->generic_list();
+    if (list == nullptr) {
+        return clause;
+    }
+
+    for (auto *decl : list->interface_constant_declaration()) {
+        clause.generics.push_back(makeGenericParam(decl));
+    }
+
+    return clause;
+}
+
+auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause
+{
+    ast::PortClause clause;
+    trivia_.bind(clause, ctx);
+
+    auto *list = ctx->port_list();
+    if (list == nullptr) {
+        return clause;
+    }
+
+    auto *iface = list->interface_port_list();
+    if (iface == nullptr) {
+        return clause;
+    }
+
+    for (auto *decl : iface->interface_port_declaration()) {
+        clause.ports.push_back(makeSignalPort(decl));
+    }
+
+    return clause;
+}
+
+// ---------------------- Interface declarations ----------------------
 
 auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
   -> ast::GenericParam
@@ -20,6 +64,8 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 
     return param;
 }
+
+// ---------------------- Object declarations ----------------------
 
 auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port
 {

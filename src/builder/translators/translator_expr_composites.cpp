@@ -8,6 +8,68 @@
 
 namespace builder {
 
+// ---------------------- Aggregates ----------------------
+
+auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
+{
+    ast::GroupExpr group;
+    trivia_.bind(group, ctx);
+
+    for (auto *elem : ctx->element_association()) {
+        ast::BinaryExpr assoc;
+        trivia_.bind(assoc, elem);
+        assoc.op = "=>";
+
+        if (elem->choices() != nullptr) {
+            assoc.left = box(makeChoices(elem->choices()));
+        }
+        if (elem->expression() != nullptr) {
+            assoc.right = box(makeExpr(elem->expression()));
+        }
+
+        group.children.emplace_back(std::move(assoc));
+    }
+
+    return group;
+}
+
+auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
+{
+    if (ctx->choice().size() == 1) {
+        return makeChoice(ctx->choice(0));
+    }
+
+    ast::GroupExpr grp;
+    trivia_.bind(grp, ctx);
+    for (auto *ch : ctx->choice()) {
+        grp.children.emplace_back(makeChoice(ch));
+    }
+    return grp;
+}
+
+auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
+{
+    if (ctx->OTHERS() != nullptr) {
+        return makeToken(ctx, "others");
+    }
+    if (ctx->identifier() != nullptr) {
+        return makeToken(ctx, ctx->identifier()->getText());
+    }
+    if (ctx->simple_expression() != nullptr) {
+        return makeSimpleExpr(ctx->simple_expression());
+    }
+    if (auto *dr = ctx->discrete_range()) {
+        if (auto *rd = dr->range_decl()) {
+            if (auto *er = rd->explicit_range()) {
+                return makeRange(er);
+            }
+        }
+    }
+    return makeToken(ctx, ctx->getText());
+}
+
+// ---------------------- Constraints/Ranges ----------------------
+
 auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vector<ast::BinaryExpr>
 {
     // Dispatch based on concrete constraint type

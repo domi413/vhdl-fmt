@@ -2,10 +2,13 @@ add_library(
     builder
     STATIC
     ast_builder.cpp
-    translators/translator_constraint.cpp
+    translators/translator_concurrent.cpp
+    translators/translator_control_flow.cpp
     translators/translator_declaration.cpp
-    translators/translator_expression.cpp
-    translators/translator_statement.cpp
+    translators/translator_expr_composites.cpp
+    translators/translator_expr_names.cpp
+    translators/translator_expr_operators.cpp
+    translators/translator_sequential.cpp
     translators/translator_unit.cpp
     trivia/trivia_binder.cpp
 )
