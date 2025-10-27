@@ -6,6 +6,7 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
+#include "builder/expr_helpers.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "vhdlParser.h"
 
@@ -18,14 +19,6 @@ class Translator final
 {
     TriviaBinder &trivia_;
     antlr4::CommonTokenStream &tokens_;
-
-    /// @brief Helper to create a boxed expression
-    template<typename T = ast::Expr>
-    [[nodiscard]]
-    static auto box(T &&expr) -> ast::Box<T>
-    {
-        return std::make_unique<T>(std::forward<T>(expr));
-    }
 
   public:
     Translator(TriviaBinder &tv, antlr4::CommonTokenStream &tokens) : trivia_(tv), tokens_(tokens)
@@ -114,6 +107,18 @@ class Translator final
     auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr;
     [[nodiscard]]
     auto makeName(vhdlParser::NameContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeCallExpr(ast::Expr base, vhdlParser::Function_call_or_indexed_name_partContext *ctx)
+      -> ast::Expr;
+    [[nodiscard]]
+    auto makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
+      -> ast::Expr;
+    [[nodiscard]]
+    auto makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr;
 
     // Constraints
     [[nodiscard]]
@@ -129,48 +134,23 @@ class Translator final
     [[nodiscard]]
     auto makeBinary(Ctx *ctx, std::string op, ast::Expr left, ast::Expr right) -> ast::Expr
     {
-        ast::BinaryExpr bin;
-        trivia_.bind(bin, ctx);
-        bin.op = std::move(op);
-        bin.left = box(std::move(left));
-        bin.right = box(std::move(right));
-        return bin;
+        return expr_helpers::makeBinary(
+          trivia_, ctx, std::move(op), std::move(left), std::move(right));
     }
 
     template<typename Ctx>
     [[nodiscard]]
     auto makeUnary(Ctx *ctx, std::string op, ast::Expr value) -> ast::Expr
     {
-        ast::UnaryExpr un;
-        trivia_.bind(un, ctx);
-        un.op = std::move(op);
-        un.value = box(std::move(value));
-        return un;
+        return expr_helpers::makeUnary(trivia_, ctx, std::move(op), std::move(value));
     }
 
     template<typename Ctx>
     [[nodiscard]]
     auto makeToken(Ctx *ctx, std::string text) -> ast::Expr
     {
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = std::move(text);
-        return tok;
+        return expr_helpers::makeToken(trivia_, ctx, std::move(text));
     }
-
-    // Helper methods for makeName - process different name part types
-    [[nodiscard]]
-    auto makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr;
-    [[nodiscard]]
-    auto makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx) -> ast::Expr;
-    [[nodiscard]]
-    auto makeCallExpr(ast::Expr base, vhdlParser::Function_call_or_indexed_name_partContext *ctx)
-      -> ast::Expr;
-    [[nodiscard]]
-    auto makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
-      -> ast::Expr;
-    [[nodiscard]]
-    auto makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr;
 };
 
 } // namespace builder
