@@ -2,6 +2,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <ranges>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -38,9 +39,9 @@ auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
     }
 
     auto grp = make<ast::GroupExpr>(ctx);
-    for (auto *ch : ctx->choice()) {
-        grp.children.emplace_back(makeChoice(ch));
-    }
+    grp.children = ctx->choice()
+                 | std::views::transform([this](auto *ch) { return makeChoice(ch); })
+                 | std::ranges::to<std::vector>();
     return grp;
 }
 

@@ -2,6 +2,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <ranges>
+
 namespace builder {
 
 auto Translator::makeConcurrentAssign(
@@ -78,16 +80,16 @@ auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::
 
     // Extract sensitivity list
     if (auto *sens_list = ctx->sensitivity_list()) {
-        for (auto *name_ctx : sens_list->name()) {
-            proc.sensitivity_list.push_back(name_ctx->getText());
-        }
+        proc.sensitivity_list = sens_list->name()
+                              | std::views::transform([](auto *name) { return name->getText(); })
+                              | std::ranges::to<std::vector>();
     }
 
     // Extract sequential statements
     if (auto *stmt_part = ctx->process_statement_part()) {
-        for (auto *stmt : stmt_part->sequential_statement()) {
-            proc.body.emplace_back(makeSequentialStatement(stmt));
-        }
+        proc.body = stmt_part->sequential_statement()
+                  | std::views::transform([this](auto *stmt) { return makeSequentialStatement(stmt); })
+                  | std::ranges::to<std::vector>();
     }
 
     return proc;

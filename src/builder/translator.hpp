@@ -145,7 +145,7 @@ class Translator final
 
     /// @brief Helper to create a boxed expression
     template<typename T = ast::Expr>
-    [[nodiscard]]
+    [[nodiscard]] constexpr
     auto box(T &&expr) -> ast::Box<T>
     {
         return std::make_unique<T>(std::forward<T>(expr));

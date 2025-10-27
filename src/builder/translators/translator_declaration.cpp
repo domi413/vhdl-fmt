@@ -3,6 +3,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <ranges>
+
 namespace builder {
 
 // ---------------------- Clauses ----------------------
@@ -51,9 +53,9 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 {
     auto param = make<ast::GenericParam>(ctx);
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        param.names.emplace_back(id_ctx->getText());
-    }
+    param.names = ctx->identifier_list()->identifier()
+                | std::views::transform([](auto *id) { return id->getText(); })
+                | std::ranges::to<std::vector>();
 
     if (auto *stype = ctx->subtype_indication()) {
         param.type_name = stype->getText();
@@ -68,9 +70,9 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
 {
     auto port = make<ast::Port>(ctx);
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        port.names.emplace_back(id_ctx->getText());
-    }
+    port.names = ctx->identifier_list()->identifier()
+               | std::views::transform([](auto *id) { return id->getText(); })
+               | std::ranges::to<std::vector>();
 
     if (auto *mode = ctx->signal_mode()) {
         port.mode = mode->getText();
@@ -95,9 +97,9 @@ auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) 
 {
     auto decl = make<ast::ConstantDecl>(ctx);
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        decl.names.emplace_back(id_ctx->getText());
-    }
+    decl.names = ctx->identifier_list()->identifier()
+               | std::views::transform([](auto *id) { return id->getText(); })
+               | std::ranges::to<std::vector>();
 
     if (auto *stype = ctx->subtype_indication()) {
         decl.type_name = stype->selected_name(0)->getText();
@@ -114,9 +116,9 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
 {
     auto decl = make<ast::SignalDecl>(ctx);
 
-    for (auto *id_ctx : ctx->identifier_list()->identifier()) {
-        decl.names.emplace_back(id_ctx->getText());
-    }
+    decl.names = ctx->identifier_list()->identifier()
+               | std::views::transform([](auto *id) { return id->getText(); })
+               | std::ranges::to<std::vector>();
 
     if (auto *stype = ctx->subtype_indication()) {
         decl.type_name = stype->selected_name(0)->getText();
