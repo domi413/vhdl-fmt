@@ -6,7 +6,6 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
-#include "builder/expr_helpers.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "vhdlParser.h"
 
@@ -35,6 +34,7 @@ class Translator final
     Translator(Translator &&) = delete;
     auto operator=(Translator &&) -> Translator & = delete;
 
+  private:
     // Design units - return by value
     [[nodiscard]]
     auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity;
@@ -141,28 +141,48 @@ class Translator final
     auto makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
       -> std::vector<ast::BinaryExpr>;
 
-  private:
-    // Helper methods to reduce boilerplate for common AST node creation
+    /// @brief Helper to create a boxed expression
+    template<typename T = ast::Expr>
+    [[nodiscard]]
+    auto box(T &&expr) -> ast::Box<T>
+    {
+        return std::make_unique<T>(std::forward<T>(expr));
+    }
+
+    /// @brief Helper to create binary expressions
     template<typename Ctx>
     [[nodiscard]]
     auto makeBinary(Ctx *ctx, std::string op, ast::Expr left, ast::Expr right) -> ast::Expr
     {
-        return expr_helpers::makeBinary(
-          trivia_, ctx, std::move(op), std::move(left), std::move(right));
+        ast::BinaryExpr bin;
+        trivia_.bind(bin, ctx);
+        bin.op = std::move(op);
+        bin.left = box(std::move(left));
+        bin.right = box(std::move(right));
+        return bin;
     }
 
+    /// @brief Helper to create unary expressions
     template<typename Ctx>
     [[nodiscard]]
     auto makeUnary(Ctx *ctx, std::string op, ast::Expr value) -> ast::Expr
     {
-        return expr_helpers::makeUnary(trivia_, ctx, std::move(op), std::move(value));
+        ast::UnaryExpr un;
+        trivia_.bind(un, ctx);
+        un.op = std::move(op);
+        un.value = box(std::move(value));
+        return un;
     }
 
+    /// @brief Helper to create token expressions
     template<typename Ctx>
     [[nodiscard]]
     auto makeToken(Ctx *ctx, std::string text) -> ast::Expr
     {
-        return expr_helpers::makeToken(trivia_, ctx, std::move(text));
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = std::move(text);
+        return tok;
     }
 };
 

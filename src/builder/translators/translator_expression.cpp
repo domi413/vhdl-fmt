@@ -1,5 +1,4 @@
 #include "ast/nodes/expressions.hpp"
-#include "builder/expr_helpers.hpp"
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
@@ -8,8 +7,6 @@
 // NOLINTBEGIN(misc-no-recursion)
 
 namespace builder {
-
-using expr_helpers::box;
 
 auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr
 {
