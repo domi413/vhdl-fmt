@@ -17,15 +17,10 @@ namespace builder {
 auto Translator::makeConcurrentAssign(
   vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
 {
-    if (auto result = ConcurrentAssignmentVisitor::translate(*this, ctx)) {
-        trivia_.bind(*result, ctx);
-        return std::move(*result);
-    }
-
-    // Fallback: return empty assignment if visitor didn't handle it
-    ast::ConcurrentAssign assign;
-    trivia_.bind(assign, ctx);
-    return assign;
+    ConcurrentAssignmentVisitor visitor{ *this };
+    auto result = visitor.translate(ctx);
+    trivia_.bind(result, ctx);
+    return result;
 }
 
 auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
@@ -35,9 +30,8 @@ auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementCon
     trivia_.bind(assign, ctx);
 
     if (auto *target_ctx = ctx->target()) {
-        if (auto target = TargetVisitor::translate(*this, target_ctx)) {
-            assign.target = std::move(*target);
-        }
+        TargetVisitor visitor{ *this };
+        assign.target = visitor.translate(target_ctx);
     }
 
     if (auto *wave = ctx->waveform()) {
@@ -57,9 +51,8 @@ auto Translator::makeVariableAssign(vhdlParser::Variable_assignment_statementCon
     trivia_.bind(assign, ctx);
 
     if (auto *target_ctx = ctx->target()) {
-        if (auto target = TargetVisitor::translate(*this, target_ctx)) {
-            assign.target = std::move(*target);
-        }
+        TargetVisitor visitor{ *this };
+        assign.target = visitor.translate(target_ctx);
     }
 
     if (auto *expr = ctx->expression()) {
@@ -154,10 +147,9 @@ auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::
 
     // Extract sequential statements
     if (auto *stmt_part = ctx->process_statement_part()) {
+        SequentialStatementVisitor visitor{ *this };
         for (auto *stmt : stmt_part->sequential_statement()) {
-            if (auto result = SequentialStatementVisitor::translate(*this, stmt)) {
-                proc.body.emplace_back(std::move(*result));
-            }
+            proc.body.emplace_back(visitor.translate(stmt));
         }
     }
 
@@ -228,11 +220,10 @@ auto Translator::makeSequenceOfStatements(vhdlParser::Sequence_of_statementsCont
   -> std::vector<ast::SequentialStatement>
 {
     std::vector<ast::SequentialStatement> statements;
+    SequentialStatementVisitor visitor{ *this };
 
     for (auto *stmt : ctx->sequential_statement()) {
-        if (auto result = SequentialStatementVisitor::translate(*this, stmt)) {
-            statements.emplace_back(std::move(*result));
-        }
+        statements.emplace_back(visitor.translate(stmt));
     }
 
     return statements;

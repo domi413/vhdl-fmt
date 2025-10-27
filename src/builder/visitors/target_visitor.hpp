@@ -7,23 +7,15 @@
 #include "vhdlParser.h"
 
 #include <any>
-#include <optional>
 
 namespace builder {
 
-class TargetVisitor final : public TypedVisitor<TargetVisitor, ast::Expr>
+class TargetVisitor final : public TypedVisitor<ast::Expr>
 {
     Translator &trans_;
 
   public:
     explicit TargetVisitor(Translator &trans) : trans_(trans) {}
-
-    static auto translate(Translator &trans, vhdlParser::TargetContext *ctx)
-      -> std::optional<ast::Expr>
-    {
-        TargetVisitor visitor{ trans };
-        return visitor.TypedVisitor::translate(ctx);
-    }
 
   private:
     auto visitName(vhdlParser::NameContext *ctx) -> std::any override

@@ -8,25 +8,16 @@
 #include "vhdlParser.h"
 
 #include <any>
-#include <optional>
 #include <utility>
+
 namespace builder {
 
-class ConcurrentAssignmentVisitor final
-  : public TypedVisitor<ConcurrentAssignmentVisitor, ast::ConcurrentAssign>
+class ConcurrentAssignmentVisitor final : public TypedVisitor<ast::ConcurrentAssign>
 {
     Translator &trans_;
 
   public:
     explicit ConcurrentAssignmentVisitor(Translator &trans) : trans_(trans) {}
-
-    static auto translate(Translator &trans,
-                          vhdlParser::Concurrent_signal_assignment_statementContext *ctx)
-      -> std::optional<ast::ConcurrentAssign>
-    {
-        ConcurrentAssignmentVisitor visitor{ trans };
-        return visitor.TypedVisitor::translate(ctx);
-    }
 
   private:
     auto visitConditional_signal_assignment(vhdlParser::Conditional_signal_assignmentContext *ctx)
@@ -35,9 +26,8 @@ class ConcurrentAssignmentVisitor final
         ast::ConcurrentAssign assign;
 
         if (auto *target_ctx = ctx->target()) {
-            if (auto target = TargetVisitor::translate(trans_, target_ctx)) {
-                assign.target = std::move(*target);
-            }
+            TargetVisitor visitor{ trans_ };
+            assign.target = visitor.translate(target_ctx);
         }
 
         // Get the waveform - for now we'll take the first waveform element's expression
@@ -60,9 +50,8 @@ class ConcurrentAssignmentVisitor final
         ast::ConcurrentAssign assign;
 
         if (auto *target_ctx = ctx->target()) {
-            if (auto target = TargetVisitor::translate(trans_, target_ctx)) {
-                assign.target = std::move(*target);
-            }
+            TargetVisitor visitor{ trans_ };
+            assign.target = visitor.translate(target_ctx);
         }
 
         // For selected assignments (with...select), we'll take the first waveform

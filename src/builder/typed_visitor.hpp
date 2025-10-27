@@ -5,25 +5,27 @@
 
 #include <optional>
 #include <tree/ParseTree.h>
+#include <utility>
 
 namespace builder {
 
-// CRTP-based typed visitor for ANTLR parse trees
-//
-// Usage pattern:
-//   class MyVisitor : public TypedVisitor<MyVisitor, MyReturnType> {
-//   public:
-//       static auto translate(Translator& t, Context* ctx) {
-//           MyVisitor v{t};
-//           return v.TypedVisitor::translate(ctx);
-//       }
-//   private:
-//       std::any visitSomeContext(SomeContext* ctx) override {
-//           setResult(computeResult(ctx));
-//           return {};
-//       }
-//   };
-template<typename Derived, typename ReturnType>
+/// @brief Typed visitor for ANTLR parse trees  
+/// Simplified pattern: removes CRTP, keeps setResult for move-only types
+///
+/// Usage:
+///   class MyVisitor : public TypedVisitor<MyReturnType> {
+///   public:
+///       explicit MyVisitor(Translator& t) : trans_(t) {}
+///   private:
+///       auto visitSomeContext(SomeContext* ctx) -> std::any override {
+///           setResult(computeResult(ctx));
+///           return {};
+///       }
+///   };
+///
+///   // Call site:
+///   auto result = MyVisitor{trans}.translate(ctx);
+template <typename ReturnType>
 class TypedVisitor : public vhdlParserBaseVisitor
 {
   public:
@@ -34,23 +36,23 @@ class TypedVisitor : public vhdlParserBaseVisitor
     TypedVisitor(TypedVisitor &&) = delete;
     auto operator=(TypedVisitor &&) -> TypedVisitor & = delete;
 
-    // Main entry point: visit tree and return typed result
-    auto translate(antlr4::tree::ParseTree *tree) -> std::optional<ReturnType>
+    /// @brief Main entry point: visit tree and return typed result
+    auto translate(antlr4::tree::ParseTree *tree) -> ReturnType
     {
-        result_value_.reset();
-        visit(tree); // ANTLR dispatch
-        return std::move(result_value_);
+        result_.reset();
+        visit(tree); // ANTLR dispatch to derived class
+        return std::move(*result_);
     }
 
   protected:
     TypedVisitor() = default;
 
-    // Called by derived class visit methods
-    void setResult(ReturnType &&value) { result_value_ = std::move(value); }
-    void setResult(const ReturnType &value) { result_value_ = value; }
+    /// @brief Store result from visit methods (handles move-only types)
+    void setResult(ReturnType &&value) { result_ = std::move(value); }
+    void setResult(const ReturnType &value) { result_ = value; }
 
   private:
-    std::optional<ReturnType> result_value_;
+    std::optional<ReturnType> result_;
 };
 
 } // namespace builder

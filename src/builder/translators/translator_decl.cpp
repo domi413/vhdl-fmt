@@ -41,9 +41,8 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         port.type_name = stype->selected_name(0)->getText();
 
         if (auto *constraint = stype->constraint()) {
-            if (auto constraints = ConstraintVisitor::translate(*this, constraint)) {
-                port.constraints = std::move(*constraints);
-            }
+            ConstraintVisitor visitor{ *this };
+            port.constraints = visitor.translate(constraint);
         }
     }
 
@@ -87,9 +86,8 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
         decl.type_name = stype->selected_name(0)->getText();
 
         if (auto *constraint = stype->constraint()) {
-            if (auto constraints = ConstraintVisitor::translate(*this, constraint)) {
-                decl.constraints = std::move(*constraints);
-            }
+            ConstraintVisitor visitor{ *this };
+            decl.constraints = visitor.translate(constraint);
         }
     }
 

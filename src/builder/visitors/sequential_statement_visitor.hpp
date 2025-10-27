@@ -7,24 +7,15 @@
 #include "vhdlParser.h"
 
 #include <any>
-#include <optional>
 
 namespace builder {
 
-class SequentialStatementVisitor final
-  : public TypedVisitor<SequentialStatementVisitor, ast::SequentialStatement>
+class SequentialStatementVisitor final : public TypedVisitor<ast::SequentialStatement>
 {
     Translator &trans_;
 
   public:
     explicit SequentialStatementVisitor(Translator &trans) : trans_(trans) {}
-
-    static auto translate(Translator &trans, vhdlParser::Sequential_statementContext *ctx)
-      -> std::optional<ast::SequentialStatement>
-    {
-        SequentialStatementVisitor visitor{ trans };
-        return visitor.TypedVisitor::translate(ctx);
-    }
 
   private:
     auto visitSignal_assignment_statement(vhdlParser::Signal_assignment_statementContext *ctx)
@@ -58,8 +49,11 @@ class SequentialStatementVisitor final
         if (auto *iter = ctx->iteration_scheme()) {
             if (iter->parameter_specification() != nullptr) {
                 setResult(trans_.makeForLoop(ctx));
-            } else if (iter->condition() != nullptr) {
+                return {};
+            }
+            if (iter->condition() != nullptr) {
                 setResult(trans_.makeWhileLoop(ctx));
+                return {};
             }
         }
         // Basic loop without iteration scheme - skip for now
