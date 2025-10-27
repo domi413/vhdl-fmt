@@ -9,8 +9,7 @@ namespace builder {
 
 auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause
 {
-    ast::GenericClause clause;
-    trivia_.bind(clause, ctx);
+    auto clause = make<ast::GenericClause>(ctx);
 
     auto *list = ctx->generic_list();
     if (list == nullptr) {
@@ -26,8 +25,7 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
 
 auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause
 {
-    ast::PortClause clause;
-    trivia_.bind(clause, ctx);
+    auto clause = make<ast::PortClause>(ctx);
 
     auto *list = ctx->port_list();
     if (list == nullptr) {
@@ -51,8 +49,7 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
 auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
   -> ast::GenericParam
 {
-    ast::GenericParam param;
-    trivia_.bind(param, ctx);
+    auto param = make<ast::GenericParam>(ctx);
 
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         param.names.emplace_back(id_ctx->getText());
@@ -69,8 +66,7 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 
 auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port
 {
-    ast::Port port;
-    trivia_.bind(port, ctx);
+    auto port = make<ast::Port>(ctx);
 
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         port.names.emplace_back(id_ctx->getText());
@@ -97,8 +93,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
 
 auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) -> ast::ConstantDecl
 {
-    ast::ConstantDecl decl;
-    trivia_.bind(decl, ctx);
+    auto decl = make<ast::ConstantDecl>(ctx);
 
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         decl.names.emplace_back(id_ctx->getText());
@@ -117,8 +112,7 @@ auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) 
 
 auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl
 {
-    ast::SignalDecl decl;
-    trivia_.bind(decl, ctx);
+    auto decl = make<ast::SignalDecl>(ctx);
 
     for (auto *id_ctx : ctx->identifier_list()->identifier()) {
         decl.names.emplace_back(id_ctx->getText());

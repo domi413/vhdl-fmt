@@ -79,8 +79,7 @@ auto Translator::makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr
 auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
 {
     if (ctx->expression() != nullptr) {
-        ast::ParenExpr paren;
-        trivia_.bind(paren, ctx);
+        auto paren = make<ast::ParenExpr>(ctx);
         paren.inner = box(makeExpr(ctx->expression()));
         return paren;
     }

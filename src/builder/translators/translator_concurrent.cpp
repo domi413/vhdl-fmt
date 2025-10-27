@@ -17,16 +17,13 @@ auto Translator::makeConcurrentAssign(
     }
 
     // Fallback for unhandled cases
-    ast::ConcurrentAssign assign;
-    trivia_.bind(assign, ctx);
-    return assign;
+    return make<ast::ConcurrentAssign>(ctx);
 }
 
 auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext *ctx)
   -> ast::ConcurrentAssign
 {
-    ast::ConcurrentAssign assign;
-    trivia_.bind(assign, ctx);
+    auto assign = make<ast::ConcurrentAssign>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -48,8 +45,7 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
 auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext *ctx)
   -> ast::ConcurrentAssign
 {
-    ast::ConcurrentAssign assign;
-    trivia_.bind(assign, ctx);
+    auto assign = make<ast::ConcurrentAssign>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -72,8 +68,7 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
 
 auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::Process
 {
-    ast::Process proc;
-    trivia_.bind(proc, ctx);
+    auto proc = make<ast::Process>(ctx);
 
     // Extract label if present
     if (auto *label = ctx->label_colon()) {

@@ -12,8 +12,7 @@ namespace builder {
 
 auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::IfStatement
 {
-    ast::IfStatement stmt;
-    trivia_.bind(stmt, ctx);
+    auto stmt = make<ast::IfStatement>(ctx);
 
     // Main if branch
     auto conditions = ctx->condition();
@@ -48,8 +47,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
 
 auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> ast::CaseStatement
 {
-    ast::CaseStatement stmt;
-    trivia_.bind(stmt, ctx);
+    auto stmt = make<ast::CaseStatement>(ctx);
 
     if (auto *expr = ctx->expression()) {
         stmt.selector = makeExpr(expr);
@@ -76,8 +74,7 @@ auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> as
 
 auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::ForLoop
 {
-    ast::ForLoop loop;
-    trivia_.bind(loop, ctx);
+    auto loop = make<ast::ForLoop>(ctx);
 
     // Check if it has a FOR iteration scheme
     if (auto *iter = ctx->iteration_scheme()) {
@@ -93,14 +90,12 @@ auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::For
                         loop.range = makeRange(explicit_r);
                     } else {
                         // It's a name
-                        ast::TokenExpr tok;
-                        trivia_.bind(tok, range_decl);
+                        auto tok = make<ast::TokenExpr>(range_decl);
                         tok.text = range_decl->getText();
                         loop.range = tok;
                     }
                 } else if (auto *subtype = range->subtype_indication()) {
-                    ast::TokenExpr tok;
-                    trivia_.bind(tok, subtype);
+                    auto tok = make<ast::TokenExpr>(subtype);
                     tok.text = subtype->getText();
                     loop.range = tok;
                 }
@@ -117,8 +112,7 @@ auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::For
 
 auto Translator::makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::WhileLoop
 {
-    ast::WhileLoop loop;
-    trivia_.bind(loop, ctx);
+    auto loop = make<ast::WhileLoop>(ctx);
 
     // Check if it has a WHILE iteration scheme
     if (auto *iter = ctx->iteration_scheme()) {

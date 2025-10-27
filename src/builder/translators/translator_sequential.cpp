@@ -18,8 +18,7 @@ auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr
     }
 
     // Fallback: return token with context text
-    ast::TokenExpr token;
-    trivia_.bind(token, ctx);
+    auto token = make<ast::TokenExpr>(ctx);
     token.text = ctx->getText();
     return token;
 }
@@ -27,8 +26,7 @@ auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr
 auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
   -> ast::SequentialAssign
 {
-    ast::SequentialAssign assign;
-    trivia_.bind(assign, ctx);
+    auto assign = make<ast::SequentialAssign>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -47,8 +45,7 @@ auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementCon
 auto Translator::makeVariableAssign(vhdlParser::Variable_assignment_statementContext *ctx)
   -> ast::SequentialAssign
 {
-    ast::SequentialAssign assign;
-    trivia_.bind(assign, ctx);
+    auto assign = make<ast::SequentialAssign>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);

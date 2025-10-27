@@ -37,8 +37,7 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
 
 auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity
 {
-    ast::Entity entity;
-    trivia_.bind(entity, ctx);
+    auto entity = make<ast::Entity>(ctx);
 
     entity.name = ctx->identifier(0)->getText();
 
@@ -61,8 +60,7 @@ auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::
 
 auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture
 {
-    ast::Architecture arch;
-    trivia_.bind(arch, ctx);
+    auto arch = make<ast::Architecture>(ctx);
 
     arch.name = ctx->identifier(0)->getText();
     arch.entity_name = ctx->identifier(1)->getText();

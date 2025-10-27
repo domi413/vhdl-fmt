@@ -12,12 +12,10 @@ namespace builder {
 
 auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
 {
-    ast::GroupExpr group;
-    trivia_.bind(group, ctx);
+    auto group = make<ast::GroupExpr>(ctx);
 
     for (auto *elem : ctx->element_association()) {
-        ast::BinaryExpr assoc;
-        trivia_.bind(assoc, elem);
+        auto assoc = make<ast::BinaryExpr>(elem);
         assoc.op = "=>";
 
         if (elem->choices() != nullptr) {
@@ -39,8 +37,7 @@ auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
         return makeChoice(ctx->choice(0));
     }
 
-    ast::GroupExpr grp;
-    trivia_.bind(grp, ctx);
+    auto grp = make<ast::GroupExpr>(ctx);
     for (auto *ch : ctx->choice()) {
         grp.children.emplace_back(makeChoice(ch));
     }

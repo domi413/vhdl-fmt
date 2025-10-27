@@ -72,8 +72,7 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 
 auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr
 {
-    ast::CallExpr slice_expr;
-    trivia_.bind(slice_expr, ctx);
+    auto slice_expr = make<ast::CallExpr>(ctx);
     slice_expr.callee = box(std::move(base));
 
     if (auto *dr = ctx->discrete_range()) {
@@ -101,8 +100,7 @@ auto Translator::makeCallExpr(ast::Expr base,
                               vhdlParser::Function_call_or_indexed_name_partContext *ctx)
   -> ast::Expr
 {
-    ast::CallExpr call_expr;
-    trivia_.bind(call_expr, ctx);
+    auto call_expr = make<ast::CallExpr>(ctx);
     call_expr.callee = box(std::move(base));
 
     if (auto *assoc_list = ctx->actual_parameter_part()) {
@@ -112,8 +110,7 @@ auto Translator::makeCallExpr(ast::Expr base,
             if (associations.size() == 1) {
                 call_expr.args = box(makeCallArgument(associations[0]));
             } else {
-                ast::GroupExpr group;
-                trivia_.bind(group, list_ctx);
+                auto group = make<ast::GroupExpr>(list_ctx);
                 for (auto *elem : associations) {
                     group.children.push_back(makeCallArgument(elem));
                 }

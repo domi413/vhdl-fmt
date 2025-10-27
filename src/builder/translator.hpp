@@ -151,6 +151,16 @@ class Translator final
         return std::make_unique<T>(std::forward<T>(expr));
     }
 
+    /// @brief Helper to create and bind an AST node with trivia
+    template<typename T, typename Ctx>
+    [[nodiscard]]
+    auto make(Ctx *ctx) -> T
+    {
+        T node;
+        trivia_.bind(node, ctx);
+        return node;
+    }
+
     /// @brief Helper to create binary expressions
     template<typename Ctx>
     [[nodiscard]]
