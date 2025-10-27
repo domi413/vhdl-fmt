@@ -1,78 +1,20 @@
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
-#include "builder/visitors/concurrent_assignment_visitor.hpp"
-#include "builder/visitors/sequential_statement_visitor.hpp"
-#include "builder/visitors/target_visitor.hpp"
 #include "vhdlParser.h"
 
 #include <cstddef>
+#include <ranges>
 #include <utility>
-#include <vector>
 
+// Recursion is used for traversing expression trees, which are typically shallow in VHDL parsing.
 // NOLINTBEGIN(misc-no-recursion)
 
 namespace builder {
 
-auto Translator::makeConcurrentAssign(
-  vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
-{
-    if (auto result = ConcurrentAssignmentVisitor::translate(*this, ctx)) {
-        trivia_.bind(*result, ctx);
-        return std::move(*result);
-    }
-
-    // Fallback: return empty assignment if visitor didn't handle it
-    ast::ConcurrentAssign assign;
-    trivia_.bind(assign, ctx);
-    return assign;
-}
-
-auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
-  -> ast::SequentialAssign
-{
-    ast::SequentialAssign assign;
-    trivia_.bind(assign, ctx);
-
-    if (auto *target_ctx = ctx->target()) {
-        if (auto target = TargetVisitor::translate(*this, target_ctx)) {
-            assign.target = std::move(*target);
-        }
-    }
-
-    if (auto *wave = ctx->waveform()) {
-        auto wave_elems = wave->waveform_element();
-        if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-            assign.value = makeExpr(wave_elems[0]->expression(0));
-        }
-    }
-
-    return assign;
-}
-
-auto Translator::makeVariableAssign(vhdlParser::Variable_assignment_statementContext *ctx)
-  -> ast::SequentialAssign
-{
-    ast::SequentialAssign assign;
-    trivia_.bind(assign, ctx);
-
-    if (auto *target_ctx = ctx->target()) {
-        if (auto target = TargetVisitor::translate(*this, target_ctx)) {
-            assign.target = std::move(*target);
-        }
-    }
-
-    if (auto *expr = ctx->expression()) {
-        assign.value = makeExpr(expr);
-    }
-
-    return assign;
-}
-
 auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::IfStatement
 {
-    ast::IfStatement stmt;
-    trivia_.bind(stmt, ctx);
+    auto stmt = make<ast::IfStatement>(ctx);
 
     // Main if branch
     auto conditions = ctx->condition();
@@ -107,8 +49,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
 
 auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> ast::CaseStatement
 {
-    ast::CaseStatement stmt;
-    trivia_.bind(stmt, ctx);
+    auto stmt = make<ast::CaseStatement>(ctx);
 
     if (auto *expr = ctx->expression()) {
         stmt.selector = makeExpr(expr);
@@ -118,9 +59,9 @@ auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> as
         ast::CaseStatement::WhenClause when_clause;
 
         if (auto *choices_ctx = alt->choices()) {
-            for (auto *choice : choices_ctx->choice()) {
-                when_clause.choices.push_back(makeChoice(choice));
-            }
+            when_clause.choices = choices_ctx->choice()
+                                | std::views::transform([this](auto *ch) { return makeChoice(ch); })
+                                | std::ranges::to<std::vector>();
         }
 
         if (auto *seq = alt->sequence_of_statements()) {
@@ -133,41 +74,9 @@ auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> as
     return stmt;
 }
 
-auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::Process
-{
-    ast::Process proc;
-    trivia_.bind(proc, ctx);
-
-    // Extract label if present
-    if (auto *label = ctx->label_colon()) {
-        if (auto *id = label->identifier()) {
-            proc.label = id->getText();
-        }
-    }
-
-    // Extract sensitivity list
-    if (auto *sens_list = ctx->sensitivity_list()) {
-        for (auto *name_ctx : sens_list->name()) {
-            proc.sensitivity_list.push_back(name_ctx->getText());
-        }
-    }
-
-    // Extract sequential statements
-    if (auto *stmt_part = ctx->process_statement_part()) {
-        for (auto *stmt : stmt_part->sequential_statement()) {
-            if (auto result = SequentialStatementVisitor::translate(*this, stmt)) {
-                proc.body.emplace_back(std::move(*result));
-            }
-        }
-    }
-
-    return proc;
-}
-
 auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::ForLoop
 {
-    ast::ForLoop loop;
-    trivia_.bind(loop, ctx);
+    auto loop = make<ast::ForLoop>(ctx);
 
     // Check if it has a FOR iteration scheme
     if (auto *iter = ctx->iteration_scheme()) {
@@ -183,14 +92,12 @@ auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::For
                         loop.range = makeRange(explicit_r);
                     } else {
                         // It's a name
-                        ast::TokenExpr tok;
-                        trivia_.bind(tok, range_decl);
+                        auto tok = make<ast::TokenExpr>(range_decl);
                         tok.text = range_decl->getText();
                         loop.range = tok;
                     }
                 } else if (auto *subtype = range->subtype_indication()) {
-                    ast::TokenExpr tok;
-                    trivia_.bind(tok, subtype);
+                    auto tok = make<ast::TokenExpr>(subtype);
                     tok.text = subtype->getText();
                     loop.range = tok;
                 }
@@ -207,8 +114,7 @@ auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::For
 
 auto Translator::makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::WhileLoop
 {
-    ast::WhileLoop loop;
-    trivia_.bind(loop, ctx);
+    auto loop = make<ast::WhileLoop>(ctx);
 
     // Check if it has a WHILE iteration scheme
     if (auto *iter = ctx->iteration_scheme()) {
@@ -222,20 +128,6 @@ auto Translator::makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::W
     }
 
     return loop;
-}
-
-auto Translator::makeSequenceOfStatements(vhdlParser::Sequence_of_statementsContext *ctx)
-  -> std::vector<ast::SequentialStatement>
-{
-    std::vector<ast::SequentialStatement> statements;
-
-    for (auto *stmt : ctx->sequential_statement()) {
-        if (auto result = SequentialStatementVisitor::translate(*this, stmt)) {
-            statements.emplace_back(std::move(*result));
-        }
-    }
-
-    return statements;
 }
 
 } // namespace builder
