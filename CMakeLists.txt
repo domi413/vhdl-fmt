@@ -49,7 +49,7 @@ add_custom_command(
         ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
     COMMAND
         ${ANTLR4_EXECUTABLE} -Dlanguage=Cpp ${GRAMMAR_FILES} -lib ${GRAMMAR_DIR}
-        -o ${GENERATED_DIR} -no-listener -visitor
+        -o ${GENERATED_DIR} -no-listener
     DEPENDS
         ${GRAMMAR_FILES}
     COMMENT "Generating VHDL lexer and parser using ANTLR4"
