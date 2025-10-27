@@ -13,13 +13,10 @@ auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr
     if (ctx->relation().size() == 1) {
         return makeRelation(ctx->relation(0));
     }
-
-    ast::BinaryExpr bin;
-    trivia_.bind(bin, ctx);
-    bin.op = ctx->logical_operator(0)->getText();
-    bin.left = box(makeRelation(ctx->relation(0)));
-    bin.right = box(makeRelation(ctx->relation(1)));
-    return bin;
+    return makeBinary(ctx,
+                      ctx->logical_operator(0)->getText(),
+                      makeRelation(ctx->relation(0)),
+                      makeRelation(ctx->relation(1)));
 }
 
 auto Translator::makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr
@@ -27,13 +24,10 @@ auto Translator::makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr
     if (ctx->relational_operator() == nullptr) {
         return makeShiftExpr(ctx->shift_expression(0));
     }
-
-    ast::BinaryExpr bin;
-    trivia_.bind(bin, ctx);
-    bin.op = ctx->relational_operator()->getText();
-    bin.left = box(makeShiftExpr(ctx->shift_expression(0)));
-    bin.right = box(makeShiftExpr(ctx->shift_expression(1)));
-    return bin;
+    return makeBinary(ctx,
+                      ctx->relational_operator()->getText(),
+                      makeShiftExpr(ctx->shift_expression(0)),
+                      makeShiftExpr(ctx->shift_expression(1)));
 }
 
 auto Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast::Expr
@@ -41,35 +35,22 @@ auto Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast:
     if (ctx->shift_operator() == nullptr) {
         return makeSimpleExpr(ctx->simple_expression(0));
     }
-
-    ast::BinaryExpr bin;
-    trivia_.bind(bin, ctx);
-    bin.op = ctx->shift_operator()->getText();
-    bin.left = box(makeSimpleExpr(ctx->simple_expression(0)));
-    bin.right = box(makeSimpleExpr(ctx->simple_expression(1)));
-    return bin;
+    return makeBinary(ctx,
+                      ctx->shift_operator()->getText(),
+                      makeSimpleExpr(ctx->simple_expression(0)),
+                      makeSimpleExpr(ctx->simple_expression(1)));
 }
 
 auto Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr
 {
-    if ((ctx->PLUS() != nullptr) || (ctx->MINUS() != nullptr)) {
-        ast::UnaryExpr un;
-        trivia_.bind(un, ctx);
-        un.op = (ctx->PLUS() != nullptr) ? "+" : "-";
-        un.value = box(makeTerm(ctx->term(0)));
-        return un;
+    if (ctx->PLUS() != nullptr || ctx->MINUS() != nullptr) {
+        return makeUnary(ctx, ctx->PLUS() != nullptr ? "+" : "-", makeTerm(ctx->term(0)));
     }
-
     if (ctx->adding_operator().empty()) {
         return makeTerm(ctx->term(0));
     }
-
-    ast::BinaryExpr bin;
-    trivia_.bind(bin, ctx);
-    bin.op = ctx->adding_operator(0)->getText();
-    bin.left = box(makeTerm(ctx->term(0)));
-    bin.right = box(makeTerm(ctx->term(1)));
-    return bin;
+    return makeBinary(
+      ctx, ctx->adding_operator(0)->getText(), makeTerm(ctx->term(0)), makeTerm(ctx->term(1)));
 }
 
 auto Translator::makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr
@@ -77,42 +58,23 @@ auto Translator::makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr
     if (ctx->multiplying_operator().empty()) {
         return makeFactor(ctx->factor(0));
     }
-
-    ast::BinaryExpr bin;
-    trivia_.bind(bin, ctx);
-    bin.op = ctx->multiplying_operator(0)->getText();
-    bin.left = box(makeFactor(ctx->factor(0)));
-    bin.right = box(makeFactor(ctx->factor(1)));
-    return bin;
+    return makeBinary(ctx,
+                      ctx->multiplying_operator(0)->getText(),
+                      makeFactor(ctx->factor(0)),
+                      makeFactor(ctx->factor(1)));
 }
 
 auto Translator::makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr
 {
     if (ctx->DOUBLESTAR() != nullptr) {
-        ast::BinaryExpr bin;
-        trivia_.bind(bin, ctx);
-        bin.op = "**";
-        bin.left = box(makePrimary(ctx->primary(0)));
-        bin.right = box(makePrimary(ctx->primary(1)));
-        return bin;
+        return makeBinary(ctx, "**", makePrimary(ctx->primary(0)), makePrimary(ctx->primary(1)));
     }
-
     if (ctx->ABS() != nullptr) {
-        ast::UnaryExpr un;
-        trivia_.bind(un, ctx);
-        un.op = "abs";
-        un.value = box(makePrimary(ctx->primary(0)));
-        return un;
+        return makeUnary(ctx, "abs", makePrimary(ctx->primary(0)));
     }
-
     if (ctx->NOT() != nullptr) {
-        ast::UnaryExpr un;
-        trivia_.bind(un, ctx);
-        un.op = "not";
-        un.value = box(makePrimary(ctx->primary(0)));
-        return un;
+        return makeUnary(ctx, "not", makePrimary(ctx->primary(0)));
     }
-
     return makePrimary(ctx->primary(0));
 }
 
@@ -124,19 +86,13 @@ auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
         paren.inner = box(makeExpr(ctx->expression()));
         return paren;
     }
-
     if (ctx->aggregate() != nullptr) {
         return makeAggregate(ctx->aggregate());
     }
-
     if (auto *name_ctx = ctx->name()) {
         return makeName(name_ctx);
     }
-
-    ast::TokenExpr tok;
-    trivia_.bind(tok, ctx);
-    tok.text = ctx->getText();
-    return tok;
+    return makeToken(ctx, ctx->getText());
 }
 
 auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
@@ -145,8 +101,12 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
     // If not, just keep the whole name as a single token
     bool has_structure = false;
     for (auto *part : ctx->name_part()) {
-        if (part->function_call_or_indexed_name_part() != nullptr ||
-            part->slice_name_part() != nullptr || part->attribute_name_part() != nullptr) {
+        if (part->function_call_or_indexed_name_part()
+            != nullptr
+            || part->slice_name_part()
+            != nullptr
+            || part->attribute_name_part()
+            != nullptr) {
             has_structure = true;
             break;
         }
@@ -154,10 +114,7 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 
     if (!has_structure) {
         // Simple name (possibly with dots like "rec.field") - keep as one token
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = ctx->getText();
-        return tok;
+        return makeToken(ctx, ctx->getText());
     }
 
     // Has structural parts - build up the base, then apply operations
@@ -169,24 +126,17 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
         base_text = ctx->STRING_LITERAL()->getText();
     } else {
         // Shouldn't happen, but fallback
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = ctx->getText();
-        return tok;
+        return makeToken(ctx, ctx->getText());
     }
 
     // Consume consecutive selected_name_parts into base
     size_t i = 0;
-    while (i < ctx->name_part().size() &&
-           ctx->name_part()[i]->selected_name_part() != nullptr) {
+    while (i < ctx->name_part().size() && ctx->name_part()[i]->selected_name_part() != nullptr) {
         base_text += ctx->name_part()[i]->getText();
         i++;
     }
 
-    ast::TokenExpr base_tok;
-    trivia_.bind(base_tok, ctx);
-    base_tok.text = base_text;
-    ast::Expr base = base_tok;
+    ast::Expr base = makeToken(ctx, base_text);
 
     // Process remaining structural parts
     for (; i < ctx->name_part().size(); ++i) {
@@ -205,8 +155,7 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
     return base;
 }
 
-auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx)
-  -> ast::Expr
+auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr
 {
     ast::CallExpr slice_expr;
     trivia_.bind(slice_expr, ctx);
@@ -217,17 +166,10 @@ auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContex
             if (auto *er = rd->explicit_range()) {
                 slice_expr.args = box(makeRange(er));
             } else {
-                // It's a name-based range
-                ast::TokenExpr tok;
-                trivia_.bind(tok, rd);
-                tok.text = rd->getText();
-                slice_expr.args = box(ast::Expr{ std::move(tok) });
+                slice_expr.args = box(makeToken(rd, rd->getText()));
             }
         } else if (auto *subtype = dr->subtype_indication()) {
-            ast::TokenExpr tok;
-            trivia_.bind(tok, subtype);
-            tok.text = subtype->getText();
-            slice_expr.args = box(ast::Expr{ std::move(tok) });
+            slice_expr.args = box(makeToken(subtype, subtype->getText()));
         }
     }
 
@@ -237,37 +179,24 @@ auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContex
 auto Translator::makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx)
   -> ast::Expr
 {
-    ast::BinaryExpr sel_expr;
-    trivia_.bind(sel_expr, ctx);
-    sel_expr.op = ".";
-    sel_expr.left = box(std::move(base));
-
-    ast::TokenExpr tok;
-    trivia_.bind(tok, ctx);
-    tok.text = ctx->getText().substr(1); // Remove leading dot
-    sel_expr.right = box(ast::Expr{ std::move(tok) });
-
-    return sel_expr;
+    return makeBinary(ctx, ".", std::move(base), makeToken(ctx, ctx->getText().substr(1)));
 }
 
 auto Translator::makeCallExpr(ast::Expr base,
-                               vhdlParser::Function_call_or_indexed_name_partContext *ctx)
+                              vhdlParser::Function_call_or_indexed_name_partContext *ctx)
   -> ast::Expr
 {
     ast::CallExpr call_expr;
     trivia_.bind(call_expr, ctx);
     call_expr.callee = box(std::move(base));
 
-    // Parse the actual parameter part (association list)
     if (auto *assoc_list = ctx->actual_parameter_part()) {
         if (auto *list_ctx = assoc_list->association_list()) {
             auto associations = list_ctx->association_element();
 
             if (associations.size() == 1) {
-                // Single argument - extract it directly
                 call_expr.args = box(makeCallArgument(associations[0]));
             } else {
-                // Multiple arguments - create a group
                 ast::GroupExpr group;
                 trivia_.bind(group, list_ctx);
                 for (auto *elem : associations) {
@@ -276,11 +205,7 @@ auto Translator::makeCallExpr(ast::Expr base,
                 call_expr.args = box(ast::Expr{ std::move(group) });
             }
         } else {
-            // Fallback: use raw text
-            ast::TokenExpr tok;
-            trivia_.bind(tok, ctx);
-            tok.text = ctx->getText();
-            call_expr.args = box(ast::Expr{ std::move(tok) });
+            call_expr.args = box(makeToken(ctx, ctx->getText()));
         }
     }
 
@@ -290,17 +215,7 @@ auto Translator::makeCallExpr(ast::Expr base,
 auto Translator::makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
   -> ast::Expr
 {
-    ast::BinaryExpr attr_expr;
-    trivia_.bind(attr_expr, ctx);
-    attr_expr.op = "'";
-    attr_expr.left = box(std::move(base));
-
-    ast::TokenExpr tok;
-    trivia_.bind(tok, ctx);
-    tok.text = ctx->getText().substr(1); // Remove leading apostrophe
-    attr_expr.right = box(ast::Expr{ std::move(tok) });
-
-    return attr_expr;
+    return makeBinary(ctx, "'", std::move(base), makeToken(ctx, ctx->getText().substr(1)));
 }
 
 auto Translator::makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr
@@ -310,23 +225,11 @@ auto Translator::makeCallArgument(vhdlParser::Association_elementContext *ctx) -
             if (auto *expr = designator->expression()) {
                 return makeExpr(expr);
             }
-            // OPEN keyword or other
-            ast::TokenExpr tok;
-            trivia_.bind(tok, designator);
-            tok.text = designator->getText();
-            return tok;
+            return makeToken(designator, designator->getText());
         }
-        // Fallback
-        ast::TokenExpr tok;
-        trivia_.bind(tok, actual);
-        tok.text = actual->getText();
-        return tok;
+        return makeToken(actual, actual->getText());
     }
-    // Empty - shouldn't happen
-    ast::TokenExpr tok;
-    trivia_.bind(tok, ctx);
-    tok.text = ctx->getText();
-    return tok;
+    return makeToken(ctx, ctx->getText());
 }
 
 auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
@@ -369,23 +272,14 @@ auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
 auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
 {
     if (ctx->OTHERS() != nullptr) {
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = "others";
-        return tok;
+        return makeToken(ctx, "others");
     }
-
     if (ctx->identifier() != nullptr) {
-        ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
-        tok.text = ctx->identifier()->getText();
-        return tok;
+        return makeToken(ctx, ctx->identifier()->getText());
     }
-
     if (ctx->simple_expression() != nullptr) {
         return makeSimpleExpr(ctx->simple_expression());
     }
-
     if (auto *dr = ctx->discrete_range()) {
         if (auto *rd = dr->range_decl()) {
             if (auto *er = rd->explicit_range()) {
@@ -393,26 +287,7 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
             }
         }
     }
-
-    ast::TokenExpr tok;
-    trivia_.bind(tok, ctx);
-    tok.text = ctx->getText();
-    return tok;
-}
-
-auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr
-{
-    // If there's no direction, it's just a simple expression (single value, not a range)
-    if (ctx->direction() == nullptr || ctx->simple_expression().size() < 2) {
-        return makeSimpleExpr(ctx->simple_expression(0));
-    }
-
-    ast::BinaryExpr range;
-    trivia_.bind(range, ctx);
-    range.op = ctx->direction()->getText();
-    range.left = box(makeSimpleExpr(ctx->simple_expression(0)));
-    range.right = box(makeSimpleExpr(ctx->simple_expression(1)));
-    return range;
+    return makeToken(ctx, ctx->getText());
 }
 
 } // namespace builder

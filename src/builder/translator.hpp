@@ -124,14 +124,48 @@ class Translator final
       -> std::vector<ast::BinaryExpr>;
 
   private:
+    // Helper methods to reduce boilerplate for common AST node creation
+    template<typename Ctx>
+    [[nodiscard]]
+    auto makeBinary(Ctx *ctx, std::string op, ast::Expr left, ast::Expr right) -> ast::Expr
+    {
+        ast::BinaryExpr bin;
+        trivia_.bind(bin, ctx);
+        bin.op = std::move(op);
+        bin.left = box(std::move(left));
+        bin.right = box(std::move(right));
+        return bin;
+    }
+
+    template<typename Ctx>
+    [[nodiscard]]
+    auto makeUnary(Ctx *ctx, std::string op, ast::Expr value) -> ast::Expr
+    {
+        ast::UnaryExpr un;
+        trivia_.bind(un, ctx);
+        un.op = std::move(op);
+        un.value = box(std::move(value));
+        return un;
+    }
+
+    template<typename Ctx>
+    [[nodiscard]]
+    auto makeToken(Ctx *ctx, std::string text) -> ast::Expr
+    {
+        ast::TokenExpr tok;
+        trivia_.bind(tok, ctx);
+        tok.text = std::move(text);
+        return tok;
+    }
+
     // Helper methods for makeName - process different name part types
     [[nodiscard]]
     auto makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr;
     [[nodiscard]]
     auto makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx) -> ast::Expr;
     [[nodiscard]]
-    auto makeCallExpr(ast::Expr base,
-                      vhdlParser::Function_call_or_indexed_name_partContext *ctx) -> ast::Expr;
+    auto makeCallExpr(ast::Expr base, vhdlParser::Function_call_or_indexed_name_partContext *ctx)
+      -> ast::Expr;
     [[nodiscard]]
     auto makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
       -> ast::Expr;

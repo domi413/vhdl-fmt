@@ -44,4 +44,17 @@ auto Translator::makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
     return constraints;
 }
 
+auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr
+{
+    // If there's no direction, it's just a simple expression (single value, not a range)
+    if (ctx->direction() == nullptr || ctx->simple_expression().size() < 2) {
+        return makeSimpleExpr(ctx->simple_expression(0));
+    }
+
+    return makeBinary(ctx,
+                      ctx->direction()->getText(),
+                      makeSimpleExpr(ctx->simple_expression(0)),
+                      makeSimpleExpr(ctx->simple_expression(1)));
+}
+
 } // namespace builder
