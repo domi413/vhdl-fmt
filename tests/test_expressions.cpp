@@ -9,7 +9,8 @@
 #include <variant>
 
 // Helper to get expression from signal initialization
-static auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
+namespace {
+auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
 {
     if (design.units.size() < 2) {
         return nullptr;
@@ -24,6 +25,7 @@ static auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr 
     }
     return &(*signal->init_expr);
 }
+} // namespace
 
 // -----------------------------------------------------------------------------
 // Token expressions: literals and identifiers

@@ -10,6 +10,8 @@
 #include "vhdlParser.h"
 
 #include <CommonTokenStream.h>
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace builder {
