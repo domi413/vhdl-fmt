@@ -1,6 +1,5 @@
 #include "ast/nodes/declarations.hpp"
 #include "builder/translator.hpp"
-#include "builder/visitors/constraint_visitor.hpp"
 #include "vhdlParser.h"
 
 namespace builder {
@@ -39,8 +38,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         port.type_name = stype->selected_name(0)->getText();
 
         if (auto *constraint = stype->constraint()) {
-            ConstraintVisitor visitor{ *this };
-            port.constraints = visitor.translate(constraint);
+            port.constraints = makeConstraint(constraint);
         }
     }
 
@@ -84,8 +82,7 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
         decl.type_name = stype->selected_name(0)->getText();
 
         if (auto *constraint = stype->constraint()) {
-            ConstraintVisitor visitor{ *this };
-            decl.constraints = visitor.translate(constraint);
+            decl.constraints = makeConstraint(constraint);
         }
     }
 

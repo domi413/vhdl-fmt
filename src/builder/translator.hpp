@@ -87,6 +87,9 @@ class Translator final
     [[nodiscard]]
     auto makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::WhileLoop;
     [[nodiscard]]
+    auto makeSequentialStatement(vhdlParser::Sequential_statementContext *ctx)
+      -> ast::SequentialStatement;
+    [[nodiscard]]
     auto makeSequenceOfStatements(vhdlParser::Sequence_of_statementsContext *ctx)
       -> std::vector<ast::SequentialStatement>;
 
@@ -129,6 +132,8 @@ class Translator final
     auto makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr;
 
     // Constraints
+    [[nodiscard]]
+    auto makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vector<ast::BinaryExpr>;
     [[nodiscard]]
     auto makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
       -> std::vector<ast::BinaryExpr>;

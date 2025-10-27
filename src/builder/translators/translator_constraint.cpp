@@ -8,6 +8,21 @@
 
 namespace builder {
 
+auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx)
+  -> std::vector<ast::BinaryExpr>
+{
+    // Dispatch based on concrete constraint type
+    if (auto *index = ctx->index_constraint()) {
+        return makeIndexConstraint(index);
+    }
+    if (auto *range = ctx->range_constraint()) {
+        return makeRangeConstraint(range);
+    }
+
+    // Fallback: return empty vector
+    return {};
+}
+
 auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
   -> std::vector<ast::BinaryExpr>
 {

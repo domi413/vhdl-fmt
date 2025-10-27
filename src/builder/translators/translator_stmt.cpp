@@ -1,9 +1,6 @@
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
-#include "builder/visitors/concurrent_assignment_visitor.hpp"
-#include "builder/visitors/sequential_statement_visitor.hpp"
-#include "builder/visitors/target_visitor.hpp"
 #include "vhdlParser.h"
 
 #include <cstddef>
@@ -17,10 +14,18 @@ namespace builder {
 auto Translator::makeConcurrentAssign(
   vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
 {
-    ConcurrentAssignmentVisitor visitor{ *this };
-    auto result = visitor.translate(ctx);
-    trivia_.bind(result, ctx);
-    return result;
+    // Dispatch based on concrete assignment type
+    if (auto *cond = ctx->conditional_signal_assignment()) {
+        return makeConditionalAssign(cond);
+    }
+    if (auto *sel = ctx->selected_signal_assignment()) {
+        return makeSelectedAssign(sel);
+    }
+
+    // Fallback for unhandled cases
+    ast::ConcurrentAssign assign;
+    trivia_.bind(assign, ctx);
+    return assign;
 }
 
 auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext *ctx)
@@ -73,8 +78,19 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
 
 auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr
 {
-    TargetVisitor visitor{ *this };
-    return visitor.translate(ctx);
+    // Dispatch based on concrete target type
+    if (auto *name = ctx->name()) {
+        return makeName(name);
+    }
+    if (auto *agg = ctx->aggregate()) {
+        return makeAggregate(agg);
+    }
+
+    // Fallback: return token with context text
+    ast::TokenExpr token;
+    trivia_.bind(token, ctx);
+    token.text = ctx->getText();
+    return token;
 }
 
 auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
@@ -199,9 +215,8 @@ auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::
 
     // Extract sequential statements
     if (auto *stmt_part = ctx->process_statement_part()) {
-        SequentialStatementVisitor visitor{ *this };
         for (auto *stmt : stmt_part->sequential_statement()) {
-            proc.body.emplace_back(visitor.translate(stmt));
+            proc.body.emplace_back(makeSequentialStatement(stmt));
         }
     }
 
@@ -268,14 +283,48 @@ auto Translator::makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::W
     return loop;
 }
 
+auto Translator::makeSequentialStatement(vhdlParser::Sequential_statementContext *ctx)
+  -> ast::SequentialStatement
+{
+    // Dispatch based on concrete statement type
+    if (auto *signal_assign = ctx->signal_assignment_statement()) {
+        return makeSequentialAssign(signal_assign);
+    }
+    if (auto *var_assign = ctx->variable_assignment_statement()) {
+        return makeVariableAssign(var_assign);
+    }
+    if (auto *if_stmt = ctx->if_statement()) {
+        return makeIfStatement(if_stmt);
+    }
+    if (auto *case_stmt = ctx->case_statement()) {
+        return makeCaseStatement(case_stmt);
+    }
+    if (auto *loop_stmt = ctx->loop_statement()) {
+        if (auto *iter = loop_stmt->iteration_scheme()) {
+            if (iter->parameter_specification() != nullptr) {
+                return makeForLoop(loop_stmt);
+            }
+            if (iter->condition() != nullptr) {
+                return makeWhileLoop(loop_stmt);
+            }
+        }
+        // Basic loop without iteration scheme - not yet supported, return empty
+    }
+
+    // TODO(dyb): Add support for wait_statement, assertion_statement,
+    // report_statement, next_statement, exit_statement, return_statement, etc.
+
+    // Fallback: return empty assignment as placeholder
+    return ast::SequentialAssign{};
+}
+
 auto Translator::makeSequenceOfStatements(vhdlParser::Sequence_of_statementsContext *ctx)
   -> std::vector<ast::SequentialStatement>
 {
     std::vector<ast::SequentialStatement> statements;
-    SequentialStatementVisitor visitor{ *this };
 
     for (auto *stmt : ctx->sequential_statement()) {
-        statements.emplace_back(visitor.translate(stmt));
+        statements.emplace_back(makeSequentialStatement(stmt));
     }
 
     return statements;
