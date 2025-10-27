@@ -114,6 +114,14 @@ class Translator final
     auto makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr;
     [[nodiscard]]
     auto makeName(vhdlParser::NameContext *ctx) -> ast::Expr;
+
+    // Constraints
+    [[nodiscard]]
+    auto makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
+      -> std::vector<ast::BinaryExpr>;
+    [[nodiscard]]
+    auto makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
+      -> std::vector<ast::BinaryExpr>;
 };
 
 } // namespace builder

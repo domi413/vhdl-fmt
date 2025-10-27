@@ -3,6 +3,7 @@ add_executable(
     test_argument_parser.cpp
     test_comments.cpp
     test_config_reader.cpp
+    test_constraints.cpp
     test_declarations.cpp
     test_newlines.cpp
 )

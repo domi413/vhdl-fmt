@@ -2,6 +2,7 @@ add_library(
     builder
     STATIC
     ast_builder.cpp
+    translators/translator_constraint.cpp
     translators/translator_decl.cpp
     translators/translator_expr.cpp
     translators/translator_stmt.cpp

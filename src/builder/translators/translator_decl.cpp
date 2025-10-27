@@ -1,6 +1,9 @@
 #include "ast/nodes/declarations.hpp"
 #include "builder/translator.hpp"
+#include "builder/visitors/constraint_visitor.hpp"
 #include "vhdlParser.h"
+
+#include <utility>
 
 namespace builder {
 
@@ -38,9 +41,9 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         port.type_name = stype->selected_name(0)->getText();
 
         if (auto *constraint = stype->constraint()) {
-            // TODO(dyb): Process constraints properly
-            // For now, constraints are left empty - full constraint support needs implementation
-            (void)constraint;
+            if (auto constraints = ConstraintVisitor::translate(*this, constraint)) {
+                port.constraints = std::move(*constraints);
+            }
         }
     }
 
@@ -82,20 +85,18 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
 
     if (auto *stype = ctx->subtype_indication()) {
         decl.type_name = stype->selected_name(0)->getText();
+
+        if (auto *constraint = stype->constraint()) {
+            if (auto constraints = ConstraintVisitor::translate(*this, constraint)) {
+                decl.constraints = std::move(*constraints);
+            }
+        }
     }
 
     decl.has_bus_kw = false;
     if (auto *kind = ctx->signal_kind()) {
         if (kind->BUS() != nullptr) {
             decl.has_bus_kw = true;
-        }
-    }
-
-    if (auto *stype = ctx->subtype_indication()) {
-        if (auto *constraint = stype->constraint()) {
-            // TODO(dyb): Process constraints properly
-            // For now, constraints are left empty - full constraint support needs implementation
-            (void)constraint;
         }
     }
 
