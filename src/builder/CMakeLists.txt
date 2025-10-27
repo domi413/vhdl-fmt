@@ -3,9 +3,9 @@ add_library(
     STATIC
     ast_builder.cpp
     translators/translator_constraint.cpp
-    translators/translator_decl.cpp
-    translators/translator_expr.cpp
-    translators/translator_stmt.cpp
+    translators/translator_declaration.cpp
+    translators/translator_expression.cpp
+    translators/translator_statement.cpp
     translators/translator_unit.cpp
     trivia/trivia_binder.cpp
 )
