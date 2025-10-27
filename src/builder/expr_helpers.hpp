@@ -11,7 +11,7 @@
 namespace builder::expr_helpers {
 
 /// @brief Helper to create a boxed expression
-template <typename T = ast::Expr>
+template<typename T = ast::Expr>
 [[nodiscard]]
 inline auto box(T &&expr) -> ast::Box<T>
 {
@@ -19,9 +19,12 @@ inline auto box(T &&expr) -> ast::Box<T>
 }
 
 /// @brief Helper to create binary expressions
-template <typename Ctx>
+template<typename Ctx>
 [[nodiscard]]
-inline auto makeBinary(TriviaBinder &trivia, Ctx *ctx, std::string op, ast::Expr left,
+inline auto makeBinary(TriviaBinder &trivia,
+                       Ctx *ctx,
+                       std::string op,
+                       ast::Expr left,
                        ast::Expr right) -> ast::Expr
 {
     ast::BinaryExpr bin;
@@ -33,7 +36,7 @@ inline auto makeBinary(TriviaBinder &trivia, Ctx *ctx, std::string op, ast::Expr
 }
 
 /// @brief Helper to create unary expressions
-template <typename Ctx>
+template<typename Ctx>
 [[nodiscard]]
 inline auto makeUnary(TriviaBinder &trivia, Ctx *ctx, std::string op, ast::Expr value) -> ast::Expr
 {
@@ -45,7 +48,7 @@ inline auto makeUnary(TriviaBinder &trivia, Ctx *ctx, std::string op, ast::Expr 
 }
 
 /// @brief Helper to create token expressions
-template <typename Ctx>
+template<typename Ctx>
 [[nodiscard]]
 inline auto makeToken(TriviaBinder &trivia, Ctx *ctx, std::string text) -> ast::Expr
 {
