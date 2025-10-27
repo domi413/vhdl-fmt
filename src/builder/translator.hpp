@@ -164,11 +164,11 @@ class Translator final
     /// @brief Helper to create binary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeBinary(Ctx *ctx, std::string op, ast::Expr left, ast::Expr right) -> ast::Expr
+    auto makeBinary(const Ctx *ctx, const std::string_view op, ast::Expr left, ast::Expr right) -> ast::Expr
     {
         ast::BinaryExpr bin;
         trivia_.bind(bin, ctx);
-        bin.op = std::move(op);
+        bin.op = op;
         bin.left = box(std::move(left));
         bin.right = box(std::move(right));
         return bin;
@@ -177,11 +177,11 @@ class Translator final
     /// @brief Helper to create unary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeUnary(Ctx *ctx, std::string op, ast::Expr value) -> ast::Expr
+    auto makeUnary(const Ctx *ctx, const std::string_view op, ast::Expr value) -> ast::Expr
     {
         ast::UnaryExpr un;
         trivia_.bind(un, ctx);
-        un.op = std::move(op);
+        un.op = op;
         un.value = box(std::move(value));
         return un;
     }
@@ -189,11 +189,11 @@ class Translator final
     /// @brief Helper to create token expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeToken(Ctx *ctx, std::string text) -> ast::Expr
+    auto makeToken(const Ctx *ctx, const std::string_view text) -> ast::Expr
     {
         ast::TokenExpr tok;
         trivia_.bind(tok, ctx);
-        tok.text = std::move(text);
+        tok.text = text;
         return tok;
     }
 };
