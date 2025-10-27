@@ -11,23 +11,13 @@
 
 namespace builder {
 
-// CRTP-based visitor for assignment targets
-//
-// Translates VHDL target contexts (used in assignments) to AST expressions.
-// Targets can be:
-// - Names (signals, variables)
-// - Aggregates (for multiple assignments)
-//
-// Usage:
-//   auto target = TargetVisitor::translate(translator, target_ctx);
-class TargetVisitor : public TypedVisitor<TargetVisitor, ast::Expr>
+class TargetVisitor final : public TypedVisitor<TargetVisitor, ast::Expr>
 {
     Translator &trans_;
 
   public:
     explicit TargetVisitor(Translator &trans) : trans_(trans) {}
 
-    // Static factory method for convenient usage
     static auto translate(Translator &trans, vhdlParser::TargetContext *ctx)
       -> std::optional<ast::Expr>
     {
@@ -36,14 +26,12 @@ class TargetVisitor : public TypedVisitor<TargetVisitor, ast::Expr>
     }
 
   private:
-    // Target can be a name
     auto visitName(vhdlParser::NameContext *ctx) -> std::any override
     {
         setResult(trans_.makeName(ctx));
         return {};
     }
 
-    // Target can be an aggregate
     auto visitAggregate(vhdlParser::AggregateContext *ctx) -> std::any override
     {
         setResult(trans_.makeAggregate(ctx));

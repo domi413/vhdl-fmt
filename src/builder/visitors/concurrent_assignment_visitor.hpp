@@ -12,15 +12,6 @@
 #include <utility>
 namespace builder {
 
-// CRTP-based visitor for concurrent signal assignments
-//
-// Translates VHDL concurrent assignment contexts to AST ConcurrentAssign nodes.
-// Handles two types:
-// - Conditional signal assignments (with condition)
-// - Selected signal assignments (with...select)
-//
-// Usage:
-//   auto assign = ConcurrentAssignmentVisitor::translate(translator, ctx);
 class ConcurrentAssignmentVisitor final
   : public TypedVisitor<ConcurrentAssignmentVisitor, ast::ConcurrentAssign>
 {

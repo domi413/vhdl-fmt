@@ -11,19 +11,6 @@
 
 namespace builder {
 
-// CRTP-based visitor for sequential statements with full type safety
-//
-// This visitor leverages the TypedVisitor CRTP base to provide:
-// - Type-safe returns (no std::any in public API)
-// - Clean dispatch through ANTLR's virtual method dispatch
-// - No if-else chains
-//
-// Usage:
-//   auto stmt = SequentialStatementVisitor::translate(translator, ctx);
-//
-// The visitor automatically dispatches to the correct visitXXX() method
-// based on the parse tree node type, and each method returns the proper
-// AST statement type directly.
 class SequentialStatementVisitor final
   : public TypedVisitor<SequentialStatementVisitor, ast::SequentialStatement>
 {
