@@ -48,6 +48,7 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
     void operator()(const ast::UnaryExpr &node);
     void operator()(const ast::BinaryExpr &node);
     void operator()(const ast::ParenExpr &node);
+    void operator()(const ast::CallExpr &node);
 
     // Concurrent Statements
     void operator()(const ast::ConcurrentAssign &node);

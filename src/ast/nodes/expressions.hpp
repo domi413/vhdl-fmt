@@ -16,13 +16,14 @@ struct GroupExpr;
 struct UnaryExpr;
 struct BinaryExpr;
 struct ParenExpr;
+struct CallExpr;
 
 /// Helper alias for boxed recursive types
 template<typename T>
 using Box = std::unique_ptr<T>;
 
 /// Variant type for all expressions (holds values, not pointers)
-using Expr = std::variant<TokenExpr, GroupExpr, UnaryExpr, BinaryExpr, ParenExpr>;
+using Expr = std::variant<TokenExpr, GroupExpr, UnaryExpr, BinaryExpr, ParenExpr, CallExpr>;
 
 /// Single token: literal, identifier, or operator.
 struct TokenExpr : NodeBase
@@ -55,6 +56,14 @@ struct BinaryExpr : NodeBase
 struct ParenExpr : NodeBase
 {
     Box<Expr> inner; ///< Inner expression inside parentheses (boxed for recursion).
+};
+
+/// Function call or indexed name (e.g. `rising_edge(clk)`, `data(7 downto 0)`).
+/// Note: VHDL doesn't syntactically distinguish function calls from array indexing.
+struct CallExpr : NodeBase
+{
+    Box<Expr> callee; ///< Function/array name being called/indexed.
+    Box<Expr> args;   ///< Arguments (single expr or GroupExpr for multiple args).
 };
 
 } // namespace ast

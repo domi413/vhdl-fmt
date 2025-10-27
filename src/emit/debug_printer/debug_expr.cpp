@@ -59,6 +59,24 @@ auto DebugPrinter::operator()(const ast::ParenExpr &node) -> void
     }
 }
 
+auto DebugPrinter::operator()(const ast::CallExpr &node) -> void
+{
+    emitNodeLike(node, "CallExpr", "");
+    const IndentGuard _{ indent_ };
+
+    if (node.callee) {
+        printLine("callee:");
+        const IndentGuard _{ indent_ };
+        visit(node.callee);
+    }
+
+    if (node.args) {
+        printLine("args:");
+        const IndentGuard _{ indent_ };
+        visit(node.args);
+    }
+}
+
 } // namespace emit
 
 // NOLINTEND(misc-no-recursion)
