@@ -1,0 +1,13 @@
+build/
+.cache/
+.conan2/
+*.o
+*.a
+*.so
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+.git/
+.github/
+*.md
+!README.md

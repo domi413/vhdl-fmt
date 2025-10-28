@@ -1,0 +1,11 @@
+services:
+  dev:
+    build: .
+    volumes:
+      - .:/workspace:z
+      - conan-cache:/root/.conan2
+    working_dir: /workspace
+    command: /bin/bash
+
+volumes:
+  conan-cache:
