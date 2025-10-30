@@ -49,5 +49,4 @@ CMD ["/bin/bash"]
 # =========================
 FROM builder AS ci
 
-# Copy the full source code (for building/testing)
-COPY . .
+WORKDIR /app
