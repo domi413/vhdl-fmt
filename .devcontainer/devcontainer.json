@@ -29,6 +29,5 @@
   },
   "postCreateCommand": "make",
   "remoteUser": "root",
-  "updateRemoteUserUID": false,
   "overrideCommand": true
 }
