@@ -1,0 +1,49 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+  "name": "vhdl-fmt Development",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cmake-tools",
+        "vadimcn.vscode-lldb",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "clangd.path": "/usr/bin/clangd",
+        "clangd.arguments": [
+          "--compile-commands-dir=${workspaceFolder}/build/Debug"
+          // "--background-index",
+          // "--clang-tidy",
+          // "--completion-style=detailed",
+          // "--header-insertion=never"
+        ],
+        "cmake.configureOnOpen": false,
+        "cmake.generator": "Ninja"
+      }
+    }
+  },
+
+  "postCreateCommand": "make"
+
+  ,
+  "remoteUser": "root",
+  "updateRemoteUserUID": false,
+  "overrideCommand": true
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}

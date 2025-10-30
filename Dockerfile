@@ -16,8 +16,7 @@ RUN uv venv /opt/venv && \
     uv pip install conan gersemi==0.19.3
 
 # Setup Conan profile
-RUN . /opt/venv/bin/activate && \
-    conan profile detect --force
+RUN . /opt/venv/bin/activate
 
 # Set working directory
 WORKDIR /workspace

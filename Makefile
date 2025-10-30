@@ -31,7 +31,8 @@ $(CONAN_STAMP): conanfile.txt
 	$(call check_tool,$(CONAN_CMD))
 	@echo "Running Conan ($(BUILD_TYPE))..."
 	@$(CONAN_CMD) install . \
-		-pr=clang.profile \
+		--profile:host=clang.profile \
+		--profile:build=clang.profile \
 		--build=missing \
 		-s build_type=$(BUILD_TYPE)
 	@touch $@
