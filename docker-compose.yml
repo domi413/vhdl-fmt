@@ -2,7 +2,7 @@ services:
   dev:
     build: .
     volumes:
-      - .:/workspace:z
+      - .:/app:z
       - conan-cache:/root/.conan2
 
 volumes:
