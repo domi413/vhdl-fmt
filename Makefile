@@ -1,4 +1,4 @@
-.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored
+.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored docker-build docker-shell docker-make docker-test
 
 # -----------------------------
 # Build Configuration
@@ -141,3 +141,24 @@ check-cspell-ignored:
 	@echo "Checking for unused words in .cspell_ignored..."
 	@.github/scripts/check-cspell-ignored.sh
 	@echo "✓ Cspell ignored file check complete"
+
+# -----------------------------
+# Docker Development Environment
+# -----------------------------
+CONTAINER_CMD ?= podman
+
+docker-build:
+	@echo "Building development environment with $(CONTAINER_CMD)..."
+	@$(CONTAINER_CMD) compose build
+
+docker-shell:
+	@echo "Starting development shell with $(CONTAINER_CMD)..."
+	@$(CONTAINER_CMD) compose run --rm dev
+
+docker-make:
+	@echo "Building project in container..."
+	@$(CONTAINER_CMD) compose run --rm dev bash -c "make clean && make"
+
+docker-test:
+	@echo "Building project in container..."
+	@$(CONTAINER_CMD) compose run --rm dev bash -c "make clean && make test"
