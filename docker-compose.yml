@@ -4,7 +4,6 @@ services:
     volumes:
       - .:/workspace:z
       - conan-cache:/root/.conan2
-    working_dir: /workspace
 
 volumes:
   conan-cache:
