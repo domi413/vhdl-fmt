@@ -147,9 +147,9 @@ jobs:
       - name: Check formatting
         run: make check-format
 
-  lint:
+  lint-source:
     runs-on: ubuntu-latest
-    name: Lint
+    name: Lint Source
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 10
 
@@ -157,9 +157,9 @@ jobs:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_source_changed == 'true' }}
 
     steps:
       - name: Checkout repository
@@ -177,8 +177,41 @@ jobs:
       - name: Build
         run: make
 
-      - name: Run linter
-        run: make lint
+      - name: Run linter on source files
+        run: make lint LINT_FILES=source
+
+  lint-header:
+    runs-on: ubuntu-latest
+    name: Lint Header
+    needs: [get-changed-cpp-files, build]
+    timeout-minutes: 10
+
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
+
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_header_changed == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /root/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Build
+        run: make
+
+      - name: Run linter on header files
+        run: make lint LINT_FILES=header
 
   test:
     runs-on: ubuntu-latest
