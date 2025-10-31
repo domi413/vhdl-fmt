@@ -2,7 +2,6 @@
 #define AST_NODE_HPP
 
 #include <cstddef>
-#include <memory>
 #include <optional>
 #include <string>
 #include <variant>
