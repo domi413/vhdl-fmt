@@ -150,16 +150,16 @@ jobs:
   lint-source:
     runs-on: ubuntu-latest
     name: Lint Source
-    needs: [changed_cpp_files, build]
+    needs: [get-changed-cpp-files, build]
     timeout-minutes: 10
 
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_source_changed == 'true' }}
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
 
     steps:
       - name: Checkout repository
@@ -183,16 +183,16 @@ jobs:
   lint-header:
     runs-on: ubuntu-latest
     name: Lint Header
-    needs: [changed_cpp_files, build]
+    needs: [get-changed-cpp-files, build]
     timeout-minutes: 10
 
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_header_changed == 'true' }}
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
 
     steps:
       - name: Checkout repository
