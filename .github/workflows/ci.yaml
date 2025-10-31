@@ -11,7 +11,7 @@ on:
 jobs:
   dictionary:
     runs-on: ubuntu-latest
-    name: Check if dictionary is sorted and all ignored words are used
+    name: Dictionary
     timeout-minutes: 1
 
     if: ${{ !github.event.pull_request.draft }}
