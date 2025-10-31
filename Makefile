@@ -82,7 +82,10 @@ define check_tool
 fi
 endef
 
-SOURCES_TO_LINT := $(SOURCES)
+ifndef SOURCES_TO_LINT
+	SOURCES_TO_LINT := $(SOURCES)
+endif
+
 ifeq ($(LINT_FILES),source)
 	SOURCES_TO_LINT := $(shell find src tests -name '*.cpp')
 endif
