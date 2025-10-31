@@ -157,7 +157,7 @@ jobs:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
+      # SOURCES_TO_LINT: ${{ env.ACT == 'true' && '*' || needs.get-changed-cpp-files.outputs.changed_cpp_files }}
 
     if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
 

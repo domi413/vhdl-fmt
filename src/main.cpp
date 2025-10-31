@@ -13,7 +13,6 @@
 /// The main entry point of the program
 auto main(int argc, char *argv[]) -> int
 {
-    //  test
     try {
         const cli::ArgumentParser argparser{
             std::span<const char *const>{ argv, static_cast<std::size_t>(argc) }
