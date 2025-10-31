@@ -1,4 +1,3 @@
-absl
 antlr
 antlr4
 bugprone
@@ -7,11 +6,12 @@ cppcoreguidelines
 domi
 doublestar
 flto
-germesi
 gersemi
 nolintnextline
 subnature
+vedivad
 vhdl
+vhdlfmt
 wconversion
 wdouble
 werror

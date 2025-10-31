@@ -11,7 +11,7 @@ on:
 jobs:
   dictionary:
     runs-on: ubuntu-latest
-    name: Check if dictionary is sorted and all ignored words are used
+    name: Dictionary
     timeout-minutes: 1
 
     if: ${{ !github.event.pull_request.draft }}
@@ -71,12 +71,94 @@ jobs:
           verbose: true
           use_cspell_files: false
 
-  lint:
+  get-changed-cpp-files:
     runs-on: ubuntu-latest
-    name: Build, Lint, Format Check and Test
+    name: Get changed C++ files
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    outputs:
+      any_cpp_changed: ${{ steps.changed-files-cpp.outputs.any_changed }}
+      any_cpp_source_changed: ${{ steps.changed-files-source.outputs.any_changed }}
+      any_cpp_header_changed: ${{ steps.changed-files-header.outputs.any_changed }}
+      changed_cpp_files: ${{ steps.changed-files-cpp.outputs.all_changed_files }}
+      changed_cpp_source_files: ${{ steps.changed-files-source.outputs.all_changed_files }}
+      changed_cpp_header_files: ${{ steps.changed-files-header.outputs.all_changed_files }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed C++ files
+        id: changed-files-cpp
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.cpp
+            **/*.hpp
+
+      - name: Get changed C++ source files
+        id: changed-files-source
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.cpp
+
+      - name: Get changed C++ header files
+        id: changed-files-header
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.hpp
+
+      - name: Print changed files
+        run: |
+          echo "Changed C++ files:"
+          echo "${{ steps.changed-files-cpp.outputs.all_changed_files }}"
+          echo "Changed source files:"
+          echo "${{ steps.changed-files-source.outputs.all_changed_files }}"
+          echo "Changed header files:"
+          echo "${{ steps.changed-files-header.outputs.all_changed_files }}"
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build
     timeout-minutes: 15
+
     container:
-      image: archlinux:base-devel
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /root/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Build
+        run: make
+
+  formatter:
+    runs-on: ubuntu-latest
+    name: Formatter Check
+    timeout-minutes: 2
+
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
 
     if: ${{ !github.event.pull_request.draft }}
 
@@ -84,72 +166,103 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /var/cache/pacman/pkg
-            /home/aur/.cache/yay
-            /home/aur/yay
-          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}-v1
-          restore-keys: |
-            arch-deps-${{ runner.os }}-v1
-            arch-deps-${{ runner.os }}-
+      - name: Check formatting
+        run: make check-format
+
+  lint-source:
+    runs-on: ubuntu-latest
+    name: Lint Source
+    needs: [get-changed-cpp-files, build]
+    timeout-minutes: 10
+
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
+
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_source_changed == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Cache Conan packages
         uses: actions/cache@v4
         with:
-          path: /github/home/.conan2
+          path: /root/.conan2
           key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
           restore-keys: |
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
-      - name: Cache uv packages
+      - name: Build
+        run: make
+
+      - name: Run linter on source files
+        run: make lint LINT_FILES=source
+
+  lint-header:
+    runs-on: ubuntu-latest
+    name: Lint Header
+    needs: [get-changed-cpp-files, build]
+    timeout-minutes: 10
+
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
+
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_header_changed == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache Conan packages
         uses: actions/cache@v4
         with:
-          path: /github/home/.local/share/uv/
-          key: uv-cache-${{ runner.os }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}-v1
+          path: /root/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
           restore-keys: |
-            uv-cache-${{ runner.os }}-v1
-            uv-cache-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: |
-          pacman -Sy --needed --noconfirm \
-              base-devel \
-              clang \
-              cmake \
-              git \
-              make \
-              ninja \
-              uv \
-
-          # Create venv and install python packages
-          uv venv venv
-          source venv/bin/activate
-
-          uv pip install conan gersemi==0.19.3
-
-      - name: Setup Conan profile
-        run: |
-          source venv/bin/activate
-          conan profile detect --force
-
-      - name: Check formatting
-        run: |
-          source venv/bin/activate
-          make check-format
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
 
       - name: Build
-        run: |
-          source venv/bin/activate
-          make
+        run: make
 
-      - name: Run lint
-        run: |
-          source venv/bin/activate
-          make lint
+      - name: Run linter on header files
+        run: make lint LINT_FILES=header
+
+  test:
+    runs-on: ubuntu-latest
+    name: Test
+    needs: build
+    timeout-minutes: 10
+
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /root/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Build
+        run: make
 
       - name: Run tests
         run: make test
