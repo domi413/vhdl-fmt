@@ -71,15 +71,40 @@ jobs:
           verbose: true
           use_cspell_files: false
 
+  get-changed-cpp-files:
+    runs-on: ubuntu-latest
+    name: Get changed C++ files
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    outputs:
+      changed_cpp_files: ${{ steps.filter-cpp-files.outputs.changed_cpp_files }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed C++ files
+        id: changed-files-cpp
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.cpp
+            **/*.hpp
+
   build:
     runs-on: ubuntu-latest
     name: Build, Test and Check Formatting
+    needs: [dictionary, spellcheck]
     timeout-minutes: 15
+
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-    needs: [dictionary, spellcheck]
+
     if: ${{ !github.event.pull_request.draft }}
 
     steps:
@@ -104,17 +129,18 @@ jobs:
       - name: Check formatting
         run: make check-format
 
-
   lint:
     runs-on: ubuntu-latest
     name: Build, Lint, Format Check and Test
+    needs: [get-changed-cpp-files, dictionary, spellcheck, build]
     timeout-minutes: 10
+
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-    needs: [dictionary, spellcheck, build]
-    if: ${{ !github.event.pull_request.draft }}
+
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
 
     steps:
       - name: Checkout repository
