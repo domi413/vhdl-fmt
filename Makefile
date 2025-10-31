@@ -1,4 +1,7 @@
-.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored docker-build docker-shell docker-make docker-test
+.PHONY: 
+	all run clean conan test test-rerun test-verbose lint \
+	check-format format sort-dictionary cleanup-dictionary check-cspell-ignored \
+	docker-dev-build docker-dev docker-make docker-test docker-publish-ci
 
 # -----------------------------
 # Build Configuration
@@ -145,13 +148,14 @@ check-cspell-ignored:
 # -----------------------------
 # Docker Development Environment
 # -----------------------------
-CONTAINER_CMD ?= podman
+CONTAINER_CMD ?= docker
+CI_IMAGE_NAME ?= ghcr.io/vedivad/vhdlfmt-ci:latest
 
-docker-build:
+docker-dev-build:
 	@echo "Building development environment with $(CONTAINER_CMD)..."
 	@$(CONTAINER_CMD) compose build
 
-docker-shell:
+docker-dev:
 	@echo "Starting development shell with $(CONTAINER_CMD)..."
 	@$(CONTAINER_CMD) compose run --rm dev
 
@@ -162,3 +166,9 @@ docker-make:
 docker-test:
 	@echo "Building project in container..."
 	@$(CONTAINER_CMD) compose run --rm dev bash -c "make clean && make test"
+
+docker-publish-ci:
+	@echo "Building and publishing CI image to $(CI_IMAGE_NAME)..."
+	@$(CONTAINER_CMD) build . -t $(CI_IMAGE_NAME) --target ci
+	@$(CONTAINER_CMD) push $(CI_IMAGE_NAME)
+	@echo "✓ CI image published."
