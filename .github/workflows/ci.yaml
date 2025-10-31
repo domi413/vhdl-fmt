@@ -145,15 +145,16 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     name: Lint
-    needs: [get-changed-cpp-files, build]
+    needs: [build]
     timeout-minutes: 10
 
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
+      # SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
+    # if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
 
     steps:
       - name: Checkout repository
@@ -167,9 +168,6 @@ jobs:
           restore-keys: |
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
-
-      - name: Prepare compile_commands (Build)
-        run: make
 
       - name: Run lint
         run: make lint
@@ -199,9 +197,6 @@ jobs:
           restore-keys: |
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
-
-      - name: Build
-        run: make
 
       - name: Run tests
         run: make test
