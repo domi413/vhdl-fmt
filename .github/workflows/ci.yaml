@@ -129,11 +129,8 @@ jobs:
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
-      - name: Prepare compile_commands (configure only)
-        run: |
-          make clean
-          make conan
-          cmake --preset conan-debug
+      - name: Prepare compile_commands (Build)
+        run: make
 
       - name: Run lint
         run: make lint
