@@ -140,7 +140,7 @@ jobs:
     env:
       CONAN_HOME: /root/.conan2
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
+    # if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
 
     steps:
       - name: Checkout repository
