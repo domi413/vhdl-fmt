@@ -9,6 +9,7 @@
 #include <exception>
 #include <iostream>
 #include <span>
+#include <stdio.h>
 
 /// The main entry point of the program
 auto main(int argc, char *argv[]) -> int
