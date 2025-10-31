@@ -96,8 +96,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    name: Build, Test and Check Formatting
-    needs: [dictionary, spellcheck]
+    name: Build
     timeout-minutes: 15
 
     container:
@@ -123,16 +122,29 @@ jobs:
       - name: Build
         run: make
 
-      - name: Run tests
-        run: make test
+  formatter:
+    runs-on: ubuntu-latest
+    name: Formatter Check
+    timeout-minutes: 2
+
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Check formatting
         run: make check-format
 
   lint:
     runs-on: ubuntu-latest
-    name: Build, Lint, Format Check and Test
-    needs: [get-changed-cpp-files, dictionary, spellcheck, build]
+    name: Lint
+    needs: [get-changed-cpp-files, build]
     timeout-minutes: 10
 
     container:
@@ -160,3 +172,34 @@ jobs:
 
       - name: Run lint
         run: make lint
+
+test:
+  runs-on: ubuntu-latest
+  name: Lint
+  needs: build
+  timeout-minutes: 10
+
+  container:
+    image: ghcr.io/vedivad/vhdlfmt-ci:latest
+  env:
+    CONAN_HOME: /root/.conan2
+
+    if: ${{ !github.event.pull_request.draft }}
+
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Cache Conan packages
+      uses: actions/cache@v4
+      with:
+        path: /root/.conan2
+        key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+        restore-keys: |
+          conan-${{ runner.os }}-v1
+          conan-${{ runner.os }}-
+
+      run: make
+
+    - name: Run tests
+      run: make test
