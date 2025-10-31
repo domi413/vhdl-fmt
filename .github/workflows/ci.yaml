@@ -97,9 +97,9 @@ jobs:
           verbose: true
           use_cspell_files: false
 
-  lint:
+  build:
     runs-on: ubuntu-latest
-    name: Build, Lint, Format Check and Test
+    name: Build, Test and Check Formatting
     timeout-minutes: 15
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
@@ -121,14 +121,45 @@ jobs:
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
-      - name: Check formatting
-        run: make check-format
-
       - name: Build
         run: make
 
-      - name: Run lint
-        run: make lint
-
       - name: Run tests
         run: make test
+
+      - name: Check formatting
+        run: make check-format
+
+
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    timeout-minutes: 20
+    container:
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
+    needs: [changes, dictionary, spellcheck, build]
+    if: ${{ !github.event.pull_request.draft && needs.changes.outputs.code == 'true' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: /root/.conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('conanfile.txt') }}-v1
+          restore-keys: |
+            conan-${{ runner.os }}-v1
+            conan-${{ runner.os }}-
+
+      - name: Prepare compile_commands (configure only)
+        run: |
+          make clean
+          make conan
+          cmake --preset conan-debug
+
+      - name: Run lint
+        run: make lint
