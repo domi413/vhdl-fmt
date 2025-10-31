@@ -13,21 +13,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     container:
-      image: archlinux:base-devel
+      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+    env:
+      CONAN_HOME: /root/.conan2
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            /var/cache/pacman/pkg
-          key: arch-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yaml') }}-v1
-          restore-keys: |
-            arch-deps-${{ runner.os }}-v1
-            arch-deps-${{ runner.os }}-
+        uses: actions/checkout@v5
 
       - name: Cache Conan packages
         uses: actions/cache@v4
@@ -37,27 +29,6 @@ jobs:
           restore-keys: |
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: |
-          pacman -Sy --needed --noconfirm \
-              base-devel \
-              clang \
-              cmake \
-              git \
-              make \
-              ninja \
-              uv
-
-          # Create venv and install python packages
-          uv venv venv
-          source venv/bin/activate
-          uv pip install conan
-
-      - name: Setup Conan profile
-        run: |
-          source venv/bin/activate
-          conan profile detect --force
 
       - name: Create and Publish Release
         uses: release-drafter/release-drafter@v6
