@@ -150,7 +150,7 @@ jobs:
   lint-source:
     runs-on: ubuntu-latest
     name: Lint Source
-    needs: [get-changed-cpp-files, build]
+    needs: [changed_cpp_files, build]
     timeout-minutes: 10
 
     container:
@@ -183,7 +183,7 @@ jobs:
   lint-header:
     runs-on: ubuntu-latest
     name: Lint Header
-    needs: [get-changed-cpp-files, build]
+    needs: [changed_cpp_files, build]
     timeout-minutes: 10
 
     container:
