@@ -1,4 +1,3 @@
-absl
 antlr
 antlr4
 bugprone
@@ -7,7 +6,6 @@ cppcoreguidelines
 domi
 doublestar
 flto
-germesi
 gersemi
 nolintnextline
 subnature
