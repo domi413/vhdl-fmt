@@ -3,6 +3,7 @@ services:
     build:
       context: .
       target: dev
+    image: localhost/vhdl-fmt-dev:latest
     volumes:
       - .:/app:z
       - conan-cache:/root/.conan2

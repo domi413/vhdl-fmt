@@ -5,7 +5,7 @@ FROM fedora:43 AS builder
 
 # Install system dependencies
 RUN dnf install -y --setopt=install_weak_deps=false \
-    python3 clang cmake git make ninja-build \
+    python3 clang clang-tools-extra cmake git make ninja-build nodejs \
     && dnf clean all
 
 # Get the latest version of uv
