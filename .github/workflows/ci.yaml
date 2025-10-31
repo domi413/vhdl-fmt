@@ -175,7 +175,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    name: Lint
+    name: Test
     needs: build
     timeout-minutes: 10
 
@@ -184,7 +184,7 @@ jobs:
     env:
       CONAN_HOME: /root/.conan2
 
-      if: ${{ !github.event.pull_request.draft }}
+    if: ${{ !github.event.pull_request.draft }}
 
     steps:
       - name: Checkout repository
@@ -199,6 +199,7 @@ jobs:
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
+      - name: Build
         run: make
 
       - name: Run tests
