@@ -9,6 +9,32 @@ on:
       - reopened
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    name: Detect source-relevant changes
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Filter changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - 'src/**/*.{c,cc,cpp,cxx,h,hpp,hxx}'
+              - 'tests/**/*.{c,cc,cpp,cxx,h,hpp,hxx}'
+              - 'grammars/**'
+              - 'CMakeLists.txt'
+              - '**/CMakeLists.txt'
+              - 'CMakeUserPresets.json'
+              - 'conanfile.txt'
+              - '.clang-format'
+              - '.clang-tidy'
+
   dictionary:
     runs-on: ubuntu-latest
     name: Check if dictionary is sorted and all ignored words are used
@@ -79,8 +105,8 @@ jobs:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-
-    if: ${{ !github.event.pull_request.draft }}
+    needs: [changes, dictionary, spellcheck]
+    if: ${{ !github.event.pull_request.draft && needs.changes.outputs.code == 'true' }}
 
     steps:
       - name: Checkout repository
