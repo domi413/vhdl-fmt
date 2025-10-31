@@ -71,10 +71,41 @@ jobs:
           verbose: true
           use_cspell_files: false
 
-  lint:
+  get-changed-cpp-files:
     runs-on: ubuntu-latest
-    name: Build, Lint, Format Check and Test
+    name: Get changed C++ files
+
+    if: ${{ !github.event.pull_request.draft }}
+
+    outputs:
+      any_cpp_changed: ${{ steps.changed-files-cpp.outputs.any_changed }}
+      changed_cpp_files: ${{ steps.changed-files-cpp.outputs.all_changed_files }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed C++ files
+        id: changed-files-cpp
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.cpp
+            **/*.hpp
+
+      - name: Print changed files
+        run: |
+          echo "Changed C++ files:"
+          echo "${{ steps.changed-files-cpp.outputs.all_changed_files }}"
+
+  build-format-lint-test:
+    runs-on: ubuntu-latest
+    name: Build, Format Check, Lint and Test
+    needs: get-changed-cpp-files
     timeout-minutes: 15
+
     container:
       image: archlinux:base-devel
 
@@ -123,12 +154,11 @@ jobs:
               git \
               make \
               ninja \
-              uv \
+              uv
 
           # Create venv and install python packages
           uv venv venv
           source venv/bin/activate
-
           uv pip install conan gersemi==0.19.3
 
       - name: Setup Conan profile
@@ -146,10 +176,16 @@ jobs:
           source venv/bin/activate
           make
 
-      - name: Run lint
+      - name: Run lint on changed files
+        if: ${{ needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
+        env:
+          SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
         run: |
           source venv/bin/activate
+          echo "Linting changed files: $SOURCES_TO_LINT"
           make lint
 
       - name: Run tests
-        run: make test
+        run: |
+          source venv/bin/activate
+          make test
