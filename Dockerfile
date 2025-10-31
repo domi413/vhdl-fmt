@@ -1,18 +1,18 @@
-# =========================
-# Stage 1: Builder (shared base)
-# =========================
-FROM archlinux:base-devel AS builder
+# ==================================================
+# Stage 1: Builder image
+# ==================================================
+FROM fedora:43 AS builder
 
 # Install system dependencies
-RUN pacman -Syu --noconfirm --needed \
-    python python-pip clang cmake git make ninja uv \
-    && pacman -Scc --noconfirm \
-    && rm -rf /var/cache/pacman/pkg/* /tmp/*
+RUN dnf install -y --setopt=install_weak_deps=false \
+    python3 clang cmake git make ninja-build \
+    && dnf clean all
+
+# Get the latest version of uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Setup venv
-RUN python -m venv /opt/venv \
-    && /opt/venv/bin/python -m ensurepip \
-    && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
+RUN uv venv /opt/venv --seed \
     && /opt/venv/bin/pip install --no-cache-dir conan gersemi==0.19.3
 
 ENV PATH="/opt/venv/bin:$PATH"
@@ -24,17 +24,16 @@ WORKDIR /app
 COPY conanfile.txt clang.profile ./
 
 # Prefill Conan dependencies (equivalent to `make conan`)
-RUN conan profile detect || true && \
-    conan install . \
+RUN conan install . \
     --profile:host=clang.profile \
     --profile:build=clang.profile \
     --build=missing \
     -s build_type=Debug && \
     rm -rf /root/.conan2/p/tmp
 
-# =========================
-# Stage 2: Development image
-# =========================
+# ==================================================
+# Stage 2.1: Development image
+# ==================================================
 FROM builder AS dev
 
 # Add colored prompt for root
@@ -44,9 +43,9 @@ WORKDIR /app
 
 CMD ["/bin/bash"]
 
-# =========================
-# Stage 3: CI image
-# =========================
+# ==================================================
+# Stage 2.2: CI image
+# ==================================================
 FROM builder AS ci
 
 WORKDIR /app
