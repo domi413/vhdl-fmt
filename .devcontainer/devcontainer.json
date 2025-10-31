@@ -1,0 +1,29 @@
+{
+  "name": "vhdl-fmt Development",
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "llvm-vs-code-extensions.vscode-clangd",
+        "ms-vscode.cmake-tools",
+        "vadimcn.vscode-lldb",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "clangd.path": "/usr/bin/clangd",
+        "clangd.arguments": [
+          "--compile-commands-dir=${workspaceFolder}/build/Debug"
+        ],
+        "cmake.configureOnOpen": false,
+        "cmake.generator": "Ninja"
+      }
+    }
+  },
+  "postCreateCommand": "make",
+  "remoteUser": "root",
+  "overrideCommand": true
+}

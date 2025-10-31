@@ -1,0 +1,12 @@
+services:
+  dev:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/app:z
+      - conan-cache:/root/.conan2
+    command: [ "/bin/bash" ] # explicit default
+
+volumes:
+  conan-cache:
