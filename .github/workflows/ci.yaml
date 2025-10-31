@@ -133,8 +133,8 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
-    name: Lint
-    timeout-minutes: 20
+    name: Build, Lint, Format Check and Test
+    timeout-minutes: 10
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
