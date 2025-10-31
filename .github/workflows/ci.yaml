@@ -78,7 +78,8 @@ jobs:
     if: ${{ !github.event.pull_request.draft }}
 
     outputs:
-      changed_cpp_files: ${{ steps.filter-cpp-files.outputs.changed_cpp_files }}
+      any_cpp_changed: ${{ steps.changed-files-cpp.outputs.any_changed }}
+      changed_cpp_files: ${{ steps.changed-files-cpp.outputs.all_changed_files }}
 
     steps:
       - name: Checkout repository
