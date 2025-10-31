@@ -84,8 +84,7 @@ class Logger final
           logger->set_level(console_sink->level());
           logger->flush_on(spdlog::level::err);
 
-          int x{};
-          x++;
+          int x;
           return logger;
       }())
     {

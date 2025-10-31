@@ -79,7 +79,11 @@ jobs:
 
     outputs:
       any_cpp_changed: ${{ steps.changed-files-cpp.outputs.any_changed }}
+      any_cpp_source_changed: ${{ steps.changed-files-source.outputs.any_changed }}
+      any_cpp_header_changed: ${{ steps.changed-files-header.outputs.any_changed }}
       changed_cpp_files: ${{ steps.changed-files-cpp.outputs.all_changed_files }}
+      changed_cpp_source_files: ${{ steps.changed-files-source.outputs.all_changed_files }}
+      changed_cpp_header_files: ${{ steps.changed-files-header.outputs.all_changed_files }}
 
     steps:
       - name: Checkout repository
@@ -95,10 +99,28 @@ jobs:
             **/*.cpp
             **/*.hpp
 
+      - name: Get changed C++ source files
+        id: changed-files-source
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.cpp
+
+      - name: Get changed C++ header files
+        id: changed-files-header
+        uses: tj-actions/changed-files@v47
+        with:
+          files: |
+            **/*.hpp
+
       - name: Print changed files
         run: |
           echo "Changed C++ files:"
           echo "${{ steps.changed-files-cpp.outputs.all_changed_files }}"
+          echo "Changed source files:"
+          echo "${{ steps.changed-files-source.outputs.all_changed_files }}"
+          echo "Changed header files:"
+          echo "${{ steps.changed-files-header.outputs.all_changed_files }}"
 
   build:
     runs-on: ubuntu-latest
@@ -157,9 +179,9 @@ jobs:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_source_changed == 'true' }}
 
     steps:
       - name: Checkout repository
@@ -190,9 +212,9 @@ jobs:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
-      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_files }}
+      SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
 
-    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_changed == 'true' }}
+    if: ${{ !github.event.pull_request.draft && needs.get-changed-cpp-files.outputs.any_cpp_header_changed == 'true' }}
 
     steps:
       - name: Checkout repository
