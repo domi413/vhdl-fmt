@@ -5,7 +5,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("Architecture: Basic architecture body", "[architecture][design_unit]")
+TEST_CASE("Architecture: Basic architecture body", "[design_units][architecture]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of MyEntity is
@@ -26,7 +26,7 @@ TEST_CASE("Architecture: Basic architecture body", "[architecture][design_unit]"
     REQUIRE_FALSE(arch->stmts.empty());
 }
 
-TEST_CASE("Architecture: Multiple architectures for same entity", "[architecture]")
+TEST_CASE("Architecture: Multiple architectures for same entity", "[design_units][architecture]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of Counter is

@@ -1,3 +1,4 @@
+#include "ast/node.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 #include "common/test_utils.hpp"
@@ -9,8 +10,7 @@
 using test_utils::leadingComments;
 using test_utils::trailingComments;
 
-// Entity-level leading comments
-TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
+TEST_CASE("Entity captures top-level leading comments", "[design_units][comments]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         -- License text
@@ -31,8 +31,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(texts.back().contains("Entity declaration"));
 }
 
-// Generic-level leading and inline comments
-TEST_CASE("Generic captures both leading and inline comments", "[comments][generic]")
+TEST_CASE("Generic captures both leading and inline comments", "[design_units][comments]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Example is
@@ -62,8 +61,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE(trail.front().contains("Inline for CONST_V"));
 }
 
-// Port-level leading and inline comments
-TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
+TEST_CASE("Ports capture leading and inline comments", "[design_units][comments]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Example is

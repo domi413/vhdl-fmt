@@ -86,7 +86,7 @@ auto Translator::makeSequentialStatement(vhdlParser::Sequential_statementContext
         // Basic loop without iteration scheme - not yet supported, return empty
     }
 
-    // TODO(dyb): Add support for wait_statement, assertion_statement,
+    // TODO(someone): Add support for wait_statement, assertion_statement,
     // report_statement, next_statement, exit_statement, return_statement, etc.
 
     // Fallback: return empty assignment as placeholder

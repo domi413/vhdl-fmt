@@ -21,14 +21,14 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
             if (auto *entity_ctx = primary->entity_declaration()) {
                 dest.units.emplace_back(makeEntity(entity_ctx));
             }
-            // TODO(translator): Handle configuration_declaration and package_declaration
+            // TODO(someone): Handle configuration_declaration and package_declaration
         }
         // Check secondary units (architecture_body | package_body)
         else if (auto *secondary = lib_unit->secondary_unit()) {
             if (auto *arch_ctx = secondary->architecture_body()) {
                 dest.units.emplace_back(makeArchitecture(arch_ctx));
             }
-            // TODO(translator): Handle package_body
+            // TODO(someone): Handle package_body
         }
     }
 }
@@ -73,7 +73,7 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
             } else if (auto *sig_ctx = item->signal_declaration()) {
                 arch.decls.emplace_back(makeSignalDecl(sig_ctx));
             }
-            // TODO(user): Add more declaration types as needed (variables, types, subprograms,
+            // TODO(someone): Add more declaration types as needed (variables, types, subprograms,
             // etc.)
         }
     }
@@ -86,8 +86,8 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
             } else if (auto *sig_assign = stmt->concurrent_signal_assignment_statement()) {
                 arch.stmts.emplace_back(makeConcurrentAssign(sig_assign));
             }
-            // TODO(user): Add more concurrent statement types (component instantiation, generate,
-            // etc.)
+            // TODO(someone): Add more concurrent statement types (component instantiation,
+            // generate, etc.)
         }
     }
 

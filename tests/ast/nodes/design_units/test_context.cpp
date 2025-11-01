@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("Context: Basic context declaration (VHDL-2008)", "[context][design_unit][vhdl2008]")
+TEST_CASE("Context: Basic context declaration (VHDL-2008)", "[design_unit][context]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         context MyContext is
@@ -13,13 +13,14 @@ TEST_CASE("Context: Basic context declaration (VHDL-2008)", "[context][design_un
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // REQUIRE(design.units.size() == 1);
     // auto *ctx = std::get_if<ast::Context>(&design.units[0]);
     // REQUIRE(ctx != nullptr);
     // REQUIRE(ctx->name == "MyContext");
 }
 
-TEST_CASE("Context: With multiple libraries and use clauses", "[context][vhdl2008]")
+TEST_CASE("Context: With multiple libraries and use clauses", "[design_unit][context]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         context IEEEContext is
@@ -31,11 +32,12 @@ TEST_CASE("Context: With multiple libraries and use clauses", "[context][vhdl200
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *ctx = std::get_if<ast::Context>(&design.units[0]);
     // REQUIRE(ctx != nullptr);
 }
 
-TEST_CASE("Context: Referencing other contexts", "[context][vhdl2008]")
+TEST_CASE("Context: Referencing other contexts", "[design_unit][context]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         context ExtendedContext is
@@ -46,6 +48,7 @@ TEST_CASE("Context: Referencing other contexts", "[context][vhdl2008]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *ctx = std::get_if<ast::Context>(&design.units[0]);
     // REQUIRE(ctx != nullptr);
 }

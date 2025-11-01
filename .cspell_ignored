@@ -9,6 +9,7 @@ flto
 gersemi
 nolintnextline
 subnature
+testbench
 vedivad
 vhdl
 vhdlfmt

@@ -173,7 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint Source
     needs: [get-changed-cpp-files, build]
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
@@ -200,13 +200,15 @@ jobs:
         run: make
 
       - name: Run linter on source files
+        env:
+          SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
         run: make lint LINT_FILES=source
 
   lint-header:
     runs-on: ubuntu-latest
     name: Lint Header
     needs: [get-changed-cpp-files, build]
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
@@ -233,6 +235,8 @@ jobs:
         run: make
 
       - name: Run linter on header files
+        env:
+          SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
         run: make lint LINT_FILES=header
 
   test:
