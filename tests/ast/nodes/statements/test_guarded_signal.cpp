@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("GuardedSignalAssignment: Simple guarded signal assignment",
           "[statements][guarded_signal_assignment]")
@@ -18,7 +15,7 @@ TEST_CASE("GuardedSignalAssignment: Simple guarded signal assignment",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check guarded signal assignment when implemented
+    // TODO(someone): Check guarded signal assignment when implemented
 }
 
 TEST_CASE("GuardedSignalAssignment: Guarded assignment with delay",
@@ -33,5 +30,5 @@ TEST_CASE("GuardedSignalAssignment: Guarded assignment with delay",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check guarded signal assignment when implemented
+    // TODO(someone): Check guarded signal assignment when implemented
 }

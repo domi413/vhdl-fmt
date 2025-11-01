@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("SelectedAssign: Simple selected assignment", "[statements][selected_assign]")
 {
@@ -20,7 +17,7 @@ TEST_CASE("SelectedAssign: Simple selected assignment", "[statements][selected_a
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check selected assign statement when implemented
+    // TODO(someone): Check selected assign statement when implemented
 }
 
 TEST_CASE("SelectedAssign: Selected assignment with ranges", "[statements][selected_assign]")
@@ -37,5 +34,5 @@ TEST_CASE("SelectedAssign: Selected assignment with ranges", "[statements][selec
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check selected assign statement when implemented
+    // TODO(someone): Check selected assign statement when implemented
 }

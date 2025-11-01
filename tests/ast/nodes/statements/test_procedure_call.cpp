@@ -1,4 +1,3 @@
-#include "ast/nodes/design_units.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
@@ -20,7 +19,7 @@ TEST_CASE("ProcedureCall: Simple procedure call", "[statements][procedure_call]"
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check procedure call statement when implemented
+    // TODO(someone): Check procedure call statement when implemented
 }
 
 TEST_CASE("ProcedureCall: Procedure call with parameters", "[statements][procedure_call]")
@@ -37,5 +36,5 @@ TEST_CASE("ProcedureCall: Procedure call with parameters", "[statements][procedu
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check procedure call statement when implemented
+    // TODO(someone): Check procedure call statement when implemented
 }

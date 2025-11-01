@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("ConcurrentProcedureCall: Simple concurrent procedure call",
           "[statements][concurrent_procedure_call]")
@@ -18,7 +15,7 @@ TEST_CASE("ConcurrentProcedureCall: Simple concurrent procedure call",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check concurrent procedure call when implemented
+    // TODO(someone): Check concurrent procedure call when implemented
 }
 
 TEST_CASE("ConcurrentProcedureCall: Concurrent procedure call with parameters",
@@ -33,5 +30,5 @@ TEST_CASE("ConcurrentProcedureCall: Concurrent procedure call with parameters",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check concurrent procedure call when implemented
+    // TODO(someone): Check concurrent procedure call when implemented
 }

@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("IfGenerateWithAlternative: If-else generate", "[statements][if_generate]")
 {
@@ -21,7 +18,7 @@ TEST_CASE("IfGenerateWithAlternative: If-else generate", "[statements][if_genera
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check if generate with alternative when implemented
+    // TODO(someone): Check if generate with alternative when implemented
 }
 
 TEST_CASE("IfGenerateWithAlternative: If-elsif-else generate", "[statements][if_generate]")
@@ -41,5 +38,5 @@ TEST_CASE("IfGenerateWithAlternative: If-elsif-else generate", "[statements][if_
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check if generate with alternative when implemented
+    // TODO(someone): Check if generate with alternative when implemented
 }

@@ -1,4 +1,3 @@
-#include "ast/nodes/design_units.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
@@ -22,7 +21,7 @@ TEST_CASE("Block: Simple block statement", "[statements][block]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check block statement when implemented
+    // TODO(someone): Check block statement when implemented
 }
 
 TEST_CASE("Block: Block with guard", "[statements][block]")
@@ -41,5 +40,5 @@ TEST_CASE("Block: Block with guard", "[statements][block]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check block statement when implemented
+    // TODO(someone): Check block statement when implemented
 }

@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("Exit: Simple exit statement", "[statements][exit]")
 {
@@ -22,7 +19,7 @@ TEST_CASE("Exit: Simple exit statement", "[statements][exit]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check exit statement when implemented
+    // TODO(someone): Check exit statement when implemented
 }
 
 TEST_CASE("Exit: Exit with condition", "[statements][exit]")
@@ -41,5 +38,5 @@ TEST_CASE("Exit: Exit with condition", "[statements][exit]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check exit statement when implemented
+    // TODO(someone): Check exit statement when implemented
 }

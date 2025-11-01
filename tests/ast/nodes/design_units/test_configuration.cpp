@@ -1,7 +1,9 @@
+#include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
+#include <variant>
 
 TEST_CASE("Configuration: Basic configuration declaration", "[design_units][configuration]")
 {
@@ -15,6 +17,7 @@ TEST_CASE("Configuration: Basic configuration declaration", "[design_units][conf
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // REQUIRE(design.units.size() == 1);
     // auto *config = std::get_if<ast::Configuration>(&design.units[0]);
     // REQUIRE(config != nullptr);
@@ -36,6 +39,7 @@ TEST_CASE("Configuration: With component bindings", "[design_units][configuratio
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *config = std::get_if<ast::Configuration>(&design.units[0]);
     // REQUIRE(config != nullptr);
 }
@@ -54,6 +58,7 @@ TEST_CASE("Configuration: With generic map", "[design_units][configuration]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *config = std::get_if<ast::Configuration>(&design.units[0]);
     // REQUIRE(config != nullptr);
 }

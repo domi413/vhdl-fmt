@@ -1,4 +1,3 @@
-#include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
@@ -53,7 +52,7 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
     }
 
     // For selected assignments (with...select), we'll take the first waveform
-    // TODO(dyb): Handle full selected waveforms structure
+    // TODO(someone): Handle full selected waveforms structure
     if (auto *sel_waves = ctx->selected_waveforms()) {
         auto waves = sel_waves->waveform();
         if (!waves.empty()) {

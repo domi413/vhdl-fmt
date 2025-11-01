@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("Report: Simple report statement", "[statements][report]")
 {
@@ -20,7 +17,7 @@ TEST_CASE("Report: Simple report statement", "[statements][report]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check report statement when implemented
+    // TODO(someone): Check report statement when implemented
 }
 
 TEST_CASE("Report: Report with severity", "[statements][report]")
@@ -37,5 +34,5 @@ TEST_CASE("Report: Report with severity", "[statements][report]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check report statement when implemented
+    // TODO(someone): Check report statement when implemented
 }

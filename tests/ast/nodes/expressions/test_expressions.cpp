@@ -1,23 +1,23 @@
-#include "ast/nodes/expressions.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
+#include "ast/nodes/expressions.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 #include <variant>
-    if (design.units.size() < 2) {
-        return nullptr;
-    }
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    if ((arch == nullptr) || arch->decls.empty()) {
-        return nullptr;
-    }
-    const auto *signal = std::get_if<ast::SignalDecl>(arch->decls.data());
-    if ((signal == nullptr) || !signal->init_expr.has_value()) {
-        return nullptr;
-    }
-    return &(*signal->init_expr);
+if (design.units.size() < 2) {
+    return nullptr;
+}
+const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+if ((arch == nullptr) || arch->decls.empty()) {
+    return nullptr;
+}
+const auto *signal = std::get_if<ast::SignalDecl>(arch->decls.data());
+if ((signal == nullptr) || !signal->init_expr.has_value()) {
+    return nullptr;
+}
+return &(*signal->init_expr);
 }
 
 } // namespace

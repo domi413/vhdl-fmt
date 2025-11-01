@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("FileIOStatement: Read from file", "[statements][file_io]")
 {
@@ -22,7 +19,7 @@ TEST_CASE("FileIOStatement: Read from file", "[statements][file_io]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check file IO statement when implemented
+    // TODO(someone): Check file IO statement when implemented
 }
 
 TEST_CASE("FileIOStatement: Write to file", "[statements][file_io]")
@@ -41,5 +38,5 @@ TEST_CASE("FileIOStatement: Write to file", "[statements][file_io]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check file IO statement when implemented
+    // TODO(someone): Check file IO statement when implemented
 }

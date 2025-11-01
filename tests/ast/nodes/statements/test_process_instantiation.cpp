@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("ProcessInstantiation: Simple process instantiation",
           "[statements][process_instantiation]")
@@ -23,7 +20,7 @@ TEST_CASE("ProcessInstantiation: Simple process instantiation",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check process instantiation when implemented
+    // TODO(someone): Check process instantiation when implemented
 }
 
 TEST_CASE("ProcessInstantiation: Process instantiation with declarations",
@@ -46,5 +43,5 @@ TEST_CASE("ProcessInstantiation: Process instantiation with declarations",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check process instantiation when implemented
+    // TODO(someone): Check process instantiation when implemented
 }

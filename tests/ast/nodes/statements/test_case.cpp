@@ -1,4 +1,3 @@
-#include "ast/nodes/design_units.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
@@ -215,55 +214,3 @@ TEST_CASE("CaseStatement: Case with null statement", "[statements][case]")
     REQUIRE(case_stmt != nullptr);
     REQUIRE(case_stmt->when_clauses.size() == 3);
 }
-
-// Multiple choices per when clause (not yet verified if supported)
-// TEST_CASE("CaseStatement: Case with multiple choices", "[statements][case]")
-// {
-//     constexpr std::string_view VHDL_FILE = R"(
-//         entity Test is end Test;
-//         architecture RTL of Test is
-//         begin
-//             process
-//             begin
-//                 case sel is
-//                     when 0 | 1 | 2 =>
-//                         result := LOW;
-//                     when 3 | 4 | 5 =>
-//                         result := MID;
-//                     when 6 | 7 =>
-//                         result := HIGH;
-//                     when others =>
-//                         result := DEFAULT;
-//                 end case;
-//             end process;
-//         end RTL;
-//     )";
-//
-//     auto design = builder::buildFromString(VHDL_FILE);
-//     // TODO: Verify multiple choices per when clause
-// }
-
-// Case with ranges (not yet verified if supported)
-// TEST_CASE("CaseStatement: Case with ranges", "[statements][case]")
-// {
-//     constexpr std::string_view VHDL_FILE = R"(
-//         entity Test is end Test;
-//         architecture RTL of Test is
-//         begin
-//             process
-//             begin
-//                 case value is
-//                     when 0 to 10 =>
-//                         category := LOW;
-//                     when 11 to 20 =>
-//                         category := MID;
-//                     when 21 to 31 =>
-//                         category := HIGH;
-//                 end case;
-//             end process;
-//         end RTL;
-//     )";
-//
-//     auto design = builder::buildFromString(VHDL_FILE);
-//     // TODO: Verify range support in when clauses
-// }

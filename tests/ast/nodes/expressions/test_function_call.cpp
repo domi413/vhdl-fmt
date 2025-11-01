@@ -1,7 +1,10 @@
+#include "ast/nodes/design_units.hpp"
+#include "ast/nodes/expressions.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
+#include <variant>
 
 TEST_CASE("FunctionCall: Simple function call", "[expressions][function_call]")
 {

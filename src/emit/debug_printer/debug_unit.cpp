@@ -1,5 +1,4 @@
 #include "ast/nodes/design_file.hpp"
-#include "ast/nodes/design_units.hpp"
 #include "emit/debug_printer.hpp"
 
 #include <string_view>

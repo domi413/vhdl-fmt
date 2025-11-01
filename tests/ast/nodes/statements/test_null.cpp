@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("Null: Simple null statement", "[statements][null]")
 {
@@ -20,7 +17,7 @@ TEST_CASE("Null: Simple null statement", "[statements][null]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check null statement when implemented
+    // TODO(someone): Check null statement when implemented
 }
 
 TEST_CASE("Null: Null in conditional branch", "[statements][null]")
@@ -39,5 +36,5 @@ TEST_CASE("Null: Null in conditional branch", "[statements][null]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check null statement when implemented
+    // TODO(someone): Check null statement when implemented
 }

@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("ComponentInstantiation: Simple component instantiation",
           "[statements][component_instantiation]")
@@ -21,7 +18,7 @@ TEST_CASE("ComponentInstantiation: Simple component instantiation",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check component instantiation when implemented
+    // TODO(someone): Check component instantiation when implemented
 }
 
 TEST_CASE("ComponentInstantiation: Instantiation with generic map",
@@ -40,5 +37,5 @@ TEST_CASE("ComponentInstantiation: Instantiation with generic map",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check component instantiation when implemented
+    // TODO(someone): Check component instantiation when implemented
 }

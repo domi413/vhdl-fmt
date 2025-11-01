@@ -7,7 +7,6 @@
 #include <span>
 #include <string_view>
 #include <typeinfo>
-#include <variant>
 
 namespace emit {
 

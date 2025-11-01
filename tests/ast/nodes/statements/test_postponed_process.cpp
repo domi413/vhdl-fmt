@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("PostponedProcess: Simple postponed process", "[statements][postponed_process]")
 {
@@ -20,7 +17,7 @@ TEST_CASE("PostponedProcess: Simple postponed process", "[statements][postponed_
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check postponed process when implemented
+    // TODO(someone): Check postponed process when implemented
 }
 
 TEST_CASE("PostponedProcess: Postponed process with sensitivity list",
@@ -40,5 +37,5 @@ TEST_CASE("PostponedProcess: Postponed process with sensitivity list",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check postponed process when implemented
+    // TODO(someone): Check postponed process when implemented
 }

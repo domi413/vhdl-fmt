@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("LoopWithLabel: Simple labeled loop", "[statements][loop_with_label]")
 {
@@ -22,7 +19,7 @@ TEST_CASE("LoopWithLabel: Simple labeled loop", "[statements][loop_with_label]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check loop with label when implemented
+    // TODO(someone): Check loop with label when implemented
 }
 
 TEST_CASE("LoopWithLabel: Nested labeled loops", "[statements][loop_with_label]")
@@ -43,5 +40,5 @@ TEST_CASE("LoopWithLabel: Nested labeled loops", "[statements][loop_with_label]"
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check loop with label when implemented
+    // TODO(someone): Check loop with label when implemented
 }

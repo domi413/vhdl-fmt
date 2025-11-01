@@ -1,4 +1,3 @@
-#include "ast/nodes/design_units.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
@@ -20,7 +19,7 @@ TEST_CASE("Assert: Simple assert statement", "[statements][assert]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check assert statement when implemented
+    // TODO(someone): Check assert statement when implemented
 }
 
 TEST_CASE("Assert: Assert with report and severity", "[statements][assert]")
@@ -37,5 +36,5 @@ TEST_CASE("Assert: Assert with report and severity", "[statements][assert]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check assert statement when implemented
+    // TODO(someone): Check assert statement when implemented
 }

@@ -1,4 +1,3 @@
-#include "ast/nodes/design_units.hpp"
 #include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
@@ -17,7 +16,7 @@ TEST_CASE("ConditionalAssign: Simple conditional assignment", "[statements][cond
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check conditional assign statement when implemented
+    // TODO(someone): Check conditional assign statement when implemented
 }
 
 TEST_CASE("ConditionalAssign: Conditional assignment with multiple conditions",
@@ -34,5 +33,5 @@ TEST_CASE("ConditionalAssign: Conditional assignment with multiple conditions",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check conditional assign statement when implemented
+    // TODO(someone): Check conditional assign statement when implemented
 }

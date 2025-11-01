@@ -1,10 +1,7 @@
-#include "ast/nodes/design_units.hpp"
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("ForceReleaseStatements: Force statement", "[statements][force_release]")
 {
@@ -17,7 +14,7 @@ TEST_CASE("ForceReleaseStatements: Force statement", "[statements][force_release
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check force statement when implemented
+    // TODO(someone): Check force statement when implemented
 }
 
 TEST_CASE("ForceReleaseStatements: Release statement", "[statements][force_release]")
@@ -31,5 +28,5 @@ TEST_CASE("ForceReleaseStatements: Release statement", "[statements][force_relea
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO: Check release statement when implemented
+    // TODO(someone): Check release statement when implemented
 }
