@@ -1,7 +1,4 @@
-.PHONY:
-	all run clean conan test test-rerun test-verbose lint \
-	check-format format sort-dictionary cleanup-dictionary check-cspell-ignored \
-	docker-dev-build docker-dev docker-make docker-test docker-publish-ci
+.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored docker-dev-build docker-dev docker-make docker-test docker-publish-ci
 
 # -----------------------------
 # Build Configuration
