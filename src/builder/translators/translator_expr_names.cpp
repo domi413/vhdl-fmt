@@ -2,7 +2,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
-#include <cstddef>
+#include <algorithm>
 #include <string>
 #include <utility>
 
@@ -13,20 +13,17 @@ namespace builder {
 
 auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 {
+    const auto &parts = ctx->name_part();
     // For formatting: check if we have any structural parts (calls, slices, attributes)
     // If not, just keep the whole name as a single token
-    bool has_structure = false;
-    for (auto *part : ctx->name_part()) {
-        if (part->function_call_or_indexed_name_part()
+    const auto has_structure = std::ranges::any_of(parts, [](auto *part) {
+        return part->function_call_or_indexed_name_part()
             != nullptr
             || part->slice_name_part()
             != nullptr
             || part->attribute_name_part()
-            != nullptr) {
-            has_structure = true;
-            break;
-        }
-    }
+            != nullptr;
+    });
 
     if (!has_structure) {
         // Simple name (possibly with dots like "rec.field") - keep as one token
@@ -46,17 +43,17 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
     }
 
     // Consume consecutive selected_name_parts into base
-    size_t i = 0;
-    while (i < ctx->name_part().size() && ctx->name_part()[i]->selected_name_part() != nullptr) {
-        base_text += ctx->name_part()[i]->getText();
-        i++;
+    auto it = parts.begin();
+    while (it != parts.end() && (*it)->selected_name_part() != nullptr) {
+        base_text += (*it)->getText();
+        ++it;
     }
 
-    ast::Expr base = makeToken(ctx, base_text);
+    ast::Expr base = makeToken(ctx, std::move(base_text));
 
     // Process remaining structural parts
-    for (; i < ctx->name_part().size(); ++i) {
-        auto *part = ctx->name_part()[i];
+    for (; it != parts.end(); ++it) {
+        auto *part = *it;
 
         if (auto *slice = part->slice_name_part()) {
             base = makeSliceExpr(std::move(base), slice);
