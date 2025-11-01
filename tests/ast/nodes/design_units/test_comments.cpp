@@ -9,9 +9,7 @@
 using test_utils::leadingComments;
 using test_utils::trailingComments;
 
-// -----------------------------------------------------------------------------
 // Entity-level leading comments
-// -----------------------------------------------------------------------------
 TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -34,9 +32,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(texts.back().contains("Entity declaration"));
 }
 
-// -----------------------------------------------------------------------------
 // Generic-level leading and inline comments
-// -----------------------------------------------------------------------------
 TEST_CASE("Generic captures both leading and inline comments", "[comments][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -68,9 +64,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE(trail.front().contains("Inline for CONST_V"));
 }
 
-// -----------------------------------------------------------------------------
 // Port-level leading and inline comments
-// -----------------------------------------------------------------------------
 TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
 {
     constexpr std::string_view VHDL_FILE = R"(

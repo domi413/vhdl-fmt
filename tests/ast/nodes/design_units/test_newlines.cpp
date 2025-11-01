@@ -7,9 +7,6 @@
 #include <string_view>
 #include <variant>
 
-// -----------------------------------------------------------------------------
-// Leading trivia: pure blank lines between comments are preserved as Newlines
-// -----------------------------------------------------------------------------
 TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia][leading]")
 {
     // One blank *source* line between two leading comments.

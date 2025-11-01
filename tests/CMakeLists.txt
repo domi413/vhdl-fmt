@@ -14,6 +14,7 @@ add_executable(
     ast/nodes/declarations/test_constraints.cpp
     ast/nodes/declarations/test_declarations.cpp
     ast/nodes/expressions/test_expressions.cpp
+    ast/nodes/statements/test_statements.cpp
     cli/test_argument_parser.cpp
     cli/test_config_reader.cpp
 )
