@@ -18,12 +18,12 @@ TEST_CASE("Architecture: Basic architecture body", "[architecture][design_unit]"
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
+    auto *arch = std::get_if<ast::Architecture>(design.units.data());
     REQUIRE(arch != nullptr);
     REQUIRE(arch->name == "RTL");
     REQUIRE(arch->entity_name == "MyEntity");
-    REQUIRE(arch->decls.size() >= 1);
-    REQUIRE(arch->stmts.size() >= 1);
+    REQUIRE_FALSE(arch->decls.empty());
+    REQUIRE_FALSE(arch->stmts.empty());
 }
 
 TEST_CASE("Architecture: Multiple architectures for same entity", "[architecture]")
@@ -41,7 +41,7 @@ TEST_CASE("Architecture: Multiple architectures for same entity", "[architecture
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    auto *arch1 = std::get_if<ast::Architecture>(&design.units[0]);
+    auto *arch1 = std::get_if<ast::Architecture>(design.units.data());
     REQUIRE(arch1 != nullptr);
     REQUIRE(arch1->name == "RTL");
     REQUIRE(arch1->entity_name == "Counter");

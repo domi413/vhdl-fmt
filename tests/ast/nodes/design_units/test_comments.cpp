@@ -23,7 +23,6 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
     const auto &trivia = entity->trivia.value();
     const auto texts = leadingComments(trivia.leading);
 
@@ -52,7 +51,6 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     const auto &g = entity->generic_clause.generics[0];
     REQUIRE(g.trivia.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
     const auto &trivia = g.trivia.value();
     const auto lead = leadingComments(trivia.leading);
     const auto trail = trailingComments(trivia.trailing);
@@ -86,7 +84,6 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     {
         const auto &clk = entity->port_clause.ports[0];
         REQUIRE(clk.trivia.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
         const auto &trivia = clk.trivia.value();
         const auto lead = leadingComments(trivia.leading);
         const auto trail = trailingComments(trivia.trailing);
@@ -98,7 +95,6 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     {
         const auto &rst = entity->port_clause.ports[1];
         REQUIRE(rst.trivia.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
         const auto &trivia = rst.trivia.value();
         const auto lead = leadingComments(trivia.leading);
         const auto trail = trailingComments(trivia.trailing);

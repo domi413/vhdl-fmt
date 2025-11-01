@@ -1,9 +1,7 @@
-#include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("PackageBody: Function implementation", "[package_body][design_unit]")
 {
@@ -49,7 +47,7 @@ TEST_CASE("PackageBody: With local declarations", "[package_body]")
     constexpr std::string_view VHDL_FILE = R"(
         package body UtilPkg is
             constant LOCAL_CONST : integer := 42;
-            
+
             function GetValue return integer is
             begin
                 return LOCAL_CONST;
