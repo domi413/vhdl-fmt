@@ -1,12 +1,12 @@
 add_executable(
     tests
-    test_argument_parser.cpp
-    test_comments.cpp
-    test_config_reader.cpp
-    test_constraints.cpp
-    test_declarations.cpp
-    test_expressions.cpp
-    test_newlines.cpp
+    ast/test_comments.cpp
+    ast/test_constraints.cpp
+    ast/test_declarations.cpp
+    ast/test_expressions.cpp
+    ast/test_newlines.cpp
+    cli/test_argument_parser.cpp
+    cli/test_config_reader.cpp
 )
 
 target_link_libraries(
@@ -23,6 +23,7 @@ target_include_directories(
     tests
     PRIVATE
         ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/tests
         ${GENERATED_DIR}
 )
 
