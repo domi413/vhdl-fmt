@@ -13,7 +13,7 @@ namespace builder {
 
 auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 {
-    const auto parts = ctx->name_part();
+    const auto &parts = ctx->name_part();
     // For formatting: check if we have any structural parts (calls, slices, attributes)
     // If not, just keep the whole name as a single token
     const auto has_structure = std::ranges::any_of(parts, [](auto *part) {
