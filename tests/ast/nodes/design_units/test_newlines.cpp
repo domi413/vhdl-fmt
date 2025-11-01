@@ -7,7 +7,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("Leading trivia preserves pure blank lines between comments", "[design_units][newlines]]")
+TEST_CASE("Leading trivia preserves pure blank lines between comments", "[design_units][newlines]")
 {
     // One blank *source* line between two leading comments.
     constexpr std::string_view VHDL_FILE = R"(

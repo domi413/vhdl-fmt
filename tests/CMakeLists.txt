@@ -24,6 +24,7 @@ add_executable(
     ast/nodes/declarations/test_type_decl.cpp
     ast/nodes/declarations/test_subtype_decl.cpp
     ast/nodes/declarations/test_function_decl.cpp
+    ast/nodes/declarations/test_impure_function.cpp
     ast/nodes/declarations/test_procedure_decl.cpp
     ast/nodes/declarations/test_component_decl.cpp
     ast/nodes/declarations/test_alias_decl.cpp
@@ -40,6 +41,24 @@ add_executable(
     ast/nodes/expressions/test_token_expr.cpp
     ast/nodes/expressions/test_unary_expr.cpp
     ast/nodes/expressions/test_binary_expr.cpp
+    ast/nodes/expressions/test_group_expr.cpp
+    ast/nodes/expressions/test_paren_expr.cpp
+    ast/nodes/expressions/test_function_call.cpp
+    ast/nodes/expressions/test_aggregate.cpp
+    ast/nodes/expressions/test_qualified_expr.cpp
+    ast/nodes/expressions/test_type_conversion.cpp
+    ast/nodes/expressions/test_attribute_expr.cpp
+    ast/nodes/expressions/test_range_expr.cpp
+    ast/nodes/expressions/test_slice_expr.cpp
+    ast/nodes/expressions/test_indexed_expr.cpp
+    ast/nodes/expressions/test_allocator.cpp
+    ast/nodes/expressions/test_string_literal.cpp
+    ast/nodes/expressions/test_external_name.cpp
+    ast/nodes/expressions/test_reduction_ops.cpp
+    ast/nodes/expressions/test_matching_rel_ops.cpp
+    ast/nodes/expressions/test_conditional_expr.cpp
+    ast/nodes/expressions/test_access_deref.cpp
+    ast/nodes/expressions/test_open_expr.cpp
     #
     # Statements
     ast/nodes/statements/test_concurrent_assign.cpp
