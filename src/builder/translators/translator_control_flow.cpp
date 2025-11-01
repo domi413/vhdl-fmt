@@ -20,7 +20,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     auto conditions = ctx->condition();
     auto sequences = ctx->sequence_of_statements();
 
-    if (conditions.empty() && sequences.empty()) {
+    if (conditions.empty() || sequences.empty()) {
         return stmt;
     }
 
