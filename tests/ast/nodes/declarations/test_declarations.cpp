@@ -7,9 +7,6 @@
 #include <string_view>
 #include <variant>
 
-// -----------------------------------------------------------------------------
-// Architecture declarations: signals and constants
-// -----------------------------------------------------------------------------
 TEST_CASE("Architecture captures signal declarations", "[declarations][architecture]")
 {
     constexpr std::string_view VHDL_FILE = R"(

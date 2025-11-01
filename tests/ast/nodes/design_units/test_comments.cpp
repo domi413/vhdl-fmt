@@ -1,6 +1,6 @@
 #include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
-#include "test_utils.hpp"
+#include "common/test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
@@ -9,9 +9,7 @@
 using test_utils::leadingComments;
 using test_utils::trailingComments;
 
-// -----------------------------------------------------------------------------
 // Entity-level leading comments
-// -----------------------------------------------------------------------------
 TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -25,7 +23,6 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
     const auto &trivia = entity->trivia.value();
     const auto texts = leadingComments(trivia.leading);
 
@@ -34,9 +31,7 @@ TEST_CASE("Entity captures top-level leading comments", "[comments][entity]")
     REQUIRE(texts.back().contains("Entity declaration"));
 }
 
-// -----------------------------------------------------------------------------
 // Generic-level leading and inline comments
-// -----------------------------------------------------------------------------
 TEST_CASE("Generic captures both leading and inline comments", "[comments][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -56,7 +51,6 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     const auto &g = entity->generic_clause.generics[0];
     REQUIRE(g.trivia.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
     const auto &trivia = g.trivia.value();
     const auto lead = leadingComments(trivia.leading);
     const auto trail = trailingComments(trivia.trailing);
@@ -68,9 +62,7 @@ TEST_CASE("Generic captures both leading and inline comments", "[comments][gener
     REQUIRE(trail.front().contains("Inline for CONST_V"));
 }
 
-// -----------------------------------------------------------------------------
 // Port-level leading and inline comments
-// -----------------------------------------------------------------------------
 TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -92,7 +84,6 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     {
         const auto &clk = entity->port_clause.ports[0];
         REQUIRE(clk.trivia.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
         const auto &trivia = clk.trivia.value();
         const auto lead = leadingComments(trivia.leading);
         const auto trail = trailingComments(trivia.trailing);
@@ -104,7 +95,6 @@ TEST_CASE("Ports capture leading and inline comments", "[comments][ports]")
     {
         const auto &rst = entity->port_clause.ports[1];
         REQUIRE(rst.trivia.has_value());
-        // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
         const auto &trivia = rst.trivia.value();
         const auto lead = leadingComments(trivia.leading);
         const auto trail = trailingComments(trivia.trailing);

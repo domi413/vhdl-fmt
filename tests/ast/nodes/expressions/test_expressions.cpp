@@ -10,6 +10,7 @@
 
 // Helper to get expression from signal initialization
 namespace {
+
 auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
 {
     if (design.units.size() < 2) {
@@ -25,11 +26,9 @@ auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
     }
     return &(*signal->init_expr);
 }
+
 } // namespace
 
-// -----------------------------------------------------------------------------
-// Token expressions: literals and identifiers
-// -----------------------------------------------------------------------------
 TEST_CASE("Token expression: integer literal", "[expressions][token]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -87,9 +86,6 @@ TEST_CASE("Token expression: identifier", "[expressions][token]")
     REQUIRE(tok->text == "MAX_VALUE");
 }
 
-// -----------------------------------------------------------------------------
-// Unary expressions: +, -, not, abs
-// -----------------------------------------------------------------------------
 TEST_CASE("Unary expression: negation", "[expressions][unary]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -151,9 +147,6 @@ TEST_CASE("Unary expression: abs operator", "[expressions][unary]")
     REQUIRE(unary->op == "abs");
 }
 
-// -----------------------------------------------------------------------------
-// Binary expressions: arithmetic operators
-// -----------------------------------------------------------------------------
 TEST_CASE("Binary expression: addition", "[expressions][binary][arithmetic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -200,9 +193,6 @@ TEST_CASE("Binary expression: exponentiation", "[expressions][binary][arithmetic
     REQUIRE(bin->op == "**");
 }
 
-// -----------------------------------------------------------------------------
-// Binary expressions: logical and relational operators
-// -----------------------------------------------------------------------------
 TEST_CASE("Binary expression: or operator", "[expressions][binary][logical]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -241,9 +231,6 @@ TEST_CASE("Binary expression: equality", "[expressions][binary][relational]")
     REQUIRE(bin->op == "=");
 }
 
-// -----------------------------------------------------------------------------
-// Binary expressions: range and attribute operators
-// -----------------------------------------------------------------------------
 TEST_CASE("Binary expression: downto range", "[expressions][binary][range]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -340,9 +327,7 @@ TEST_CASE("Binary expression: selected name (dot)", "[expressions][binary][selec
     REQUIRE(tok->text == "record_var.field");
 }
 
-// -----------------------------------------------------------------------------
 // Parenthesized expressions
-// -----------------------------------------------------------------------------
 TEST_CASE("Parenthesized expression: complex", "[expressions][paren]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -365,9 +350,6 @@ TEST_CASE("Parenthesized expression: complex", "[expressions][paren]")
     REQUIRE(inner->op == "+");
 }
 
-// -----------------------------------------------------------------------------
-// Call expressions: function calls and array indexing
-// -----------------------------------------------------------------------------
 TEST_CASE("Call expression: single argument", "[expressions][call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -472,9 +454,6 @@ TEST_CASE("Call expression: slice with range", "[expressions][call][slice]")
     REQUIRE(range_expr->op == "downto");
 }
 
-// -----------------------------------------------------------------------------
-// Group expressions: aggregates
-// -----------------------------------------------------------------------------
 TEST_CASE("Group expression: simple aggregate", "[expressions][group]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -524,9 +503,7 @@ TEST_CASE("Group expression: multiple elements", "[expressions][group]")
     }
 }
 
-// -----------------------------------------------------------------------------
 // Complex nested expressions
-// -----------------------------------------------------------------------------
 TEST_CASE("Complex expression: nested binary operations", "[expressions][complex]")
 {
     constexpr std::string_view VHDL_FILE = R"(

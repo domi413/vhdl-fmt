@@ -1,7 +1,4 @@
-.PHONY: 
-	all run clean conan test test-rerun test-verbose lint \
-	check-format format sort-dictionary cleanup-dictionary check-cspell-ignored \
-	docker-dev-build docker-dev docker-make docker-test docker-publish-ci
+.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored docker-dev-build docker-dev docker-make docker-test docker-publish-ci
 
 # -----------------------------
 # Build Configuration
@@ -43,7 +40,7 @@ $(CONAN_STAMP): conanfile.txt
 conan: $(CONAN_STAMP)
 
 run: $(BUILD_STAMP)
-	@./$(TARGET) ./tests/data/simple.vhdl
+	@./$(TARGET) ./tests/data/vhdl/simple.vhdl
 
 test: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET) --output-on-failure

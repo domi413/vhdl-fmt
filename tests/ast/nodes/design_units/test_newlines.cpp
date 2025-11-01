@@ -7,9 +7,6 @@
 #include <string_view>
 #include <variant>
 
-// -----------------------------------------------------------------------------
-// Leading trivia: pure blank lines between comments are preserved as Newlines
-// -----------------------------------------------------------------------------
 TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia][leading]")
 {
     // One blank *source* line between two leading comments.
@@ -25,7 +22,6 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[trivia
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 
-    // NOLINTNEXTLINE(bugprone-unchecked-optional-access) - checked by REQUIRE above
     const auto &trivia = entity->trivia.value();
     const auto &lead = trivia.leading;
 
