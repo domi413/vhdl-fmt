@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("PackageBody: Function implementation", "[package_body][design_unit]")
+TEST_CASE("PackageBody: Function implementation", "[design_unit][package_body]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package body MyPackage is
@@ -15,13 +15,14 @@ TEST_CASE("PackageBody: Function implementation", "[package_body][design_unit]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // REQUIRE(design.units.size() == 1);
     // auto *pkg_body = std::get_if<ast::PackageBody>(&design.units[0]);
     // REQUIRE(pkg_body != nullptr);
     // REQUIRE(pkg_body->name == "MyPackage");
 }
 
-TEST_CASE("PackageBody: Multiple subprogram implementations", "[package_body]")
+TEST_CASE("PackageBody: Multiple subprogram implementations", "[design_unit][package_body]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package body MathPkg is
@@ -38,11 +39,12 @@ TEST_CASE("PackageBody: Multiple subprogram implementations", "[package_body]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *pkg_body = std::get_if<ast::PackageBody>(&design.units[0]);
     // REQUIRE(pkg_body != nullptr);
 }
 
-TEST_CASE("PackageBody: With local declarations", "[package_body]")
+TEST_CASE("PackageBody: With local declarations", "[design_unit][package_body]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package body UtilPkg is
@@ -56,6 +58,7 @@ TEST_CASE("PackageBody: With local declarations", "[package_body]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *pkg_body = std::get_if<ast::PackageBody>(&design.units[0]);
     // REQUIRE(pkg_body != nullptr);
 }

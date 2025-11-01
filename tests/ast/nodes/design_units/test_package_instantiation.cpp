@@ -4,13 +4,14 @@
 #include <string_view>
 
 TEST_CASE("PackageInstantiation: Generic package instantiation (VHDL-2008)",
-          "[package_instantiation][vhdl2008]")
+          "[design_units][package_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package IntPkg is new GenericPkg generic map (dtype => integer);
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // REQUIRE(design.units.size() == 1);
     // auto *pkg_inst = std::get_if<ast::PackageInstantiation>(&design.units[0]);
     // REQUIRE(pkg_inst != nullptr);
@@ -18,7 +19,7 @@ TEST_CASE("PackageInstantiation: Generic package instantiation (VHDL-2008)",
 }
 
 TEST_CASE("PackageInstantiation: With multiple generic parameters",
-          "[package_instantiation][vhdl2008]")
+          "[design_units][package_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package CustomPkg is new GenericPkg
@@ -30,17 +31,20 @@ TEST_CASE("PackageInstantiation: With multiple generic parameters",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *pkg_inst = std::get_if<ast::PackageInstantiation>(&design.units[0]);
     // REQUIRE(pkg_inst != nullptr);
 }
 
-TEST_CASE("PackageInstantiation: With qualified package name", "[package_instantiation][vhdl2008]")
+TEST_CASE("PackageInstantiation: With qualified package name",
+          "[design_units][package_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package MyIntPkg is new work.GenericPkg generic map (dtype => integer);
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
+    // TODO(someone):
     // auto *pkg_inst = std::get_if<ast::PackageInstantiation>(&design.units[0]);
     // REQUIRE(pkg_inst != nullptr);
 }

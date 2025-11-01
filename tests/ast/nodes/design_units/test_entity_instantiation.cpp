@@ -3,7 +3,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("EntityInstantiation: Direct entity instantiation", "[entity_instantiation]")
+TEST_CASE("EntityInstantiation: Direct entity instantiation",
+          "[design_units][entity_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of Top is
@@ -18,7 +19,7 @@ TEST_CASE("EntityInstantiation: Direct entity instantiation", "[entity_instantia
     // REQUIRE(arch->stmts.size() >= 1);
 }
 
-TEST_CASE("EntityInstantiation: With generic map", "[entity_instantiation]")
+TEST_CASE("EntityInstantiation: With generic map", "[design_units][entity_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of System is
@@ -34,7 +35,8 @@ TEST_CASE("EntityInstantiation: With generic map", "[entity_instantiation]")
     // REQUIRE(arch != nullptr);
 }
 
-TEST_CASE("EntityInstantiation: Without architecture specification", "[entity_instantiation]")
+TEST_CASE("EntityInstantiation: Without architecture specification",
+          "[design_units][entity_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of Top is
@@ -49,7 +51,7 @@ TEST_CASE("EntityInstantiation: Without architecture specification", "[entity_in
     // REQUIRE(arch != nullptr);
 }
 
-TEST_CASE("EntityInstantiation: With library prefix", "[entity_instantiation]")
+TEST_CASE("EntityInstantiation: With library prefix", "[design_units][entity_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of Top is
@@ -64,7 +66,7 @@ TEST_CASE("EntityInstantiation: With library prefix", "[entity_instantiation]")
     // REQUIRE(arch != nullptr);
 }
 
-TEST_CASE("EntityInstantiation: Multiple instantiations", "[entity_instantiation]")
+TEST_CASE("EntityInstantiation: Multiple instantiations", "[design_units][entity_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture Structural of Top is

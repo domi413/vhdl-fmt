@@ -75,3 +75,77 @@ TEST_CASE("ConstantDecl: Boolean constant", "[declarations][constant]")
     REQUIRE(constant->names[0] == "ENABLE");
     REQUIRE(constant->type_name == "boolean");
 }
+
+TEST_CASE("ConstantDecl: String constant", "[declarations][constant]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            constant MESSAGE : string := "Hello World";
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 1);
+
+    auto *constant = std::get_if<ast::ConstantDecl>(arch->decls.data());
+    REQUIRE(constant != nullptr);
+    REQUIRE(constant->names[0] == "MESSAGE");
+    REQUIRE(constant->type_name == "string");
+    REQUIRE(constant->init_expr.has_value());
+}
+
+TEST_CASE("ConstantDecl: Multiple separate constant declarations", "[declarations][constant]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            constant WIDTH : integer := 8;
+            constant HEIGHT : integer := 16;
+            constant DEPTH : integer := 32;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 3);
+
+    auto *const1 = std::get_if<ast::ConstantDecl>(arch->decls.data());
+    REQUIRE(const1 != nullptr);
+    REQUIRE(const1->names[0] == "WIDTH");
+
+    auto *const2 = std::get_if<ast::ConstantDecl>(&arch->decls[1]);
+    REQUIRE(const2 != nullptr);
+    REQUIRE(const2->names[0] == "HEIGHT");
+
+    auto *const3 = std::get_if<ast::ConstantDecl>(&arch->decls[2]);
+    REQUIRE(const3 != nullptr);
+    REQUIRE(const3->names[0] == "DEPTH");
+}
+
+TEST_CASE("ConstantDecl: Constant with expression initialization", "[declarations][constant]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is end E;
+        architecture A of E is
+            constant RESULT : integer := 10 + 20;
+        begin
+        end A;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 1);
+
+    auto *constant = std::get_if<ast::ConstantDecl>(arch->decls.data());
+    REQUIRE(constant != nullptr);
+    REQUIRE(constant->names[0] == "RESULT");
+    REQUIRE(constant->type_name == "integer");
+    REQUIRE(constant->init_expr.has_value());
+}

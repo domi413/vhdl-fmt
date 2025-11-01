@@ -1,5 +1,7 @@
 add_executable(
     tests
+    #
+    # Design Units
     ast/nodes/design_units/test_comments.cpp
     ast/nodes/design_units/test_newlines.cpp
     ast/nodes/design_units/test_entity.cpp
@@ -11,14 +13,35 @@ add_executable(
     ast/nodes/design_units/test_package_instantiation.cpp
     ast/nodes/design_units/test_interface_package.cpp
     ast/nodes/design_units/test_entity_instantiation.cpp
+    #
+    # Declarations
     ast/nodes/declarations/test_constraints.cpp
     ast/nodes/declarations/test_signal_decl.cpp
-    ast/nodes/declarations/test_constant_decl.cpp
+    ast/nodes/declarations/test_constant.cpp
     ast/nodes/declarations/test_generic_param.cpp
     ast/nodes/declarations/test_port.cpp
+    ast/nodes/declarations/test_variable_decl.cpp
+    ast/nodes/declarations/test_type_decl.cpp
+    ast/nodes/declarations/test_subtype_decl.cpp
+    ast/nodes/declarations/test_function_decl.cpp
+    ast/nodes/declarations/test_procedure_decl.cpp
+    ast/nodes/declarations/test_component_decl.cpp
+    ast/nodes/declarations/test_alias_decl.cpp
+    ast/nodes/declarations/test_attribute_decl.cpp
+    ast/nodes/declarations/test_file_decl.cpp
+    ast/nodes/declarations/test_group_decl.cpp
+    ast/nodes/declarations/test_use_clause.cpp
+    ast/nodes/declarations/test_library_clause.cpp
+    ast/nodes/declarations/test_shared_variable.cpp
+    ast/nodes/declarations/test_protected_type.cpp
+    ast/nodes/declarations/test_disconnect_spec.cpp
+    #
+    # Expressions
     ast/nodes/expressions/test_token_expr.cpp
     ast/nodes/expressions/test_unary_expr.cpp
     ast/nodes/expressions/test_binary_expr.cpp
+    #
+    # Statements
     ast/nodes/statements/test_concurrent_assign.cpp
     ast/nodes/statements/test_sequential_assign.cpp
     ast/nodes/statements/test_process.cpp
@@ -26,6 +49,8 @@ add_executable(
     ast/nodes/statements/test_case_statement.cpp
     ast/nodes/statements/test_for_loop.cpp
     ast/nodes/statements/test_while_loop.cpp
+    #
+    # cli
     cli/test_argument_parser.cpp
     cli/test_config_reader.cpp
 )

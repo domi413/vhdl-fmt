@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("InterfacePackage: As generic parameter (VHDL-2008)", "[interface_package][vhdl2008]")
+TEST_CASE("InterfacePackage: As generic parameter (VHDL-2008)", "[design_units][interface_package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity MyEntity is
@@ -33,7 +33,7 @@ TEST_CASE("InterfacePackage: With box notation for unspecified generics",
     // REQUIRE(entity != nullptr);
 }
 
-TEST_CASE("InterfacePackage: Multiple interface packages", "[interface_package][vhdl2008]")
+TEST_CASE("InterfacePackage: Multiple interface packages", "[design_units][interface_package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity MultiPkgEntity is
@@ -49,7 +49,7 @@ TEST_CASE("InterfacePackage: Multiple interface packages", "[interface_package][
     // REQUIRE(entity != nullptr);
 }
 
-TEST_CASE("InterfacePackage: Mixed with regular generics", "[interface_package][vhdl2008]")
+TEST_CASE("InterfacePackage: Mixed with regular generics", "[design_units][interface_package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity MixedGenericEntity is
