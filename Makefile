@@ -79,16 +79,14 @@ define check_tool
 fi
 endef
 
-ifndef SOURCES_TO_LINT
-	SOURCES_TO_LINT := $(SOURCES)
-endif
-
-ifeq ($(LINT_FILES),source)
-	SOURCES_TO_LINT := $(shell find src tests -name '*.cpp')
-endif
-
-ifeq ($(LINT_FILES),header)
-	SOURCES_TO_LINT := $(shell find src tests -name '*.hpp')
+ifdef SOURCES_TO_LINT
+	FILES_TO_LINT := $(SOURCES_TO_LINT)
+else ifeq ($(LINT_FILES),source)
+	FILES_TO_LINT := $(shell find src tests -name '*.cpp')
+else ifeq ($(LINT_FILES),header)
+	FILES_TO_LINT := $(shell find src tests -name '*.hpp')
+else
+	FILES_TO_LINT := $(SOURCES)
 endif
 
 # Use `make lint LINT_FILES=header/source` to lint either one
