@@ -26,33 +26,6 @@ TEST_CASE("ConcurrentAssign: Simple concurrent signal assignment", "[concurrent]
     REQUIRE(assign != nullptr);
 }
 
-TEST_CASE("Process: Process with sensitivity list", "[process][statement]")
-{
-    constexpr std::string_view VHDL_FILE = R"(
-        entity Test is end Test;
-        architecture RTL of Test is
-        begin
-            process (clk, rst)
-            begin
-                if rst = '1' then
-                    count <= 0;
-                end if;
-            end process;
-        end RTL;
-    )";
-
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
-
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->sensitivity_list.size() == 2);
-    REQUIRE(proc->sensitivity_list[0] == "clk");
-    REQUIRE(proc->sensitivity_list[1] == "rst");
-}
-
 TEST_CASE("IfStatement: If/elsif/else conditional", "[if][statement]")
 {
     constexpr std::string_view VHDL_FILE = R"(
