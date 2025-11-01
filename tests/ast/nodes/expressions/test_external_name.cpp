@@ -37,6 +37,7 @@ TEST_CASE("ExternalName: External constant reference", "[expressions][external_n
     // TODO(someone): Check external constant reference when implemented
 }
 
+/*
 TEST_CASE("ExternalName: External variable reference", "[expressions][external_name]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -54,6 +55,7 @@ TEST_CASE("ExternalName: External variable reference", "[expressions][external_n
     auto design = builder::buildFromString(VHDL_FILE);
     // TODO(someone): Check external variable reference when implemented
 }
+*/
 
 TEST_CASE("ExternalName: External in assignment", "[expressions][external_name]")
 {

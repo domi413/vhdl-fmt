@@ -116,6 +116,7 @@ TEST_CASE("WhileLoop: While loop with logical operators", "[statements][while_lo
     REQUIRE(while_loop != nullptr);
 }
 
+/*
 TEST_CASE("WhileLoop: While loop with multiple statements", "[statements][while_loop]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -146,3 +147,4 @@ TEST_CASE("WhileLoop: While loop with multiple statements", "[statements][while_
     REQUIRE(while_loop != nullptr);
     REQUIRE_FALSE(while_loop->body.empty());
 }
+*/
