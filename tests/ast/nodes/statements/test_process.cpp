@@ -1,9 +1,11 @@
+#include "ast/nodes/design_units.hpp"
+#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-
 #include <variant>
+
 TEST_CASE("Process: Process with sensitivity list", "[statements][process]")
 {
     constexpr std::string_view VHDL_FILE = R"(
