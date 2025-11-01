@@ -20,14 +20,16 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     auto conditions = ctx->condition();
     auto sequences = ctx->sequence_of_statements();
 
-    if (!conditions.empty() && !sequences.empty()) {
-        stmt.if_branch.condition = makeExpr(conditions[0]->expression());
-        stmt.if_branch.body = makeSequenceOfStatements(sequences[0]);
+    if (conditions.empty() && sequences.empty()) {
+        return stmt;
     }
+
+    stmt.if_branch.condition = makeExpr(conditions[0]->expression());
+    stmt.if_branch.body = makeSequenceOfStatements(sequences[0]);
 
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
     // If there's an else, the last sequence doesn't have a condition
-    for (const size_t i : std::views::iota(size_t{1}, conditions.size())) {
+    for (const auto i : std::views::iota(std::size_t{ 1 }, conditions.size())) {
         ast::IfStatement::Branch elsif_branch;
         elsif_branch.condition = makeExpr(conditions[i]->expression());
         elsif_branch.body = makeSequenceOfStatements(sequences[i]);
