@@ -10,6 +10,7 @@
 
 // Helper to get expression from signal initialization
 namespace {
+
 auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
 {
     if (design.units.size() < 2) {
@@ -25,6 +26,7 @@ auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
     }
     return &(*signal->init_expr);
 }
+
 } // namespace
 
 // -----------------------------------------------------------------------------
