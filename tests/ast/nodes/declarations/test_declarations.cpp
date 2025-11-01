@@ -7,10 +7,6 @@
 #include <string_view>
 #include <variant>
 
-// =============================================================================
-// Mixed Declarations
-// =============================================================================
-
 TEST_CASE("Multiple declaration types in architecture", "[declarations][mixed]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -61,10 +57,6 @@ TEST_CASE("Architecture with no declarations", "[declarations][empty]")
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.empty());
 }
-
-// =============================================================================
-// Not Yet Implemented Declarations (commented out)
-// =============================================================================
 
 TEST_CASE("VariableDecl: Variable in process", "[declarations][variable]")
 {
