@@ -20,19 +20,19 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     auto conditions = ctx->condition();
     auto sequences = ctx->sequence_of_statements();
 
-    if (!conditions.empty() && !sequences.empty()) {
-        stmt.if_branch.condition = makeExpr(conditions[0]->expression());
-        stmt.if_branch.body = makeSequenceOfStatements(sequences[0]);
+    if (conditions.empty() || sequences.empty()) {
+        return stmt;
     }
+
+    stmt.if_branch.condition = makeExpr(conditions[0]->expression());
+    stmt.if_branch.body = makeSequenceOfStatements(sequences[0]);
 
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
     // If there's an else, the last sequence doesn't have a condition
-    const size_t num_elsif = conditions.size() - 1;
-
-    for (size_t i = 0; i < num_elsif; ++i) {
+    for (const auto i : std::views::iota(std::size_t{ 1 }, conditions.size())) {
         ast::IfStatement::Branch elsif_branch;
-        elsif_branch.condition = makeExpr(conditions[i + 1]->expression());
-        elsif_branch.body = makeSequenceOfStatements(sequences[i + 1]);
+        elsif_branch.condition = makeExpr(conditions[i]->expression());
+        elsif_branch.body = makeSequenceOfStatements(sequences[i]);
         stmt.elsif_branches.push_back(std::move(elsif_branch));
     }
 

@@ -88,7 +88,7 @@ auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept
 
     std::size_t last_default = start_index;
 
-    for (auto *token : tokens | std::views::drop(start_index + 1)) {
+    for (const auto *token : tokens | std::views::drop(start_index + 1)) {
         if (token == nullptr || token->getLine() != line) {
             break;
         }
