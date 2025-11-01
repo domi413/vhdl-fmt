@@ -1,10 +1,19 @@
 add_executable(
     tests
-    ast/test_comments.cpp
-    ast/test_constraints.cpp
-    ast/test_declarations.cpp
-    ast/test_expressions.cpp
-    ast/test_newlines.cpp
+    ast/nodes/design_units/test_comments.cpp
+    ast/nodes/design_units/test_newlines.cpp
+    ast/nodes/design_units/test_entity.cpp
+    ast/nodes/design_units/test_architecture.cpp
+    ast/nodes/design_units/test_package.cpp
+    ast/nodes/design_units/test_package_body.cpp
+    ast/nodes/design_units/test_configuration.cpp
+    ast/nodes/design_units/test_context.cpp
+    ast/nodes/design_units/test_package_instantiation.cpp
+    ast/nodes/design_units/test_interface_package.cpp
+    ast/nodes/design_units/test_entity_instantiation.cpp
+    ast/nodes/declarations/test_constraints.cpp
+    ast/nodes/declarations/test_declarations.cpp
+    ast/nodes/expressions/test_expressions.cpp
     cli/test_argument_parser.cpp
     cli/test_config_reader.cpp
 )
