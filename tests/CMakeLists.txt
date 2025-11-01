@@ -15,68 +15,68 @@ add_executable(
     ast/nodes/design_units/test_package_instantiation.cpp
     #
     # Declarations
-    ast/nodes/declarations/test_alias_decl.cpp
-    ast/nodes/declarations/test_attribute_decl.cpp
-    ast/nodes/declarations/test_component_decl.cpp
+    ast/nodes/declarations/test_alias.cpp
+    ast/nodes/declarations/test_attribute.cpp
+    ast/nodes/declarations/test_component.cpp
     ast/nodes/declarations/test_constant.cpp
     ast/nodes/declarations/test_constraints.cpp
     ast/nodes/declarations/test_disconnect_spec.cpp
-    ast/nodes/declarations/test_file_decl.cpp
-    ast/nodes/declarations/test_function_decl.cpp
+    ast/nodes/declarations/test_file.cpp
+    ast/nodes/declarations/test_function.cpp
     ast/nodes/declarations/test_generic_param.cpp
-    ast/nodes/declarations/test_group_decl.cpp
+    ast/nodes/declarations/test_group.cpp
     ast/nodes/declarations/test_impure_function.cpp
     ast/nodes/declarations/test_library_clause.cpp
     ast/nodes/declarations/test_port.cpp
-    ast/nodes/declarations/test_procedure_decl.cpp
+    ast/nodes/declarations/test_procedure.cpp
     ast/nodes/declarations/test_protected_type.cpp
     ast/nodes/declarations/test_shared_variable.cpp
-    ast/nodes/declarations/test_signal_decl.cpp
-    ast/nodes/declarations/test_subtype_decl.cpp
-    ast/nodes/declarations/test_type_decl.cpp
+    ast/nodes/declarations/test_signal.cpp
+    ast/nodes/declarations/test_subtype.cpp
+    ast/nodes/declarations/test_type.cpp
     ast/nodes/declarations/test_use_clause.cpp
-    ast/nodes/declarations/test_variable_decl.cpp
+    ast/nodes/declarations/test_variable.cpp
     #
     # Expressions
     ast/nodes/expressions/test_access_deref.cpp
     ast/nodes/expressions/test_aggregate.cpp
     ast/nodes/expressions/test_allocator.cpp
-    ast/nodes/expressions/test_attribute_expr.cpp
-    ast/nodes/expressions/test_binary_expr.cpp
-    ast/nodes/expressions/test_conditional_expr.cpp
+    ast/nodes/expressions/test_attribute.cpp
+    ast/nodes/expressions/test_binary.cpp
+    ast/nodes/expressions/test_conditional.cpp
     ast/nodes/expressions/test_external_name.cpp
     ast/nodes/expressions/test_function_call.cpp
-    ast/nodes/expressions/test_group_expr.cpp
-    ast/nodes/expressions/test_indexed_expr.cpp
+    ast/nodes/expressions/test_group.cpp
+    ast/nodes/expressions/test_indexed.cpp
     ast/nodes/expressions/test_matching_rel_ops.cpp
-    ast/nodes/expressions/test_open_expr.cpp
-    ast/nodes/expressions/test_paren_expr.cpp
-    ast/nodes/expressions/test_qualified_expr.cpp
-    ast/nodes/expressions/test_range_expr.cpp
+    ast/nodes/expressions/test_open.cpp
+    ast/nodes/expressions/test_paren.cpp
+    ast/nodes/expressions/test_qualified.cpp
+    ast/nodes/expressions/test_range.cpp
     ast/nodes/expressions/test_reduction_ops.cpp
-    ast/nodes/expressions/test_slice_expr.cpp
+    ast/nodes/expressions/test_slice.cpp
     ast/nodes/expressions/test_string_literal.cpp
-    ast/nodes/expressions/test_token_expr.cpp
+    ast/nodes/expressions/test_token.cpp
     ast/nodes/expressions/test_type_conversion.cpp
-    ast/nodes/expressions/test_unary_expr.cpp
+    ast/nodes/expressions/test_unary.cpp
     #
     # Statements
     ast/nodes/statements/test_assert.cpp
     ast/nodes/statements/test_block.cpp
     ast/nodes/statements/test_case_generate.cpp
-    ast/nodes/statements/test_case_statement.cpp
+    ast/nodes/statements/test_case.cpp
     ast/nodes/statements/test_component_instantiation.cpp
     ast/nodes/statements/test_concurrent_assign.cpp
     ast/nodes/statements/test_concurrent_procedure_call.cpp
     ast/nodes/statements/test_conditional_assign.cpp
     ast/nodes/statements/test_exit.cpp
-    ast/nodes/statements/test_file_io_statement.cpp
+    ast/nodes/statements/test_file_io.cpp
     ast/nodes/statements/test_for_loop.cpp
-    ast/nodes/statements/test_force_release_statements.cpp
+    ast/nodes/statements/test_force_release.cpp
     ast/nodes/statements/test_generate.cpp
-    ast/nodes/statements/test_guarded_signal_assignment.cpp
+    ast/nodes/statements/test_guarded_signal.cpp
     ast/nodes/statements/test_if_generate_with_alternative.cpp
-    ast/nodes/statements/test_if_statement.cpp
+    ast/nodes/statements/test_if.cpp
     ast/nodes/statements/test_loop_with_label.cpp
     ast/nodes/statements/test_next.cpp
     ast/nodes/statements/test_null.cpp
