@@ -1,9 +1,7 @@
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("ProcedureCall: Simple procedure call", "[statements][procedure_call]")
 {

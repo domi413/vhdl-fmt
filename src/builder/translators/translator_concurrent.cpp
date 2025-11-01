@@ -1,3 +1,4 @@
+#include "ast/nodes/statements.hpp"
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 

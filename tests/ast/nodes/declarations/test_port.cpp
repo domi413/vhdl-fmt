@@ -1,11 +1,9 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
-#include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("Port: Single input port", "[declarations][port]")
 {

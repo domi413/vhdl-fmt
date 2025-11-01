@@ -1,9 +1,7 @@
-#include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("InterfacePackage: As generic parameter (VHDL-2008)", "[design_units][interface_package]")
 {

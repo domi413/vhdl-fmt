@@ -1,4 +1,5 @@
 #include "ast/nodes/design_file.hpp"
+#include "ast/nodes/design_units.hpp"
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 

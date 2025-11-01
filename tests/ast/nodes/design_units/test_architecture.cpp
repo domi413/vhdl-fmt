@@ -1,9 +1,7 @@
-#include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("Architecture: Basic architecture body", "[design_units][architecture]")
 {
@@ -22,8 +20,8 @@ TEST_CASE("Architecture: Basic architecture body", "[design_units][architecture]
     REQUIRE(arch != nullptr);
     REQUIRE(arch->name == "RTL");
     REQUIRE(arch->entity_name == "MyEntity");
-    REQUIRE(arch->decls.size() >= 1);
-    REQUIRE(arch->stmts.size() >= 1);
+    REQUIRE_FALSE(arch->decls.empty());
+    REQUIRE_FALSE(arch->stmts.empty());
 }
 
 TEST_CASE("Architecture: Multiple architectures for same entity", "[design_units][architecture]")

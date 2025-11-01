@@ -1,10 +1,9 @@
-#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
+#include <variant>
 TEST_CASE("IfStatement: Simple if statement", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
