@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("Package: Basic package declaration", "[package][design_unit]")
+TEST_CASE("Package: Basic package declaration", "[design_units][package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package MyPackage is
@@ -19,7 +19,7 @@ TEST_CASE("Package: Basic package declaration", "[package][design_unit]")
     // REQUIRE(pkg->name == "MyPackage");
 }
 
-TEST_CASE("Package: With constants and functions", "[package]")
+TEST_CASE("Package: With constants and functions", "[design_units][package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package Constants is
@@ -35,7 +35,7 @@ TEST_CASE("Package: With constants and functions", "[package]")
     // REQUIRE(pkg->decls.size() >= 2);
 }
 
-TEST_CASE("Package: With type declarations", "[package]")
+TEST_CASE("Package: With type declarations", "[design_units][package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package TypesPkg is
@@ -49,7 +49,7 @@ TEST_CASE("Package: With type declarations", "[package]")
     // REQUIRE(pkg != nullptr);
 }
 
-TEST_CASE("Package: Minimal empty package", "[package]")
+TEST_CASE("Package: Minimal empty package", "[design_units][package]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package EmptyPkg is

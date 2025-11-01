@@ -12,9 +12,20 @@ add_executable(
     ast/nodes/design_units/test_interface_package.cpp
     ast/nodes/design_units/test_entity_instantiation.cpp
     ast/nodes/declarations/test_constraints.cpp
-    ast/nodes/declarations/test_declarations.cpp
-    ast/nodes/expressions/test_expressions.cpp
-    ast/nodes/statements/test_statements.cpp
+    ast/nodes/declarations/test_signal_decl.cpp
+    ast/nodes/declarations/test_constant_decl.cpp
+    ast/nodes/declarations/test_generic_param.cpp
+    ast/nodes/declarations/test_port.cpp
+    ast/nodes/expressions/test_token_expr.cpp
+    ast/nodes/expressions/test_unary_expr.cpp
+    ast/nodes/expressions/test_binary_expr.cpp
+    ast/nodes/statements/test_concurrent_assign.cpp
+    ast/nodes/statements/test_sequential_assign.cpp
+    ast/nodes/statements/test_process.cpp
+    ast/nodes/statements/test_if_statement.cpp
+    ast/nodes/statements/test_case_statement.cpp
+    ast/nodes/statements/test_for_loop.cpp
+    ast/nodes/statements/test_while_loop.cpp
     cli/test_argument_parser.cpp
     cli/test_config_reader.cpp
 )

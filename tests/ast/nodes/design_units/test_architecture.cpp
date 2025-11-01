@@ -5,7 +5,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("Architecture: Basic architecture body", "[architecture][design_unit]")
+TEST_CASE("Architecture: Basic architecture body", "[design_units][architecture]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of MyEntity is
@@ -18,15 +18,15 @@ TEST_CASE("Architecture: Basic architecture body", "[architecture][design_unit]"
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    auto *arch = std::get_if<ast::Architecture>(design.units.data());
+    auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->name == "RTL");
     REQUIRE(arch->entity_name == "MyEntity");
-    REQUIRE_FALSE(arch->decls.empty());
-    REQUIRE_FALSE(arch->stmts.empty());
+    REQUIRE(arch->decls.size() >= 1);
+    REQUIRE(arch->stmts.size() >= 1);
 }
 
-TEST_CASE("Architecture: Multiple architectures for same entity", "[architecture]")
+TEST_CASE("Architecture: Multiple architectures for same entity", "[design_units][architecture]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         architecture RTL of Counter is
@@ -41,7 +41,7 @@ TEST_CASE("Architecture: Multiple architectures for same entity", "[architecture
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    auto *arch1 = std::get_if<ast::Architecture>(design.units.data());
+    auto *arch1 = std::get_if<ast::Architecture>(&design.units[0]);
     REQUIRE(arch1 != nullptr);
     REQUIRE(arch1->name == "RTL");
     REQUIRE(arch1->entity_name == "Counter");
