@@ -2,7 +2,7 @@
 
 > A fast, modern and configurable VHDL code formatter built to improve readability and consistency in your projects.
 
-** NOTE: The formatter does not work yet and is still under development.**
+**NOTE: The formatter does not work yet and is still under development.**
 
 ## Installation
 
@@ -75,7 +75,9 @@ Contributions are welcome\! Please fork the repository and open a pull request t
 
 ### Dependencies for Development
 
-To ensure consistent code quality across contributions, the following tools are part of the development and CI pipeline:
+To ensure consistent code quality across contributions, we recommend to use the provided dev container.
+
+Otherwise if you prefer to use your own environment, the following tools are part of the development and CI pipeline:
 
 - `clang` (`clang`, `clang-format`, `clang-tidy`)
 - `cmake`
@@ -85,5 +87,5 @@ To ensure consistent code quality across contributions, the following tools are 
 
 **NOTE:**
 
-- `clang` version 20 is required. This might not be the latest version on some Linux distributions.
+- `clang` version 21 is required. This might not be the latest version on some Linux distributions.
 - `gersemi` and `clang-format` are not strictly required for development, but the CI pipeline will fail if files are not formatted correctly.
