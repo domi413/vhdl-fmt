@@ -1,5 +1,5 @@
-#include "ast/nodes/statements.hpp"
 #include "ast/nodes/design_units.hpp"
+#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -21,7 +21,7 @@ TEST_CASE("ConcurrentAssign: Simple concurrent signal assignment", "[concurrent]
     auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
-    
+
     auto *assign = std::get_if<ast::ConcurrentAssign>(arch->stmts.data());
     REQUIRE(assign != nullptr);
 }
@@ -45,7 +45,7 @@ TEST_CASE("Process: Process with sensitivity list", "[process][statement]")
     auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
-    
+
     auto *proc = std::get_if<ast::Process>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE(proc->sensitivity_list.size() == 2);
@@ -75,11 +75,11 @@ TEST_CASE("IfStatement: If/elsif/else conditional", "[if][statement]")
     auto design = builder::buildFromString(VHDL_FILE);
     auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
-    
+
     auto *proc = std::get_if<ast::Process>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
-    
+
     auto *if_stmt = std::get_if<ast::IfStatement>(proc->body.data());
     REQUIRE(if_stmt != nullptr);
     REQUIRE(if_stmt->elsif_branches.size() == 1);
@@ -109,11 +109,11 @@ TEST_CASE("CaseStatement: Case with when clauses", "[case][statement]")
     auto design = builder::buildFromString(VHDL_FILE);
     auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
-    
+
     auto *proc = std::get_if<ast::Process>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
-    
+
     auto *case_stmt = std::get_if<ast::CaseStatement>(proc->body.data());
     REQUIRE(case_stmt != nullptr);
     REQUIRE(case_stmt->when_clauses.size() == 3);
@@ -137,11 +137,11 @@ TEST_CASE("ForLoop: For loop statement", "[loop][statement]")
     auto design = builder::buildFromString(VHDL_FILE);
     auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
-    
+
     auto *proc = std::get_if<ast::Process>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
-    
+
     auto *for_loop = std::get_if<ast::ForLoop>(proc->body.data());
     REQUIRE(for_loop != nullptr);
     REQUIRE(for_loop->iterator == "i");
@@ -165,11 +165,11 @@ TEST_CASE("WhileLoop: While loop statement", "[loop][statement]")
     auto design = builder::buildFromString(VHDL_FILE);
     auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
     REQUIRE(arch != nullptr);
-    
+
     auto *proc = std::get_if<ast::Process>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
-    
+
     auto *while_loop = std::get_if<ast::WhileLoop>(proc->body.data());
     REQUIRE(while_loop != nullptr);
 }

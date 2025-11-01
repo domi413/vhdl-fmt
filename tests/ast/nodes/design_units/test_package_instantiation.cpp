@@ -3,7 +3,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("PackageInstantiation: Generic package instantiation (VHDL-2008)", "[package_instantiation][vhdl2008]")
+TEST_CASE("PackageInstantiation: Generic package instantiation (VHDL-2008)",
+          "[package_instantiation][vhdl2008]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package IntPkg is new GenericPkg generic map (dtype => integer);
@@ -16,7 +17,8 @@ TEST_CASE("PackageInstantiation: Generic package instantiation (VHDL-2008)", "[p
     // REQUIRE(pkg_inst->name == "IntPkg");
 }
 
-TEST_CASE("PackageInstantiation: With multiple generic parameters", "[package_instantiation][vhdl2008]")
+TEST_CASE("PackageInstantiation: With multiple generic parameters",
+          "[package_instantiation][vhdl2008]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package CustomPkg is new GenericPkg

@@ -18,7 +18,8 @@ TEST_CASE("InterfacePackage: As generic parameter (VHDL-2008)", "[interface_pack
     // REQUIRE(entity != nullptr);
 }
 
-TEST_CASE("InterfacePackage: With box notation for unspecified generics", "[interface_package][vhdl2008]")
+TEST_CASE("InterfacePackage: With box notation for unspecified generics",
+          "[interface_package][vhdl2008]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Processor is
