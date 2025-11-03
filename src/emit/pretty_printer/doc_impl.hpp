@@ -50,6 +50,7 @@ struct Union
 class DocImpl
 {
   public:
+    // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
     std::variant<Empty, Text, Line, Concat, Nest, Union> value;
 
     // Convenience constructors
