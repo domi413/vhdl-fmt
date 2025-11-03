@@ -49,22 +49,21 @@ struct Union
 /// Internal document representation using variant
 class DocImpl
 {
-    using Variant = std::variant<Empty, Text, Line, Concat, Nest, Union>;
-    Variant value_;
-
   public:
+    std::variant<Empty, Text, Line, Concat, Nest, Union> value;
+
     // Convenience constructors
-    explicit DocImpl(Empty e) : value_(e) {}
-    explicit DocImpl(Text t) : value_(std::move(t)) {}
-    explicit DocImpl(Line l) : value_(l) {}
-    explicit DocImpl(Concat c) : value_(std::move(c)) {}
-    explicit DocImpl(Nest n) : value_(std::move(n)) {}
-    explicit DocImpl(Union u) : value_(std::move(u)) {}
+    explicit DocImpl(Empty e) : value(e) {}
+    explicit DocImpl(Text t) : value(std::move(t)) {}
+    explicit DocImpl(Line l) : value(l) {}
+    explicit DocImpl(Concat c) : value(std::move(c)) {}
+    explicit DocImpl(Nest n) : value(std::move(n)) {}
+    explicit DocImpl(Union u) : value(std::move(u)) {}
 };
 
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;
-auto makeText(std::string text) -> DocPtr;
+auto makeText(std::string_view text) -> DocPtr;
 auto makeLine() -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
 auto makeNest(int indent, DocPtr doc) -> DocPtr;

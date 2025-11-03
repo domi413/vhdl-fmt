@@ -10,44 +10,45 @@ Doc::Doc() : impl_(makeEmpty()) {}
 // Basic constructors
 auto Doc::empty() -> Doc
 {
-    throw "not implemented";
+    return Doc(makeEmpty());
 }
 
 auto Doc::text(std::string_view str) -> Doc
 {
-    throw "not implemented";
+    return Doc(makeText(str));
 }
 
 auto Doc::line() -> Doc
 {
-    throw "not implemented";
+    return Doc(makeLine());
 }
 
 // Combinators
 auto Doc::operator+(const Doc &other) const -> Doc
 {
-    throw "not implemented";
+    return Doc(makeConcat(impl_, other.impl_));
 }
 
 auto Doc::nest(int indent) const -> Doc
 {
-    throw "not implemented";
+    return Doc(makeNest(indent, impl_));
 }
 
 auto Doc::group() const -> Doc
 {
-    throw "not implemented";
+    return Doc(makeUnion(impl_, impl_));
 }
 
 // Rendering
 auto Doc::render(int width) const -> std::string
 {
-    throw "not implemented";
+    Renderer renderer(width);
+    return renderer.render(impl_);
 }
 
 void Doc::renderToStream(std::ostream &out, int width) const
 {
-    throw "not implemented";
+    out << render(width);
 }
 
 // Internal access
@@ -59,7 +60,7 @@ auto Doc::impl() const -> const std::shared_ptr<DocImpl> &
 // Helper functions
 auto space() -> Doc
 {
-    throw "not implemented";
+    return Doc::text(" ");
 }
 
 } // namespace emit

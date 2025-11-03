@@ -1,4 +1,5 @@
 #include "emit/pretty_printer/doc.hpp"
+
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 
@@ -75,7 +76,8 @@ TEST_CASE("Nested indentation accumulates", "[doc]")
 
     std::string expected = "outer\n  middle\n    inner";
     REQUIRE(doc.render(80) == expected);
-}TEST_CASE("Group allows line to be flattened when it fits", "[doc]")
+}
+TEST_CASE("Group allows line to be flattened when it fits", "[doc]")
 {
     Doc doc = (Doc::text("a") + Doc::line() + Doc::text("b")).group();
     // Should fit on one line, so line becomes space
@@ -85,9 +87,10 @@ TEST_CASE("Nested indentation accumulates", "[doc]")
 TEST_CASE("Group forces break when content doesn't fit", "[doc]")
 {
     // Create content that's too wide for the line
-    Doc doc = (Doc::text("very_long_identifier_that_exceeds") +
-               Doc::line() +
-               Doc::text("the_width_limit")).group();
+    Doc doc = (Doc::text("very_long_identifier_that_exceeds")
+               + Doc::line()
+               + Doc::text("the_width_limit"))
+                .group();
 
     const int width = 20;
 
@@ -115,7 +118,7 @@ TEST_CASE("Complex nested structure", "[doc]")
 TEST_CASE("Doc is copyable", "[doc]")
 {
     Doc doc1 = Doc::text("hello");
-    Doc doc2 = doc1;  // NOLINT (performance-unnecessary-copy-initialization)
+    Doc doc2 = doc1; // NOLINT (performance-unnecessary-copy-initialization)
 
     REQUIRE(doc1.render(80) == "hello");
     REQUIRE(doc2.render(80) == "hello");
