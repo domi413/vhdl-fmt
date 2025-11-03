@@ -95,7 +95,7 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
         },
         [&](const Concat &node) -> int {
             // Thread remaining width through both sides
-            int remaining = fitsImpl(width, node.left);
+            const int remaining = fitsImpl(width, node.left);
             if (remaining < 0) {
                 return -1;
             }
@@ -129,4 +129,4 @@ void Renderer::newline(int indent)
 
 } // namespace emit
 
-// NOLINTBEGIN (misc-no-recursion)
+// NOLINTEND (misc-no-recursion)

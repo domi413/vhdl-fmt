@@ -4,7 +4,6 @@
 #include "emit/pretty_printer/renderer.hpp"
 
 #include <memory>
-#include <ostream>
 #include <string>
 #include <string_view>
 
@@ -51,7 +50,7 @@ auto Doc::nest(int indent) const -> Doc
 
 auto Doc::group() const -> Doc
 {
-    return Doc(makeUnion(impl_, impl_));
+    return Doc(makeUnion(flatten(impl_), impl_));
 }
 
 // Rendering

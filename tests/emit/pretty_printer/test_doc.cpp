@@ -2,6 +2,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string>
+#include <utility>
 
 using emit::Doc;
 using emit::space;
@@ -9,7 +10,7 @@ using emit::space;
 TEST_CASE("Doc::empty creates empty document", "[doc]")
 {
     const Doc doc = Doc::empty();
-    REQUIRE(doc.render(80) == "");
+    REQUIRE(doc.render(80).empty());
 }
 
 TEST_CASE("Doc::text creates text document", "[doc]")
