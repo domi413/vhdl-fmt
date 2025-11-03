@@ -3,6 +3,11 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 #include "emit/pretty_printer/renderer.hpp"
 
+#include <memory>
+#include <ostream>
+#include <string>
+#include <string_view>
+
 namespace emit {
 
 Doc::Doc() : impl_(makeEmpty()) {}

@@ -3,6 +3,9 @@
 #include "emit/pretty_printer/doc.hpp"
 
 #include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
 
 namespace emit {
 
