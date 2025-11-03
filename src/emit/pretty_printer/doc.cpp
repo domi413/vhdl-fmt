@@ -29,6 +29,16 @@ auto Doc::operator+(const Doc &other) const -> Doc
     return Doc(makeConcat(impl_, other.impl_));
 }
 
+auto Doc::operator&(const Doc &other) const -> Doc
+{
+    return *this + space() + other;
+}
+
+auto Doc::operator/(const Doc &other) const -> Doc
+{
+    return *this + line() + other;
+}
+
 auto Doc::nest(int indent) const -> Doc
 {
     return Doc(makeNest(indent, impl_));

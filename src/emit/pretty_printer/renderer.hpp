@@ -35,7 +35,10 @@ class Renderer final
     void renderDoc(int indent, Mode mode, const DocPtr &doc);
 
     // Check if document fits on current line
-    auto fits(int width, const DocPtr &doc) -> bool;
+    static auto fits(int width, const DocPtr &doc) -> bool;
+
+    // Helper for fits: returns remaining width, or -1 if doesn't fit
+    static auto fitsImpl(int width, const DocPtr &doc) -> int;
 
     // Output helpers
     void write(std::string_view text);

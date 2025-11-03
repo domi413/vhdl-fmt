@@ -22,7 +22,7 @@ struct Text
 };
 
 /// Line break (space when flattened, newline when broken)
-struct Line
+struct LineBreak
 {};
 
 /// Concatenation of two documents
@@ -51,12 +51,12 @@ class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty, Text, Line, Concat, Nest, Union> value;
+    std::variant<Empty, Text, LineBreak, Concat, Nest, Union> value;
 
     // Convenience constructors
     explicit DocImpl(Empty e) : value(e) {}
     explicit DocImpl(Text t) : value(std::move(t)) {}
-    explicit DocImpl(Line l) : value(l) {}
+    explicit DocImpl(LineBreak l) : value(l) {}
     explicit DocImpl(Concat c) : value(std::move(c)) {}
     explicit DocImpl(Nest n) : value(std::move(n)) {}
     explicit DocImpl(Union u) : value(std::move(u)) {}

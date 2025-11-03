@@ -1,5 +1,7 @@
 #include "emit/pretty_printer/doc_impl.hpp"
+
 #include "emit/pretty_printer/doc.hpp"
+
 #include <memory>
 
 namespace emit {
@@ -17,7 +19,7 @@ auto makeText(std::string_view text) -> DocPtr
 
 auto makeLine() -> DocPtr
 {
-    return std::make_shared<DocImpl>(Line{});
+    return std::make_shared<DocImpl>(LineBreak{});
 }
 
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr
@@ -50,9 +52,9 @@ auto flatten(const DocPtr &doc) -> DocPtr
     }
 
     return std::visit(Overload{
-                        [](const Empty &) -> DocPtr { return std::make_shared<DocImpl>(Empty{}); },
-                        [](const Text &node) -> DocPtr { return std::make_shared<DocImpl>(node); },
-                        [](const Line &) -> DocPtr {
+                        [](const Empty &) -> DocPtr { return makeEmpty(); },
+                        [](const Text &node) -> DocPtr { return makeText(node.content); },
+                        [](const LineBreak &) -> DocPtr {
                             // Line becomes a space when flattened
                             return makeText(" ");
                         },

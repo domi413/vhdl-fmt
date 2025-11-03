@@ -14,49 +14,38 @@ TEST_CASE("Doc::empty creates empty document", "[doc]")
 
 TEST_CASE("Doc::text creates text document", "[doc]")
 {
-    Doc doc = Doc::text("hello");
-    REQUIRE(doc.render(80) == "hello");
-}
-
-TEST_CASE("Doc::text with multiple words", "[doc]")
-{
     Doc doc = Doc::text("hello world");
     REQUIRE(doc.render(80) == "hello world");
 }
 
-TEST_CASE("space helper creates single space", "[doc]")
+TEST_CASE("Space helper creates single space", "[doc]")
 {
     Doc doc = space();
     REQUIRE(doc.render(80) == " ");
 }
 
-TEST_CASE("Concatenation with operator+", "[doc]")
+TEST_CASE("Direct concatenation with operator+", "[doc]")
 {
     Doc doc = Doc::text("hello") + Doc::text("world");
     REQUIRE(doc.render(80) == "helloworld");
 }
 
-TEST_CASE("Concatenation with spaces", "[doc]")
+TEST_CASE("Space concatenation with operator&", "[doc]")
 {
-    Doc doc = Doc::text("hello") + space() + Doc::text("world");
-    REQUIRE(doc.render(80) == "hello world");
-}
-
-TEST_CASE("Multiple concatenations", "[doc]")
-{
-    Doc doc = Doc::text("a") + space() + Doc::text("b") + space() + Doc::text("c");
+    Doc doc = Doc::text("a") & Doc::text("b") & Doc::text("c");
     REQUIRE(doc.render(80) == "a b c");
 }
 
-TEST_CASE("Line break renders as newline", "[doc]")
+TEST_CASE("Line break with operator/", "[doc]")
 {
-    Doc doc = Doc::text("hello") + Doc::line() + Doc::text("world");
-    REQUIRE(doc.render(80) == "hello\nworld");
+    Doc doc = Doc::text("hello") / Doc::text("world");
+    std::string expected = "hello\nworld";
+    REQUIRE(doc.render(80) == expected);
 }
 
 TEST_CASE("Line break with indentation", "[doc]")
 {
-    Doc doc = Doc::text("hello") + Doc::line() + Doc::text("world").nest(2);
+    Doc doc = Doc::text("hello") + (Doc::line() + Doc::text("world")).nest(2);
     // Note: nest should affect the indentation after line breaks
     std::string expected = "hello\n  world";
     REQUIRE(doc.render(80) == expected);
@@ -64,22 +53,23 @@ TEST_CASE("Line break with indentation", "[doc]")
 
 TEST_CASE("Nest increases indentation", "[doc]")
 {
-    Doc doc = (Doc::text("begin") + Doc::line() + Doc::text("end")).nest(2);
+    Doc doc = Doc::text("begin") + (Doc::line() + Doc::text("end")).nest(2);
     REQUIRE(doc.render(80) == "begin\n  end");
 }
 
 TEST_CASE("Nested indentation accumulates", "[doc]")
 {
-    Doc inner = Doc::text("inner");
-    Doc middle = (Doc::text("middle") + Doc::line() + inner.nest(2)).nest(2);
-    Doc doc = Doc::text("outer") + Doc::line() + middle;
+    Doc inner = Doc::line() + Doc::text("inner");
+    Doc middle = Doc::line() + Doc::text("middle") + inner.nest(2);
+    Doc outer = Doc::text("outer") + middle.nest(2);
 
     std::string expected = "outer\n  middle\n    inner";
-    REQUIRE(doc.render(80) == expected);
+    REQUIRE(outer.render(80) == expected);
 }
+
 TEST_CASE("Group allows line to be flattened when it fits", "[doc]")
 {
-    Doc doc = (Doc::text("a") + Doc::line() + Doc::text("b")).group();
+    Doc doc = (Doc::text("a") / Doc::text("b")).group();
     // Should fit on one line, so line becomes space
     REQUIRE(doc.render(80) == "a b");
 }
@@ -107,9 +97,9 @@ TEST_CASE("Empty documents don't affect output", "[doc]")
 
 TEST_CASE("Complex nested structure", "[doc]")
 {
-    Doc header = Doc::text("if") + space() + Doc::text("condition");
-    Doc body = Doc::text("then") + Doc::line() + Doc::text("statement;");
-    Doc full = header + Doc::line() + body.nest(2);
+    Doc header = Doc::text("if") & Doc::text("condition");
+    Doc body = Doc::text("then") / Doc::text("statement;");
+    Doc full = header / body.nest(2);
 
     std::string expected = "if condition\nthen\n  statement;";
     REQUIRE(full.render(80) == expected);

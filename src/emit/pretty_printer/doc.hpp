@@ -35,6 +35,8 @@ class Doc final
 
     // Combinators
     auto operator+(const Doc &other) const -> Doc;
+    auto operator&(const Doc &other) const -> Doc;
+    auto operator/(const Doc &other) const -> Doc;
     [[nodiscard]]
     auto nest(int indent) const -> Doc;
     [[nodiscard]]
