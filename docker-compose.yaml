@@ -8,6 +8,10 @@ services:
       - .:/app:z
       - conan-cache:/root/.conan2
     command: ["/bin/bash"] # explicit default
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
 
 volumes:
   conan-cache:

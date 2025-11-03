@@ -3,6 +3,8 @@
   "dockerComposeFile": ["../docker-compose.yaml"],
   "service": "dev",
   "workspaceFolder": "/app",
+  "capAdd": ["SYS_PTRACE"],
+  "securityOpt": ["seccomp=unconfined"],
   "customizations": {
     "vscode": {
       "extensions": [
@@ -24,7 +26,7 @@
           "--compile-commands-dir=${workspaceFolder}/build/Debug"
         ],
         "cmake.configureOnOpen": false,
-        "cmake.generator": "Ninja"
+        "cmake.generator": "Ninja",
         "testMate.cpp.test.advancedExecutables": [
           {
             "pattern": "{build,Build,BUILD,out,Out,OUT}/**/*{test,Test,TEST}*",
