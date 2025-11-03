@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace emit {
 
@@ -45,7 +46,7 @@ class Doc final
     // Rendering
     [[nodiscard]]
     auto render(int width) const -> std::string;
-    void renderToStream(std::ostream &out, int width) const;
+    void renderToStream(std::ostream &out, int width) const { out << render(width); }
 
     // Internal access
     [[nodiscard]]

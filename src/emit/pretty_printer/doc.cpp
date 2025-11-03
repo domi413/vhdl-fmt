@@ -61,11 +61,6 @@ auto Doc::render(int width) const -> std::string
     return renderer.render(impl_);
 }
 
-void Doc::renderToStream(std::ostream &out, int width) const
-{
-    out << render(width);
-}
-
 // Internal access
 auto Doc::impl() const -> const std::shared_ptr<DocImpl> &
 {

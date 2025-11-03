@@ -6,6 +6,9 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <variant>
+
+// NOLINTBEGIN (misc-no-recursion)
 
 namespace emit {
 
@@ -76,5 +79,7 @@ auto flatten(const DocPtr &doc) -> DocPtr
                       },
                       doc->value);
 }
+
+// NOLINTEND (misc-no-recursion)
 
 } // namespace emit
