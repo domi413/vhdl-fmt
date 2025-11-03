@@ -21,6 +21,13 @@ message(
 )
 message(STATUS "  Standard: C++${CMAKE_CXX_STANDARD}")
 
+# Enable ccache for faster rebuilds if available
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "  ccache:   ${CCACHE_PROGRAM}")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 find_package(antlr4-runtime CONFIG REQUIRED)
 find_package(argparse REQUIRED)
 find_package(yaml-cpp REQUIRED)
@@ -45,7 +52,11 @@ find_program(ANTLR4_EXECUTABLE antlr4 REQUIRED)
 add_custom_command(
     OUTPUT
         ${GENERATED_DIR}/vhdlLexer.cpp
+        ${GENERATED_DIR}/vhdlLexer.h
         ${GENERATED_DIR}/vhdlParser.cpp
+        ${GENERATED_DIR}/vhdlParser.h
+        ${GENERATED_DIR}/vhdlLexer.tokens
+        ${GENERATED_DIR}/vhdlParser.tokens
     COMMAND
         ${CMAKE_COMMAND} -E make_directory ${GENERATED_DIR}
     COMMAND
@@ -57,16 +68,7 @@ add_custom_command(
     VERBATIM
 )
 
-# Group that rule into an explicit target
-add_custom_target(
-    generate_vhdl_parser
-    DEPENDS
-        ${GENERATED_DIR}/vhdlLexer.cpp
-        ${GENERATED_DIR}/vhdlParser.cpp
-)
-
-# Create the library directly from the *expected* generated files,
-# not from a GLOB that runs before generation.
+# Create the library from the generated sources
 add_library(
     vhdl_generated
     STATIC
@@ -74,8 +76,12 @@ add_library(
     ${GENERATED_DIR}/vhdlParser.cpp
 )
 
-# Make sure ANTLR runs before building this library
-add_dependencies(vhdl_generated generate_vhdl_parser)
+# Mark generated sources explicitly
+set_source_files_properties(
+    ${GENERATED_DIR}/vhdlLexer.cpp
+    ${GENERATED_DIR}/vhdlParser.cpp
+    PROPERTIES GENERATED TRUE
+)
 
 # Mark generated headers as SYSTEM to suppress warnings in generated code
 target_include_directories(vhdl_generated SYSTEM PUBLIC ${GENERATED_DIR})
@@ -97,5 +103,4 @@ configure_file(${VERSION_IN_FILE} ${VERSION_OUT_FILE} @ONLY)
 # --------------------------------------------------------------------
 add_subdirectory(src)
 add_subdirectory(tests)
-
 enable_testing()
