@@ -83,9 +83,7 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
     return std::visit(
       Overload{
         [&](const Empty &) -> int { return width; },
-        [&](const Text &node) -> int {
-            return width - static_cast<int>(node.content.length());
-        },
+        [&](const Text &node) -> int { return width - static_cast<int>(node.content.length()); },
         [&](const LineBreak &) -> int {
             // In flat mode, line becomes space
             return width - 1;
