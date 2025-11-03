@@ -5,11 +5,7 @@
 
 namespace emit {
 
-// Doc construction
-Doc::Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}
-
 Doc::Doc() : impl_(makeEmpty()) {}
-Doc::~Doc() = default;
 
 // Basic constructors
 auto Doc::empty() -> Doc

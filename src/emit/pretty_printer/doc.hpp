@@ -17,11 +17,12 @@ class Doc final
   private:
     std::shared_ptr<DocImpl> impl_;
 
-    explicit Doc(std::shared_ptr<DocImpl> impl);
+    explicit Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}
 
   public:
     Doc();
-    ~Doc();
+    ~Doc() = default;
+
     Doc(const Doc &) = default;
     auto operator=(const Doc &) -> Doc & = default;
     Doc(Doc &&) noexcept = default;

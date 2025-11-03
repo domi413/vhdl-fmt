@@ -94,6 +94,9 @@ add_executable(
     # cli
     cli/test_argument_parser.cpp
     cli/test_config_reader.cpp
+    #
+    # emit
+    emit/pretty_printer/test_doc.cpp
 )
 
 target_link_libraries(
