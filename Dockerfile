@@ -37,7 +37,7 @@ RUN conan install . \
 FROM builder AS dev
 
 RUN dnf install -y --setopt=install_weak_deps=false \
-    lldb \
+    lldb ccache \
     && dnf clean all
 
 # Add colored prompt for root
