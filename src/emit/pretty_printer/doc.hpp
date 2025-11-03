@@ -1,7 +1,6 @@
 #ifndef EMIT_DOC_HPP
 #define EMIT_DOC_HPP
 
-#include <iosfwd>
 #include <memory>
 #include <string>
 #include <string_view>
