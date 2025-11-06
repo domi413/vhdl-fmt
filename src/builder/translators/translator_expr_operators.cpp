@@ -2,9 +2,6 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
-// Recursion is used for traversing expression trees, which are typically shallow in VHDL parsing.
-// NOLINTBEGIN(misc-no-recursion)
-
 namespace builder {
 
 auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr
@@ -94,5 +91,3 @@ auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
 }
 
 } // namespace builder
-
-// NOLINTEND(misc-no-recursion)

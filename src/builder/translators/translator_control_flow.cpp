@@ -8,7 +8,6 @@
 #include <utility>
 
 // Recursion is used for traversing expression trees, which are typically shallow in VHDL parsing.
-// NOLINTBEGIN(misc-no-recursion)
 
 namespace builder {
 
@@ -131,5 +130,3 @@ auto Translator::makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::W
 }
 
 } // namespace builder
-
-// NOLINTEND(misc-no-recursion)
