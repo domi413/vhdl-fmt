@@ -9,35 +9,36 @@ namespace builder {
 
 auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr
 {
-    if (ctx->relation().size() == 1) {
-        return makeRelation(ctx->relation(0));
+    const auto &relations = ctx->relation();
+    if (relations.size() == 1) {
+        return makeRelation(relations[0]);
     }
     return makeBinary(ctx,
                       ctx->logical_operator(0)->getText(),
-                      makeRelation(ctx->relation(0)),
-                      makeRelation(ctx->relation(1)));
+                      makeRelation(relations[0]),
+                      makeRelation(relations[1]));
 }
 
 auto Translator::makeRelation(vhdlParser::RelationContext *ctx) -> ast::Expr
 {
-    if (ctx->relational_operator() == nullptr) {
+    auto *rel_op = ctx->relational_operator();
+    if (rel_op == nullptr) {
         return makeShiftExpr(ctx->shift_expression(0));
     }
-    return makeBinary(ctx,
-                      ctx->relational_operator()->getText(),
-                      makeShiftExpr(ctx->shift_expression(0)),
-                      makeShiftExpr(ctx->shift_expression(1)));
+    const auto &shift_exprs = ctx->shift_expression();
+    return makeBinary(
+      ctx, rel_op->getText(), makeShiftExpr(shift_exprs[0]), makeShiftExpr(shift_exprs[1]));
 }
 
 auto Translator::makeShiftExpr(vhdlParser::Shift_expressionContext *ctx) -> ast::Expr
 {
-    if (ctx->shift_operator() == nullptr) {
+    auto *shift_op = ctx->shift_operator();
+    if (shift_op == nullptr) {
         return makeSimpleExpr(ctx->simple_expression(0));
     }
-    return makeBinary(ctx,
-                      ctx->shift_operator()->getText(),
-                      makeSimpleExpr(ctx->simple_expression(0)),
-                      makeSimpleExpr(ctx->simple_expression(1)));
+    const auto &simple_exprs = ctx->simple_expression();
+    return makeBinary(
+      ctx, shift_op->getText(), makeSimpleExpr(simple_exprs[0]), makeSimpleExpr(simple_exprs[1]));
 }
 
 auto Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> ast::Expr
@@ -45,47 +46,49 @@ auto Translator::makeSimpleExpr(vhdlParser::Simple_expressionContext *ctx) -> as
     if (ctx->PLUS() != nullptr || ctx->MINUS() != nullptr) {
         return makeUnary(ctx, ctx->PLUS() != nullptr ? "+" : "-", makeTerm(ctx->term(0)));
     }
-    if (ctx->adding_operator().empty()) {
+    const auto &adding_ops = ctx->adding_operator();
+    if (adding_ops.empty()) {
         return makeTerm(ctx->term(0));
     }
-    return makeBinary(
-      ctx, ctx->adding_operator(0)->getText(), makeTerm(ctx->term(0)), makeTerm(ctx->term(1)));
+    const auto &terms = ctx->term();
+    return makeBinary(ctx, adding_ops[0]->getText(), makeTerm(terms[0]), makeTerm(terms[1]));
 }
 
 auto Translator::makeTerm(vhdlParser::TermContext *ctx) -> ast::Expr
 {
-    if (ctx->multiplying_operator().empty()) {
+    const auto &mult_ops = ctx->multiplying_operator();
+    if (mult_ops.empty()) {
         return makeFactor(ctx->factor(0));
     }
-    return makeBinary(ctx,
-                      ctx->multiplying_operator(0)->getText(),
-                      makeFactor(ctx->factor(0)),
-                      makeFactor(ctx->factor(1)));
+    const auto &factors = ctx->factor();
+    return makeBinary(ctx, mult_ops[0]->getText(), makeFactor(factors[0]), makeFactor(factors[1]));
 }
 
 auto Translator::makeFactor(vhdlParser::FactorContext *ctx) -> ast::Expr
 {
+    const auto &primaries = ctx->primary();
     if (ctx->DOUBLESTAR() != nullptr) {
-        return makeBinary(ctx, "**", makePrimary(ctx->primary(0)), makePrimary(ctx->primary(1)));
+        return makeBinary(ctx, "**", makePrimary(primaries[0]), makePrimary(primaries[1]));
     }
     if (ctx->ABS() != nullptr) {
-        return makeUnary(ctx, "abs", makePrimary(ctx->primary(0)));
+        return makeUnary(ctx, "abs", makePrimary(primaries[0]));
     }
     if (ctx->NOT() != nullptr) {
-        return makeUnary(ctx, "not", makePrimary(ctx->primary(0)));
+        return makeUnary(ctx, "not", makePrimary(primaries[0]));
     }
-    return makePrimary(ctx->primary(0));
+    return makePrimary(primaries[0]);
 }
 
 auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
 {
-    if (ctx->expression() != nullptr) {
-        auto paren = make<ast::ParenExpr>(ctx);
-        paren.inner = box(makeExpr(ctx->expression()));
+    if (auto *expr = ctx->expression()) {
+        auto paren = makeLight<ast::ParenExpr>();
+        trivia_.bind(paren, ctx);
+        paren.inner = box(makeExpr(expr));
         return paren;
     }
-    if (ctx->aggregate() != nullptr) {
-        return makeAggregate(ctx->aggregate());
+    if (auto *agg = ctx->aggregate()) {
+        return makeAggregate(agg);
     }
     if (auto *name_ctx = ctx->name()) {
         return makeName(name_ctx);

@@ -15,15 +15,19 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
 {
     auto group = make<ast::GroupExpr>(ctx);
 
-    for (auto *elem : ctx->element_association()) {
-        auto assoc = make<ast::BinaryExpr>(elem);
+    const auto &elems = ctx->element_association();
+    group.children.reserve(elems.size());
+
+    for (auto *elem : elems) {
+        auto assoc = makeLight<ast::BinaryExpr>();
+        // Skip trivia for internal aggregate elements
         assoc.op = "=>";
 
-        if (elem->choices() != nullptr) {
-            assoc.left = box(makeChoices(elem->choices()));
+        if (auto *choices = elem->choices()) {
+            assoc.left = box(makeChoices(choices));
         }
-        if (elem->expression() != nullptr) {
-            assoc.right = box(makeExpr(elem->expression()));
+        if (auto *expr = elem->expression()) {
+            assoc.right = box(makeExpr(expr));
         }
 
         group.children.emplace_back(std::move(assoc));
@@ -34,14 +38,17 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
 
 auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
 {
-    if (ctx->choice().size() == 1) {
-        return makeChoice(ctx->choice(0));
+    const auto &choices = ctx->choice();
+    if (choices.size() == 1) {
+        return makeChoice(choices[0]);
     }
 
-    auto grp = make<ast::GroupExpr>(ctx);
-    grp.children = ctx->choice()
-                 | std::views::transform([this](auto *ch) { return makeChoice(ch); })
-                 | std::ranges::to<std::vector>();
+    auto grp = makeLight<ast::GroupExpr>();
+    trivia_.bind(grp, ctx);
+    grp.children.reserve(choices.size());
+    for (auto *ch : choices) {
+        grp.children.push_back(makeChoice(ch));
+    }
     return grp;
 }
 
@@ -85,9 +92,11 @@ auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vect
 auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
   -> std::vector<ast::BinaryExpr>
 {
+    const auto &discrete_ranges = ctx->discrete_range();
     std::vector<ast::BinaryExpr> constraints;
+    constraints.reserve(discrete_ranges.size());
 
-    for (auto *discrete_r : ctx->discrete_range()) {
+    for (auto *discrete_r : discrete_ranges) {
         if (auto *range_decl = discrete_r->range_decl()) {
             if (auto *explicit_r = range_decl->explicit_range()) {
                 if (auto range_expr = makeRange(explicit_r);
@@ -120,15 +129,16 @@ auto Translator::makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
 
 auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr
 {
+    const auto &simple_exprs = ctx->simple_expression();
+    auto *dir = ctx->direction();
+
     // If there's no direction, it's just a simple expression (single value, not a range)
-    if (ctx->direction() == nullptr || ctx->simple_expression().size() < 2) {
-        return makeSimpleExpr(ctx->simple_expression(0));
+    if (dir == nullptr || simple_exprs.size() < 2) {
+        return makeSimpleExpr(simple_exprs[0]);
     }
 
-    return makeBinary(ctx,
-                      ctx->direction()->getText(),
-                      makeSimpleExpr(ctx->simple_expression(0)),
-                      makeSimpleExpr(ctx->simple_expression(1)));
+    return makeBinary(
+      ctx, dir->getText(), makeSimpleExpr(simple_exprs[0]), makeSimpleExpr(simple_exprs[1]));
 }
 
 } // namespace builder

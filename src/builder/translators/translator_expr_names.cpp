@@ -14,19 +14,36 @@ namespace builder {
 auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 {
     const auto &parts = ctx->name_part();
+
+    // Early exit: if no parts, just return identifier/literal as token
+    if (parts.empty()) {
+        if (ctx->identifier() != nullptr) {
+            return makeToken(ctx, ctx->identifier()->getText());
+        }
+        if (ctx->STRING_LITERAL() != nullptr) {
+            return makeToken(ctx, ctx->STRING_LITERAL()->getText());
+        }
+        return makeToken(ctx, ctx->getText());
+    }
+
     // For formatting: check if we have any structural parts (calls, slices, attributes)
     // If not, just keep the whole name as a single token
-    const auto has_structure = std::ranges::any_of(parts, [](auto *part) {
-        return part->function_call_or_indexed_name_part()
+    bool has_structure = false;
+    for (auto *part : parts) {
+        if (part->function_call_or_indexed_name_part()
             != nullptr
             || part->slice_name_part()
             != nullptr
             || part->attribute_name_part()
-            != nullptr;
-    });
+            != nullptr) {
+            has_structure = true;
+            break;
+        }
+    }
 
     if (!has_structure) {
         // Simple name (possibly with dots like "rec.field") - keep as one token
+        // Cache getText() result to avoid repeated string construction
         return makeToken(ctx, ctx->getText());
     }
 
@@ -42,7 +59,8 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
         return makeToken(ctx, ctx->getText());
     }
 
-    // Consume consecutive selected_name_parts into base
+    // Consume consecutive selected_name_parts into base (pre-allocate for efficiency)
+    base_text.reserve(base_text.size() + parts.size() * 8); // Estimate: avg 8 chars per part
     auto it = parts.begin();
     while (it != parts.end() && (*it)->selected_name_part() != nullptr) {
         base_text += (*it)->getText();
@@ -70,7 +88,8 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 
 auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr
 {
-    auto slice_expr = make<ast::CallExpr>(ctx);
+    auto slice_expr = makeLight<ast::CallExpr>();
+    trivia_.bind(slice_expr, ctx);
     slice_expr.callee = box(std::move(base));
 
     if (auto *dr = ctx->discrete_range()) {
@@ -91,24 +110,29 @@ auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContex
 auto Translator::makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx)
   -> ast::Expr
 {
-    return makeBinary(ctx, ".", std::move(base), makeToken(ctx, ctx->getText().substr(1)));
+    // Cache getText() and substr result
+    auto text = ctx->getText();
+    return makeBinary(ctx, ".", std::move(base), makeToken(ctx, text.substr(1)));
 }
 
 auto Translator::makeCallExpr(ast::Expr base,
                               vhdlParser::Function_call_or_indexed_name_partContext *ctx)
   -> ast::Expr
 {
-    auto call_expr = make<ast::CallExpr>(ctx);
+    auto call_expr = makeLight<ast::CallExpr>();
+    trivia_.bind(call_expr, ctx);
     call_expr.callee = box(std::move(base));
 
     if (auto *assoc_list = ctx->actual_parameter_part()) {
         if (auto *list_ctx = assoc_list->association_list()) {
-            auto associations = list_ctx->association_element();
+            const auto &associations = list_ctx->association_element();
 
             if (associations.size() == 1) {
                 call_expr.args = box(makeCallArgument(associations[0]));
             } else {
-                auto group = make<ast::GroupExpr>(list_ctx);
+                auto group = makeLight<ast::GroupExpr>();
+                trivia_.bind(group, list_ctx);
+                group.children.reserve(associations.size());
                 for (auto *elem : associations) {
                     group.children.push_back(makeCallArgument(elem));
                 }

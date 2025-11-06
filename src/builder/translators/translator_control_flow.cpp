@@ -17,8 +17,8 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     auto stmt = make<ast::IfStatement>(ctx);
 
     // Main if branch
-    auto conditions = ctx->condition();
-    auto sequences = ctx->sequence_of_statements();
+    const auto &conditions = ctx->condition();
+    const auto &sequences = ctx->sequence_of_statements();
 
     if (conditions.empty() || sequences.empty()) {
         return stmt;
@@ -29,7 +29,12 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
 
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
     // If there's an else, the last sequence doesn't have a condition
-    for (const auto i : std::views::iota(std::size_t{ 1 }, conditions.size())) {
+    const std::size_t elsif_count = conditions.size() - 1;
+    if (elsif_count > 0) {
+        stmt.elsif_branches.reserve(elsif_count);
+    }
+
+    for (std::size_t i = 1; i < conditions.size(); ++i) {
         ast::IfStatement::Branch elsif_branch;
         elsif_branch.condition = makeExpr(conditions[i]->expression());
         elsif_branch.body = makeSequenceOfStatements(sequences[i]);
@@ -55,13 +60,18 @@ auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> as
         stmt.selector = makeExpr(expr);
     }
 
-    for (auto *alt : ctx->case_statement_alternative()) {
+    const auto &alternatives = ctx->case_statement_alternative();
+    stmt.when_clauses.reserve(alternatives.size());
+
+    for (auto *alt : alternatives) {
         ast::CaseStatement::WhenClause when_clause;
 
         if (auto *choices_ctx = alt->choices()) {
-            when_clause.choices = choices_ctx->choice()
-                                | std::views::transform([this](auto *ch) { return makeChoice(ch); })
-                                | std::ranges::to<std::vector>();
+            const auto &choices = choices_ctx->choice();
+            when_clause.choices.reserve(choices.size());
+            for (auto *ch : choices) {
+                when_clause.choices.push_back(makeChoice(ch));
+            }
         }
 
         if (auto *seq = alt->sequence_of_statements()) {
@@ -91,15 +101,12 @@ auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::For
                     if (auto *explicit_r = range_decl->explicit_range()) {
                         loop.range = makeRange(explicit_r);
                     } else {
-                        // It's a name
-                        auto tok = make<ast::TokenExpr>(range_decl);
-                        tok.text = range_decl->getText();
-                        loop.range = tok;
+                        // It's a name - cache getText() result
+                        loop.range = makeToken(range_decl, range_decl->getText());
                     }
                 } else if (auto *subtype = range->subtype_indication()) {
-                    auto tok = make<ast::TokenExpr>(subtype);
-                    tok.text = subtype->getText();
-                    loop.range = tok;
+                    // Cache getText() result
+                    loop.range = makeToken(subtype, subtype->getText());
                 }
             }
         }

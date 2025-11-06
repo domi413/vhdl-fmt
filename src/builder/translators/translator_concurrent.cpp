@@ -33,9 +33,12 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
     // Get the waveform - for now we'll take the first waveform element's expression
     if (auto *cond_wave = ctx->conditional_waveforms()) {
         if (auto *wave = cond_wave->waveform()) {
-            auto wave_elems = wave->waveform_element();
-            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpr(wave_elems[0]->expression(0));
+            const auto &wave_elems = wave->waveform_element();
+            if (!wave_elems.empty()) {
+                const auto &exprs = wave_elems[0]->expression();
+                if (!exprs.empty()) {
+                    assign.value = makeExpr(exprs[0]);
+                }
             }
         }
     }
@@ -55,11 +58,14 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
     // For selected assignments (with...select), we'll take the first waveform
     // TODO(someone): Handle full selected waveforms structure
     if (auto *sel_waves = ctx->selected_waveforms()) {
-        auto waves = sel_waves->waveform();
+        const auto &waves = sel_waves->waveform();
         if (!waves.empty()) {
-            auto wave_elems = waves[0]->waveform_element();
-            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpr(wave_elems[0]->expression(0));
+            const auto &wave_elems = waves[0]->waveform_element();
+            if (!wave_elems.empty()) {
+                const auto &exprs = wave_elems[0]->expression();
+                if (!exprs.empty()) {
+                    assign.value = makeExpr(exprs[0]);
+                }
             }
         }
     }
@@ -80,17 +86,20 @@ auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::
 
     // Extract sensitivity list
     if (auto *sens_list = ctx->sensitivity_list()) {
-        proc.sensitivity_list = sens_list->name()
-                              | std::views::transform([](auto *name) { return name->getText(); })
-                              | std::ranges::to<std::vector>();
+        const auto &names = sens_list->name();
+        proc.sensitivity_list.reserve(names.size());
+        for (auto *name : names) {
+            proc.sensitivity_list.push_back(name->getText());
+        }
     }
 
     // Extract sequential statements
     if (auto *stmt_part = ctx->process_statement_part()) {
-        proc.body
-          = stmt_part->sequential_statement()
-          | std::views::transform([this](auto *stmt) { return makeSequentialStatement(stmt); })
-          | std::ranges::to<std::vector>();
+        const auto &stmts = stmt_part->sequential_statement();
+        proc.body.reserve(stmts.size());
+        for (auto *stmt : stmts) {
+            proc.body.push_back(makeSequentialStatement(stmt));
+        }
     }
 
     return proc;

@@ -162,39 +162,50 @@ class Translator final
         return node;
     }
 
-    /// @brief Helper to create binary expressions
+    /// @brief Helper to create a node without trivia binding (for internal/temporary nodes)
+    template<typename T>
+    [[nodiscard]]
+    constexpr auto makeLight() -> T
+    {
+        return T{};
+    }
+
+    /// @brief Helper to create binary expressions (lightweight, no trivia)
     template<typename Ctx>
     [[nodiscard]]
     auto makeBinary(const Ctx *ctx, std::string_view op, ast::Expr left, ast::Expr right)
       -> ast::Expr
     {
         ast::BinaryExpr bin;
-        trivia_.bind(bin, ctx);
+        // Skip trivia binding for internal expression nodes - trivia is bound at statement level
+        // trivia_.bind(bin, ctx);
         bin.op = op;
         bin.left = box(std::move(left));
         bin.right = box(std::move(right));
         return bin;
     }
 
-    /// @brief Helper to create unary expressions
+    /// @brief Helper to create unary expressions (lightweight, no trivia)
     template<typename Ctx>
     [[nodiscard]]
     auto makeUnary(const Ctx *ctx, std::string_view op, ast::Expr value) -> ast::Expr
     {
         ast::UnaryExpr un;
-        trivia_.bind(un, ctx);
+        // Skip trivia binding for internal expression nodes
+        // trivia_.bind(un, ctx);
         un.op = op;
         un.value = box(std::move(value));
         return un;
     }
 
-    /// @brief Helper to create token expressions
+    /// @brief Helper to create token expressions (lightweight, no trivia)
     template<typename Ctx>
     [[nodiscard]]
     auto makeToken(const Ctx *ctx, std::string_view text) -> ast::Expr
     {
         ast::TokenExpr tok;
-        trivia_.bind(tok, ctx);
+        // Skip trivia binding for leaf tokens - trivia is bound at higher levels
+        // trivia_.bind(tok, ctx);
         tok.text = text;
         return tok;
     }
