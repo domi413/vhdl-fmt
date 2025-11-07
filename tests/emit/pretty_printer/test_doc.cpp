@@ -4,6 +4,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 #include <utility>
+#include <vector>
 
 using emit::Doc;
 using emit::space;
@@ -143,7 +144,7 @@ TEST_CASE("Table with simple alignment", "[doc][table]")
 {
     using emit::makeTable;
 
-    std::vector<std::vector<Doc>> rows = {
+    const std::vector<std::vector<Doc>> rows = {
         { Doc::text("enable"),   Doc::text(":"), Doc::text("in"),  Doc::text("std_logic")        },
         { Doc::text("clk"),      Doc::text(":"), Doc::text("in"),  Doc::text("std_logic")        },
         { Doc::text("data_out"), Doc::text(":"), Doc::text("out"), Doc::text("std_logic_vector") }
@@ -161,7 +162,7 @@ TEST_CASE("Table composable with other Doc operations", "[doc][table]")
 {
     using emit::makeTable;
 
-    std::vector<std::vector<Doc>> rows = {
+    const std::vector<std::vector<Doc>> rows = {
         { Doc::text("port1"), Doc::text(":"), Doc::text("in"),  Doc::text("std_logic") },
         { Doc::text("port2"), Doc::text(":"), Doc::text("out"), Doc::text("std_logic") }
     };
@@ -182,7 +183,7 @@ TEST_CASE("Empty table", "[doc][table]")
 {
     using emit::makeTable;
 
-    std::vector<std::vector<Doc>> rows;
+    const std::vector<std::vector<Doc>> rows;
     auto table = makeTable(rows);
 
     REQUIRE(table.render(80).empty());

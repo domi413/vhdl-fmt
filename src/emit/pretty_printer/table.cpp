@@ -1,6 +1,9 @@
 #include "emit/pretty_printer/table.hpp"
 
+#include "emit/pretty_printer/doc.hpp"
+
 #include <algorithm>
+#include <cstddef>
 #include <ranges>
 #include <string>
 #include <vector>

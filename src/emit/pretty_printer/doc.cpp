@@ -3,7 +3,6 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 #include "emit/pretty_printer/renderer.hpp"
 
-#include <memory>
 #include <string>
 #include <string_view>
 
