@@ -5,8 +5,6 @@
 #include <string>
 #include <string_view>
 
-// NOLINTBEGIN(misc-no-recursion)
-
 namespace emit {
 
 // Concurrent Statements
@@ -176,5 +174,3 @@ auto DebugPrinter::operator()(const ast::WhileLoop &node) -> void
 }
 
 } // namespace emit
-
-// NOLINTEND(misc-no-recursion)

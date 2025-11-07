@@ -1,8 +1,6 @@
 #include "ast/nodes/expressions.hpp"
 #include "emit/debug_printer.hpp"
 
-// NOLINTBEGIN(misc-no-recursion)
-
 namespace emit {
 
 auto DebugPrinter::operator()(const ast::TokenExpr &node) -> void
@@ -78,5 +76,3 @@ auto DebugPrinter::operator()(const ast::CallExpr &node) -> void
 }
 
 } // namespace emit
-
-// NOLINTEND(misc-no-recursion)

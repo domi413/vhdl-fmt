@@ -8,8 +8,6 @@
 #include <utility>
 #include <variant>
 
-// NOLINTBEGIN (misc-no-recursion)
-
 namespace emit {
 
 // Factory functions
@@ -79,7 +77,5 @@ auto flatten(const DocPtr &doc) -> DocPtr
                       },
                       doc->value);
 }
-
-// NOLINTEND (misc-no-recursion)
 
 } // namespace emit

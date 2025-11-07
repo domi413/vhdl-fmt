@@ -6,9 +6,6 @@
 #include <string>
 #include <utility>
 
-// Recursion is used for traversing expression trees, which are typically shallow in VHDL parsing.
-// NOLINTBEGIN(misc-no-recursion)
-
 namespace builder {
 
 auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
@@ -143,5 +140,3 @@ auto Translator::makeCallArgument(vhdlParser::Association_elementContext *ctx) -
 }
 
 } // namespace builder
-
-// NOLINTEND(misc-no-recursion)

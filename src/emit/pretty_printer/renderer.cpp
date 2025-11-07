@@ -5,8 +5,6 @@
 #include <string>
 #include <variant>
 
-// NOLINTBEGIN (misc-no-recursion)
-
 namespace emit {
 
 // Helper for overload pattern
@@ -128,5 +126,3 @@ void Renderer::newline(int indent)
 }
 
 } // namespace emit
-
-// NOLINTEND (misc-no-recursion)
