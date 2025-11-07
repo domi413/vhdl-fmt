@@ -7,7 +7,6 @@
 #include <ranges>
 #include <utility>
 
-
 namespace builder {
 
 auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::IfStatement
