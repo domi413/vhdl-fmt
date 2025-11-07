@@ -23,7 +23,12 @@ auto makeText(std::string_view text) -> DocPtr
 
 auto makeLine() -> DocPtr
 {
-    return std::make_shared<DocImpl>(LineBreak{});
+    return std::make_shared<DocImpl>(SoftLine{});
+}
+
+auto makeHardLine() -> DocPtr
+{
+    return std::make_shared<DocImpl>(HardLine{});
 }
 
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr
@@ -58,9 +63,13 @@ auto flatten(const DocPtr &doc) -> DocPtr
     return std::visit(Overload{
                         [](const Empty &) -> DocPtr { return makeEmpty(); },
                         [](const Text &node) -> DocPtr { return makeText(node.content); },
-                        [](const LineBreak &) -> DocPtr {
+                        [](const SoftLine &) -> DocPtr {
                             // Line becomes a space when flattened
                             return makeText(" ");
+                        },
+                        [](const HardLine &) -> DocPtr {
+                            // Hard line never becomes a space
+                            return makeHardLine();
                         },
                         [](const Concat &node) -> DocPtr {
                             // Recursively flatten both sides

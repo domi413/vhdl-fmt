@@ -36,7 +36,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
                      // Empty produces nothing
                  },
                  [&](const Text &node) -> void { write(node.content); },
-                 [&](const LineBreak &) -> void {
+                 [&](const SoftLine &) -> void {
                      if (mode == Mode::FLAT) {
                          // In flat mode, line becomes space
                          write(" ");
@@ -44,6 +44,10 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
                          // In break mode, line becomes newline + indent
                          newline(indent);
                      }
+                 },
+                 [&](const HardLine &) -> void {
+                     // Hard line always breaks, regardless of mode
+                     newline(indent);
                  },
                  [&](const Concat &node) -> void {
                      renderDoc(indent, mode, node.left);
@@ -87,9 +91,13 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
       Overload{
         [&](const Empty &) -> int { return width; },
         [&](const Text &node) -> int { return width - static_cast<int>(node.content.length()); },
-        [&](const LineBreak &) -> int {
+        [&](const SoftLine &) -> int {
             // In flat mode, line becomes space
             return width - 1;
+        },
+        [&](const HardLine &) -> int {
+            // Hard line never fits on the same line
+            return -1;
         },
         [&](const Concat &node) -> int {
             // Thread remaining width through both sides

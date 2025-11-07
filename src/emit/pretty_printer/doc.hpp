@@ -30,11 +30,13 @@ class Doc final
     static auto empty() -> Doc;
     static auto text(std::string_view str) -> Doc;
     static auto line() -> Doc;
+    static auto hardline() -> Doc;
 
     // Combinators
     auto operator+(const Doc &other) const -> Doc;  ///> Direct concatenation
     auto operator&(const Doc &other) const -> Doc;  ///> Space concatenation
-    auto operator/(const Doc &other) const -> Doc;  ///> Line break
+    auto operator/(const Doc &other) const -> Doc;  ///> Softline
+    auto operator|(const Doc &other) const -> Doc;  ///> Hardline
     auto operator<<(const Doc &other) const -> Doc; ///> Line break + indent rhs
     auto operator>>(const Doc &other) const -> Doc; ///> Line break + dedent rhs
     [[nodiscard]]

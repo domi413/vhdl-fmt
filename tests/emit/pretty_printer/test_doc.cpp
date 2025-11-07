@@ -75,26 +75,18 @@ TEST_CASE("Operator>> dedents right-hand side by 2", "[doc]")
     REQUIRE(doc.render(80) == expected);
 }
 
-TEST_CASE("Group allows line to be flattened when it fits", "[doc]")
+TEST_CASE("Soft line becomes space when grouped and fits", "[doc]")
 {
-    const Doc doc = (Doc::text("a") / Doc::text("b")).group();
-    // Should fit on one line, so line becomes space
-    REQUIRE(doc.render(80) == "a b");
+    const Doc doc = (Doc::text("hello") / Doc::text("world")).group();
+    // Soft line becomes space when it fits
+    REQUIRE(doc.render(80) == "hello world");
 }
 
-TEST_CASE("Group forces break when content doesn't fit", "[doc]")
+TEST_CASE("Hard line never becomes space", "[doc]")
 {
-    // Create content that's too wide for the line
-    const Doc doc = (Doc::text("very_long_identifier_that_exceeds")
-                     + Doc::line()
-                     + Doc::text("the_width_limit"))
-                      .group();
-
-    const int width = 20;
-
-    const std::string result = doc.render(width);
-    // Should break because it doesn't fit in 20 characters
-    REQUIRE(result == "very_long_identifier_that_exceeds\nthe_width_limit");
+    const Doc doc = (Doc::text("hello") | Doc::text("world")).group();
+    // Hard line always breaks, even when grouped
+    REQUIRE(doc.render(80) == "hello\nworld");
 }
 
 TEST_CASE("Empty documents don't affect output", "[doc]")

@@ -27,6 +27,11 @@ auto Doc::line() -> Doc
     return Doc(makeLine());
 }
 
+auto Doc::hardline() -> Doc
+{
+    return Doc(makeHardLine());
+}
+
 // Combinators
 auto Doc::operator+(const Doc &other) const -> Doc
 {
@@ -41,6 +46,11 @@ auto Doc::operator&(const Doc &other) const -> Doc
 auto Doc::operator/(const Doc &other) const -> Doc
 {
     return *this + line() + other;
+}
+
+auto Doc::operator|(const Doc &other) const -> Doc
+{
+    return *this + hardline() + other;
 }
 
 auto Doc::operator<<(const Doc &other) const -> Doc
