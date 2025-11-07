@@ -61,7 +61,7 @@ TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_fi
     const auto result = doc.render(80);
 
     const std::string expected = "entity counter is\n"
-                                 "  port (clk : in std_logic );\n"
+                                 "  port ( clk : in std_logic );\n"
                                  "end entity counter;\n\n"
                                  "architecture rtl of counter is\n"
                                  "begin\n"

@@ -40,7 +40,7 @@ TEST_CASE("Entity with generics", "[pretty_printer][design_units]")
 
     // Indentation is 2 spaces
     const std::string expected = "entity configurable is\n"
-                                 "  generic (WIDTH : positive := 8 );\n"
+                                 "  generic ( WIDTH : positive := 8 );\n"
                                  "end entity configurable;";
 
     REQUIRE(result == expected);
@@ -70,7 +70,7 @@ TEST_CASE("Entity with ports", "[pretty_printer][design_units]")
     const auto result = doc.render(80);
 
     const std::string expected = "entity counter is\n"
-                                 "  port (clk : in std_logic;  count : out natural );\n"
+                                 "  port ( clk : in std_logic; count : out natural );\n"
                                  "end entity counter;";
     REQUIRE(result == expected);
 }
@@ -116,8 +116,8 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
 
     // Both clauses fit on one line with 2-space indentation
     const std::string expected = "entity fifo is\n"
-                                 "  generic (DEPTH : positive := 16 );\n"
-                                 "  port (data_in : in std_logic_vector(7 downto 0) );\n"
+                                 "  generic ( DEPTH : positive := 16 );\n"
+                                 "  port ( data_in : in std_logic_vector(7 downto 0) );\n"
                                  "end entity fifo;";
 
     REQUIRE(result == expected);
