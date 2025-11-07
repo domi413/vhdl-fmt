@@ -13,16 +13,14 @@ auto PrettyPrinter::operator()(const ast::DesignFile &node) -> Doc
         return Doc::empty();
     }
 
-    auto docs
-      = node.units | std::views::transform([this](const auto &unit) { return visit(unit); });
-
     Doc result = Doc::empty();
-    for (auto [index, doc] : std::views::enumerate(docs)) {
+
+    for (auto [index, unit] : std::views::enumerate(node.units)) {
         if (index > 0) {
             // Add blank line between design units
             result = result / Doc::line();
         }
-        result = result + doc;
+        result = result + visit(unit);
     }
 
     return result + Doc::line(); // Trailing newline

@@ -4,6 +4,7 @@
 #include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <memory>
 #include <utility>
 
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
