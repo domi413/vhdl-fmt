@@ -7,7 +7,6 @@
 #include <ranges>
 #include <utility>
 
-// Recursion is used for traversing expression trees, which are typically shallow in VHDL parsing.
 
 namespace builder {
 
