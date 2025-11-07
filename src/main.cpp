@@ -3,6 +3,7 @@
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
 // #include "emit/debug_printer.hpp"
+#include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
 
 #include <cstddef>
