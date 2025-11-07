@@ -55,7 +55,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
                  },
                  [&](const Nest &node) -> void {
                      // Increase indentation for nested content
-                     renderDoc(indent + node.indent, mode, node.doc);
+                     renderDoc(indent + (node.indent * indent_size_), mode, node.doc);
                  },
                  [&](const Union &node) -> void {
                      // Decide: use flat or broken layout?

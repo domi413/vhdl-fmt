@@ -1,5 +1,6 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
+#include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
 #include "nodes/declarations.hpp"
 
@@ -138,6 +139,36 @@ TEST_CASE("Entity with custom end label", "[pretty_printer][design_units]")
 
     const std::string expected = "entity my_entity is\n"
                                  "end entity custom_label;";
+
+    REQUIRE(result == expected);
+}
+
+TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_units][config]")
+{
+    ast::Entity entity;
+    entity.name = "configurable";
+
+    // Add generic
+    ast::GenericParam param;
+    param.names = { "WIDTH" };
+    param.type_name = "positive";
+    ast::TokenExpr default_val;
+    default_val.text = "8";
+    param.default_expr = default_val;
+    entity.generic_clause.generics.push_back(std::move(param));
+
+    // Create config with 4-space indent
+    common::Config config;
+    config.line_config.indent_size = 4;
+    emit::PrettyPrinter printer; // Stateless!
+
+    const auto doc = printer(entity);
+    const auto result = doc.render(config); // Config passed to render
+
+    // Indentation should be 4 spaces now
+    const std::string expected = "entity configurable is\n"
+                                 "    generic ( WIDTH : positive := 8 );\n"
+                                 "end entity configurable;";
 
     REQUIRE(result == expected);
 }

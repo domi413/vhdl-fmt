@@ -6,13 +6,17 @@
 #include <string_view>
 #include <utility>
 
+namespace common {
+struct Config;
+} // namespace common
+
 namespace emit {
 
 // Forward declarations
 class DocImpl;
 
-// Default indentation amount for << and >> operators
-inline constexpr int DEFAULT_INDENT = 2;
+// Default indentation amount for << and >> operators (in indent levels, not spaces)
+inline constexpr int DEFAULT_INDENT = 1;
 
 /// Document abstraction for pretty printing
 class Doc final
@@ -54,6 +58,10 @@ class Doc final
     // Rendering
     [[nodiscard]]
     auto render(int width) const -> std::string;
+    [[nodiscard]]
+    auto render(int width, int indent_size) const -> std::string;
+    [[nodiscard]]
+    auto render(const common::Config &config) const -> std::string;
 };
 
 // Helper functions

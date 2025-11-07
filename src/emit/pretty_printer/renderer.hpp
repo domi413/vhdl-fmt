@@ -21,11 +21,12 @@ class Renderer final
 {
   private:
     int width_;
+    int indent_size_;
     int column_{ 0 };
     std::string output_;
 
   public:
-    explicit Renderer(int width) : width_(width) {}
+    Renderer(int width, int indent_size) : width_(width), indent_size_(indent_size) {}
 
     // Core rendering function
     auto render(const DocPtr &doc) -> std::string;

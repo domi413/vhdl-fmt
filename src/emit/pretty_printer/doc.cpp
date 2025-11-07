@@ -1,5 +1,6 @@
 #include "emit/pretty_printer/doc.hpp"
 
+#include "common/config.hpp"
 #include "emit/pretty_printer/doc_impl.hpp"
 #include "emit/pretty_printer/renderer.hpp"
 
@@ -88,7 +89,21 @@ auto Doc::group() const -> Doc
 // Rendering
 auto Doc::render(int width) const -> std::string
 {
-    Renderer renderer(width);
+    Renderer renderer(width, 2); // Default 2 spaces per indent level
+    return renderer.render(impl_);
+}
+
+auto Doc::render(int width, int indent_size) const -> std::string
+{
+    Renderer renderer(width, indent_size);
+    return renderer.render(impl_);
+}
+
+auto Doc::render(const common::Config &config) const -> std::string
+{
+    const int width = static_cast<int>(config.line_config.line_length);
+    const int indent_size = static_cast<int>(config.line_config.indent_size);
+    Renderer renderer(width, indent_size);
     return renderer.render(impl_);
 }
 
