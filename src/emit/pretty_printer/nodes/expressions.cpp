@@ -1,6 +1,7 @@
 #include "ast/nodes/expressions.hpp"
 
 #include "emit/pretty_printer.hpp"
+#include "emit/pretty_printer/doc.hpp"
 
 namespace emit {
 
@@ -9,9 +10,9 @@ auto PrettyPrinter::operator()(const ast::TokenExpr &node) -> Doc
     return Doc::text(node.text);
 }
 
-auto PrettyPrinter::operator()(const ast::GroupExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::GroupExpr & /*node*/) -> Doc
 {
-    // TODO: Implement group expression printing
+    // TODO(dyb): Implement group expression printing
     return Doc::text("(group)");
 }
 

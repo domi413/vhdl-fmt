@@ -1,6 +1,7 @@
 #include "ast/nodes/design_units.hpp"
 
 #include "emit/pretty_printer.hpp"
+#include "emit/pretty_printer/doc.hpp"
 
 namespace emit {
 
@@ -75,7 +76,7 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) -> Doc
     }
 
     // end [architecture] [<name>];
-    Doc end_line
+    const Doc end_line
       = Doc::text("end") & Doc::text("architecture") & Doc::text(node.name) + Doc::text(";");
     result = result / end_line;
 

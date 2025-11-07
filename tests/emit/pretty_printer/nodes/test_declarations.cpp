@@ -3,6 +3,8 @@
 #include "emit/pretty_printer.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <memory>
+#include <utility>
 
 // TODO(user): Should declarations ever be split into multiple lines in VHDL?
 

@@ -1,8 +1,11 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "emit/pretty_printer.hpp"
+#include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <memory>
+#include <utility>
 
 TEST_CASE("Simple Entity without generics or ports", "[pretty_printer][design_units]")
 {

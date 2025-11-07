@@ -1,12 +1,14 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "emit/pretty_printer.hpp"
+#include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <utility>
 
 TEST_CASE("Empty DesignFile", "[pretty_printer][design_file]")
 {
-    ast::DesignFile file;
+    const ast::DesignFile file;
     // Empty units list
 
     emit::PrettyPrinter printer;

@@ -1,5 +1,6 @@
 #include "ast/nodes/design_units.hpp"
 #include "emit/pretty_printer.hpp"
+#include "emit/pretty_printer/doc.hpp"
 
 namespace emit {
 
@@ -12,7 +13,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
     Doc result = Doc::empty();
 
     // generic (
-    Doc opener = Doc::text("generic") & Doc::text("(");
+    const Doc opener = Doc::text("generic") & Doc::text("(");
 
     // Build list of generic parameters
     Doc params = Doc::empty();
@@ -26,7 +27,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
         params = params + visit(generic);
     }
 
-    Doc closer = Doc::text(");");
+    const Doc closer = Doc::text(");");
     result = opener << params >> closer;
 
     return result.group();
@@ -41,7 +42,7 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
     Doc result = Doc::empty();
 
     // port (
-    Doc opener = Doc::text("port") & Doc::text("(");
+    const Doc opener = Doc::text("port") & Doc::text("(");
 
     // Build list of ports
     Doc ports = Doc::empty();
@@ -55,7 +56,7 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
         ports = ports + visit(port);
     }
 
-    Doc closer = Doc::text(");");
+    const Doc closer = Doc::text(");");
     result = opener << ports >> closer;
 
     return result.group();

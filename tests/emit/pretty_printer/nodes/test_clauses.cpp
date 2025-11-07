@@ -1,12 +1,14 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "emit/pretty_printer.hpp"
+#include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <utility>
 
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
 {
-    ast::GenericClause clause;
+    const ast::GenericClause clause;
     // Empty generics list
 
     emit::PrettyPrinter printer;
@@ -67,7 +69,7 @@ TEST_CASE("GenericClause with multiple parameters", "[pretty_printer][clauses]")
 
 TEST_CASE("Empty PortClause", "[pretty_printer][clauses]")
 {
-    ast::PortClause clause;
+    const ast::PortClause clause;
     // Empty ports list
 
     emit::PrettyPrinter printer;
@@ -126,9 +128,9 @@ TEST_CASE("PortClause with multiple ports", "[pretty_printer][clauses]")
     constraint.right = std::move(right);
     port3.constraints.push_back(std::move(constraint));
 
-    clause.ports.push_back(std::move(port1));
-    clause.ports.push_back(std::move(port2));
-    clause.ports.push_back(std::move(port3));
+    clause.ports.emplace_back(std::move(port1));
+    clause.ports.emplace_back(std::move(port2));
+    clause.ports.emplace_back(std::move(port3));
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
