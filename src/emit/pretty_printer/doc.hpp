@@ -49,10 +49,6 @@ class Doc final
     // Rendering
     [[nodiscard]]
     auto render(int width) const -> std::string;
-
-    // Internal access
-    [[nodiscard]]
-    auto impl() const -> const std::shared_ptr<DocImpl> &;
 };
 
 // Helper functions

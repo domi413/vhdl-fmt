@@ -79,12 +79,6 @@ auto Doc::render(int width) const -> std::string
     return renderer.render(impl_);
 }
 
-// Internal access
-auto Doc::impl() const -> const std::shared_ptr<DocImpl> &
-{
-    return impl_;
-}
-
 // Helper functions
 auto space() -> Doc
 {
