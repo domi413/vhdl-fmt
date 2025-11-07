@@ -111,6 +111,28 @@ lint:
 
 	@echo "✓ Linting complete"
 
+lint-diff:
+	$(call check_tool,$(RUN_CLANG_TIDY_CMD))
+	$(call check_tool,$(CLANG_TIDY_CMD))
+	@echo "Linting changed files compared to main branch..."
+	@CHANGED_FILES=$$(git diff --name-only --diff-filter=ACM main...HEAD | grep -E '\.(cpp|hpp)$$' || true); \
+	if [ -z "$$CHANGED_FILES" ]; then \
+		echo "No C++ files changed."; \
+		exit 0; \
+	fi; \
+	echo "Files to lint: $$CHANGED_FILES"; \
+	SOURCES=$$(echo "$$CHANGED_FILES" | grep '\.cpp$$' || true); \
+	HEADERS=$$(echo "$$CHANGED_FILES" | grep '\.hpp$$' || true); \
+	if [ -n "$$SOURCES" ]; then \
+		echo "Running clang-tidy on changed source files..."; \
+		$(RUN_CLANG_TIDY_CMD) $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) -j $(LINT_CPUS) $$SOURCES || exit 1; \
+	fi; \
+	if [ -n "$$HEADERS" ]; then \
+		echo "Running clang-tidy on changed headers..."; \
+		echo "$$HEADERS" | xargs -r -P $(LINT_CPUS) -n 1 $(CLANG_TIDY_CMD) $(LINT_COMMON_FLAGS) $(LINT_TIDY_FLAGS) || exit 1; \
+	fi; \
+	echo "✓ Linting complete"
+
 check-format:
 	$(call check_tool,$(CLANG_FORMAT_CMD))
 	$(call check_tool,$(GERSEMI_CMD))
