@@ -80,7 +80,9 @@ add_library(
 set_source_files_properties(
     ${GENERATED_DIR}/vhdlLexer.cpp
     ${GENERATED_DIR}/vhdlParser.cpp
-    PROPERTIES GENERATED TRUE
+    PROPERTIES
+        GENERATED
+            TRUE
 )
 
 # Mark generated headers as SYSTEM to suppress warnings in generated code
