@@ -14,9 +14,7 @@ class DocImpl;
 /// Document abstraction for pretty printing
 class Doc final
 {
-  private:
     std::shared_ptr<DocImpl> impl_;
-
     explicit Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}
 
   public:
@@ -34,11 +32,11 @@ class Doc final
     static auto line() -> Doc;
 
     // Combinators
-    auto operator+(const Doc &other) const -> Doc;
-    auto operator&(const Doc &other) const -> Doc;
-    auto operator/(const Doc &other) const -> Doc;
-    auto operator<<(const Doc &other) const -> Doc; // Line break + indent rhs
-    auto operator>>(const Doc &other) const -> Doc; // Line break + dedent rhs
+    auto operator+(const Doc &other) const -> Doc;  ///> Direct concatenation
+    auto operator&(const Doc &other) const -> Doc;  ///> Space concatenation
+    auto operator/(const Doc &other) const -> Doc;  ///> Line break
+    auto operator<<(const Doc &other) const -> Doc; ///> Line break + indent rhs
+    auto operator>>(const Doc &other) const -> Doc; ///> Line break + dedent rhs
     [[nodiscard]]
     auto nest(int indent) const -> Doc;
     [[nodiscard]]
