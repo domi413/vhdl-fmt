@@ -121,8 +121,10 @@ void Renderer::write(std::string_view text)
 void Renderer::newline(int indent)
 {
     output_ += '\n';
-    output_.append(indent, ' ');
-    column_ = indent;
+    // Ensure indent is never negative
+    const int actual_indent = indent > 0 ? indent : 0;
+    output_.append(actual_indent, ' ');
+    column_ = actual_indent;
 }
 
 } // namespace emit

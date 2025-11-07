@@ -43,6 +43,16 @@ auto Doc::operator/(const Doc &other) const -> Doc
     return *this + line() + other;
 }
 
+auto Doc::operator<<(const Doc &other) const -> Doc
+{
+    return *this + (line() + other).nest(2);
+}
+
+auto Doc::operator>>(const Doc &other) const -> Doc
+{
+    return *this + (line() + other).nest(-2);
+}
+
 auto Doc::nest(int indent) const -> Doc
 {
     return Doc(makeNest(indent, impl_));

@@ -4,6 +4,7 @@ bugprone
 combinators
 conanfile
 cppcoreguidelines
+dedents
 domi
 doublestar
 flto

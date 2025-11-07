@@ -37,6 +37,8 @@ class Doc final
     auto operator+(const Doc &other) const -> Doc;
     auto operator&(const Doc &other) const -> Doc;
     auto operator/(const Doc &other) const -> Doc;
+    auto operator<<(const Doc &other) const -> Doc; // Line break + indent rhs
+    auto operator>>(const Doc &other) const -> Doc; // Line break + dedent rhs
     [[nodiscard]]
     auto nest(int indent) const -> Doc;
     [[nodiscard]]

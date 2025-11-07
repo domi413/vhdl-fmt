@@ -44,28 +44,35 @@ TEST_CASE("Line break with operator/", "[doc]")
     REQUIRE(doc.render(80) == expected);
 }
 
-TEST_CASE("Line break with indentation", "[doc]")
-{
-    const Doc doc = Doc::text("hello") + (Doc::line() + Doc::text("world")).nest(2);
-    // Note: nest should affect the indentation after line breaks
-    std::string expected = "hello\n  world";
-    REQUIRE(doc.render(80) == expected);
-}
-
 TEST_CASE("Nest increases indentation", "[doc]")
 {
     const Doc doc = Doc::text("begin") + (Doc::line() + Doc::text("end")).nest(2);
     REQUIRE(doc.render(80) == "begin\n  end");
 }
 
+TEST_CASE("Operator<< nests right-hand side by 2", "[doc]")
+{
+    const Doc doc = Doc::text("begin") << Doc::text("end");
+    REQUIRE(doc.render(80) == "begin\n  end");
+}
+
 TEST_CASE("Nested indentation accumulates", "[doc]")
 {
-    const Doc inner = Doc::line() + Doc::text("inner");
-    const Doc middle = Doc::line() + Doc::text("middle") + inner.nest(2);
-    const Doc outer = Doc::text("outer") + middle.nest(2);
+    const Doc inner = Doc::text("inner");
+    const Doc middle = Doc::text("middle");
+    const Doc outer = Doc::text("outer");
+
+    const Doc full = outer << (middle << inner);
 
     std::string expected = "outer\n  middle\n    inner";
-    REQUIRE(outer.render(80) == expected);
+    REQUIRE(full.render(80) == expected);
+}
+
+TEST_CASE("Operator>> dedents right-hand side by 2", "[doc]")
+{
+    const Doc doc = Doc::text("begin") << Doc::text("indented") >> Doc::text("back");
+    std::string expected = "begin\n  indented\nback";
+    REQUIRE(doc.render(80) == expected);
 }
 
 TEST_CASE("Group allows line to be flattened when it fits", "[doc]")
@@ -98,11 +105,12 @@ TEST_CASE("Empty documents don't affect output", "[doc]")
 
 TEST_CASE("Complex nested structure", "[doc]")
 {
-    const Doc header = Doc::text("if") & Doc::text("condition");
-    const Doc body = Doc::text("then") / Doc::text("statement;");
-    const Doc full = header / body.nest(2);
+    const Doc header = Doc::text("if") & Doc::text("condition") & Doc::text("then");
+    const Doc body = Doc::text("statement;");
+    const Doc footer = Doc::text("end if;");
+    const Doc full = header << body >> footer;
 
-    const std::string expected = "if condition\nthen\n  statement;";
+    const std::string expected = "if condition then\n  statement;\nend if;";
     REQUIRE(full.render(80) == expected);
 }
 
@@ -125,9 +133,9 @@ TEST_CASE("Doc is movable", "[doc]")
 
 TEST_CASE("Structural sharing works correctly", "[doc]")
 {
-    const Doc shared = Doc::text("shared") + space() + Doc::text("part");
-    const Doc doc1 = shared + space() + Doc::text("A");
-    const Doc doc2 = shared + space() + Doc::text("B");
+    const Doc shared = Doc::text("shared") & Doc::text("part");
+    const Doc doc1 = shared & Doc::text("A");
+    const Doc doc2 = shared & Doc::text("B");
 
     REQUIRE(doc1.render(80) == "shared part A");
     REQUIRE(doc2.render(80) == "shared part B");
