@@ -3,20 +3,7 @@
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
-#include <algorithm>
-#include <utility>
-
 namespace emit {
-
-namespace {
-// Helper to append multiple items with << operator
-auto appendAll(Doc initial, const auto &items, auto visitor) -> Doc
-{
-    return std::ranges::fold_left(items | std::views::transform(visitor),
-                                  std::move(initial),
-                                  [](const Doc &acc, const Doc &doc) -> Doc { return acc << doc; });
-}
-} // namespace
 
 auto PrettyPrinter::operator()(const ast::Entity &node) -> Doc
 {
@@ -33,12 +20,16 @@ auto PrettyPrinter::operator()(const ast::Entity &node) -> Doc
     }
 
     // Declarations
-    result = appendAll(result, node.decls, [this](const auto &decl) { return visit(decl); });
+    for (const auto &decl : node.decls) {
+        result = result << visit(decl);
+    }
 
     // Begin section (concurrent statements)
     if (!node.stmts.empty()) {
         result = result / Doc::text("begin");
-        result = appendAll(result, node.stmts, [this](const auto &stmt) { return visit(stmt); });
+        for (const auto &stmt : node.stmts) {
+            result = result << visit(stmt);
+        }
     }
 
     // end [entity] [<name>];
@@ -58,13 +49,17 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) -> Doc
                & Doc::text("is");
 
     // Declarations
-    result = appendAll(result, node.decls, [this](const auto &decl) { return visit(decl); });
+    for (const auto &decl : node.decls) {
+        result = result << visit(decl);
+    }
 
     // begin
     result = result / Doc::text("begin");
 
     // Concurrent statements
-    result = appendAll(result, node.stmts, [this](const auto &stmt) { return visit(stmt); });
+    for (const auto &stmt : node.stmts) {
+        result = result << visit(stmt);
+    }
 
     // end [architecture] [<name>];
     const Doc end_line
