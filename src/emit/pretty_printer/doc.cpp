@@ -66,6 +66,20 @@ auto Doc::operator>>(const Doc &other) const -> Doc
     return *this + nested;
 }
 
+auto Doc::hardIndent(const Doc &other) const -> Doc
+{
+    // *this + (hardline() + other).nest(DEFAULT_INDENT)
+    auto nested = Doc(makeNest(DEFAULT_INDENT, makeConcat(hardline().impl_, other.impl_)));
+    return *this + nested;
+}
+
+auto Doc::hardDedent(const Doc &other) const -> Doc
+{
+    // *this + (hardline() + other).nest(-DEFAULT_INDENT)
+    auto nested = Doc(makeNest(-DEFAULT_INDENT, makeConcat(hardline().impl_, other.impl_)));
+    return *this + nested;
+}
+
 auto Doc::group() const -> Doc
 {
     return Doc(makeUnion(flatten(impl_), impl_));

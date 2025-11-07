@@ -40,8 +40,13 @@ class Doc final
     auto operator&(const Doc &other) const -> Doc;  ///> Space concatenation
     auto operator/(const Doc &other) const -> Doc;  ///> Softline
     auto operator|(const Doc &other) const -> Doc;  ///> Hardline
-    auto operator<<(const Doc &other) const -> Doc; ///> Line break + indent rhs
-    auto operator>>(const Doc &other) const -> Doc; ///> Line break + dedent rhs
+    auto operator<<(const Doc &other) const -> Doc; ///> Softline + indent rhs
+    auto operator>>(const Doc &other) const -> Doc; ///> Softline + dedent rhs
+
+    [[nodiscard]]
+    auto hardIndent(const Doc &other) const -> Doc; ///> Hardline + indent rhs
+    [[nodiscard]]
+    auto hardDedent(const Doc &other) const -> Doc; ///> Hardline + dedent rhs
 
     [[nodiscard]]
     auto group() const -> Doc;

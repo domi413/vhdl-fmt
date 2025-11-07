@@ -137,3 +137,37 @@ TEST_CASE("Render with different widths", "[doc]")
     // Too narrow - should break
     REQUIRE(doc.render(5) == "short\ntext");
 }
+
+TEST_CASE("hardIndent forces line break with indentation", "[doc]")
+{
+    const Doc doc = Doc::text("begin").hardIndent(Doc::text("end"));
+    // Should always break, even if grouped
+    REQUIRE(doc.render(80) == "begin\n  end");
+}
+
+TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
+{
+    const Doc doc = Doc::text("begin").hardIndent(Doc::text("end")).group();
+    // Hard line never becomes space, even in a group
+    REQUIRE(doc.render(80) == "begin\n  end");
+}
+
+TEST_CASE("hardDedent reduces indentation with hard break", "[doc]")
+{
+    const Doc doc
+      = Doc::text("begin").hardIndent(Doc::text("indented")).hardDedent(Doc::text("back"));
+    const std::string expected = "begin\n  indented\nback";
+    REQUIRE(doc.render(80) == expected);
+}
+
+TEST_CASE("Soft vs hard indent comparison", "[doc]")
+{
+    const Doc soft = (Doc::text("x") << Doc::text("y")).group();
+    const Doc hard = Doc::text("x").hardIndent(Doc::text("y")).group();
+
+    // Soft can collapse when grouped and fits
+    REQUIRE(soft.render(80) == "x y");
+
+    // Hard always breaks, even when grouped
+    REQUIRE(hard.render(80) == "x\n  y");
+}
