@@ -20,7 +20,6 @@ TEST_CASE("Simple Entity without generics or ports", "[pretty_printer][design_un
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
-    // Entity header and end statement collapse to one line when they fit
     const std::string expected = "entity simple_entity is\n"
                                  "end entity simple_entity;";
 
@@ -45,7 +44,6 @@ TEST_CASE("Entity with generics", "[pretty_printer][design_units]")
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
-    // Indentation is 2 spaces
     const std::string expected = "entity configurable is\n"
                                  "  generic ( WIDTH : positive := 8 );\n"
                                  "end entity configurable;";
@@ -121,7 +119,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
-    // Both clauses fit on one line with 2-space indentation
+    // Both clauses fit on one line
     const std::string expected = "entity fifo is\n"
                                  "  generic ( DEPTH : positive := 16 );\n"
                                  "  port ( data_in : in std_logic_vector(7 downto 0) );\n"
@@ -161,14 +159,12 @@ TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_
     entity.generic_clause.generics.push_back(std::move(param));
 
     // Create config with 4-space indent
-    common::Config config;
+    auto config = defaultConfig();
     config.line_config.indent_size = 4;
 
-    // Pass config to printer for structural decisions
     emit::PrettyPrinter printer(config);
 
     const auto doc = printer(entity);
-    // Config also passed to render for spacing/width
     const auto result = doc.render(config);
 
     // Indentation should be 4 spaces now

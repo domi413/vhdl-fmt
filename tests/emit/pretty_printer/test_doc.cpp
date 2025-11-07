@@ -47,10 +47,17 @@ TEST_CASE("Line break with operator/", "[doc]")
     REQUIRE(doc.render(defaultConfig()) == expected);
 }
 
-TEST_CASE("Operator<< nests right-hand side by 2", "[doc]")
+TEST_CASE("Operator<< nests right-hand side", "[doc]")
 {
     const Doc doc = Doc::text("begin") << Doc::text("end");
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
+}
+
+TEST_CASE("Operator>> dedents right-hand side", "[doc]")
+{
+    const Doc doc = Doc::text("begin") << Doc::text("indented") >> Doc::text("back");
+    std::string expected = "begin\n  indented\nback";
+    REQUIRE(doc.render(defaultConfig()) == expected);
 }
 
 TEST_CASE("Nested indentation accumulates", "[doc]")
@@ -63,13 +70,6 @@ TEST_CASE("Nested indentation accumulates", "[doc]")
 
     std::string expected = "outer\n  middle\n    inner";
     REQUIRE(full.render(defaultConfig()) == expected);
-}
-
-TEST_CASE("Operator>> dedents right-hand side by 2", "[doc]")
-{
-    const Doc doc = Doc::text("begin") << Doc::text("indented") >> Doc::text("back");
-    std::string expected = "begin\n  indented\nback";
-    REQUIRE(doc.render(defaultConfig()) == expected);
 }
 
 TEST_CASE("Soft line becomes space when grouped and fits", "[doc]")
