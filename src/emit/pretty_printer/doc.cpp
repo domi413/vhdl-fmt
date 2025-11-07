@@ -55,17 +55,16 @@ auto Doc::operator|(const Doc &other) const -> Doc
 
 auto Doc::operator<<(const Doc &other) const -> Doc
 {
-    return *this + (line() + other).nest(2);
+    // *this + (line() + other).nest(DEFAULT_INDENT)
+    auto nested = Doc(makeNest(DEFAULT_INDENT, makeConcat(line().impl_, other.impl_)));
+    return *this + nested;
 }
 
 auto Doc::operator>>(const Doc &other) const -> Doc
 {
-    return *this + (line() + other).nest(-2);
-}
-
-auto Doc::nest(int indent) const -> Doc
-{
-    return Doc(makeNest(indent, impl_));
+    // *this + (line() + other).nest(-DEFAULT_INDENT)
+    auto nested = Doc(makeNest(-DEFAULT_INDENT, makeConcat(line().impl_, other.impl_)));
+    return *this + nested;
 }
 
 auto Doc::group() const -> Doc

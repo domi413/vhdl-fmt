@@ -45,12 +45,6 @@ TEST_CASE("Line break with operator/", "[doc]")
     REQUIRE(doc.render(80) == expected);
 }
 
-TEST_CASE("Nest increases indentation", "[doc]")
-{
-    const Doc doc = Doc::text("begin") + (Doc::line() + Doc::text("end")).nest(2);
-    REQUIRE(doc.render(80) == "begin\n  end");
-}
-
 TEST_CASE("Operator<< nests right-hand side by 2", "[doc]")
 {
     const Doc doc = Doc::text("begin") << Doc::text("end");

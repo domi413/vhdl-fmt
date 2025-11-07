@@ -61,7 +61,7 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) -> Doc
     // Declarations
     if (!node.decls.empty()) {
         for (const auto &decl : node.decls) {
-            result = result / visit(decl).nest(2);
+            result = result << visit(decl);
         }
     }
 
@@ -71,7 +71,7 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) -> Doc
     // Concurrent statements
     if (!node.stmts.empty()) {
         for (const auto &stmt : node.stmts) {
-            result = result / visit(stmt).nest(2);
+            result = result << visit(stmt);
         }
     }
 

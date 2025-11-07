@@ -11,6 +11,9 @@ namespace emit {
 // Forward declarations
 class DocImpl;
 
+// Default indentation amount for << and >> operators
+inline constexpr int DEFAULT_INDENT = 2;
+
 /// Document abstraction for pretty printing
 class Doc final
 {
@@ -39,8 +42,7 @@ class Doc final
     auto operator|(const Doc &other) const -> Doc;  ///> Hardline
     auto operator<<(const Doc &other) const -> Doc; ///> Line break + indent rhs
     auto operator>>(const Doc &other) const -> Doc; ///> Line break + dedent rhs
-    [[nodiscard]]
-    auto nest(int indent) const -> Doc;
+
     [[nodiscard]]
     auto group() const -> Doc;
 
