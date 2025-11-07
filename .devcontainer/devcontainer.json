@@ -44,7 +44,8 @@
           "env": "${envObj}",
           "environment": "${envObjArray}",
           "sourceFileMap": "${sourceFileMapObj}"
-        }
+        },
+        "cmake.ctest.testExplorerIntegrationEnabled": false
       }
     }
   },
