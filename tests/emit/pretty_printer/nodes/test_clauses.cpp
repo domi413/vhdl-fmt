@@ -1,11 +1,14 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "emit/pretty_printer.hpp"
+#include "emit/test_utils.hpp"
 #include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <utility>
+
+using emit::test::defaultConfig;
 
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
 {
@@ -14,7 +17,7 @@ TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result.empty());
 }
@@ -34,7 +37,7 @@ TEST_CASE("GenericClause with single parameter", "[pretty_printer][clauses]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     // When it fits on one line, it should be compact
     REQUIRE(result == "generic ( WIDTH : integer := 8 );");
@@ -63,7 +66,7 @@ TEST_CASE("GenericClause with multiple parameters", "[pretty_printer][clauses]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "generic ( WIDTH : positive := 8; HEIGHT : positive := 16 );");
 }
@@ -75,7 +78,7 @@ TEST_CASE("Empty PortClause", "[pretty_printer][clauses]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result.empty());
 }
@@ -93,7 +96,7 @@ TEST_CASE("PortClause with single port", "[pretty_printer][clauses]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "port ( clk : in std_logic );");
 }
@@ -135,7 +138,7 @@ TEST_CASE("PortClause with multiple ports", "[pretty_printer][clauses]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(clause);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "port (\n"
                                  "  clk : in std_logic;\n"

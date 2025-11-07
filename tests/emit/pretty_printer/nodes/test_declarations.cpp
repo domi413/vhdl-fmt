@@ -1,10 +1,13 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/expressions.hpp"
 #include "emit/pretty_printer.hpp"
+#include "emit/test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <utility>
+
+using emit::test::defaultConfig;
 
 // TODO(user): Should declarations ever be split into multiple lines in VHDL?
 
@@ -16,7 +19,7 @@ TEST_CASE("GenericParam with single name", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(param);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "WIDTH : integer");
 }
@@ -29,7 +32,7 @@ TEST_CASE("GenericParam with multiple names", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(param);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "WIDTH, HEIGHT, DEPTH : positive");
 }
@@ -46,7 +49,7 @@ TEST_CASE("GenericParam with default value", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(param);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "WIDTH : integer := 8");
 }
@@ -63,7 +66,7 @@ TEST_CASE("GenericParam with multiple names and default", "[pretty_printer][decl
 
     emit::PrettyPrinter printer;
     const auto doc = printer(param);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "A, B : natural := 0");
 }
@@ -77,7 +80,7 @@ TEST_CASE("Port with single name and mode", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "clk : in std_logic");
 }
@@ -91,7 +94,7 @@ TEST_CASE("Port with multiple names", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "data_in, data_out : inout std_logic_vector");
 }
@@ -118,7 +121,7 @@ TEST_CASE("Port with constraints", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "data : in std_logic_vector(7 downto 0)");
 }
@@ -159,7 +162,7 @@ TEST_CASE("Port with multiple constraints", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "matrix : out matrix_type(7 downto 0, 3 downto 0)");
 }
@@ -177,7 +180,7 @@ TEST_CASE("Port with default value", "[pretty_printer][declarations]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "enable : in std_logic := '0'");
 }
@@ -209,7 +212,7 @@ TEST_CASE("Port with constraints and default value", "[pretty_printer][declarati
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result == "data : in std_logic_vector(7 downto 0) := X\"00\"");
 }

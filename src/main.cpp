@@ -12,7 +12,6 @@
 #include <span>
 #include <stdexcept>
 
-/// The main entry point of the program
 auto main(int argc, char *argv[]) -> int
 {
     try {
@@ -30,14 +29,13 @@ auto main(int argc, char *argv[]) -> int
         // Build AST from input file
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
 
-        // Use DebugPrinter to print AST
+        // Debug print the AST
         // emit::DebugPrinter debug_printer(std::cout);
         // debug_printer.visit(root);
 
-        // Use pretty printer with config for structural decisions (table vs compact, etc.)
+        // Pretty print the AST
         emit::PrettyPrinter printer(config);
         const auto doc = printer(root);
-        // Render with same config for spacing/width decisions
         std::cout << doc.render(config);
 
     } catch (const std::exception &ex) {

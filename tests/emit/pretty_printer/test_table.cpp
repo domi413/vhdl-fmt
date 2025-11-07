@@ -1,11 +1,13 @@
 #include "emit/pretty_printer/doc.hpp"
 #include "emit/pretty_printer/table.hpp"
+#include "emit/test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 #include <vector>
 
 using emit::Doc;
+using emit::test::defaultConfig;
 
 TEST_CASE("Table with simple alignment", "[table]")
 {
@@ -22,7 +24,7 @@ TEST_CASE("Table with simple alignment", "[table]")
     const std::string expected = "enable   : in  std_logic\n"
                                  "clk      : in  std_logic\n"
                                  "data_out : out std_logic_vector";
-    REQUIRE(table.render(80) == expected);
+    REQUIRE(table.render(defaultConfig()) == expected);
 }
 
 TEST_CASE("Table composable with other Doc operations", "[table]")
@@ -35,7 +37,8 @@ TEST_CASE("Table composable with other Doc operations", "[table]")
     };
 
     auto table = makeTable(rows);
-    auto doc = Doc::text("entity MyEntity is") / Doc::bracket(Doc::text("port ("), table, Doc::text(");"));
+    auto doc
+      = Doc::text("entity MyEntity is") / Doc::bracket(Doc::text("port ("), table, Doc::text(");"));
 
     const std::string expected = "entity MyEntity is\n"
                                  "port (\n"
@@ -43,7 +46,7 @@ TEST_CASE("Table composable with other Doc operations", "[table]")
                                  "  port2 : out std_logic\n"
                                  ");";
 
-    REQUIRE(doc.render(80) == expected);
+    REQUIRE(doc.render(defaultConfig()) == expected);
 }
 
 TEST_CASE("Empty table", "[table]")
@@ -53,5 +56,5 @@ TEST_CASE("Empty table", "[table]")
     const std::vector<std::vector<Doc>> rows;
     auto table = makeTable(rows);
 
-    REQUIRE(table.render(80).empty());
+    REQUIRE(table.render(defaultConfig()).empty());
 }

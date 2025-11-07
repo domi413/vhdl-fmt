@@ -7,6 +7,10 @@
 #include <string>
 #include <string_view>
 
+namespace common {
+struct Config;
+} // namespace common
+
 namespace emit {
 
 /// Rendering mode for layout algorithm
@@ -26,7 +30,7 @@ class Renderer final
     std::string output_;
 
   public:
-    Renderer(int width, int indent_size) : width_(width), indent_size_(indent_size) {}
+    explicit Renderer(const common::Config &config);
 
     // Core rendering function
     auto render(const DocPtr &doc) -> std::string;

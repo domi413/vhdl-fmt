@@ -1,5 +1,6 @@
 #include "emit/pretty_printer/renderer.hpp"
 
+#include "common/config.hpp"
 #include "emit/pretty_printer/doc_impl.hpp"
 
 #include <string>
@@ -13,6 +14,12 @@ struct Overload : Ts... // NOLINT(fuchsia-multiple-inheritance)
 {
     using Ts::operator()...;
 };
+
+Renderer::Renderer(const common::Config &config) :
+  width_(config.line_config.line_length),
+  indent_size_(config.line_config.indent_size)
+{
+}
 
 auto Renderer::render(const DocPtr &doc) -> std::string
 {

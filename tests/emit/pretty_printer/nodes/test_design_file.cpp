@@ -1,10 +1,13 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "emit/pretty_printer.hpp"
+#include "emit/test_utils.hpp"
 #include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <utility>
+
+using emit::test::defaultConfig;
 
 TEST_CASE("Empty DesignFile", "[pretty_printer][design_file]")
 {
@@ -13,7 +16,7 @@ TEST_CASE("Empty DesignFile", "[pretty_printer][design_file]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(file);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     REQUIRE(result.empty());
 }
@@ -29,7 +32,7 @@ TEST_CASE("DesignFile with single entity", "[pretty_printer][design_file]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(file);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
     const std::string expected = "entity test_entity is\n"
                                  "end entity test_entity;\n";
 
@@ -60,7 +63,7 @@ TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_fi
 
     emit::PrettyPrinter printer;
     const auto doc = printer(file);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "entity counter is\n"
                                  "  port ( clk : in std_logic );\n"
@@ -93,7 +96,7 @@ TEST_CASE("DesignFile with multiple design units", "[pretty_printer][design_file
 
     emit::PrettyPrinter printer;
     const auto doc = printer(file);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "entity entity1 is\n"
                                  "end entity entity1;\n\n"

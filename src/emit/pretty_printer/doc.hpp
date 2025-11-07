@@ -61,10 +61,6 @@ class Doc final
 
     // Rendering
     [[nodiscard]]
-    auto render(int width) const -> std::string;
-    [[nodiscard]]
-    auto render(int width, int indent_size) const -> std::string;
-    [[nodiscard]]
     auto render(const common::Config &config) const -> std::string;
 };
 

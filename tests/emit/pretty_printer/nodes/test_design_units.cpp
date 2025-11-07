@@ -2,11 +2,14 @@
 #include "ast/nodes/expressions.hpp"
 #include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
+#include "emit/test_utils.hpp"
 #include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <utility>
+
+using emit::test::defaultConfig;
 
 TEST_CASE("Simple Entity without generics or ports", "[pretty_printer][design_units]")
 {
@@ -15,7 +18,7 @@ TEST_CASE("Simple Entity without generics or ports", "[pretty_printer][design_un
 
     emit::PrettyPrinter printer;
     const auto doc = printer(entity);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     // Entity header and end statement collapse to one line when they fit
     const std::string expected = "entity simple_entity is\n"
@@ -40,7 +43,7 @@ TEST_CASE("Entity with generics", "[pretty_printer][design_units]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(entity);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     // Indentation is 2 spaces
     const std::string expected = "entity configurable is\n"
@@ -71,7 +74,7 @@ TEST_CASE("Entity with ports", "[pretty_printer][design_units]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(entity);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "entity counter is\n"
                                  "  port ( clk : in std_logic; count : out natural );\n"
@@ -116,7 +119,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(entity);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     // Both clauses fit on one line with 2-space indentation
     const std::string expected = "entity fifo is\n"
@@ -135,7 +138,7 @@ TEST_CASE("Entity with custom end label", "[pretty_printer][design_units]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(entity);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "entity my_entity is\n"
                                  "end entity custom_label;";
@@ -184,7 +187,7 @@ TEST_CASE("Simple Architecture", "[pretty_printer][design_units]")
 
     emit::PrettyPrinter printer;
     const auto doc = printer(arch);
-    const auto result = doc.render(80);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "architecture rtl of counter is\n"
                                  "begin\n"

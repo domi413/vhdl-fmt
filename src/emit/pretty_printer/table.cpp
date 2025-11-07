@@ -1,5 +1,6 @@
 #include "emit/pretty_printer/table.hpp"
 
+#include "common/config.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
 #include <algorithm>
@@ -11,7 +12,7 @@
 namespace emit {
 
 // Use a very wide width to avoid line breaking when measuring cells
-constexpr int CELL_RENDER_WIDTH = 10000;
+constexpr auto CONFIG = common::Config{ .line_config = { .line_length = 10000 } };
 
 auto makeTable(const std::vector<std::vector<Doc>> &rows) -> Doc
 {
@@ -28,7 +29,7 @@ auto makeTable(const std::vector<std::vector<Doc>> &rows) -> Doc
     for (const auto &row : rows) {
         auto &rendered_row = rendered_cells.emplace_back();
         for (auto [col, cell] : std::views::enumerate(row) | std::views::take(num_columns)) {
-            auto &cell_text = rendered_row.emplace_back(cell.render(CELL_RENDER_WIDTH));
+            auto &cell_text = rendered_row.emplace_back(cell.render(CONFIG));
             max_widths[col] = std::max(max_widths[col], static_cast<int>(cell_text.length()));
         }
     }
