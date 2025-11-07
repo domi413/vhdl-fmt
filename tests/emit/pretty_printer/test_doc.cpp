@@ -94,7 +94,7 @@ TEST_CASE("Complex nested structure", "[doc]")
     const Doc header = Doc::text("if") & Doc::text("condition") & Doc::text("then");
     const Doc body = Doc::text("statement;");
     const Doc footer = Doc::text("end if;");
-    const Doc full = header << body >> footer;
+    const Doc full = header << (body >> footer);
 
     const std::string expected = "if condition then\n  statement;\nend if;";
     REQUIRE(full.render(80) == expected);

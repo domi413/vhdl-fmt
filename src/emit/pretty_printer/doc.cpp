@@ -81,6 +81,11 @@ auto Doc::hardDedent(const Doc &other) const -> Doc
     return *this + nested;
 }
 
+auto Doc::bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc
+{
+    return left << (inner >> right);
+}
+
 auto Doc::group() const -> Doc
 {
     return Doc(makeUnion(flatten(impl_), impl_));

@@ -35,7 +35,7 @@ TEST_CASE("Table composable with other Doc operations", "[table]")
     };
 
     auto table = makeTable(rows);
-    auto doc = Doc::text("entity MyEntity is") / Doc::text("port (") << table >> Doc::text(");");
+    auto doc = Doc::text("entity MyEntity is") / Doc::bracket(Doc::text("port ("), table, Doc::text(");"));
 
     const std::string expected = "entity MyEntity is\n"
                                  "port (\n"

@@ -28,7 +28,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    return (opener << params >> closer).group();
+    return Doc::bracket(opener, params, closer).group();
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
@@ -57,7 +57,7 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
     const Doc opener = Doc::text("port") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    return (opener << ports >> closer).group();
+    return Doc::bracket(opener, ports, closer).group();
 }
 
 } // namespace emit

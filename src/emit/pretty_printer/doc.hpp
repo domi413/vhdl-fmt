@@ -52,6 +52,10 @@ class Doc final
     [[nodiscard]]
     auto hardDedent(const Doc &other) const -> Doc; ///> Hardline + dedent rhs
 
+    // Higher-level combinators for common patterns
+    [[nodiscard]]
+    static auto bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc;
+
     [[nodiscard]]
     auto group() const -> Doc;
 
