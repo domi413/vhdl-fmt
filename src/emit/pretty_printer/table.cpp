@@ -12,9 +12,9 @@
 namespace emit {
 
 // Use a very wide width to avoid line breaking when measuring cells
-constexpr auto CONFIG = common::Config{ .line_config = { .line_length = 10000 } };
+constexpr int MEASUREMENT_LINE_LENGTH = 10000;
 
-auto makeTable(const std::vector<std::vector<Doc>> &rows) -> Doc
+auto makeTable(const std::vector<std::vector<Doc>> &rows, const common::Config &config) -> Doc
 {
     if (rows.empty() || rows[0].empty()) {
         return Doc::empty();
@@ -23,13 +23,17 @@ auto makeTable(const std::vector<std::vector<Doc>> &rows) -> Doc
     const size_t num_columns = rows[0].size();
 
     // Step 1: Render all cells to measure widths
+    // Use a very wide width to avoid line breaking when measuring cells
+    auto measurement_config = config;
+    measurement_config.line_config.line_length = MEASUREMENT_LINE_LENGTH;
+
     std::vector<std::vector<std::string>> rendered_cells;
     std::vector<int> max_widths(num_columns, 0);
 
     for (const auto &row : rows) {
         auto &rendered_row = rendered_cells.emplace_back();
         for (auto [col, cell] : std::views::enumerate(row) | std::views::take(num_columns)) {
-            auto &cell_text = rendered_row.emplace_back(cell.render(CONFIG));
+            auto &cell_text = rendered_row.emplace_back(cell.render(measurement_config));
             max_widths[col] = std::max(max_widths[col], static_cast<int>(cell_text.length()));
         }
     }
