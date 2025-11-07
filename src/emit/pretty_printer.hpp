@@ -21,13 +21,6 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     PrettyPrinter() = default;
     explicit PrettyPrinter(common::Config config) : config_(config) {}
 
-    // Access to config for structural decisions
-    [[nodiscard]]
-    auto config() const -> const common::Config &
-    {
-        return config_;
-    }
-
     PrettyPrinter(const PrettyPrinter &) = delete;
     auto operator=(const PrettyPrinter &) -> PrettyPrinter & = delete;
     PrettyPrinter(PrettyPrinter &&) = delete;
