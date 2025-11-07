@@ -37,6 +37,11 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
         return Doc::empty();
     }
 
+    // Example: Check config for alignment preference
+    // if (config().port_map.align_signals) {
+    //     return formatPortsAsTable(node.ports);
+    // }
+
     // Build list of ports using fold_left
     auto ports = std::ranges::fold_left(
       node.ports | std::views::transform([this](const auto &p) { return visit(p); }),

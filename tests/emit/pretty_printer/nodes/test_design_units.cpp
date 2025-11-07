@@ -160,10 +160,13 @@ TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_
     // Create config with 4-space indent
     common::Config config;
     config.line_config.indent_size = 4;
-    emit::PrettyPrinter printer; // Stateless!
+
+    // Pass config to printer for structural decisions
+    emit::PrettyPrinter printer(config);
 
     const auto doc = printer(entity);
-    const auto result = doc.render(config); // Config passed to render
+    // Config also passed to render for spacing/width
+    const auto result = doc.render(config);
 
     // Indentation should be 4 spaces now
     const std::string expected = "entity configurable is\n"

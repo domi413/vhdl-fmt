@@ -7,14 +7,23 @@
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
 #include "ast/visitor.hpp"
+#include "common/config.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
 namespace emit {
 
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 {
+  private:
+    common::Config config_;
+
   public:
     PrettyPrinter() = default;
+    explicit PrettyPrinter(common::Config config) : config_(config) {}
+
+    // Access to config for structural decisions
+    [[nodiscard]]
+    auto config() const -> const common::Config & { return config_; }
 
     PrettyPrinter(const PrettyPrinter &) = delete;
     auto operator=(const PrettyPrinter &) -> PrettyPrinter & = delete;

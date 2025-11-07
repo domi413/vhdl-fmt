@@ -34,9 +34,10 @@ auto main(int argc, char *argv[]) -> int
         // emit::DebugPrinter debug_printer(std::cout);
         // debug_printer.visit(root);
 
-        // Use pretty printer to print AST
-        emit::PrettyPrinter printer;
+        // Use pretty printer with config for structural decisions (table vs compact, etc.)
+        emit::PrettyPrinter printer(config);
         const auto doc = printer(root);
+        // Render with same config for spacing/width decisions
         std::cout << doc.render(config);
 
     } catch (const std::exception &ex) {
