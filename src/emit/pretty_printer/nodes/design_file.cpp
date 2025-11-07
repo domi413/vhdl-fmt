@@ -15,10 +15,9 @@ auto PrettyPrinter::operator()(const ast::DesignFile &node) -> Doc
 
     Doc result = Doc::empty();
 
-    for (auto [index, unit] : std::views::enumerate(node.units)) {
-        if (index > 0) {
-            // Add blank line between design units
-            result = result / Doc::line();
+    for (auto [i, unit] : std::views::enumerate(node.units)) {
+        if (i > 0) {
+            result = result / Doc::line(); // Blank line separator
         }
         result = result + visit(unit);
     }
