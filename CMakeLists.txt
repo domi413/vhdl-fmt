@@ -102,5 +102,6 @@ configure_file(${VERSION_IN_FILE} ${VERSION_OUT_FILE} @ONLY)
 # Project subdirs
 # --------------------------------------------------------------------
 add_subdirectory(src)
-add_subdirectory(tests)
+
 enable_testing()
+add_subdirectory(tests)
