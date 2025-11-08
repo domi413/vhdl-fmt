@@ -70,7 +70,7 @@ TEST_CASE("Entity with ports", "[pretty_printer][design_units]")
     entity.port_clause.ports.push_back(std::move(port1));
     entity.port_clause.ports.push_back(std::move(port2));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer(defaultConfig());
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -115,7 +115,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
 
     entity.port_clause.ports.push_back(std::move(port));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer(defaultConfig());
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -181,7 +181,7 @@ TEST_CASE("Simple Architecture", "[pretty_printer][design_units]")
     arch.name = "rtl";
     arch.entity_name = "counter";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer(defaultConfig());
     const auto doc = printer(arch);
     const auto result = doc.render(defaultConfig());
 
