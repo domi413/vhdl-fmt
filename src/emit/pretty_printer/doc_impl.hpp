@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <variant>
 
 namespace emit {
@@ -59,14 +58,8 @@ class DocImpl
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
     std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union> value;
 
-    // Convenience constructors
-    explicit DocImpl(Empty e) : value(e) {}
-    explicit DocImpl(Text t) : value(std::move(t)) {}
-    explicit DocImpl(SoftLine l) : value(l) {}
-    explicit DocImpl(HardLine h) : value(h) {}
-    explicit DocImpl(Concat c) : value(std::move(c)) {}
-    explicit DocImpl(Nest n) : value(std::move(n)) {}
-    explicit DocImpl(Union u) : value(std::move(u)) {}
+    // Since all members are public, this class is considered an aggregate type and allows for
+    // aggregate initialization.
 };
 
 // Factory functions for creating documents
