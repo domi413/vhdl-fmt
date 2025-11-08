@@ -16,7 +16,7 @@ TEST_CASE("Port: Single input port", "[declarations][port]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 1);
 
@@ -36,7 +36,7 @@ TEST_CASE("Port: Single output port", "[declarations][port]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 1);
 
@@ -55,7 +55,7 @@ TEST_CASE("Port: Multiple ports same declaration", "[declarations][port]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 1);
 

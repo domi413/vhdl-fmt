@@ -12,33 +12,36 @@
 namespace ast {
 
 // Forward declarations
-struct ConcurrentAssign;
-struct SequentialAssign;
+struct ConcurrentSignalAssignmentStatement;
+struct SignalAssignmentStatement;
 struct IfStatement;
 struct CaseStatement;
-struct Process;
-struct ForLoop;
-struct WhileLoop;
+struct ProcessStatement;
+struct ForLoopStatement;
+struct WhileLoopStatement;
 
 /// Variant type for concurrent statements (outside processes)
-using ConcurrentStatement = std::variant<ConcurrentAssign, Process>;
+using ConcurrentStatement = std::variant<ConcurrentSignalAssignmentStatement, ProcessStatement>;
 
 /// Variant type for sequential statements (inside processes)
-using SequentialStatement
-  = std::variant<SequentialAssign, IfStatement, CaseStatement, ForLoop, WhileLoop>;
+using SequentialStatement = std::variant<SignalAssignmentStatement,
+                                         IfStatement,
+                                         CaseStatement,
+                                         ForLoopStatement,
+                                         WhileLoopStatement>;
 
 /// @brief Concurrent signal assignment: target <= value;
-struct ConcurrentAssign : NodeBase
+struct ConcurrentSignalAssignmentStatement : NodeBase
 {
-    Expr target;
-    Expr value;
+    Expression target;
+    Expression value;
 };
 
 /// @brief Sequential signal/variable assignment: target := value;
-struct SequentialAssign : NodeBase
+struct SignalAssignmentStatement : NodeBase
 {
-    Expr target;
-    Expr value;
+    Expression target;
+    Expression value;
 };
 
 /// @brief If statement with optional elsif and else branches
@@ -47,7 +50,7 @@ struct IfStatement : NodeBase
     struct Branch
     {
         std::optional<NodeTrivia> trivia;
-        Expr condition; // Empty for else branch
+        Expression condition; // Empty for else branch
         std::vector<SequentialStatement> body;
     };
 
@@ -62,16 +65,16 @@ struct CaseStatement : NodeBase
     struct WhenClause
     {
         std::optional<NodeTrivia> trivia;
-        std::vector<Expr> choices; // Can be multiple: when 1 | 2 | 3 =>
+        std::vector<Expression> choices; // Can be multiple: when 1 | 2 | 3 =>
         std::vector<SequentialStatement> body;
     };
 
-    Expr selector; // The expression being switched on
+    Expression selector; // The expression being switched on
     std::vector<WhenClause> when_clauses;
 };
 
 /// @brief Process statement (sensitivity list + sequential statements)
-struct Process : NodeBase
+struct ProcessStatement : NodeBase
 {
     std::optional<std::string> label;
     std::vector<std::string> sensitivity_list;
@@ -79,17 +82,17 @@ struct Process : NodeBase
 };
 
 /// @brief For loop: for i in range loop ... end loop;
-struct ForLoop : NodeBase
+struct ForLoopStatement : NodeBase
 {
     std::string iterator; // Loop variable name
-    Expr range;           // Range expression (e.g., 0 to 10)
+    Expression range;           // Range expression (e.g., 0 to 10)
     std::vector<SequentialStatement> body;
 };
 
 /// @brief While loop: while condition loop ... end loop;
-struct WhileLoop : NodeBase
+struct WhileLoopStatement : NodeBase
 {
-    Expr condition;
+    Expression condition;
     std::vector<SequentialStatement> body;
 };
 

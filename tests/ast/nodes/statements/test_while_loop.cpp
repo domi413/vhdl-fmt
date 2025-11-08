@@ -22,14 +22,14 @@ TEST_CASE("WhileLoop: Simple while loop", "[statements][while_loop]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *while_loop = std::get_if<ast::WhileLoop>(proc->body.data());
+    auto *while_loop = std::get_if<ast::WhileLoopStatement>(proc->body.data());
     REQUIRE(while_loop != nullptr);
 }
 
@@ -50,14 +50,14 @@ TEST_CASE("WhileLoop: While loop with comparison condition", "[statements][while
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *while_loop = std::get_if<ast::WhileLoop>(proc->body.data());
+    auto *while_loop = std::get_if<ast::WhileLoopStatement>(proc->body.data());
     REQUIRE(while_loop != nullptr);
 }
 
@@ -78,14 +78,14 @@ TEST_CASE("WhileLoop: While loop with boolean condition", "[statements][while_lo
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *while_loop = std::get_if<ast::WhileLoop>(proc->body.data());
+    auto *while_loop = std::get_if<ast::WhileLoopStatement>(proc->body.data());
     REQUIRE(while_loop != nullptr);
 }
 
@@ -105,14 +105,14 @@ TEST_CASE("WhileLoop: While loop with logical operators", "[statements][while_lo
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *while_loop = std::get_if<ast::WhileLoop>(proc->body.data());
+    auto *while_loop = std::get_if<ast::WhileLoopStatement>(proc->body.data());
     REQUIRE(while_loop != nullptr);
 }
 

@@ -6,25 +6,25 @@
 
 namespace builder {
 
-auto Translator::makeConcurrentAssign(
-  vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssign
+auto Translator::makeConcurrentAssignStatement(
+  vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssignStatement
 {
     // Dispatch based on concrete assignment type
     if (auto *cond = ctx->conditional_signal_assignment()) {
-        return makeConditionalAssign(cond);
+        return makeConditionalAssignStatement(cond);
     }
     if (auto *sel = ctx->selected_signal_assignment()) {
         return makeSelectedAssign(sel);
     }
 
     // Fallback for unhandled cases
-    return make<ast::ConcurrentAssign>(ctx);
+    return make<ast::ConcurrentAssignStatement>(ctx);
 }
 
-auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext *ctx)
-  -> ast::ConcurrentAssign
+auto Translator::makeConditionalAssignStatement(
+  vhdlParser::Conditional_signal_assignmentContext *ctx) -> ast::ConcurrentAssignStatement
 {
-    auto assign = make<ast::ConcurrentAssign>(ctx);
+    auto assign = make<ast::ConcurrentAssignStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -35,7 +35,7 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
         if (auto *wave = cond_wave->waveform()) {
             auto wave_elems = wave->waveform_element();
             if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpr(wave_elems[0]->expression(0));
+                assign.value = makeExpression(wave_elems[0]->expression(0));
             }
         }
     }
@@ -44,9 +44,9 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
 }
 
 auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext *ctx)
-  -> ast::ConcurrentAssign
+  -> ast::ConcurrentAssignStatement
 {
-    auto assign = make<ast::ConcurrentAssign>(ctx);
+    auto assign = make<ast::ConcurrentAssignStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -59,7 +59,7 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
         if (!waves.empty()) {
             auto wave_elems = waves[0]->waveform_element();
             if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpr(wave_elems[0]->expression(0));
+                assign.value = makeExpression(wave_elems[0]->expression(0));
             }
         }
     }
@@ -67,9 +67,10 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
     return assign;
 }
 
-auto Translator::makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::Process
+auto Translator::makeProcessStatement(vhdlParser::Process_statementContext *ctx)
+  -> ast::ProcessStatement
 {
-    auto proc = make<ast::Process>(ctx);
+    auto proc = make<ast::ProcessStatement>(ctx);
 
     // Extract label if present
     if (auto *label = ctx->label_colon()) {

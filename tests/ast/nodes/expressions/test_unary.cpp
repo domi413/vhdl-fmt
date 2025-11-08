@@ -11,12 +11,12 @@
 // Helper to get expression from signal initialization
 namespace {
 
-auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
+auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expression *
 {
     if (design.units.size() < 2) {
         return nullptr;
     }
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    const auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     if ((arch == nullptr) || arch->decls.empty()) {
         return nullptr;
     }

@@ -18,7 +18,7 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[design
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->trivia.has_value());
 

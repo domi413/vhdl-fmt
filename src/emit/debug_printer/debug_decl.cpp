@@ -7,7 +7,7 @@
 
 namespace emit {
 
-auto DebugPrinter::operator()(const ast::GenericParam &node) -> void
+auto DebugPrinter::operator()(const ast::InterfaceConstantDecl &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
@@ -20,7 +20,7 @@ auto DebugPrinter::operator()(const ast::GenericParam &node) -> void
     visit(node.default_expr);
 }
 
-auto DebugPrinter::operator()(const ast::Port &node) -> void
+auto DebugPrinter::operator()(const ast::InterfacePortDecl &node) -> void
 {
     std::ostringstream oss;
     oss << std::ranges::to<std::string>(node.names
@@ -70,6 +70,23 @@ auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void
 
     const IndentGuard _{ indent_ };
     visit(node.init_expr);
+}
+
+auto DebugPrinter::operator()(const ast::AliasDecl &node) -> void
+{
+    std::ostringstream oss;
+    oss << node.name;
+
+    if (node.type_indication) {
+        oss << " : " << *node.type_indication;
+    }
+
+    oss << " is";
+
+    emitNodeLike(node, "AliasDecl", oss.str());
+
+    const IndentGuard _{ indent_ };
+    visit(node.target);
 }
 
 } // namespace emit

@@ -13,23 +13,23 @@
 namespace ast {
 
 // Forward declarations
-struct Entity;
-struct Architecture;
+struct EntityDecl;
+struct ArchitectureBody;
 
 /// Variant type for all design units (holds values, not pointers)
-using DesignUnit = std::variant<Entity, Architecture>;
+using DesignUnit = std::variant<EntityDecl, ArchitectureBody>;
 
 struct GenericClause : NodeBase
 {
-    std::vector<GenericParam> generics;
+    std::vector<InterfaceConstantDecl> generics;
 };
 
 struct PortClause : NodeBase
 {
-    std::vector<Port> ports;
+    std::vector<InterfacePortDecl> ports;
 };
 
-struct Entity : NodeBase
+struct EntityDecl : NodeBase
 {
     std::string name;
     GenericClause generic_clause;
@@ -39,7 +39,7 @@ struct Entity : NodeBase
     std::optional<std::string> end_label;
 };
 
-struct Architecture : NodeBase
+struct ArchitectureBody : NodeBase
 {
     std::string name;
     std::string entity_name;

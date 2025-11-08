@@ -14,7 +14,7 @@ auto DebugPrinter::operator()(const ast::DesignFile &node) -> void
     visit(node.units);
 }
 
-auto DebugPrinter::operator()(const ast::Entity &node) -> void
+auto DebugPrinter::operator()(const ast::EntityDecl &node) -> void
 {
     emitNodeLike(node, "Entity", node.name);
     const IndentGuard _{ indent_ };
@@ -34,7 +34,7 @@ auto DebugPrinter::operator()(const ast::Entity &node) -> void
     }
 }
 
-auto DebugPrinter::operator()(const ast::Architecture &node) -> void
+auto DebugPrinter::operator()(const ast::ArchitectureBody &node) -> void
 {
     emitNodeLike(node, "Architecture", node.name + " of " + node.entity_name);
     const IndentGuard _{ indent_ };

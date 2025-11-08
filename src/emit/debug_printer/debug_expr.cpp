@@ -57,7 +57,7 @@ auto DebugPrinter::operator()(const ast::ParenExpr &node) -> void
     }
 }
 
-auto DebugPrinter::operator()(const ast::CallExpr &node) -> void
+auto DebugPrinter::operator()(const ast::FunctionCallOrIndexedNamePart &node) -> void
 {
     emitNodeLike(node, "CallExpr", "");
     const IndentGuard _{ indent_ };

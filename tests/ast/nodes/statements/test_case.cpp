@@ -27,10 +27,10 @@ TEST_CASE("CaseStatement: Simple case with when clauses", "[statements][case]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
@@ -64,10 +64,10 @@ TEST_CASE("CaseStatement: Case with integer values", "[statements][case]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
@@ -99,10 +99,10 @@ TEST_CASE("CaseStatement: Case with bit patterns", "[statements][case]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
@@ -135,10 +135,10 @@ TEST_CASE("CaseStatement: Case with multiple statements per branch", "[statement
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
@@ -171,10 +171,10 @@ TEST_CASE("CaseStatement: Nested case statements", "[statements][case]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
@@ -204,10 +204,10 @@ TEST_CASE("CaseStatement: Case with null statement", "[statements][case]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 

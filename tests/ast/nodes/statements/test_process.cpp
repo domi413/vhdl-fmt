@@ -22,11 +22,11 @@ TEST_CASE("Process: Process with sensitivity list", "[statements][process]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE(proc->sensitivity_list.size() == 2);
     REQUIRE(proc->sensitivity_list[0] == "clk");
@@ -48,11 +48,11 @@ TEST_CASE("Process: Process without sensitivity list", "[statements][process]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE(proc->sensitivity_list.empty());
 }
@@ -71,11 +71,11 @@ TEST_CASE("Process: Labeled process", "[statements][process]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE(proc->label.has_value());
     REQUIRE(proc->label.value() == "counter_proc");

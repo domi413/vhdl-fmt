@@ -19,8 +19,10 @@ add_executable(
     nodes/declarations/test_attribute.cpp
     nodes/declarations/test_component.cpp
     nodes/declarations/test_constant.cpp
-    nodes/declarations/test_constraints.cpp
-    nodes/declarations/test_disconnect_spec.cpp
+    nodes/declarations/test_constant_decl.cpp
+    nodes/declarations/test_constraint.cpp
+    nodes/declarations/test_declaration.cpp
+    nodes/declarations/test_disconnect.cpp
     nodes/declarations/test_file.cpp
     nodes/declarations/test_function.cpp
     nodes/declarations/test_generic_param.cpp

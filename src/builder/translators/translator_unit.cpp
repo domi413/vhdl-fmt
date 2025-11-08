@@ -19,7 +19,7 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
         // package_declaration)
         if (auto *primary = lib_unit->primary_unit()) {
             if (auto *entity_ctx = primary->entity_declaration()) {
-                dest.units.emplace_back(makeEntity(entity_ctx));
+                dest.units.emplace_back(makeEntityDecl(entity_ctx));
             }
             // TODO(someone): Handle configuration_declaration and package_declaration
         }
@@ -35,9 +35,9 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
 
 // ---------------------- Design units ----------------------
 
-auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity
+auto Translator::makeEntityDecl(vhdlParser::Entity_declarationContext *ctx) -> ast::EntityDecl
 {
-    auto entity = make<ast::Entity>(ctx);
+    auto entity = make<ast::EntityDecl>(ctx);
 
     entity.name = ctx->identifier(0)->getText();
 
@@ -58,9 +58,10 @@ auto Translator::makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::
     return entity;
 }
 
-auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture
+auto Translator::makeArchitectureBody(vhdlParser::Architecture_bodyContext *ctx)
+  -> ast::ArchitectureBody
 {
-    auto arch = make<ast::Architecture>(ctx);
+    auto arch = make<ast::ArchitectureBody>(ctx);
 
     arch.name = ctx->identifier(0)->getText();
     arch.entity_name = ctx->identifier(1)->getText();
@@ -72,6 +73,8 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
                 arch.decls.emplace_back(makeConstantDecl(const_ctx));
             } else if (auto *sig_ctx = item->signal_declaration()) {
                 arch.decls.emplace_back(makeSignalDecl(sig_ctx));
+            } else if (auto *alias_ctx = item->alias_declaration()) {
+                arch.decls.emplace_back(makeAliasDecl(alias_ctx));
             }
             // TODO(someone): Add more declaration types as needed (variables, types, subprograms,
             // etc.)
@@ -82,9 +85,9 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
     if (auto *stmt_part = ctx->architecture_statement_part()) {
         for (auto *stmt : stmt_part->architecture_statement()) {
             if (auto *proc = stmt->process_statement()) {
-                arch.stmts.emplace_back(makeProcess(proc));
+                arch.stmts.emplace_back(makeProcessStatement(proc));
             } else if (auto *sig_assign = stmt->concurrent_signal_assignment_statement()) {
-                arch.stmts.emplace_back(makeConcurrentAssign(sig_assign));
+                arch.stmts.emplace_back(makeConcurrentSignalAssignmentStatement(sig_assign));
             }
             // TODO(someone): Add more concurrent statement types (component instantiation,
             // generate, etc.)

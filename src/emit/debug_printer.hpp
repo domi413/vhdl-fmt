@@ -31,16 +31,17 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
 
     // Node visitors
     void operator()(const ast::DesignFile &node);
-    void operator()(const ast::Entity &node);
-    void operator()(const ast::Architecture &node);
+    void operator()(const ast::EntityDecl &node);
+    void operator()(const ast::ArchitectureBody &node);
     void operator()(const ast::GenericClause &node);
     void operator()(const ast::PortClause &node);
-    void operator()(const ast::GenericParam &node);
-    void operator()(const ast::Port &node);
+    void operator()(const ast::InterfaceConstantDecl &node);
+    void operator()(const ast::InterfacePortDecl &node);
 
     // Declarations
     void operator()(const ast::SignalDecl &node);
     void operator()(const ast::ConstantDecl &node);
+    void operator()(const ast::AliasDecl &node);
 
     // Expressions
     void operator()(const ast::TokenExpr &node);
@@ -48,18 +49,18 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
     void operator()(const ast::UnaryExpr &node);
     void operator()(const ast::BinaryExpr &node);
     void operator()(const ast::ParenExpr &node);
-    void operator()(const ast::CallExpr &node);
+    void operator()(const ast::FunctionCallOrIndexedNamePart &node);
 
     // Concurrent Statements
-    void operator()(const ast::ConcurrentAssign &node);
-    void operator()(const ast::Process &node);
+    void operator()(const ast::ConcurrentSignalAssignmentStatement &node);
+    void operator()(const ast::ProcessStatement &node);
 
     // Sequential Statements
-    void operator()(const ast::SequentialAssign &node);
+    void operator()(const ast::SignalAssignmentStatement &node);
     void operator()(const ast::IfStatement &node);
     void operator()(const ast::CaseStatement &node);
-    void operator()(const ast::ForLoop &node);
-    void operator()(const ast::WhileLoop &node);
+    void operator()(const ast::ForLoopStatement &node);
+    void operator()(const ast::WhileLoopStatement &node);
 
   private:
     std::ostream &out_;

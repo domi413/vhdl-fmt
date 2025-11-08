@@ -1,7 +1,12 @@
+#include "ast/nodes/declarations.hpp"
+#include "ast/nodes/design_file.hpp"
+#include "ast/nodes/design_units.hpp"
+#include "ast/nodes/expressions.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
+#include <variant>
 
 TEST_CASE("AliasDecl: Simple alias", "[declarations][alias]")
 {
@@ -15,7 +20,21 @@ TEST_CASE("AliasDecl: Simple alias", "[declarations][alias]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check alias declaration when implemented
+    REQUIRE(design.units.size() == 2);
+
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 2);
+
+    auto *alias = std::get_if<ast::AliasDecl>(&arch->decls[1]);
+    REQUIRE(alias != nullptr);
+    REQUIRE(alias->name == "ShortName");
+    REQUIRE_FALSE(alias->type_indication.has_value());
+    REQUIRE_FALSE(alias->signature.has_value());
+
+    auto *target = std::get_if<ast::TokenExpr>(&alias->target);
+    REQUIRE(target != nullptr);
+    REQUIRE(target->text == "LongSignalName");
 }
 
 TEST_CASE("AliasDecl: Object alias with slice", "[declarations][alias]")
@@ -30,29 +49,47 @@ TEST_CASE("AliasDecl: Object alias with slice", "[declarations][alias]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check object alias when implemented
+    REQUIRE(design.units.size() == 2);
+
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 2);
+
+    auto *alias = std::get_if<ast::AliasDecl>(&arch->decls[1]);
+    REQUIRE(alias != nullptr);
+    REQUIRE(alias->name == "byte");
+    REQUIRE(alias->type_indication.has_value());
+    REQUIRE_FALSE(alias->signature.has_value());
+
+    auto *call_expr = std::get_if<ast::FunctionCallOrIndexedNamePart>(&alias->target);
+    REQUIRE(call_expr != nullptr);
 }
 
-TEST_CASE("AliasDecl: Non-object alias", "[declarations][alias]")
+TEST_CASE("AliasDecl: Alias with subtype indication", "[declarations][alias]")
 {
     constexpr std::string_view VHDL_FILE = R"(
-        package P is
-            alias sl is std_logic;
-        end P;
+        entity E is end E;
+        architecture A of E is
+            signal status : integer;
+            alias error_code : integer is status;
+        begin
+        end A;
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check non-object alias when implemented
-}
+    REQUIRE(design.units.size() == 2);
 
-TEST_CASE("AliasDecl: Alias for type", "[declarations][alias]")
-{
-    constexpr std::string_view VHDL_FILE = R"(
-        package P is
-            alias MyInt is integer;
-        end P;
-    )";
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
+    REQUIRE(arch != nullptr);
+    REQUIRE(arch->decls.size() == 2);
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check type alias when implemented
+    auto *alias = std::get_if<ast::AliasDecl>(&arch->decls[1]);
+    REQUIRE(alias != nullptr);
+    REQUIRE(alias->name == "error_code");
+    REQUIRE(alias->type_indication.has_value());
+    REQUIRE(alias->type_indication.value() == "integer");
+
+    auto *target = std::get_if<ast::TokenExpr>(&alias->target);
+    REQUIRE(target != nullptr);
+    REQUIRE(target->text == "status");
 }

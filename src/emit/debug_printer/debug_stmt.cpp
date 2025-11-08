@@ -9,7 +9,7 @@ namespace emit {
 
 // Concurrent Statements
 
-auto DebugPrinter::operator()(const ast::ConcurrentAssign &node) -> void
+auto DebugPrinter::operator()(const ast::ConcurrentSignalAssignmentStatement &node) -> void
 {
     emitNodeLike(node, "ConcurrentAssign", "<=");
     const IndentGuard _{ indent_ };
@@ -25,7 +25,7 @@ auto DebugPrinter::operator()(const ast::ConcurrentAssign &node) -> void
     }
 }
 
-auto DebugPrinter::operator()(const ast::Process &node) -> void
+auto DebugPrinter::operator()(const ast::ProcessStatement &node) -> void
 {
     std::string extra = node.label ? "[" + *node.label + "]" : "";
 
@@ -45,7 +45,7 @@ auto DebugPrinter::operator()(const ast::Process &node) -> void
 
 // Sequential Statements
 
-auto DebugPrinter::operator()(const ast::SequentialAssign &node) -> void
+auto DebugPrinter::operator()(const ast::SignalAssignmentStatement &node) -> void
 {
     emitNodeLike(node, "SequentialAssign", ":=");
     const IndentGuard _{ indent_ };
@@ -137,7 +137,7 @@ auto DebugPrinter::operator()(const ast::CaseStatement &node) -> void
     }
 }
 
-auto DebugPrinter::operator()(const ast::ForLoop &node) -> void
+auto DebugPrinter::operator()(const ast::ForLoopStatement &node) -> void
 {
     emitNodeLike(node, "ForLoop", "[" + node.iterator + "]");
     const IndentGuard _{ indent_ };
@@ -155,7 +155,7 @@ auto DebugPrinter::operator()(const ast::ForLoop &node) -> void
     }
 }
 
-auto DebugPrinter::operator()(const ast::WhileLoop &node) -> void
+auto DebugPrinter::operator()(const ast::WhileLoopStatement &node) -> void
 {
     emitNodeLike(node, "WhileLoop", "");
     const IndentGuard _{ indent_ };

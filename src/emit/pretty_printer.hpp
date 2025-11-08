@@ -24,12 +24,12 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 
     // Node visitors
     auto operator()(const ast::DesignFile &node) -> Doc;
-    auto operator()(const ast::Entity &node) -> Doc;
+    auto operator()(const ast::EntityDecl &node) -> Doc;
     auto operator()(const ast::Architecture &node) -> Doc;
     auto operator()(const ast::GenericClause &node) -> Doc;
     auto operator()(const ast::PortClause &node) -> Doc;
-    auto operator()(const ast::GenericParam &node) -> Doc;
-    auto operator()(const ast::Port &node) -> Doc;
+    auto operator()(const ast::InterfaceConstantDecl &node) -> Doc;
+    auto operator()(const ast::InterfacePortDecl &node) -> Doc;
 
     // Declarations
     auto operator()(const ast::SignalDecl &node) -> Doc;
@@ -44,15 +44,15 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::CallExpr &node) -> Doc;
 
     // Concurrent Statements
-    auto operator()(const ast::ConcurrentAssign &node) -> Doc;
-    auto operator()(const ast::Process &node) -> Doc;
+    auto operator()(const ast::ConcurrentSignalAssignmentStatement &node) -> Doc;
+    auto operator()(const ast::ProcessStatement &node) -> Doc;
 
     // Sequential Statements
-    auto operator()(const ast::SequentialAssign &node) -> Doc;
+    auto operator()(const ast::SignalAssignmentStatement &node) -> Doc;
     auto operator()(const ast::IfStatement &node) -> Doc;
     auto operator()(const ast::CaseStatement &node) -> Doc;
-    auto operator()(const ast::ForLoop &node) -> Doc;
-    auto operator()(const ast::WhileLoop &node) -> Doc;
+    auto operator()(const ast::ForLoopStatement &node) -> Doc;
+    auto operator()(const ast::WhileLoopStatement &node) -> Doc;
 };
 
 } // namespace emit

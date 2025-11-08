@@ -17,7 +17,7 @@ TEST_CASE("Entity: Basic entity declaration with ports and generics", "[design_u
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->name == "MyEntity");
     REQUIRE(entity->end_label.has_value());
@@ -40,7 +40,7 @@ TEST_CASE("Entity: Multiple generics", "[design_units][entity]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->generic_clause.generics.size() == 3);
     REQUIRE(entity->generic_clause.generics[0].names[0] == "WIDTH");
@@ -56,7 +56,7 @@ TEST_CASE("Entity: Minimal entity without ports or generics", "[design_units][en
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->name == "MinimalEntity");
     REQUIRE(entity->generic_clause.generics.empty());

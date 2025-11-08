@@ -21,7 +21,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
         return stmt;
     }
 
-    stmt.if_branch.condition = makeExpr(conditions[0]->expression());
+    stmt.if_branch.condition = makeExpression(conditions[0]->expression());
     stmt.if_branch.body = makeSequenceOfStatements(sequences[0]);
 
     // elsif branches - number of elsif branches is conditions.size() - 1 (minus the initial if)
@@ -49,7 +49,7 @@ auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> as
     auto stmt = make<ast::CaseStatement>(ctx);
 
     if (auto *expr = ctx->expression()) {
-        stmt.selector = makeExpr(expr);
+        stmt.selector = makeExpression(expr);
     }
 
     for (auto *alt : ctx->case_statement_alternative()) {
@@ -71,9 +71,10 @@ auto Translator::makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> as
     return stmt;
 }
 
-auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::ForLoop
+auto Translator::makeForLoopStatement(vhdlParser::Loop_statementContext *ctx)
+  -> ast::ForLoopStatement
 {
-    auto loop = make<ast::ForLoop>(ctx);
+    auto loop = make<ast::ForLoopStatement>(ctx);
 
     // Check if it has a FOR iteration scheme
     if (auto *iter = ctx->iteration_scheme()) {
@@ -109,14 +110,15 @@ auto Translator::makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::For
     return loop;
 }
 
-auto Translator::makeWhileLoop(vhdlParser::Loop_statementContext *ctx) -> ast::WhileLoop
+auto Translator::makeWhileLoopStatement(vhdlParser::Loop_statementContext *ctx)
+  -> ast::WhileLoopStatement
 {
-    auto loop = make<ast::WhileLoop>(ctx);
+    auto loop = make<ast::WhileLoopStatement>(ctx);
 
     // Check if it has a WHILE iteration scheme
     if (auto *iter = ctx->iteration_scheme()) {
         if (auto *cond = iter->condition()) {
-            loop.condition = makeExpr(cond->expression());
+            loop.condition = makeExpression(cond->expression());
         }
     }
 

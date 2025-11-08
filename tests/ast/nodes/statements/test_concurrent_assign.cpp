@@ -20,11 +20,11 @@ TEST_CASE("ConcurrentAssign: Simple signal assignment", "[statements][concurrent
 
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *assign = std::get_if<ast::ConcurrentAssign>(arch->stmts.data());
+    auto *assign = std::get_if<ast::ConcurrentAssignStatement>(arch->stmts.data());
     REQUIRE(assign != nullptr);
 }
 
@@ -39,11 +39,11 @@ TEST_CASE("ConcurrentAssign: Assignment with literal", "[statements][concurrent_
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *assign = std::get_if<ast::ConcurrentAssign>(arch->stmts.data());
+    auto *assign = std::get_if<ast::ConcurrentAssignStatement>(arch->stmts.data());
     REQUIRE(assign != nullptr);
 
     // Check target
@@ -70,13 +70,13 @@ TEST_CASE("ConcurrentAssign: Multiple assignments", "[statements][concurrent_ass
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 3);
 
     // Check all three are concurrent assignments
     for (size_t i = 0; i < 3; i++) {
-        auto *assign = std::get_if<ast::ConcurrentAssign>(&arch->stmts[i]);
+        auto *assign = std::get_if<ast::ConcurrentAssignStatement>(&arch->stmts[i]);
         REQUIRE(assign != nullptr);
     }
 }

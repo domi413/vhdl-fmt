@@ -11,7 +11,7 @@ namespace builder {
 
 // ---------------------- Aggregates ----------------------
 
-auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
+auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expression
 {
     auto group = make<ast::GroupExpr>(ctx);
 
@@ -23,7 +23,7 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
             assoc.left = box(makeChoices(elem->choices()));
         }
         if (elem->expression() != nullptr) {
-            assoc.right = box(makeExpr(elem->expression()));
+            assoc.right = box(makeExpression(elem->expression()));
         }
 
         group.children.emplace_back(std::move(assoc));
@@ -32,7 +32,7 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
     return group;
 }
 
-auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
+auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expression
 {
     if (ctx->choice().size() == 1) {
         return makeChoice(ctx->choice(0));
@@ -45,7 +45,7 @@ auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expr
     return grp;
 }
 
-auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
+auto Translator::makeChoices(vhdlParser::ChoiceContext *ctx) -> ast::Expression
 {
     if (ctx->OTHERS() != nullptr) {
         return makeToken(ctx, "others");
@@ -54,7 +54,7 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
         return makeToken(ctx, ctx->identifier()->getText());
     }
     if (ctx->simple_expression() != nullptr) {
-        return makeSimpleExpr(ctx->simple_expression());
+        return makeSimpleExpression(ctx->simple_expression());
     }
     if (auto *dr = ctx->discrete_range()) {
         if (auto *rd = dr->range_decl()) {
@@ -118,17 +118,17 @@ auto Translator::makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
     return constraints;
 }
 
-auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr
+auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expression
 {
     // If there's no direction, it's just a simple expression (single value, not a range)
     if (ctx->direction() == nullptr || ctx->simple_expression().size() < 2) {
-        return makeSimpleExpr(ctx->simple_expression(0));
+        return makeSimpleExpression(ctx->simple_expression(0));
     }
 
     return makeBinary(ctx,
                       ctx->direction()->getText(),
-                      makeSimpleExpr(ctx->simple_expression(0)),
-                      makeSimpleExpr(ctx->simple_expression(1)));
+                      makeSimpleExpression(ctx->simple_expression(0)),
+                      makeSimpleExpression(ctx->simple_expression(1)));
 }
 
 } // namespace builder

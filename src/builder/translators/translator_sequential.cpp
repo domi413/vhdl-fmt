@@ -7,7 +7,7 @@
 
 namespace builder {
 
-auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr
+auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expression
 {
     // Dispatch based on concrete target type
     if (auto *name = ctx->name()) {
@@ -23,10 +23,10 @@ auto Translator::makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr
     return token;
 }
 
-auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx)
-  -> ast::SequentialAssign
+auto Translator::makeSignalAssignmentStatement(vhdlParser::Signal_assignment_statementContext *ctx)
+  -> ast::SignalAssignmentStatement
 {
-    auto assign = make<ast::SequentialAssign>(ctx);
+    auto assign = make<ast::SignalAssignmentStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -35,24 +35,24 @@ auto Translator::makeSequentialAssign(vhdlParser::Signal_assignment_statementCon
     if (auto *wave = ctx->waveform()) {
         auto wave_elems = wave->waveform_element();
         if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-            assign.value = makeExpr(wave_elems[0]->expression(0));
+            assign.value = makeExpression(wave_elems[0]->expression(0));
         }
     }
 
     return assign;
 }
 
-auto Translator::makeVariableAssign(vhdlParser::Variable_assignment_statementContext *ctx)
-  -> ast::SequentialAssign
+auto Translator::makeVariableAssignStatement(vhdlParser::Variable_assignment_statementContext *ctx)
+  -> ast::SignalAssignmentStatement
 {
-    auto assign = make<ast::SequentialAssign>(ctx);
+    auto assign = make<ast::SignalAssignmentStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
     }
 
     if (auto *expr = ctx->expression()) {
-        assign.value = makeExpr(expr);
+        assign.value = makeExpression(expr);
     }
 
     return assign;
@@ -63,10 +63,10 @@ auto Translator::makeSequentialStatement(vhdlParser::Sequential_statementContext
 {
     // Dispatch based on concrete statement type
     if (auto *signal_assign = ctx->signal_assignment_statement()) {
-        return makeSequentialAssign(signal_assign);
+        return makeSignalAssignmentStatement(signal_assign);
     }
     if (auto *var_assign = ctx->variable_assignment_statement()) {
-        return makeVariableAssign(var_assign);
+        return makeVariableAssignStatement(var_assign);
     }
     if (auto *if_stmt = ctx->if_statement()) {
         return makeIfStatement(if_stmt);
@@ -77,10 +77,10 @@ auto Translator::makeSequentialStatement(vhdlParser::Sequential_statementContext
     if (auto *loop_stmt = ctx->loop_statement()) {
         if (auto *iter = loop_stmt->iteration_scheme()) {
             if (iter->parameter_specification() != nullptr) {
-                return makeForLoop(loop_stmt);
+                return makeForLoopStatement(loop_stmt);
             }
             if (iter->condition() != nullptr) {
-                return makeWhileLoop(loop_stmt);
+                return makeWhileLoopStatement(loop_stmt);
             }
         }
         // Basic loop without iteration scheme - not yet supported, return empty
@@ -90,7 +90,7 @@ auto Translator::makeSequentialStatement(vhdlParser::Sequential_statementContext
     // report_statement, next_statement, exit_statement, return_statement, etc.
 
     // Fallback: return empty assignment as placeholder
-    return ast::SequentialAssign{};
+    return ast::SignalAssignmentStatement{};
 }
 
 auto Translator::makeSequenceOfStatements(vhdlParser::Sequence_of_statementsContext *ctx)

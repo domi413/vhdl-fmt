@@ -21,14 +21,14 @@ TEST_CASE("SequentialAssign: Simple variable assignment", "[statements][sequenti
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *assign = std::get_if<ast::SequentialAssign>(proc->body.data());
+    auto *assign = std::get_if<ast::SequentialAssignStatement>(proc->body.data());
     REQUIRE(assign != nullptr);
 }
 
@@ -46,14 +46,14 @@ TEST_CASE("SequentialAssign: Assignment with literal value", "[statements][seque
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
 
-    auto *proc = std::get_if<ast::Process>(arch->stmts.data());
+    auto *proc = std::get_if<ast::ProcessStatement>(arch->stmts.data());
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *assign = std::get_if<ast::SequentialAssign>(proc->body.data());
+    auto *assign = std::get_if<ast::SequentialAssignStatement>(proc->body.data());
     REQUIRE(assign != nullptr);
 
     // Check target

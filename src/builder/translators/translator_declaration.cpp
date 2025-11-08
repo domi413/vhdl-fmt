@@ -19,7 +19,7 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
     }
 
     for (auto *decl : list->interface_constant_declaration()) {
-        clause.generics.push_back(makeGenericParam(decl));
+        clause.generics.push_back(makeInterfaceConstantDecl(decl));
     }
 
     return clause;
@@ -40,7 +40,7 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
     }
 
     for (auto *decl : iface->interface_port_declaration()) {
-        clause.ports.push_back(makeSignalPort(decl));
+        clause.ports.push_back(makeInterfacePortDecl(decl));
     }
 
     return clause;
@@ -48,10 +48,10 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
 
 // ---------------------- Interface declarations ----------------------
 
-auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
-  -> ast::GenericParam
+auto Translator::makeInterfaceConstantDecl(vhdlParser::Interface_constant_declarationContext *ctx)
+  -> ast::InterfaceConstantDecl
 {
-    auto param = make<ast::GenericParam>(ctx);
+    auto param = make<ast::InterfaceConstantDecl>(ctx);
 
     param.names = ctx->identifier_list()->identifier()
                 | std::views::transform([](auto *id) { return id->getText(); })
@@ -66,9 +66,10 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 
 // ---------------------- Object declarations ----------------------
 
-auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port
+auto Translator::makeInterfacePortDecl(vhdlParser::Interface_port_declarationContext *ctx)
+  -> ast::InterfacePortDecl
 {
-    auto port = make<ast::Port>(ctx);
+    auto port = make<ast::InterfacePortDecl>(ctx);
 
     port.names = ctx->identifier_list()->identifier()
                | std::views::transform([](auto *id) { return id->getText(); })
@@ -87,7 +88,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
     }
 
     if (auto *expr = ctx->expression()) {
-        port.default_expr = makeExpr(expr);
+        port.default_expr = makeExpression(expr);
     }
 
     return port;
@@ -106,7 +107,7 @@ auto Translator::makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) 
     }
 
     if (auto *expr = ctx->expression()) {
-        decl.init_expr = makeExpr(expr);
+        decl.init_expr = makeExpression(expr);
     }
 
     return decl;
@@ -136,7 +137,42 @@ auto Translator::makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> a
     }
 
     if (auto *expr = ctx->expression()) {
-        decl.init_expr = makeExpr(expr);
+        decl.init_expr = makeExpression(expr);
+    }
+
+    return decl;
+}
+
+auto Translator::makeAliasDecl(vhdlParser::Alias_declarationContext *ctx) -> ast::AliasDecl
+{
+    auto decl = make<ast::AliasDecl>(ctx);
+
+    // Get the alias designator (identifier or character literal)
+    if (auto *designator = ctx->alias_designator()) {
+        if (auto *id = designator->identifier()) {
+            decl.name = id->getText();
+        } else if (auto *char_lit = designator->CHARACTER_LITERAL()) {
+            decl.name = char_lit->getText();
+        }
+    }
+
+    // Get optional type indication (subtype_indication or subnature_indication)
+    if (auto *indication = ctx->alias_indication()) {
+        if (auto *subtype = indication->subtype_indication()) {
+            decl.type_indication = subtype->getText();
+        } else if (auto *subnature = indication->subnature_indication()) {
+            decl.type_indication = subnature->getText();
+        }
+    }
+
+    // Get the target name being aliased
+    if (auto *name = ctx->name()) {
+        decl.target = makeName(name);
+    }
+
+    // Get optional signature (for subprogram/enum disambiguation)
+    if (auto *sig = ctx->signature()) {
+        decl.signature = sig->getText();
     }
 
     return decl;

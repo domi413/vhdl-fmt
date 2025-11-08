@@ -8,7 +8,7 @@
 
 namespace builder {
 
-auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
+auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expression
 {
     const auto &parts = ctx->name_part();
     // For formatting: check if we have any structural parts (calls, slices, attributes)
@@ -46,7 +46,7 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
         ++it;
     }
 
-    ast::Expr base = makeToken(ctx, std::move(base_text));
+    ast::Expression base = makeToken(ctx, std::move(base_text));
 
     // Process remaining structural parts
     for (; it != parts.end(); ++it) {
@@ -55,7 +55,7 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
         if (auto *slice = part->slice_name_part()) {
             base = makeSliceExpr(std::move(base), slice);
         } else if (auto *call = part->function_call_or_indexed_name_part()) {
-            base = makeCallExpr(std::move(base), call);
+            base = makeFunctionCallOrIndexedNamePart(std::move(base), call);
         } else if (auto *attr = part->attribute_name_part()) {
             base = makeAttributeExpr(std::move(base), attr);
         }
@@ -65,9 +65,10 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
     return base;
 }
 
-auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr
+auto Translator::makeSliceNamePart(ast::Expression base, vhdlParser::Slice_name_partContext *ctx)
+  -> ast::Expression
 {
-    auto slice_expr = make<ast::CallExpr>(ctx);
+    auto slice_expr = make<ast::FunctionCallOrIndexedNamePart>(ctx);
     slice_expr.callee = box(std::move(base));
 
     if (auto *dr = ctx->discrete_range()) {
@@ -85,17 +86,17 @@ auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContex
     return slice_expr;
 }
 
-auto Translator::makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext *ctx)
-  -> ast::Expr
+auto Translator::makeSelectExpr(ast::Expression base, vhdlParser::Selected_name_partContext *ctx)
+  -> ast::Expression
 {
     return makeBinary(ctx, ".", std::move(base), makeToken(ctx, ctx->getText().substr(1)));
 }
 
-auto Translator::makeCallExpr(ast::Expr base,
-                              vhdlParser::Function_call_or_indexed_name_partContext *ctx)
-  -> ast::Expr
+auto Translator::makeFunctionCallOrIndexedNamePart(
+  ast::Expression base,
+  vhdlParser::Function_call_or_indexed_name_partContext *ctx) -> ast::Expression
 {
-    auto call_expr = make<ast::CallExpr>(ctx);
+    auto call_expr = make<ast::FunctionCallOrIndexedNamePart>(ctx);
     call_expr.callee = box(std::move(base));
 
     if (auto *assoc_list = ctx->actual_parameter_part()) {
@@ -109,7 +110,7 @@ auto Translator::makeCallExpr(ast::Expr base,
                 for (auto *elem : associations) {
                     group.children.push_back(makeCallArgument(elem));
                 }
-                call_expr.args = box(ast::Expr{ std::move(group) });
+                call_expr.args = box(ast::Expression{ std::move(group) });
             }
         } else {
             call_expr.args = box(makeToken(ctx, ctx->getText()));
@@ -119,18 +120,20 @@ auto Translator::makeCallExpr(ast::Expr base,
     return call_expr;
 }
 
-auto Translator::makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext *ctx)
-  -> ast::Expr
+auto Translator::makeAttributeNamePart(ast::Expression base,
+                                       vhdlParser::Attribute_name_partContext *ctx)
+  -> ast::Expression
 {
     return makeBinary(ctx, "'", std::move(base), makeToken(ctx, ctx->getText().substr(1)));
 }
 
-auto Translator::makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr
+auto Translator::makeAssociationElement(vhdlParser::Association_elementContext *ctx)
+  -> ast::Expression
 {
     if (auto *actual = ctx->actual_part()) {
         if (auto *designator = actual->actual_designator()) {
             if (auto *expr = designator->expression()) {
-                return makeExpr(expr);
+                return makeExpression(expr);
             }
             return makeToken(designator, designator->getText());
         }
