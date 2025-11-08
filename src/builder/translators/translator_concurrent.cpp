@@ -14,6 +14,7 @@ auto Translator::makeConcurrentAssignStatement(
     if (auto *cond = ctx->conditional_signal_assignment()) {
         return makeConditionalAssignStatement(cond);
     }
+
     if (auto *sel = ctx->selected_signal_assignment()) {
         return makeSelectedAssign(sel);
     }
@@ -32,13 +33,19 @@ auto Translator::makeConditionalAssignStatement(
     }
 
     // Get the waveform - for now we'll take the first waveform element's expression
-    if (auto *cond_wave = ctx->conditional_waveforms()) {
-        if (auto *wave = cond_wave->waveform()) {
-            auto wave_elems = wave->waveform_element();
-            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpression(wave_elems[0]->expression(0));
-            }
-        }
+    auto *cond_wave = ctx->conditional_waveforms();
+    if (cond_wave == nullptr) {
+        return assign;
+    }
+
+    auto *wave = cond_wave->waveform();
+    if (wave == nullptr) {
+        return assign;
+    }
+
+    auto wave_elems = wave->waveform_element();
+    if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
+        assign.value = makeExpression(wave_elems[0]->expression(0));
     }
 
     return assign;

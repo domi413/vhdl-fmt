@@ -57,19 +57,19 @@ class TriviaBinder final
     [[nodiscard]]
     static constexpr auto isComment(const antlr4::Token *t) noexcept -> bool
     {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::COMMENTS;
+        return (t != nullptr) && (t->getChannel() == vhdlLexer::COMMENTS);
     }
 
     [[nodiscard]]
     static constexpr auto isNewline(const antlr4::Token *t) noexcept -> bool
     {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::NEWLINES;
+        return (t != nullptr) && (t->getChannel() == vhdlLexer::NEWLINES);
     }
 
     [[nodiscard]]
     static constexpr auto isDefault(const antlr4::Token *t) noexcept -> bool
     {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::DEFAULT_TOKEN_CHANNEL;
+        return (t != nullptr) && (t->getChannel() == vhdlLexer::DEFAULT_TOKEN_CHANNEL);
     }
 
     [[nodiscard]]

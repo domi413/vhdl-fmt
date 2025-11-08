@@ -25,7 +25,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     // Node visitors
     auto operator()(const ast::DesignFile &node) -> Doc;
     auto operator()(const ast::EntityDecl &node) -> Doc;
-    auto operator()(const ast::Architecture &node) -> Doc;
+    auto operator()(const ast::ArchitectureBody &node) -> Doc;
     auto operator()(const ast::GenericClause &node) -> Doc;
     auto operator()(const ast::PortClause &node) -> Doc;
     auto operator()(const ast::InterfaceConstantDecl &node) -> Doc;

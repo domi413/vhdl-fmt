@@ -19,6 +19,14 @@ struct CaseStatement;
 struct ProcessStatement;
 struct ForLoopStatement;
 struct WhileLoopStatement;
+struct WaitStatement;
+struct AssertStatement;
+struct ReportStatement;
+struct NextStatement;
+struct ExitStatement;
+struct ReturnStatement;
+struct ProcedureCallStatement;
+struct NullStatement;
 
 /// Variant type for concurrent statements (outside processes)
 using ConcurrentStatement = std::variant<ConcurrentSignalAssignmentStatement, ProcessStatement>;
@@ -28,7 +36,15 @@ using SequentialStatement = std::variant<SignalAssignmentStatement,
                                          IfStatement,
                                          CaseStatement,
                                          ForLoopStatement,
-                                         WhileLoopStatement>;
+                                         WhileLoopStatement,
+                                         WaitStatement,
+                                         AssertStatement,
+                                         ReportStatement,
+                                         NextStatement,
+                                         ExitStatement,
+                                         ReturnStatement,
+                                         ProcedureCallStatement,
+                                         NullStatement>;
 
 /// @brief Concurrent signal assignment: target <= value;
 struct ConcurrentSignalAssignmentStatement : NodeBase
@@ -85,7 +101,7 @@ struct ProcessStatement : NodeBase
 struct ForLoopStatement : NodeBase
 {
     std::string iterator; // Loop variable name
-    Expression range;           // Range expression (e.g., 0 to 10)
+    Expression range;     // Range expression (e.g., 0 to 10)
     std::vector<SequentialStatement> body;
 };
 
@@ -94,6 +110,69 @@ struct WhileLoopStatement : NodeBase
 {
     Expression condition;
     std::vector<SequentialStatement> body;
+};
+
+/// @brief Wait statement: wait for/on/until condition
+struct WaitStatement : NodeBase
+{
+    std::optional<std::string> label;
+    std::vector<std::string> sensitivity_list; // ON sensitivity list
+    std::optional<Expression> condition;       // UNTIL condition
+    std::optional<Expression> timeout;         // FOR timeout
+};
+
+/// @brief Assert statement: assert condition report message severity level
+struct AssertStatement : NodeBase
+{
+    std::optional<std::string> label;
+    Expression condition;
+    std::optional<Expression> report_expr;
+    std::optional<Expression> severity_expr;
+};
+
+/// @brief Report statement: report message severity level
+struct ReportStatement : NodeBase
+{
+    std::optional<std::string> label;
+    Expression message;
+    std::optional<Expression> severity_expr;
+};
+
+/// @brief Next statement: next [loop_label] [when condition]
+struct NextStatement : NodeBase
+{
+    std::optional<std::string> label;
+    std::optional<std::string> loop_label; // Which loop to continue
+    std::optional<Expression> condition;   // WHEN condition
+};
+
+/// @brief Exit statement: exit [loop_label] [when condition]
+struct ExitStatement : NodeBase
+{
+    std::optional<std::string> label;
+    std::optional<std::string> loop_label; // Which loop to exit
+    std::optional<Expression> condition;   // WHEN condition
+};
+
+/// @brief Return statement: return [expression]
+struct ReturnStatement : NodeBase
+{
+    std::optional<std::string> label;
+    std::optional<Expression> value;
+};
+
+/// @brief Procedure call statement: procedure_name(args)
+struct ProcedureCallStatement : NodeBase
+{
+    std::optional<std::string> label;
+    std::string procedure_name;
+    std::optional<Expression> args; // Arguments (single expr or GroupExpr)
+};
+
+/// @brief Null statement: null;
+struct NullStatement : NodeBase
+{
+    std::optional<std::string> label;
 };
 
 } // namespace ast

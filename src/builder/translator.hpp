@@ -128,14 +128,15 @@ class Translator final
     [[nodiscard]] auto makeWhileLoopStatement(vhdlParser::Loop_statementContext *ctx) -> ast::WhileLoopStatement;
     [[nodiscard]] auto makeSequentialStatement(vhdlParser::Sequential_statementContext *ctx) -> ast::SequentialStatement;
     [[nodiscard]] auto makeSequenceOfStatements(vhdlParser::Sequence_of_statementsContext *ctx) -> std::vector<ast::SequentialStatement>;
+    [[nodiscard]] auto makeWaitStatement(vhdlParser::Wait_statementContext *ctx) -> ast::WaitStatement;
+    [[nodiscard]] auto makeAssertStatement(vhdlParser::Assertion_statementContext *ctx) -> ast::AssertStatement;
+    [[nodiscard]] auto makeReportStatement(vhdlParser::Report_statementContext *ctx) -> ast::ReportStatement;
+    [[nodiscard]] auto makeNextStatement(vhdlParser::Next_statementContext *ctx) -> ast::NextStatement;
+    [[nodiscard]] auto makeExitStatement(vhdlParser::Exit_statementContext *ctx) -> ast::ExitStatement;
+    [[nodiscard]] auto makeReturnStatement(vhdlParser::Return_statementContext *ctx) -> ast::ReturnStatement;
+    [[nodiscard]] auto makeProcedureCallStatement(vhdlParser::Procedure_call_statementContext *ctx) -> ast::ProcedureCallStatement;
+    [[nodiscard]] auto makeNullStatement(vhdlParser::Sequential_statementContext *ctx) -> ast::NullStatement;
     // [[nodiscard]] auto makeLoopStatement(vhdlParser::Loop_statementContext *ctx) -> ast::LoopStatement;
-    // [[nodiscard]] auto makeAssertionStatement(vhdlParser::Assertion_statementContext *ctx) -> ast::AssertionStatement;
-    // [[nodiscard]] auto makeReportStatement(vhdlParser::Report_statementContext *ctx) -> ast::ReportStatement;
-    // [[nodiscard]] auto makeWaitStatement(vhdlParser::Wait_statementContext *ctx) -> ast::WaitStatement;
-    // [[nodiscard]] auto makeExitStatement(vhdlParser::Exit_statementContext *ctx) -> ast::ExitStatement;
-    // [[nodiscard]] auto makeNextStatement(vhdlParser::Next_statementContext *ctx) -> ast::NextStatement;
-    // [[nodiscard]] auto makeReturnStatement(vhdlParser::Return_statementContext *ctx) -> ast::ReturnStatement;
-    // [[nodiscard]] auto makeProcedureCallStatement(vhdlParser::Procedure_call_statementContext *ctx) -> ast::ProcedureCallStatement;
     // [[nodiscard]] auto makeBreakStatement(vhdlParser::Break_statementContext *ctx) -> ast::BreakStatement;
 
     // ========================================================================================

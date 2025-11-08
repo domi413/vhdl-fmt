@@ -158,11 +158,9 @@ auto Translator::makeAliasDecl(vhdlParser::Alias_declarationContext *ctx) -> ast
 
     // Get optional type indication (subtype_indication or subnature_indication)
     if (auto *indication = ctx->alias_indication()) {
-        if (auto *subtype = indication->subtype_indication()) {
-            decl.type_indication = subtype->getText();
-        } else if (auto *subnature = indication->subnature_indication()) {
-            decl.type_indication = subnature->getText();
-        }
+        decl.type_indication = (indication->subtype_indication() != nullptr)
+                               ? indication->subtype_indication()->getText()
+                               : indication->subnature_indication()->getText();
     }
 
     // Get the target name being aliased

@@ -14,8 +14,8 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     auto stmt = make<ast::IfStatement>(ctx);
 
     // Main if branch
-    auto conditions = ctx->condition();
-    auto sequences = ctx->sequence_of_statements();
+    const auto conditions = ctx->condition();
+    const auto sequences = ctx->sequence_of_statements();
 
     if (conditions.empty() || sequences.empty()) {
         return stmt;
@@ -77,29 +77,31 @@ auto Translator::makeForLoopStatement(vhdlParser::Loop_statementContext *ctx)
     auto loop = make<ast::ForLoopStatement>(ctx);
 
     // Check if it has a FOR iteration scheme
-    if (auto *iter = ctx->iteration_scheme()) {
-        if (auto *param = iter->parameter_specification()) {
-            if (auto *id = param->identifier()) {
-                loop.iterator = id->getText();
-            }
+    auto *iter = ctx->iteration_scheme();
+    if (iter == nullptr) {
+        return loop;
+    }
 
-            if (auto *range = param->discrete_range()) {
-                // discrete_range can be range_decl or subtype_indication
-                if (auto *range_decl = range->range_decl()) {
-                    if (auto *explicit_r = range_decl->explicit_range()) {
-                        loop.range = makeRange(explicit_r);
-                    } else {
-                        // It's a name
-                        auto tok = make<ast::TokenExpr>(range_decl);
-                        tok.text = range_decl->getText();
-                        loop.range = tok;
-                    }
-                } else if (auto *subtype = range->subtype_indication()) {
-                    auto tok = make<ast::TokenExpr>(subtype);
-                    tok.text = subtype->getText();
-                    loop.range = tok;
-                }
+    auto *param = iter->parameter_specification();
+    if (param == nullptr) {
+        return loop;
+    }
+
+    if (auto *id = param->identifier()) {
+        loop.iterator = id->getText();
+    }
+
+    if (auto *range = param->discrete_range()) {
+        // discrete_range can be range_decl or subtype_indication
+        if (auto *range_decl = range->range_decl()) {
+            if (auto *explicit_r = range_decl->explicit_range()) {
+                loop.range = makeRange(explicit_r);
+            } else {
+                // It's a name
+                loop.range = makeToken(range_decl, range_decl->getText());
             }
+        } else if (auto *subtype = range->subtype_indication()) {
+            loop.range = makeToken(subtype, subtype->getText());
         }
     }
 
@@ -116,10 +118,13 @@ auto Translator::makeWhileLoopStatement(vhdlParser::Loop_statementContext *ctx)
     auto loop = make<ast::WhileLoopStatement>(ctx);
 
     // Check if it has a WHILE iteration scheme
-    if (auto *iter = ctx->iteration_scheme()) {
-        if (auto *cond = iter->condition()) {
-            loop.condition = makeExpression(cond->expression());
-        }
+    auto *iter = ctx->iteration_scheme();
+    if (iter == nullptr) {
+        return loop;
+    }
+
+    if (auto *cond = iter->condition()) {
+        loop.condition = makeExpression(cond->expression());
     }
 
     if (auto *seq = ctx->sequence_of_statements()) {

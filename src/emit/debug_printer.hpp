@@ -61,6 +61,14 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
     void operator()(const ast::CaseStatement &node);
     void operator()(const ast::ForLoopStatement &node);
     void operator()(const ast::WhileLoopStatement &node);
+    void operator()(const ast::WaitStatement &node);
+    void operator()(const ast::AssertStatement &node);
+    void operator()(const ast::ReportStatement &node);
+    void operator()(const ast::NextStatement &node);
+    void operator()(const ast::ExitStatement &node);
+    void operator()(const ast::ReturnStatement &node);
+    void operator()(const ast::ProcedureCallStatement &node);
+    void operator()(const ast::NullStatement &node);
 
   private:
     std::ostream &out_;

@@ -173,4 +173,142 @@ auto DebugPrinter::operator()(const ast::WhileLoopStatement &node) -> void
     }
 }
 
+auto DebugPrinter::operator()(const ast::WaitStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+
+    if (!node.sensitivity_list.empty()) {
+        const auto joined_list = std::ranges::to<std::string>(
+          node.sensitivity_list | std::views::join_with(std::string_view{ ", " }));
+        extra += " ON (" + joined_list + ")";
+    }
+
+    emitNodeLike(node, "WaitStatement", extra);
+    const IndentGuard _{ indent_ };
+
+    if (node.condition) {
+        printLine("until:");
+        const IndentGuard _{ indent_ };
+        visit(*node.condition);
+    }
+
+    if (node.timeout) {
+        printLine("for:");
+        const IndentGuard _{ indent_ };
+        visit(*node.timeout);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::AssertStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    emitNodeLike(node, "AssertStatement", extra);
+    const IndentGuard _{ indent_ };
+
+    printLine("condition:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.condition);
+    }
+
+    if (node.report_expr) {
+        printLine("report:");
+        const IndentGuard _{ indent_ };
+        visit(*node.report_expr);
+    }
+
+    if (node.severity_expr) {
+        printLine("severity:");
+        const IndentGuard _{ indent_ };
+        visit(*node.severity_expr);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::ReportStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    emitNodeLike(node, "ReportStatement", extra);
+    const IndentGuard _{ indent_ };
+
+    printLine("message:");
+    {
+        const IndentGuard _{ indent_ };
+        visit(node.message);
+    }
+
+    if (node.severity_expr) {
+        printLine("severity:");
+        const IndentGuard _{ indent_ };
+        visit(*node.severity_expr);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::NextStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    if (node.loop_label) {
+        extra += " → " + *node.loop_label;
+    }
+
+    emitNodeLike(node, "NextStatement", extra);
+
+    if (node.condition) {
+        const IndentGuard _{ indent_ };
+        printLine("when:");
+        const IndentGuard _{ indent_ };
+        visit(*node.condition);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::ExitStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    if (node.loop_label) {
+        extra += " → " + *node.loop_label;
+    }
+
+    emitNodeLike(node, "ExitStatement", extra);
+
+    if (node.condition) {
+        const IndentGuard _{ indent_ };
+        printLine("when:");
+        const IndentGuard _{ indent_ };
+        visit(*node.condition);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::ReturnStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    emitNodeLike(node, "ReturnStatement", extra);
+
+    if (node.value) {
+        const IndentGuard _{ indent_ };
+        printLine("value:");
+        const IndentGuard _{ indent_ };
+        visit(*node.value);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::ProcedureCallStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    extra += " " + node.procedure_name;
+
+    emitNodeLike(node, "ProcedureCall", extra);
+
+    if (node.args) {
+        const IndentGuard _{ indent_ };
+        printLine("args:");
+        const IndentGuard _{ indent_ };
+        visit(*node.args);
+    }
+}
+
+auto DebugPrinter::operator()(const ast::NullStatement &node) -> void
+{
+    std::string extra = node.label ? "[" + *node.label + "]" : "";
+    emitNodeLike(node, "NullStatement", extra);
+}
+
 } // namespace emit
