@@ -2,6 +2,7 @@
 
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
+#include "emit/pretty_printer/doc_utils.hpp"
 
 namespace emit {
 
@@ -9,18 +10,10 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) -> Doc
 {
     // <name> : <type> [:= <default>]
     // Multiple names: name1, name2 : type
-    Doc result = Doc::empty();
 
-    // Names
-    bool first = true;
-    for (const auto &name : node.names) {
-        if (!first) {
-            result = result + Doc::text(",") & Doc::text(name);
-        } else {
-            result = Doc::text(name);
-        }
-        first = false;
-    }
+    // Names (joined with comma and space)
+    auto name_docs = toDocVector(node.names, [](const auto &name) { return Doc::text(name); });
+    Doc result = joinDocs(name_docs, Doc::text(",") & Doc::empty(), false);
 
     // Type
     result = result & Doc::text(":") & Doc::text(node.type_name);
@@ -37,36 +30,17 @@ auto PrettyPrinter::operator()(const ast::Port &node) -> Doc
 {
     // <name> : <mode> <type> [:= <default>]
     // Multiple names: name1, name2 : in type
-    Doc result = Doc::empty();
 
-    // Names
-    bool first = true;
-    for (const auto &name : node.names) {
-        if (!first) {
-            result = result + Doc::text(",") & Doc::text(name);
-        } else {
-            result = Doc::text(name);
-        }
-        first = false;
-    }
+    // Names (joined with comma and space)
+    auto name_docs = toDocVector(node.names, [](const auto &name) { return Doc::text(name); });
+    Doc result = joinDocs(name_docs, Doc::text(",") & Doc::empty(), false);
 
     // Mode and type
     result = result & Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
 
-    // Constraints (e.g., (7 downto 0))
-    if (!node.constraints.empty()) {
-        Doc constraints = Doc::text("(");
-        bool first_constraint = true;
-        for (const auto &constraint : node.constraints) {
-            if (!first_constraint) {
-                constraints = constraints + Doc::text(",") & visit(constraint);
-            } else {
-                constraints = constraints + visit(constraint);
-            }
-            first_constraint = false;
-        }
-        constraints = constraints + Doc::text(")");
-        result = result + constraints;
+    // Constraint (e.g., (7 downto 0) or range 0 to 255)
+    if (node.constraint.has_value()) {
+        result = result + visit(node.constraint.value());
     }
 
     // Default value

@@ -14,7 +14,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
     }
 
     // Build list of generic parameters using fold_left
-    auto params = std::ranges::fold_left(
+    Doc params = std::ranges::fold_left(
       node.generics | std::views::transform([this](const auto &g) { return visit(g); }),
       Doc::empty(),
       [first = true](const Doc &acc, const Doc &doc) mutable -> Doc {
@@ -37,13 +37,8 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
         return Doc::empty();
     }
 
-    // Example: Check config for alignment preference
-    // if (config().port_map.align_signals) {
-    //     return formatPortsAsTable(node.ports);
-    // }
-
     // Build list of ports using fold_left
-    auto ports = std::ranges::fold_left(
+    Doc ports = std::ranges::fold_left(
       node.ports | std::views::transform([this](const auto &p) { return visit(p); }),
       Doc::empty(),
       [first = true](const Doc &acc, const Doc &doc) mutable -> Doc {
