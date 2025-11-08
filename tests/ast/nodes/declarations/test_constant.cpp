@@ -7,7 +7,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("ConstantDecl: Simple constant with initialization", "[declarations][constant]")
+TEST_CASE("makeConstantDecl: Simple constant with initialization", "[declarations][constant]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -30,7 +30,7 @@ TEST_CASE("ConstantDecl: Simple constant with initialization", "[declarations][c
     REQUIRE(constant->init_expr.has_value());
 }
 
-TEST_CASE("ConstantDecl: Multiple constants same declaration", "[declarations][constant]")
+TEST_CASE("makeConstantDecl: Multiple constants same declaration", "[declarations][constant]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -55,7 +55,7 @@ TEST_CASE("ConstantDecl: Multiple constants same declaration", "[declarations][c
     REQUIRE(constant->init_expr.has_value());
 }
 
-TEST_CASE("ConstantDecl: Boolean constant", "[declarations][constant]")
+TEST_CASE("makeConstantDecl: Boolean constant", "[declarations][constant]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -76,7 +76,7 @@ TEST_CASE("ConstantDecl: Boolean constant", "[declarations][constant]")
     REQUIRE(constant->type_name == "boolean");
 }
 
-TEST_CASE("ConstantDecl: String constant", "[declarations][constant]")
+TEST_CASE("makeConstantDecl: String constant", "[declarations][constant]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -98,7 +98,7 @@ TEST_CASE("ConstantDecl: String constant", "[declarations][constant]")
     REQUIRE(constant->init_expr.has_value());
 }
 
-TEST_CASE("ConstantDecl: Multiple separate constant declarations", "[declarations][constant]")
+TEST_CASE("makeConstantDecl: Multiple separate constant declarations", "[declarations][constant]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -128,7 +128,7 @@ TEST_CASE("ConstantDecl: Multiple separate constant declarations", "[declaration
     REQUIRE(const3->names[0] == "DEPTH");
 }
 
-TEST_CASE("ConstantDecl: Constant with expression initialization", "[declarations][constant]")
+TEST_CASE("makeConstantDecl: Constant with expression initialization", "[declarations][constant]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

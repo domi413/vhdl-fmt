@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("ComponentDecl: Component for instantiation", "[declarations][component]")
+TEST_CASE("makeComponentDecl: Component for instantiation", "[declarations][component]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -19,7 +19,7 @@ TEST_CASE("ComponentDecl: Component for instantiation", "[declarations][componen
     // TODO(someone): Check component declaration when implemented
 }
 
-TEST_CASE("ComponentDecl: Component with generics", "[declarations][component]")
+TEST_CASE("makeComponentDecl: Component with generics", "[declarations][component]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -36,7 +36,7 @@ TEST_CASE("ComponentDecl: Component with generics", "[declarations][component]")
     // TODO(someone): Check component with generics when implemented
 }
 
-TEST_CASE("ComponentDecl: Component with multiple ports", "[declarations][component]")
+TEST_CASE("makeComponentDecl: Component with multiple ports", "[declarations][component]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

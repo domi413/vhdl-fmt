@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("SubtypeDecl: Constrained subtype", "[declarations][subtype]")
+TEST_CASE("makeSubtypeDecl: Constrained subtype", "[declarations][subtype]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -15,7 +15,7 @@ TEST_CASE("SubtypeDecl: Constrained subtype", "[declarations][subtype]")
     // TODO(someone): Check subtype declaration when implemented
 }
 
-TEST_CASE("SubtypeDecl: Subtype with resolution function", "[declarations][subtype]")
+TEST_CASE("makeSubtypeDecl: Subtype with resolution function", "[declarations][subtype]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -27,7 +27,7 @@ TEST_CASE("SubtypeDecl: Subtype with resolution function", "[declarations][subty
     // TODO(someone): Check subtype with resolution when implemented
 }
 
-TEST_CASE("SubtypeDecl: Unconstrained subtype", "[declarations][subtype]")
+TEST_CASE("makeSubtypeDecl: Unconstrained subtype", "[declarations][subtype]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is

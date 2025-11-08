@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("ProcedureDecl: Procedure prototype", "[declarations][procedure]")
+TEST_CASE("makeProcedureDecl: Procedure prototype", "[declarations][procedure]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -30,7 +30,7 @@ TEST_CASE("ProcedureBody: Procedure implementation", "[declarations][procedure]"
     // TODO(someone): Check procedure body when implemented
 }
 
-TEST_CASE("ProcedureDecl: Procedure with multiple parameters", "[declarations][procedure]")
+TEST_CASE("makeProcedureDecl: Procedure with multiple parameters", "[declarations][procedure]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is

@@ -7,31 +7,7 @@
 #include <string_view>
 #include <variant>
 
-/*
-TEST_CASE("GenericParam: Single generic with default", "[declarations][generic]")
-{
-    constexpr std::string_view VHDL_FILE = R"(
-        entity E is
-            generic (WIDTH : integer := 8);
-        end E;
-    )";
-
-    auto design = builder::buildFromString(VHDL_FILE);
-    REQUIRE(design.units.size() == 1);
-
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
-
-    auto &generic = entity->generic_clause.generics[0];
-    REQUIRE(generic.names.size() == 1);
-    REQUIRE(generic.names[0] == "WIDTH");
-    REQUIRE(generic.type_name == "integer");
-    REQUIRE(generic.default_expr.has_value());
-}
-*/
-
-TEST_CASE("GenericParam: Generic without default", "[declarations][generic]")
+TEST_CASE("makeGenericClause: Single generic without default", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -50,31 +26,27 @@ TEST_CASE("GenericParam: Generic without default", "[declarations][generic]")
     REQUIRE_FALSE(generic.default_expr.has_value());
 }
 
-/*
-TEST_CASE("GenericParam: Multiple generics same declaration", "[declarations][generic]")
+TEST_CASE("makeGenericClause: Single generic with default", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
-            generic (WIDTH, HEIGHT, DEPTH : integer := 8);
+            generic (WIDTH : integer := 8);
         end E;
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->generic_clause.generics.size() == 1);
 
     auto &generic = entity->generic_clause.generics[0];
-    REQUIRE(generic.names.size() == 3);
+    REQUIRE(generic.names.size() == 1);
     REQUIRE(generic.names[0] == "WIDTH");
-    REQUIRE(generic.names[1] == "HEIGHT");
-    REQUIRE(generic.names[2] == "DEPTH");
     REQUIRE(generic.type_name == "integer");
     REQUIRE(generic.default_expr.has_value());
 }
-*/
 
-TEST_CASE("GenericParam: Multiple separate generic declarations", "[declarations][generic]")
+TEST_CASE("makeGenericClause: Multiple separate generic declarations", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -101,8 +73,29 @@ TEST_CASE("GenericParam: Multiple separate generic declarations", "[declarations
     REQUIRE(entity->generic_clause.generics[2].type_name == "boolean");
 }
 
-/*
-TEST_CASE("GenericParam: Generic with expression default", "[declarations][generic]")
+TEST_CASE("makeGenericClause: Multiple generics same declaration", "[clauses][generic]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity E is
+            generic (WIDTH, HEIGHT, DEPTH : integer := 8);
+        end E;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
+    REQUIRE(entity != nullptr);
+    REQUIRE(entity->generic_clause.generics.size() == 1);
+
+    auto &generic = entity->generic_clause.generics[0];
+    REQUIRE(generic.names.size() == 3);
+    REQUIRE(generic.names[0] == "WIDTH");
+    REQUIRE(generic.names[1] == "HEIGHT");
+    REQUIRE(generic.names[2] == "DEPTH");
+    REQUIRE(generic.type_name == "integer");
+    REQUIRE(generic.default_expr.has_value());
+}
+
+TEST_CASE("makeGenericClause: Generic with expression default", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -111,7 +104,7 @@ TEST_CASE("GenericParam: Generic with expression default", "[declarations][gener
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->generic_clause.generics.size() == 1);
 
@@ -119,4 +112,3 @@ TEST_CASE("GenericParam: Generic with expression default", "[declarations][gener
     REQUIRE(generic.names[0] == "ADDR_WIDTH");
     REQUIRE(generic.default_expr.has_value());
 }
-*/

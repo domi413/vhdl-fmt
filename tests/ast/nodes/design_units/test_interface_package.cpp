@@ -14,7 +14,7 @@ TEST_CASE("InterfacePackage: As generic parameter (VHDL-2008)", "[design_units][
 
     auto design = builder::buildFromString(VHDL_FILE);
     // REQUIRE(design.units.size() == 1);
-    // auto *entity = std::get_if<ast::Entity>(&design.units[0]);
+    // auto *entity = std::get_if<ast::EntityDecl>(&design.units[0]);
     // REQUIRE(entity != nullptr);
 }
 
@@ -29,7 +29,7 @@ TEST_CASE("InterfacePackage: With box notation for unspecified generics",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *entity = std::get_if<ast::Entity>(&design.units[0]);
+    // auto *entity = std::get_if<ast::EntityDecl>(&design.units[0]);
     // REQUIRE(entity != nullptr);
 }
 
@@ -45,7 +45,7 @@ TEST_CASE("InterfacePackage: Multiple interface packages", "[design_units][inter
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *entity = std::get_if<ast::Entity>(&design.units[0]);
+    // auto *entity = std::get_if<ast::EntityDecl>(&design.units[0]);
     // REQUIRE(entity != nullptr);
 }
 
@@ -62,6 +62,6 @@ TEST_CASE("InterfacePackage: Mixed with regular generics", "[design_units][inter
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *entity = std::get_if<ast::Entity>(&design.units[0]);
+    // auto *entity = std::get_if<ast::EntityDecl>(&design.units[0]);
     // REQUIRE(entity != nullptr);
 }

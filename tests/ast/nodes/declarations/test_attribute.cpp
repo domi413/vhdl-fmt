@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("AttributeDecl: Attribute declaration", "[declarations][attribute]")
+TEST_CASE("makeAttributeDecl: Attribute declaration", "[declarations][attribute]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -30,7 +30,7 @@ TEST_CASE("AttributeSpec: Attribute specification", "[declarations][attribute]")
     // TODO(someone): Check attribute specification when implemented
 }
 
-TEST_CASE("AttributeDecl: Multiple attributes", "[declarations][attribute]")
+TEST_CASE("makeAttributeDecl: Multiple attributes", "[declarations][attribute]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is

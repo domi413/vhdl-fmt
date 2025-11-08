@@ -14,7 +14,7 @@ TEST_CASE("EntityInstantiation: Direct entity instantiation",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
+    // auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[0]);
     // REQUIRE(arch != nullptr);
     // REQUIRE(arch->stmts.size() >= 1);
 }
@@ -31,7 +31,7 @@ TEST_CASE("EntityInstantiation: With generic map", "[design_units][entity_instan
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
+    // auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[0]);
     // REQUIRE(arch != nullptr);
 }
 
@@ -47,7 +47,7 @@ TEST_CASE("EntityInstantiation: Without architecture specification",
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
+    // auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[0]);
     // REQUIRE(arch != nullptr);
 }
 
@@ -62,7 +62,7 @@ TEST_CASE("EntityInstantiation: With library prefix", "[design_units][entity_ins
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
+    // auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[0]);
     // REQUIRE(arch != nullptr);
 }
 
@@ -79,6 +79,6 @@ TEST_CASE("EntityInstantiation: Multiple instantiations", "[design_units][entity
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // auto *arch = std::get_if<ast::Architecture>(&design.units[0]);
+    // auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[0]);
     // REQUIRE(arch != nullptr);
 }

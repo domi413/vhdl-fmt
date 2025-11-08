@@ -7,7 +7,8 @@
 namespace builder {
 
 auto Translator::makeConcurrentAssignStatement(
-  vhdlParser::Concurrent_signal_assignment_statementContext *ctx) -> ast::ConcurrentAssignStatement
+  vhdlParser::Concurrent_signal_assignment_statementContext *ctx)
+  -> ast::ConcurrentSignalAssignmentStatement
 {
     // Dispatch based on concrete assignment type
     if (auto *cond = ctx->conditional_signal_assignment()) {
@@ -18,13 +19,13 @@ auto Translator::makeConcurrentAssignStatement(
     }
 
     // Fallback for unhandled cases
-    return make<ast::ConcurrentAssignStatement>(ctx);
+    return make<ast::ConcurrentSignalAssignmentStatement>(ctx);
 }
 
 auto Translator::makeConditionalAssignStatement(
-  vhdlParser::Conditional_signal_assignmentContext *ctx) -> ast::ConcurrentAssignStatement
+  vhdlParser::Conditional_signal_assignmentContext *ctx) -> ast::ConcurrentSignalAssignmentStatement
 {
-    auto assign = make<ast::ConcurrentAssignStatement>(ctx);
+    auto assign = make<ast::ConcurrentSignalAssignmentStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
@@ -44,9 +45,9 @@ auto Translator::makeConditionalAssignStatement(
 }
 
 auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext *ctx)
-  -> ast::ConcurrentAssignStatement
+  -> ast::ConcurrentSignalAssignmentStatement
 {
-    auto assign = make<ast::ConcurrentAssignStatement>(ctx);
+    auto assign = make<ast::ConcurrentSignalAssignmentStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);

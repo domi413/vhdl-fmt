@@ -53,11 +53,11 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expression
         auto *part = *it;
 
         if (auto *slice = part->slice_name_part()) {
-            base = makeSliceExpr(std::move(base), slice);
+            base = makeSliceNamePart(std::move(base), slice);
         } else if (auto *call = part->function_call_or_indexed_name_part()) {
             base = makeFunctionCallOrIndexedNamePart(std::move(base), call);
         } else if (auto *attr = part->attribute_name_part()) {
-            base = makeAttributeExpr(std::move(base), attr);
+            base = makeAttributeNamePart(std::move(base), attr);
         }
         // Ignore any remaining selected_name_parts (shouldn't happen after structure)
     }
@@ -104,11 +104,11 @@ auto Translator::makeFunctionCallOrIndexedNamePart(
             auto associations = list_ctx->association_element();
 
             if (associations.size() == 1) {
-                call_expr.args = box(makeCallArgument(associations[0]));
+                call_expr.args = box(makeAssociationElement(associations[0]));
             } else {
                 auto group = make<ast::GroupExpr>(list_ctx);
                 for (auto *elem : associations) {
-                    group.children.push_back(makeCallArgument(elem));
+                    group.children.push_back(makeAssociationElement(elem));
                 }
                 call_expr.args = box(ast::Expression{ std::move(group) });
             }

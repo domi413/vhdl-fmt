@@ -11,12 +11,12 @@
 // Helper to get expression from signal initialization
 namespace {
 
-auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expr *
+auto getSignalInitExpr(const ast::DesignFile &design) -> const ast::Expression *
 {
     if (design.units.size() < 2) {
         return nullptr;
     }
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    const auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     if ((arch == nullptr) || arch->decls.empty()) {
         return nullptr;
     }
@@ -245,7 +245,7 @@ TEST_CASE("Binary expression: downto range", "[expressions][binary][range]")
     auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 1);
 
@@ -268,7 +268,7 @@ TEST_CASE("Binary expression: to range", "[expressions][binary][range]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    auto *entity = std::get_if<ast::EntityDecl>(design.units.data());
     REQUIRE(entity != nullptr);
     REQUIRE(entity->port_clause.ports.size() == 1);
 
@@ -364,7 +364,7 @@ TEST_CASE("Call expression: single argument", "[expressions][call]")
     const auto *expr = getSignalInitExpr(design);
     REQUIRE(expr != nullptr);
 
-    const auto *call = std::get_if<ast::CallExpr>(expr);
+    const auto *call = std::get_if<ast::FunctionCallOrIndexedNamePart>(expr);
     REQUIRE(call != nullptr);
 
     auto *callee = std::get_if<ast::TokenExpr>(call->callee.get());
@@ -390,7 +390,7 @@ TEST_CASE("Call expression: multiple arguments", "[expressions][call]")
     const auto *expr = getSignalInitExpr(design);
     REQUIRE(expr != nullptr);
 
-    const auto *call = std::get_if<ast::CallExpr>(expr);
+    const auto *call = std::get_if<ast::FunctionCallOrIndexedNamePart>(expr);
     REQUIRE(call != nullptr);
 
     auto *callee = std::get_if<ast::TokenExpr>(call->callee.get());
@@ -416,7 +416,7 @@ TEST_CASE("Call expression: array indexing", "[expressions][call]")
     const auto *expr = getSignalInitExpr(design);
     REQUIRE(expr != nullptr);
 
-    const auto *call = std::get_if<ast::CallExpr>(expr);
+    const auto *call = std::get_if<ast::FunctionCallOrIndexedNamePart>(expr);
     REQUIRE(call != nullptr);
 
     auto *callee = std::get_if<ast::TokenExpr>(call->callee.get());
@@ -442,7 +442,7 @@ TEST_CASE("Call expression: slice with range", "[expressions][call][slice]")
     const auto *expr = getSignalInitExpr(design);
     REQUIRE(expr != nullptr);
 
-    const auto *call = std::get_if<ast::CallExpr>(expr);
+    const auto *call = std::get_if<ast::FunctionCallOrIndexedNamePart>(expr);
     REQUIRE(call != nullptr);
 
     auto *callee = std::get_if<ast::TokenExpr>(call->callee.get());
@@ -565,7 +565,7 @@ TEST_CASE("Complex expression: function call with arithmetic", "[expressions][co
     const auto *expr = getSignalInitExpr(design);
     REQUIRE(expr != nullptr);
 
-    const auto *call = std::get_if<ast::CallExpr>(expr);
+    const auto *call = std::get_if<ast::FunctionCallOrIndexedNamePart>(expr);
     REQUIRE(call != nullptr);
 
     auto *callee = std::get_if<ast::TokenExpr>(call->callee.get());

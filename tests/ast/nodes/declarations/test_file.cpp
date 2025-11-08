@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("FileDecl: File declaration", "[declarations][file]")
+TEST_CASE("makeFileDecl: File declaration", "[declarations][file]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -17,7 +17,7 @@ TEST_CASE("FileDecl: File declaration", "[declarations][file]")
     // TODO(someone): Check file declaration when implemented
 }
 
-TEST_CASE("FileDecl: File with different modes", "[declarations][file]")
+TEST_CASE("makeFileDecl: File with different modes", "[declarations][file]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -32,7 +32,7 @@ TEST_CASE("FileDecl: File with different modes", "[declarations][file]")
     // TODO(someone): Check file declarations with modes when implemented
 }
 
-TEST_CASE("FileDecl: File without open mode", "[declarations][file]")
+TEST_CASE("makeFileDecl: File without open mode", "[declarations][file]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -46,7 +46,7 @@ TEST_CASE("FileDecl: File without open mode", "[declarations][file]")
     // TODO(someone): Check file without mode when implemented
 }
 
-TEST_CASE("FileDecl: File in subprogram", "[declarations][file]")
+TEST_CASE("makeFileDecl: File in subprogram", "[declarations][file]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is

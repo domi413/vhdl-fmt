@@ -14,30 +14,32 @@ add_executable(
     nodes/design_units/test_package_body.cpp
     nodes/design_units/test_package_instantiation.cpp
     #
+    # Clauses
+    nodes/clauses/test_generic_clause.cpp
+    nodes/clauses/test_library_clause.cpp
+    nodes/clauses/test_port_clause.cpp
+    nodes/clauses/test_use_clause.cpp
+    #
     # Declarations
     nodes/declarations/test_alias.cpp
     nodes/declarations/test_attribute.cpp
     nodes/declarations/test_component.cpp
     nodes/declarations/test_constant.cpp
-    nodes/declarations/test_constant_decl.cpp
     nodes/declarations/test_constraint.cpp
     nodes/declarations/test_declaration.cpp
     nodes/declarations/test_disconnect.cpp
     nodes/declarations/test_file.cpp
     nodes/declarations/test_function.cpp
-    nodes/declarations/test_generic_param.cpp
     nodes/declarations/test_group.cpp
     nodes/declarations/test_impure_function.cpp
-    nodes/declarations/test_library_clause.cpp
-    nodes/declarations/test_port.cpp
     nodes/declarations/test_procedure.cpp
     nodes/declarations/test_protected_type.cpp
     nodes/declarations/test_shared_variable.cpp
     nodes/declarations/test_signal.cpp
     nodes/declarations/test_subtype.cpp
     nodes/declarations/test_type.cpp
-    nodes/declarations/test_use_clause.cpp
     nodes/declarations/test_variable.cpp
+    #
     #
     # Expressions
     nodes/expressions/test_access_deref.cpp
@@ -61,8 +63,10 @@ add_executable(
     nodes/expressions/test_token.cpp
     nodes/expressions/test_type_conversion.cpp
     nodes/expressions/test_unary.cpp
+    nodes/expressions/test_expressions.cpp
     #
     # Statements
+    nodes/statements/test_statements.cpp
     nodes/statements/test_assert.cpp
     nodes/statements/test_block.cpp
     nodes/statements/test_case_generate.cpp

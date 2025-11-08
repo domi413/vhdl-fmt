@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("TypeConversion: Integer conversion", "[expressions][type_conversion]")
+TEST_CASE("makeTypeConversion: Integer conversion", "[expressions][type_conversion]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -20,7 +20,7 @@ TEST_CASE("TypeConversion: Integer conversion", "[expressions][type_conversion]"
     // TODO(someone): Check integer conversion when implemented
 }
 
-TEST_CASE("TypeConversion: Std_logic_vector conversion", "[expressions][type_conversion]")
+TEST_CASE("makeTypeConversion: Std_logic_vector conversion", "[expressions][type_conversion]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -37,7 +37,7 @@ TEST_CASE("TypeConversion: Std_logic_vector conversion", "[expressions][type_con
     // TODO(someone): Check std_logic_vector conversion when implemented
 }
 
-TEST_CASE("TypeConversion: Conversion in port map", "[expressions][type_conversion]")
+TEST_CASE("makeTypeConversion: Conversion in port map", "[expressions][type_conversion]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -56,7 +56,7 @@ TEST_CASE("TypeConversion: Conversion in port map", "[expressions][type_conversi
     // TODO(someone): Check conversion in port map when implemented
 }
 
-TEST_CASE("TypeConversion: Nested conversions", "[expressions][type_conversion]")
+TEST_CASE("makeTypeConversion: Nested conversions", "[expressions][type_conversion]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

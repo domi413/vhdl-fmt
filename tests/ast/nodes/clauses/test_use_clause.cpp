@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("UseClause: Use clause import", "[declarations][use]")
+TEST_CASE("makeUseClause: Single use clause import", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         use work.MyPackage.all;
@@ -11,10 +11,10 @@ TEST_CASE("UseClause: Use clause import", "[declarations][use]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check use clause when implemented
+    // TODO: Check use clause when makeUseClause is implemented
 }
 
-TEST_CASE("UseClause: Multiple use clauses", "[declarations][use]")
+TEST_CASE("makeUseClause: Multiple use clauses", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         use work.Pkg1.all;
@@ -24,10 +24,10 @@ TEST_CASE("UseClause: Multiple use clauses", "[declarations][use]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check multiple use clauses when implemented
+    // TODO: Check multiple use clauses when makeUseClause is implemented
 }
 
-TEST_CASE("UseClause: Use clause with specific items", "[declarations][use]")
+TEST_CASE("makeUseClause: Use clause with specific items", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         use IEEE.std_logic_1164.std_logic, IEEE.std_logic_1164.std_logic_vector;
@@ -35,10 +35,10 @@ TEST_CASE("UseClause: Use clause with specific items", "[declarations][use]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check use clause with specific items when implemented
+    // TODO: Check use clause with specific items when makeUseClause is implemented
 }
 
-TEST_CASE("UseClause: Use clause in architecture", "[declarations][use]")
+TEST_CASE("makeUseClause: Use clause in architecture", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -49,5 +49,5 @@ TEST_CASE("UseClause: Use clause in architecture", "[declarations][use]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check use clause in architecture when implemented
+    // TODO: Check use clause in architecture when makeUseClause is implemented
 }

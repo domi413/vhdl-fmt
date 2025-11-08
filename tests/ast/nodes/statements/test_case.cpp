@@ -6,7 +6,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("CaseStatement: Simple case with when clauses", "[statements][case]")
+TEST_CASE("makeCaseStatement: Simple case with when clauses", "[statements][case]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -39,7 +39,7 @@ TEST_CASE("CaseStatement: Simple case with when clauses", "[statements][case]")
     REQUIRE(case_stmt->when_clauses.size() == 3);
 }
 
-TEST_CASE("CaseStatement: Case with integer values", "[statements][case]")
+TEST_CASE("makeCaseStatement: Case with integer values", "[statements][case]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -76,7 +76,7 @@ TEST_CASE("CaseStatement: Case with integer values", "[statements][case]")
     REQUIRE(case_stmt->when_clauses.size() == 5);
 }
 
-TEST_CASE("CaseStatement: Case with bit patterns", "[statements][case]")
+TEST_CASE("makeCaseStatement: Case with bit patterns", "[statements][case]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -111,7 +111,7 @@ TEST_CASE("CaseStatement: Case with bit patterns", "[statements][case]")
     REQUIRE(case_stmt->when_clauses.size() == 4);
 }
 
-TEST_CASE("CaseStatement: Case with multiple statements per branch", "[statements][case]")
+TEST_CASE("makeCaseStatement: Case with multiple statements per branch", "[statements][case]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -147,7 +147,7 @@ TEST_CASE("CaseStatement: Case with multiple statements per branch", "[statement
     REQUIRE(case_stmt->when_clauses.size() == 3);
 }
 
-TEST_CASE("CaseStatement: Nested case statements", "[statements][case]")
+TEST_CASE("makeCaseStatement: Nested case statements", "[statements][case]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -183,7 +183,7 @@ TEST_CASE("CaseStatement: Nested case statements", "[statements][case]")
     REQUIRE(case_stmt->when_clauses.size() == 2);
 }
 
-TEST_CASE("CaseStatement: Case with null statement", "[statements][case]")
+TEST_CASE("makeCaseStatement: Case with null statement", "[statements][case]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

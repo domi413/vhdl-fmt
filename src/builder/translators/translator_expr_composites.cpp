@@ -45,7 +45,7 @@ auto Translator::makeChoices(vhdlParser::ChoicesContext *ctx) -> ast::Expression
     return grp;
 }
 
-auto Translator::makeChoices(vhdlParser::ChoiceContext *ctx) -> ast::Expression
+auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expression
 {
     if (ctx->OTHERS() != nullptr) {
         return makeToken(ctx, "others");

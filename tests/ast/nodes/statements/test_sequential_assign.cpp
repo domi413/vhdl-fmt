@@ -28,7 +28,7 @@ TEST_CASE("SequentialAssign: Simple variable assignment", "[statements][sequenti
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *assign = std::get_if<ast::SequentialAssignStatement>(proc->body.data());
+    auto *assign = std::get_if<ast::SignalAssignmentStatement>(proc->body.data());
     REQUIRE(assign != nullptr);
 }
 
@@ -53,7 +53,7 @@ TEST_CASE("SequentialAssign: Assignment with literal value", "[statements][seque
     REQUIRE(proc != nullptr);
     REQUIRE_FALSE(proc->body.empty());
 
-    auto *assign = std::get_if<ast::SequentialAssignStatement>(proc->body.data());
+    auto *assign = std::get_if<ast::SignalAssignmentStatement>(proc->body.data());
     REQUIRE(assign != nullptr);
 
     // Check target

@@ -6,7 +6,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("IfStatement: Simple if statement", "[statements][if]")
+TEST_CASE("makeIfStatement: Simple if statement", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -35,7 +35,7 @@ TEST_CASE("IfStatement: Simple if statement", "[statements][if]")
     REQUIRE_FALSE(if_stmt->else_branch.has_value());
 }
 
-TEST_CASE("IfStatement: If-else statement", "[statements][if]")
+TEST_CASE("makeIfStatement: If-else statement", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -66,7 +66,7 @@ TEST_CASE("IfStatement: If-else statement", "[statements][if]")
     REQUIRE(if_stmt->else_branch.has_value());
 }
 
-TEST_CASE("IfStatement: If-elsif-else statement", "[statements][if]")
+TEST_CASE("makeIfStatement: If-elsif-else statement", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -99,7 +99,7 @@ TEST_CASE("IfStatement: If-elsif-else statement", "[statements][if]")
     REQUIRE(if_stmt->else_branch.has_value());
 }
 
-TEST_CASE("IfStatement: Multiple elsif branches", "[statements][if]")
+TEST_CASE("makeIfStatement: Multiple elsif branches", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -134,7 +134,7 @@ TEST_CASE("IfStatement: Multiple elsif branches", "[statements][if]")
     REQUIRE_FALSE(if_stmt->else_branch.has_value());
 }
 
-TEST_CASE("IfStatement: If with comparison", "[statements][if]")
+TEST_CASE("makeIfStatement: If with comparison", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -161,7 +161,7 @@ TEST_CASE("IfStatement: If with comparison", "[statements][if]")
     REQUIRE(if_stmt != nullptr);
 }
 
-TEST_CASE("IfStatement: If with logical operators", "[statements][if]")
+TEST_CASE("makeIfStatement: If with logical operators", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -188,7 +188,7 @@ TEST_CASE("IfStatement: If with logical operators", "[statements][if]")
     REQUIRE(if_stmt != nullptr);
 }
 
-TEST_CASE("IfStatement: Nested if statements", "[statements][if]")
+TEST_CASE("makeIfStatement: Nested if statements", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -220,7 +220,7 @@ TEST_CASE("IfStatement: Nested if statements", "[statements][if]")
     REQUIRE_FALSE(if_stmt->if_branch.body.empty());
 }
 
-TEST_CASE("IfStatement: Rising edge condition", "[statements][if]")
+TEST_CASE("makeIfStatement: Rising edge condition", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -247,7 +247,7 @@ TEST_CASE("IfStatement: Rising edge condition", "[statements][if]")
     REQUIRE(if_stmt != nullptr);
 }
 
-TEST_CASE("IfStatement: Reset condition pattern", "[statements][if]")
+TEST_CASE("makeIfStatement: Reset condition pattern", "[statements][if]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

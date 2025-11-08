@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("LibraryClause: Library declaration", "[declarations][library]")
+TEST_CASE("makeLibraryClause: Single library declaration", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -12,10 +12,10 @@ TEST_CASE("LibraryClause: Library declaration", "[declarations][library]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check library clause when implemented
+    // TODO: Check library clause when makeLibraryClause is implemented
 }
 
-TEST_CASE("LibraryClause: Multiple libraries", "[declarations][library]")
+TEST_CASE("makeLibraryClause: Multiple libraries", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -25,10 +25,10 @@ TEST_CASE("LibraryClause: Multiple libraries", "[declarations][library]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check multiple libraries when implemented
+    // TODO: Check multiple libraries when makeLibraryClause is implemented
 }
 
-TEST_CASE("LibraryClause: Library in package", "[declarations][library]")
+TEST_CASE("makeLibraryClause: Library in package", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -39,10 +39,10 @@ TEST_CASE("LibraryClause: Library in package", "[declarations][library]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check library in package when implemented
+    // TODO: Check library in package when makeLibraryClause is implemented
 }
 
-TEST_CASE("LibraryClause: Library with use in architecture", "[declarations][library]")
+TEST_CASE("makeLibraryClause: Library with use in architecture", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -54,5 +54,5 @@ TEST_CASE("LibraryClause: Library with use in architecture", "[declarations][lib
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    // TODO(someone): Check library with use in architecture when implemented
+    // TODO: Check library with use in architecture when makeLibraryClause is implemented
 }

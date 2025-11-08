@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("FunctionCall: Simple function call", "[expressions][function_call]")
+TEST_CASE("makeFunctionCallOrIndexedNamePart: Simple function call", "[expressions][function_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -20,7 +20,7 @@ TEST_CASE("FunctionCall: Simple function call", "[expressions][function_call]")
     // TODO(someone): Check function call when implemented
 }
 
-TEST_CASE("FunctionCall: Function call with conversion", "[expressions][function_call]")
+TEST_CASE("makeFunctionCallOrIndexedNamePart: Function call with conversion", "[expressions][function_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -37,7 +37,7 @@ TEST_CASE("FunctionCall: Function call with conversion", "[expressions][function
     // TODO(someone): Check function call with conversion when implemented
 }
 
-TEST_CASE("FunctionCall: Function call with no parameters", "[expressions][function_call]")
+TEST_CASE("makeFunctionCallOrIndexedNamePart: Function call with no parameters", "[expressions][function_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -54,7 +54,7 @@ TEST_CASE("FunctionCall: Function call with no parameters", "[expressions][funct
     // TODO(someone): Check function call with no params when implemented
 }
 
-TEST_CASE("FunctionCall: Nested function calls", "[expressions][function_call]")
+TEST_CASE("makeFunctionCallOrIndexedNamePart: Nested function calls", "[expressions][function_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

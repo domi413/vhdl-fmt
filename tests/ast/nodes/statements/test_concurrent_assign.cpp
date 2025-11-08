@@ -24,7 +24,7 @@ TEST_CASE("ConcurrentAssign: Simple signal assignment", "[statements][concurrent
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *assign = std::get_if<ast::ConcurrentAssignStatement>(arch->stmts.data());
+    auto *assign = std::get_if<ast::ConcurrentSignalAssignmentStatement>(arch->stmts.data());
     REQUIRE(assign != nullptr);
 }
 
@@ -43,7 +43,7 @@ TEST_CASE("ConcurrentAssign: Assignment with literal", "[statements][concurrent_
     REQUIRE(arch != nullptr);
     REQUIRE(arch->stmts.size() == 1);
 
-    auto *assign = std::get_if<ast::ConcurrentAssignStatement>(arch->stmts.data());
+    auto *assign = std::get_if<ast::ConcurrentSignalAssignmentStatement>(arch->stmts.data());
     REQUIRE(assign != nullptr);
 
     // Check target
@@ -76,7 +76,7 @@ TEST_CASE("ConcurrentAssign: Multiple assignments", "[statements][concurrent_ass
 
     // Check all three are concurrent assignments
     for (size_t i = 0; i < 3; i++) {
-        auto *assign = std::get_if<ast::ConcurrentAssignStatement>(&arch->stmts[i]);
+        auto *assign = std::get_if<ast::ConcurrentSignalAssignmentStatement>(&arch->stmts[i]);
         REQUIRE(assign != nullptr);
     }
 }

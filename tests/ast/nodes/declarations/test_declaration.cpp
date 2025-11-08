@@ -21,7 +21,7 @@ TEST_CASE("Multiple declaration types in architecture", "[declarations][mixed]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 4);
 
@@ -53,7 +53,7 @@ TEST_CASE("Architecture with no declarations", "[declarations][empty]")
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
+    auto *arch = std::get_if<ast::ArchitectureBody>(&design.units[1]);
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.empty());
 }

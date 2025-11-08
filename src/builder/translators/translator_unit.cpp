@@ -26,7 +26,7 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
         // Check secondary units (architecture_body | package_body)
         else if (auto *secondary = lib_unit->secondary_unit()) {
             if (auto *arch_ctx = secondary->architecture_body()) {
-                dest.units.emplace_back(makeArchitecture(arch_ctx));
+                dest.units.emplace_back(makeArchitectureBody(arch_ctx));
             }
             // TODO(someone): Handle package_body
         }
@@ -87,7 +87,7 @@ auto Translator::makeArchitectureBody(vhdlParser::Architecture_bodyContext *ctx)
             if (auto *proc = stmt->process_statement()) {
                 arch.stmts.emplace_back(makeProcessStatement(proc));
             } else if (auto *sig_assign = stmt->concurrent_signal_assignment_statement()) {
-                arch.stmts.emplace_back(makeConcurrentSignalAssignmentStatement(sig_assign));
+                arch.stmts.emplace_back(makeConcurrentAssignStatement(sig_assign));
             }
             // TODO(someone): Add more concurrent statement types (component instantiation,
             // generate, etc.)

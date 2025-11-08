@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("Context: Basic context declaration (VHDL-2008)", "[design_unit][context]")
+TEST_CASE("makeContextDecl: Basic context declaration (VHDL-2008)", "[design_unit][context]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         context MyContext is
@@ -20,7 +20,7 @@ TEST_CASE("Context: Basic context declaration (VHDL-2008)", "[design_unit][conte
     // REQUIRE(ctx->name == "MyContext");
 }
 
-TEST_CASE("Context: With multiple libraries and use clauses", "[design_unit][context]")
+TEST_CASE("makeContextDecl: With multiple libraries and use clauses", "[design_unit][context]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         context IEEEContext is
@@ -37,7 +37,7 @@ TEST_CASE("Context: With multiple libraries and use clauses", "[design_unit][con
     // REQUIRE(ctx != nullptr);
 }
 
-TEST_CASE("Context: Referencing other contexts", "[design_unit][context]")
+TEST_CASE("makeContextDecl: Referencing other contexts", "[design_unit][context]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         context ExtendedContext is

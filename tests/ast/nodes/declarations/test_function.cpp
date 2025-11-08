@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("FunctionDecl: Function prototype", "[declarations][function]")
+TEST_CASE("makeFunctionDecl: Function prototype", "[declarations][function]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -30,7 +30,7 @@ TEST_CASE("FunctionBody: Function implementation", "[declarations][function]")
     // TODO(someone): Check function body when implemented
 }
 
-TEST_CASE("FunctionDecl: Function with parameters", "[declarations][function]")
+TEST_CASE("makeFunctionDecl: Function with parameters", "[declarations][function]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is

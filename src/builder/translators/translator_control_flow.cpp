@@ -28,7 +28,7 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::I
     // If there's an else, the last sequence doesn't have a condition
     for (const auto i : std::views::iota(std::size_t{ 1 }, conditions.size())) {
         ast::IfStatement::Branch elsif_branch;
-        elsif_branch.condition = makeExpr(conditions[i]->expression());
+        elsif_branch.condition = makeExpression(conditions[i]->expression());
         elsif_branch.body = makeSequenceOfStatements(sequences[i]);
         stmt.elsif_branches.push_back(std::move(elsif_branch));
     }
