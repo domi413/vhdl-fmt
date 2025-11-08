@@ -2,6 +2,7 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
+#include "nodes/expressions.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
@@ -26,11 +27,14 @@ TEST_CASE("Signal with index constraint (array)", "[declarations][constraints]")
     REQUIRE(signal != nullptr);
     REQUIRE(signal->names[0] == "data");
     REQUIRE(signal->type_name == "std_logic_vector");
-    REQUIRE(signal->constraints.size() == 1);
+    REQUIRE(signal->constraint.has_value());
 
     // Check the constraint is "7 downto 0"
-    const auto &constraint = signal->constraints[0];
-    REQUIRE(constraint.op == "downto");
+    const auto &constraint = std::get<ast::IndexConstraint>(signal->constraint.value());
+    const auto &range_expr = std::get<ast::BinaryExpr>(constraint.ranges.children[0]);
+    const auto &left = std::get<ast::TokenExpr>(*range_expr.left);
+    const auto &right = std::get<ast::TokenExpr>(*range_expr.right);
+    REQUIRE(range_expr.op == "downto");
 }
 
 TEST_CASE("Port with index constraint", "[declarations][constraints]")
@@ -51,11 +55,16 @@ TEST_CASE("Port with index constraint", "[declarations][constraints]")
     const auto &port = entity->port_clause.ports[0];
     REQUIRE(port.names[0] == "data_in");
     REQUIRE(port.type_name == "std_logic_vector");
-    REQUIRE(port.constraints.size() == 1);
+    REQUIRE(port.constraint.has_value());
 
     // Check the constraint is "15 downto 0"
-    const auto &constraint = port.constraints[0];
-    REQUIRE(constraint.op == "downto");
+    const auto &constraint = std::get<ast::IndexConstraint>(port.constraint.value());
+    const auto &range_expr = std::get<ast::BinaryExpr>(constraint.ranges.children[0]);
+    const auto &left = std::get<ast::TokenExpr>(*range_expr.left);
+    const auto &right = std::get<ast::TokenExpr>(*range_expr.right);
+    REQUIRE(range_expr.op == "downto");
+    REQUIRE(left.text == "15");
+    REQUIRE(right.text == "0");
 }
 
 TEST_CASE("Signal with 'to' direction constraint", "[declarations][constraints]")
@@ -76,9 +85,14 @@ TEST_CASE("Signal with 'to' direction constraint", "[declarations][constraints]"
     auto *signal = std::get_if<ast::SignalDecl>(arch->decls.data());
     REQUIRE(signal != nullptr);
     REQUIRE(signal->type_name == "bit_vector");
-    REQUIRE(signal->constraints.size() == 1);
+    REQUIRE(signal->constraint.has_value());
 
     // Check the constraint is "0 to 7"
-    const auto &constraint = signal->constraints[0];
-    REQUIRE(constraint.op == "to");
+    const auto &constraint = std::get<ast::IndexConstraint>(signal->constraint.value());
+    const auto &range_expr = std::get<ast::BinaryExpr>(constraint.ranges.children[0]);
+    const auto &left = std::get<ast::TokenExpr>(*range_expr.left);
+    const auto &right = std::get<ast::TokenExpr>(*range_expr.right);
+    REQUIRE(range_expr.op == "to");
+    REQUIRE(left.text == "0");
+    REQUIRE(right.text == "7");
 }

@@ -17,6 +17,10 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
   private:
     common::Config config_;
 
+  protected:
+    // Config accessor for visitor methods
+    [[nodiscard]] auto config() const -> const common::Config& { return config_; }
+
   public:
     PrettyPrinter() = default;
     explicit PrettyPrinter(common::Config config) : config_(config) {}
@@ -47,6 +51,10 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::BinaryExpr &node) -> Doc;
     auto operator()(const ast::ParenExpr &node) -> Doc;
     auto operator()(const ast::CallExpr &node) -> Doc;
+
+    // Constraints
+    auto operator()(const ast::IndexConstraint &node) -> Doc;
+    auto operator()(const ast::RangeConstraint &node) -> Doc;
 
     // Concurrent Statements
     auto operator()(const ast::ConcurrentAssign &node) -> Doc;

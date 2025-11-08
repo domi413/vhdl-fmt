@@ -117,7 +117,11 @@ TEST_CASE("Port with constraints", "[pretty_printer][declarations]")
     constraint.left = std::move(left);
     constraint.op = "downto";
     constraint.right = std::move(right);
-    port.constraints.push_back(std::move(constraint));
+
+    // Create IndexConstraint with GroupExpr containing the range
+    ast::IndexConstraint idx_constraint;
+    idx_constraint.ranges.children.emplace_back(std::move(constraint));
+    port.constraint = ast::Constraint(std::move(idx_constraint));
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
@@ -157,8 +161,11 @@ TEST_CASE("Port with multiple constraints", "[pretty_printer][declarations]")
     constraint2.op = "downto";
     constraint2.right = std::move(right2);
 
-    port.constraints.push_back(std::move(constraint1));
-    port.constraints.push_back(std::move(constraint2));
+    // Create IndexConstraint with GroupExpr containing both ranges
+    ast::IndexConstraint idx_constraint;
+    idx_constraint.ranges.children.emplace_back(std::move(constraint1));
+    idx_constraint.ranges.children.emplace_back(std::move(constraint2));
+    port.constraint = ast::Constraint(std::move(idx_constraint));
 
     emit::PrettyPrinter printer;
     const auto doc = printer(port);
@@ -203,7 +210,11 @@ TEST_CASE("Port with constraints and default value", "[pretty_printer][declarati
     constraint.left = std::move(left);
     constraint.op = "downto";
     constraint.right = std::move(right);
-    port.constraints.push_back(std::move(constraint));
+
+    // Create IndexConstraint with GroupExpr containing the range
+    ast::IndexConstraint idx_constraint;
+    idx_constraint.ranges.children.emplace_back(std::move(constraint));
+    port.constraint = ast::Constraint(std::move(idx_constraint));
 
     // Default value
     ast::TokenExpr default_val;

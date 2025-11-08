@@ -50,6 +50,10 @@ class DebugPrinter final : public ast::VisitorBase<DebugPrinter, void>
     void operator()(const ast::ParenExpr &node);
     void operator()(const ast::CallExpr &node);
 
+    // Constraints
+    void operator()(const ast::IndexConstraint &node);
+    void operator()(const ast::RangeConstraint &node);
+
     // Concurrent Statements
     void operator()(const ast::ConcurrentAssign &node);
     void operator()(const ast::Process &node);

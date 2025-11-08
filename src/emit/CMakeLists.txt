@@ -13,6 +13,7 @@ add_library(
     pretty_printer/nodes/design_file.cpp
     pretty_printer/nodes/design_units.cpp
     pretty_printer/nodes/clauses.cpp
+    pretty_printer/nodes/constraints.cpp
     pretty_printer/nodes/declarations.cpp
     pretty_printer/nodes/expressions.cpp
     pretty_printer/nodes/statements.cpp

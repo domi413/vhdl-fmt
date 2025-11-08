@@ -111,7 +111,11 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
     constraint.left = std::move(left);
     constraint.op = "downto";
     constraint.right = std::move(right);
-    port.constraints.push_back(std::move(constraint));
+
+    // Create IndexConstraint with GroupExpr containing the range
+    ast::IndexConstraint idx_constraint;
+    idx_constraint.ranges.children.emplace_back(std::move(constraint));
+    port.constraint = ast::Constraint(std::move(idx_constraint));
 
     entity.port_clause.ports.push_back(std::move(port));
 

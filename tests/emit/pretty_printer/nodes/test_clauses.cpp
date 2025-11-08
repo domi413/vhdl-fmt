@@ -130,7 +130,11 @@ TEST_CASE("PortClause with multiple ports", "[pretty_printer][clauses]")
     constraint.left = std::move(left);
     constraint.op = "downto";
     constraint.right = std::move(right);
-    port3.constraints.push_back(std::move(constraint));
+
+    // Create IndexConstraint with GroupExpr containing the range
+    ast::IndexConstraint idx_constraint;
+    idx_constraint.ranges.children.emplace_back(std::move(constraint));
+    port3.constraint = ast::Constraint(std::move(idx_constraint));
 
     clause.ports.emplace_back(std::move(port1));
     clause.ports.emplace_back(std::move(port2));

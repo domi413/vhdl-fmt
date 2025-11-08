@@ -75,4 +75,18 @@ auto DebugPrinter::operator()(const ast::CallExpr &node) -> void
     }
 }
 
+auto DebugPrinter::operator()(const ast::IndexConstraint &node) -> void
+{
+    emitNodeLike(node, "IndexConstraint", "");
+    const IndentGuard _{ indent_ };
+    visit(node.ranges);
+}
+
+auto DebugPrinter::operator()(const ast::RangeConstraint &node) -> void
+{
+    emitNodeLike(node, "RangeConstraint", "");
+    const IndentGuard _{ indent_ };
+    visit(node.range);
+}
+
 } // namespace emit

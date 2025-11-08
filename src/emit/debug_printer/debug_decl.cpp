@@ -40,7 +40,7 @@ auto DebugPrinter::operator()(const ast::Port &node) -> void
 
     const IndentGuard _{ indent_ };
     visit(node.default_expr);
-    visit(node.constraints);
+    visit(node.constraint);
 }
 
 auto DebugPrinter::operator()(const ast::SignalDecl &node) -> void
@@ -56,7 +56,7 @@ auto DebugPrinter::operator()(const ast::SignalDecl &node) -> void
 
     const IndentGuard _{ indent_ };
     visit(node.init_expr);
-    visit(node.constraints);
+    visit(node.constraint);
 }
 
 auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void

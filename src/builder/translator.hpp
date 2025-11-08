@@ -136,13 +136,12 @@ class Translator final
 
     // Constraints
     [[nodiscard]]
-    auto makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vector<ast::BinaryExpr>;
+    auto makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::optional<ast::Constraint>;
     [[nodiscard]]
-    auto makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
-      -> std::vector<ast::BinaryExpr>;
+    auto makeIndexConstraint(vhdlParser::Index_constraintContext *ctx) -> ast::IndexConstraint;
     [[nodiscard]]
     auto makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
-      -> std::vector<ast::BinaryExpr>;
+      -> std::optional<ast::RangeConstraint>;
 
     /// @brief Helper to create a boxed expression
     template<typename T = ast::Expr>

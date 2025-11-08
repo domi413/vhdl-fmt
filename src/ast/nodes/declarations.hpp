@@ -38,7 +38,7 @@ struct SignalDecl : DeclBase
 {
     std::string type_name;
     bool has_bus_kw{ false };
-    std::vector<BinaryExpr> constraints;
+    std::optional<Constraint> constraint;
     std::optional<Expr> init_expr;
 };
 
@@ -55,7 +55,7 @@ struct Port : DeclBase
     std::string mode; // "in" / "out"
     std::string type_name;
     std::optional<Expr> default_expr;
-    std::vector<BinaryExpr> constraints;
+    std::optional<Constraint> constraint;
 };
 
 } // namespace ast
