@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makePackageBody: Function implementation", "[design_unit][package_body]")
+TEST_CASE("PackageBody: Function implementation", "[design_unit][package_body]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package body MyPackage is
@@ -22,7 +22,7 @@ TEST_CASE("makePackageBody: Function implementation", "[design_unit][package_bod
     // REQUIRE(pkg_body->name == "MyPackage");
 }
 
-TEST_CASE("makePackageBody: Multiple subprogram implementations", "[design_unit][package_body]")
+TEST_CASE("PackageBody: Multiple subprogram implementations", "[design_unit][package_body]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package body MathPkg is
@@ -44,7 +44,7 @@ TEST_CASE("makePackageBody: Multiple subprogram implementations", "[design_unit]
     // REQUIRE(pkg_body != nullptr);
 }
 
-TEST_CASE("makePackageBody: With local declarations", "[design_unit][package_body]")
+TEST_CASE("PackageBody: With local declarations", "[design_unit][package_body]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package body UtilPkg is

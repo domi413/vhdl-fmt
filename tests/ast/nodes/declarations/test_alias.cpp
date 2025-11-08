@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeAliasDecl: Simple alias", "[declarations][alias]")
+TEST_CASE("AliasDecl: Simple alias", "[declarations][alias]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -37,7 +37,7 @@ TEST_CASE("makeAliasDecl: Simple alias", "[declarations][alias]")
     REQUIRE(target->text == "LongSignalName");
 }
 
-TEST_CASE("makeAliasDecl: Object alias with slice", "[declarations][alias]")
+TEST_CASE("AliasDecl: Object alias with slice", "[declarations][alias]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -65,7 +65,7 @@ TEST_CASE("makeAliasDecl: Object alias with slice", "[declarations][alias]")
     REQUIRE(call_expr != nullptr);
 }
 
-TEST_CASE("makeAliasDecl: Alias with subtype indication", "[declarations][alias]")
+TEST_CASE("AliasDecl: Alias with subtype indication", "[declarations][alias]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

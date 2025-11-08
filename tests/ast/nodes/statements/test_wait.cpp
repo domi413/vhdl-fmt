@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeWaitStatement: Wait until condition", "[statements][wait]")
+TEST_CASE("WaitStatement: Wait until condition", "[statements][wait]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -39,7 +39,7 @@ TEST_CASE("makeWaitStatement: Wait until condition", "[statements][wait]")
     REQUIRE(wait_stmt->sensitivity_list.empty());
 }
 
-TEST_CASE("makeWaitStatement: Wait for timeout", "[statements][wait]")
+TEST_CASE("WaitStatement: Wait for timeout", "[statements][wait]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -66,7 +66,7 @@ TEST_CASE("makeWaitStatement: Wait for timeout", "[statements][wait]")
     REQUIRE(wait_stmt->sensitivity_list.empty());
 }
 
-TEST_CASE("makeWaitStatement: Wait on sensitivity list", "[statements][wait]")
+TEST_CASE("WaitStatement: Wait on sensitivity list", "[statements][wait]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -95,7 +95,7 @@ TEST_CASE("makeWaitStatement: Wait on sensitivity list", "[statements][wait]")
     REQUIRE_FALSE(wait_stmt->timeout.has_value());
 }
 
-TEST_CASE("makeWaitStatement: Wait with multiple clauses", "[statements][wait]")
+TEST_CASE("WaitStatement: Wait with multiple clauses", "[statements][wait]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -122,7 +122,7 @@ TEST_CASE("makeWaitStatement: Wait with multiple clauses", "[statements][wait]")
     REQUIRE(wait_stmt->timeout.has_value());
 }
 
-TEST_CASE("makeWaitStatement: Plain wait", "[statements][wait]")
+TEST_CASE("WaitStatement: Plain wait", "[statements][wait]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

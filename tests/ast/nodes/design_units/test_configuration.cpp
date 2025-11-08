@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeConfigurationDecl: Basic configuration declaration", "[design_units][configuration]")
+TEST_CASE("ConfigurationDecl: Basic configuration declaration", "[design_units][configuration]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         configuration MyConfig of MyEntity is
@@ -23,7 +23,7 @@ TEST_CASE("makeConfigurationDecl: Basic configuration declaration", "[design_uni
     // REQUIRE(config->entity_name == "MyEntity");
 }
 
-TEST_CASE("makeConfigurationDecl: With component bindings", "[design_units][configuration]")
+TEST_CASE("ConfigurationDecl: With component bindings", "[design_units][configuration]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         configuration TestConfig of TestEntity is
@@ -42,7 +42,7 @@ TEST_CASE("makeConfigurationDecl: With component bindings", "[design_units][conf
     // REQUIRE(config != nullptr);
 }
 
-TEST_CASE("makeConfigurationDecl: With generic map", "[design_units][configuration]")
+TEST_CASE("ConfigurationDecl: With generic map", "[design_units][configuration]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         configuration MappedConfig of MappedEntity is

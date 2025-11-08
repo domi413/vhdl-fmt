@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeVariableDecl: Variable in process", "[declarations][variable]")
+TEST_CASE("VariableDecl: Variable in process", "[declarations][variable]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -21,7 +21,7 @@ TEST_CASE("makeVariableDecl: Variable in process", "[declarations][variable]")
     // TODO(someone): Check variable declaration when implemented
 }
 
-TEST_CASE("makeVariableDecl: Variable in function", "[declarations][variable]")
+TEST_CASE("VariableDecl: Variable in function", "[declarations][variable]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -37,7 +37,7 @@ TEST_CASE("makeVariableDecl: Variable in function", "[declarations][variable]")
     // TODO(someone): Check variable declaration in function when implemented
 }
 
-TEST_CASE("makeVariableDecl: Multiple variables in process", "[declarations][variable]")
+TEST_CASE("VariableDecl: Multiple variables in process", "[declarations][variable]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -57,7 +57,7 @@ TEST_CASE("makeVariableDecl: Multiple variables in process", "[declarations][var
     // TODO(someone): Check multiple variable declarations when implemented
 }
 
-TEST_CASE("makeVariableDecl: Variable without initialization", "[declarations][variable]")
+TEST_CASE("VariableDecl: Variable without initialization", "[declarations][variable]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

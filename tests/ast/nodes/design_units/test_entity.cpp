@@ -5,7 +5,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeEntityDecl: Basic entity declaration with ports and generics", "[design_units][entity]")
+TEST_CASE("EntityDecl: Basic entity declaration with ports and generics", "[design_units][entity]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity MyEntity is
@@ -26,7 +26,7 @@ TEST_CASE("makeEntityDecl: Basic entity declaration with ports and generics", "[
     REQUIRE(entity->port_clause.ports.size() == 2);
 }
 
-TEST_CASE("makeEntityDecl: Multiple generics", "[design_units][entity]")
+TEST_CASE("EntityDecl: Multiple generics", "[design_units][entity]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Counter is
@@ -48,7 +48,7 @@ TEST_CASE("makeEntityDecl: Multiple generics", "[design_units][entity]")
     REQUIRE(entity->generic_clause.generics[2].names[0] == "ENABLE_ASYNC");
 }
 
-TEST_CASE("makeEntityDecl: Minimal entity without ports or generics", "[design_units][entity]")
+TEST_CASE("EntityDecl: Minimal entity without ports or generics", "[design_units][entity]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity MinimalEntity is

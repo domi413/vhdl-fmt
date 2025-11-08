@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeComponentInstantiation: Simple component instantiation",
+TEST_CASE("ComponentInstantiation: Simple component instantiation",
           "[statements][component_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -21,7 +21,7 @@ TEST_CASE("makeComponentInstantiation: Simple component instantiation",
     // TODO(someone): Check component instantiation when implemented
 }
 
-TEST_CASE("makeComponentInstantiation: Instantiation with generic map",
+TEST_CASE("ComponentInstantiation: Instantiation with generic map",
           "[statements][component_instantiation]")
 {
     constexpr std::string_view VHDL_FILE = R"(

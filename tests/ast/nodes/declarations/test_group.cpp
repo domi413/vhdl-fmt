@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeGroupDecl: Group declaration", "[declarations][group]")
+TEST_CASE("GroupDecl: Group declaration", "[declarations][group]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -17,7 +17,7 @@ TEST_CASE("makeGroupDecl: Group declaration", "[declarations][group]")
     // TODO(someone): Check group declaration when implemented
 }
 
-TEST_CASE("makeGroupDecl: Group with multiple signals", "[declarations][group]")
+TEST_CASE("GroupDecl: Group with multiple signals", "[declarations][group]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

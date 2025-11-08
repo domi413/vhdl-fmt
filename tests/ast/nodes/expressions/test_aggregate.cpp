@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeAggregate: Named aggregate for record", "[expressions][aggregate]")
+TEST_CASE("Aggregate: Named aggregate for record", "[expressions][aggregate]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -21,7 +21,7 @@ TEST_CASE("makeAggregate: Named aggregate for record", "[expressions][aggregate]
     // TODO(someone): Check named aggregate when implemented
 }
 
-TEST_CASE("makeAggregate: Positional aggregate for array", "[expressions][aggregate]")
+TEST_CASE("Aggregate: Positional aggregate for array", "[expressions][aggregate]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -35,7 +35,7 @@ TEST_CASE("makeAggregate: Positional aggregate for array", "[expressions][aggreg
     // TODO(someone): Check positional aggregate when implemented
 }
 
-TEST_CASE("makeAggregate: Mixed named and positional", "[expressions][aggregate]")
+TEST_CASE("Aggregate: Mixed named and positional", "[expressions][aggregate]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -52,7 +52,7 @@ TEST_CASE("makeAggregate: Mixed named and positional", "[expressions][aggregate]
     // TODO(someone): Check mixed aggregate when implemented
 }
 
-TEST_CASE("makeAggregate: Aggregate with others", "[expressions][aggregate]")
+TEST_CASE("Aggregate: Aggregate with others", "[expressions][aggregate]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

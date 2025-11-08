@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeReturnStatement: Return without value", "[statements][return]")
+TEST_CASE("ReturnStatement: Return without value", "[statements][return]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -27,7 +27,7 @@ TEST_CASE("makeReturnStatement: Return without value", "[statements][return]")
     REQUIRE(design.units.size() >= 1);
 }
 
-TEST_CASE("makeReturnStatement: Return with integer value", "[statements][return]")
+TEST_CASE("ReturnStatement: Return with integer value", "[statements][return]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -45,7 +45,7 @@ TEST_CASE("makeReturnStatement: Return with integer value", "[statements][return
     REQUIRE(design.units.size() >= 1);
 }
 
-TEST_CASE("makeReturnStatement: Return with boolean value", "[statements][return]")
+TEST_CASE("ReturnStatement: Return with boolean value", "[statements][return]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -62,7 +62,7 @@ TEST_CASE("makeReturnStatement: Return with boolean value", "[statements][return
     REQUIRE(design.units.size() >= 1);
 }
 
-TEST_CASE("makeReturnStatement: Return with expression", "[statements][return]")
+TEST_CASE("ReturnStatement: Return with expression", "[statements][return]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -83,7 +83,7 @@ TEST_CASE("makeReturnStatement: Return with expression", "[statements][return]")
     REQUIRE(design.units.size() >= 1);
 }
 
-TEST_CASE("makeReturnStatement: Return with string value", "[statements][return]")
+TEST_CASE("ReturnStatement: Return with string value", "[statements][return]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

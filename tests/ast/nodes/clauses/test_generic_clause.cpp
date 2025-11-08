@@ -7,7 +7,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeGenericClause: Single generic without default", "[clauses][generic]")
+TEST_CASE("GenericClause: Single generic without default", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -26,7 +26,7 @@ TEST_CASE("makeGenericClause: Single generic without default", "[clauses][generi
     REQUIRE_FALSE(generic.default_expr.has_value());
 }
 
-TEST_CASE("makeGenericClause: Single generic with default", "[clauses][generic]")
+TEST_CASE("GenericClause: Single generic with default", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -46,7 +46,7 @@ TEST_CASE("makeGenericClause: Single generic with default", "[clauses][generic]"
     REQUIRE(generic.default_expr.has_value());
 }
 
-TEST_CASE("makeGenericClause: Multiple separate generic declarations", "[clauses][generic]")
+TEST_CASE("GenericClause: Multiple separate generic declarations", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -73,7 +73,7 @@ TEST_CASE("makeGenericClause: Multiple separate generic declarations", "[clauses
     REQUIRE(entity->generic_clause.generics[2].type_name == "boolean");
 }
 
-TEST_CASE("makeGenericClause: Multiple generics same declaration", "[clauses][generic]")
+TEST_CASE("GenericClause: Multiple generics same declaration", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -95,7 +95,7 @@ TEST_CASE("makeGenericClause: Multiple generics same declaration", "[clauses][ge
     REQUIRE(generic.default_expr.has_value());
 }
 
-TEST_CASE("makeGenericClause: Generic with expression default", "[clauses][generic]")
+TEST_CASE("GenericClause: Generic with expression default", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is

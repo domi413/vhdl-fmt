@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeLibraryClause: Single library declaration", "[clauses][library]")
+TEST_CASE("LibraryClause: Single library declaration", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -15,7 +15,7 @@ TEST_CASE("makeLibraryClause: Single library declaration", "[clauses][library]")
     // TODO: Check library clause when makeLibraryClause is implemented
 }
 
-TEST_CASE("makeLibraryClause: Multiple libraries", "[clauses][library]")
+TEST_CASE("LibraryClause: Multiple libraries", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -28,7 +28,7 @@ TEST_CASE("makeLibraryClause: Multiple libraries", "[clauses][library]")
     // TODO: Check multiple libraries when makeLibraryClause is implemented
 }
 
-TEST_CASE("makeLibraryClause: Library in package", "[clauses][library]")
+TEST_CASE("LibraryClause: Library in package", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;
@@ -42,7 +42,7 @@ TEST_CASE("makeLibraryClause: Library in package", "[clauses][library]")
     // TODO: Check library in package when makeLibraryClause is implemented
 }
 
-TEST_CASE("makeLibraryClause: Library with use in architecture", "[clauses][library]")
+TEST_CASE("LibraryClause: Library with use in architecture", "[clauses][library]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         library IEEE;

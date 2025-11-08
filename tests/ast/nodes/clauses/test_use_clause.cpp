@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeUseClause: Single use clause import", "[clauses][use]")
+TEST_CASE("UseClause: Single use clause import", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         use work.MyPackage.all;
@@ -14,7 +14,7 @@ TEST_CASE("makeUseClause: Single use clause import", "[clauses][use]")
     // TODO: Check use clause when makeUseClause is implemented
 }
 
-TEST_CASE("makeUseClause: Multiple use clauses", "[clauses][use]")
+TEST_CASE("UseClause: Multiple use clauses", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         use work.Pkg1.all;
@@ -27,7 +27,7 @@ TEST_CASE("makeUseClause: Multiple use clauses", "[clauses][use]")
     // TODO: Check multiple use clauses when makeUseClause is implemented
 }
 
-TEST_CASE("makeUseClause: Use clause with specific items", "[clauses][use]")
+TEST_CASE("UseClause: Use clause with specific items", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         use IEEE.std_logic_1164.std_logic, IEEE.std_logic_1164.std_logic_vector;
@@ -38,7 +38,7 @@ TEST_CASE("makeUseClause: Use clause with specific items", "[clauses][use]")
     // TODO: Check use clause with specific items when makeUseClause is implemented
 }
 
-TEST_CASE("makeUseClause: Use clause in architecture", "[clauses][use]")
+TEST_CASE("UseClause: Use clause in architecture", "[clauses][use]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

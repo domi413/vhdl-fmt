@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeAllocator: New with qualified expression", "[expressions][allocator]")
+TEST_CASE("Allocator: New with qualified expression", "[expressions][allocator]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -20,7 +20,7 @@ TEST_CASE("makeAllocator: New with qualified expression", "[expressions][allocat
     // TODO(someone): Check allocator with qualified expression when implemented
 }
 
-TEST_CASE("makeAllocator: New with subtype", "[expressions][allocator]")
+TEST_CASE("Allocator: New with subtype", "[expressions][allocator]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -38,7 +38,7 @@ TEST_CASE("makeAllocator: New with subtype", "[expressions][allocator]")
     // TODO(someone): Check allocator with subtype when implemented
 }
 
-TEST_CASE("makeAllocator: New for record", "[expressions][allocator]")
+TEST_CASE("Allocator: New for record", "[expressions][allocator]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -59,7 +59,7 @@ TEST_CASE("makeAllocator: New for record", "[expressions][allocator]")
     // TODO(someone): Check allocator for record when implemented
 }
 
-TEST_CASE("makeAllocator: New without initial value", "[expressions][allocator]")
+TEST_CASE("Allocator: New without initial value", "[expressions][allocator]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

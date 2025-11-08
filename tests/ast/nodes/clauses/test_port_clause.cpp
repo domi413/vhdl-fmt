@@ -7,7 +7,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makePortClause: Single input port", "[clauses][port]")
+TEST_CASE("PortClause: Single input port", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -27,7 +27,7 @@ TEST_CASE("makePortClause: Single input port", "[clauses][port]")
     REQUIRE(port.type_name == "std_logic");
 }
 
-TEST_CASE("makePortClause: Single output port", "[clauses][port]")
+TEST_CASE("PortClause: Single output port", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -46,7 +46,7 @@ TEST_CASE("makePortClause: Single output port", "[clauses][port]")
     REQUIRE(port.type_name == "std_logic");
 }
 
-TEST_CASE("makePortClause: Multiple ports same declaration", "[clauses][port]")
+TEST_CASE("PortClause: Multiple ports same declaration", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -67,7 +67,7 @@ TEST_CASE("makePortClause: Multiple ports same declaration", "[clauses][port]")
     REQUIRE(port.mode == "in");
 }
 
-TEST_CASE("makePortClause: Multiple separate port declarations", "[clauses][port]")
+TEST_CASE("PortClause: Multiple separate port declarations", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -94,7 +94,7 @@ TEST_CASE("makePortClause: Multiple separate port declarations", "[clauses][port
     REQUIRE(entity->port_clause.ports[2].mode == "out");
 }
 
-TEST_CASE("makePortClause: Inout port", "[clauses][port]")
+TEST_CASE("PortClause: Inout port", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is
@@ -112,7 +112,7 @@ TEST_CASE("makePortClause: Inout port", "[clauses][port]")
     REQUIRE(port.mode == "inout");
 }
 
-TEST_CASE("makePortClause: Buffer port", "[clauses][port]")
+TEST_CASE("PortClause: Buffer port", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is

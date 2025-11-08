@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeNullStatement: Simple null statement", "[statements][null]")
+TEST_CASE("NullStatement: Simple null statement", "[statements][null]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -37,7 +37,7 @@ TEST_CASE("makeNullStatement: Simple null statement", "[statements][null]")
     REQUIRE_FALSE(null_stmt->label.has_value());
 }
 
-TEST_CASE("makeNullStatement: Null in if branch", "[statements][null]")
+TEST_CASE("NullStatement: Null in if branch", "[statements][null]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -67,7 +67,7 @@ TEST_CASE("makeNullStatement: Null in if branch", "[statements][null]")
     REQUIRE(null_stmt != nullptr);
 }
 
-TEST_CASE("makeNullStatement: Null in case when", "[statements][null]")
+TEST_CASE("NullStatement: Null in case when", "[statements][null]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -100,7 +100,7 @@ TEST_CASE("makeNullStatement: Null in case when", "[statements][null]")
     REQUIRE(null_stmt != nullptr);
 }
 
-TEST_CASE("makeNullStatement: Null in loop", "[statements][null]")
+TEST_CASE("NullStatement: Null in loop", "[statements][null]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -129,7 +129,7 @@ TEST_CASE("makeNullStatement: Null in loop", "[statements][null]")
     REQUIRE(null_stmt != nullptr);
 }
 
-TEST_CASE("makeNullStatement: Multiple null statements", "[statements][null]")
+TEST_CASE("NullStatement: Multiple null statements", "[statements][null]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

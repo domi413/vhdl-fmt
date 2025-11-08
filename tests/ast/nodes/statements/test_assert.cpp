@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeAssertStatement: Simple assert", "[statements][assert]")
+TEST_CASE("AssertStatement: Simple assert", "[statements][assert]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -38,7 +38,7 @@ TEST_CASE("makeAssertStatement: Simple assert", "[statements][assert]")
     REQUIRE_FALSE(assert_stmt->severity_expr.has_value());
 }
 
-TEST_CASE("makeAssertStatement: Assert with report", "[statements][assert]")
+TEST_CASE("AssertStatement: Assert with report", "[statements][assert]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -64,7 +64,7 @@ TEST_CASE("makeAssertStatement: Assert with report", "[statements][assert]")
     REQUIRE_FALSE(assert_stmt->severity_expr.has_value());
 }
 
-TEST_CASE("makeAssertStatement: Assert with report and severity", "[statements][assert]")
+TEST_CASE("AssertStatement: Assert with report and severity", "[statements][assert]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -90,7 +90,7 @@ TEST_CASE("makeAssertStatement: Assert with report and severity", "[statements][
     REQUIRE(assert_stmt->severity_expr.has_value());
 }
 
-TEST_CASE("makeAssertStatement: Assert false condition", "[statements][assert]")
+TEST_CASE("AssertStatement: Assert false condition", "[statements][assert]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

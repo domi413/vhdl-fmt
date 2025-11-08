@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeReportStatement: Simple report", "[statements][report]")
+TEST_CASE("ReportStatement: Simple report", "[statements][report]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -37,7 +37,7 @@ TEST_CASE("makeReportStatement: Simple report", "[statements][report]")
     REQUIRE_FALSE(report_stmt->severity_expr.has_value());
 }
 
-TEST_CASE("makeReportStatement: Report with severity", "[statements][report]")
+TEST_CASE("ReportStatement: Report with severity", "[statements][report]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -62,7 +62,7 @@ TEST_CASE("makeReportStatement: Report with severity", "[statements][report]")
     REQUIRE(report_stmt->severity_expr.has_value());
 }
 
-TEST_CASE("makeReportStatement: Report with warning severity", "[statements][report]")
+TEST_CASE("ReportStatement: Report with warning severity", "[statements][report]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -87,7 +87,7 @@ TEST_CASE("makeReportStatement: Report with warning severity", "[statements][rep
     REQUIRE(report_stmt->severity_expr.has_value());
 }
 
-TEST_CASE("makeReportStatement: Report with note severity", "[statements][report]")
+TEST_CASE("ReportStatement: Report with note severity", "[statements][report]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

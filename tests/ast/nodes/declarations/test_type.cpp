@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
 
-TEST_CASE("makeTypeDecl: Enumeration type", "[declarations][type]")
+TEST_CASE("TypeDecl: Enumeration type", "[declarations][type]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -15,7 +15,7 @@ TEST_CASE("makeTypeDecl: Enumeration type", "[declarations][type]")
     // TODO(someone): Check type declaration when implemented
 }
 
-TEST_CASE("makeTypeDecl: Record type", "[declarations][type]")
+TEST_CASE("TypeDecl: Record type", "[declarations][type]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -30,7 +30,7 @@ TEST_CASE("makeTypeDecl: Record type", "[declarations][type]")
     // TODO(someone): Check type declaration when implemented
 }
 
-TEST_CASE("makeTypeDecl: Array type", "[declarations][type]")
+TEST_CASE("TypeDecl: Array type", "[declarations][type]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is
@@ -42,7 +42,7 @@ TEST_CASE("makeTypeDecl: Array type", "[declarations][type]")
     // TODO(someone): Check type declaration when implemented
 }
 
-TEST_CASE("makeTypeDecl: Integer type", "[declarations][type]")
+TEST_CASE("TypeDecl: Integer type", "[declarations][type]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         package P is

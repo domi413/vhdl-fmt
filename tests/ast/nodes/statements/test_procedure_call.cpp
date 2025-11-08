@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeProcedureCallStatement: Simple procedure call", "[statements][procedure_call]")
+TEST_CASE("ProcedureCallStatement: Simple procedure call", "[statements][procedure_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -38,7 +38,7 @@ TEST_CASE("makeProcedureCallStatement: Simple procedure call", "[statements][pro
     REQUIRE_FALSE(call_stmt->args.has_value());
 }
 
-TEST_CASE("makeProcedureCallStatement: Procedure call with single argument",
+TEST_CASE("ProcedureCallStatement: Procedure call with single argument",
           "[statements][procedure_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -65,7 +65,7 @@ TEST_CASE("makeProcedureCallStatement: Procedure call with single argument",
     REQUIRE(call_stmt->args.has_value());
 }
 
-TEST_CASE("makeProcedureCallStatement: Procedure call with multiple arguments",
+TEST_CASE("ProcedureCallStatement: Procedure call with multiple arguments",
           "[statements][procedure_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -92,7 +92,7 @@ TEST_CASE("makeProcedureCallStatement: Procedure call with multiple arguments",
     REQUIRE(call_stmt->args.has_value());
 }
 
-TEST_CASE("makeProcedureCallStatement: Procedure call with named associations",
+TEST_CASE("ProcedureCallStatement: Procedure call with named associations",
           "[statements][procedure_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -119,7 +119,7 @@ TEST_CASE("makeProcedureCallStatement: Procedure call with named associations",
     REQUIRE(call_stmt->args.has_value());
 }
 
-TEST_CASE("makeProcedureCallStatement: Procedure call with qualified name",
+TEST_CASE("ProcedureCallStatement: Procedure call with qualified name",
           "[statements][procedure_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -146,7 +146,7 @@ TEST_CASE("makeProcedureCallStatement: Procedure call with qualified name",
     REQUIRE(call_stmt->args.has_value());
 }
 
-TEST_CASE("makeProcedureCallStatement: Builtin procedure call", "[statements][procedure_call]")
+TEST_CASE("ProcedureCallStatement: Builtin procedure call", "[statements][procedure_call]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

@@ -7,7 +7,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeSignalDecl: Single signal with type", "[declarations][signal]")
+TEST_CASE("SignalDecl: Single signal with type", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -32,7 +32,7 @@ TEST_CASE("makeSignalDecl: Single signal with type", "[declarations][signal]")
     REQUIRE_FALSE(signal->init_expr.has_value());
 }
 
-TEST_CASE("makeSignalDecl: Signal with initialization", "[declarations][signal]")
+TEST_CASE("SignalDecl: Signal with initialization", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
@@ -55,7 +55,7 @@ TEST_CASE("makeSignalDecl: Signal with initialization", "[declarations][signal]"
     REQUIRE(signal->init_expr.has_value());
 }
 
-TEST_CASE("makeSignalDecl: Multiple signals same declaration", "[declarations][signal]")
+TEST_CASE("SignalDecl: Multiple signals same declaration", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;

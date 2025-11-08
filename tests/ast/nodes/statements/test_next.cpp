@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeNextStatement: Simple next", "[statements][next]")
+TEST_CASE("NextStatement: Simple next", "[statements][next]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -44,7 +44,7 @@ TEST_CASE("makeNextStatement: Simple next", "[statements][next]")
     REQUIRE_FALSE(next_stmt->condition.has_value());
 }
 
-TEST_CASE("makeNextStatement: Next with condition", "[statements][next]")
+TEST_CASE("NextStatement: Next with condition", "[statements][next]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -75,7 +75,7 @@ TEST_CASE("makeNextStatement: Next with condition", "[statements][next]")
     REQUIRE_FALSE(next_stmt->loop_label.has_value());
 }
 
-TEST_CASE("makeNextStatement: Next with loop label", "[statements][next]")
+TEST_CASE("NextStatement: Next with loop label", "[statements][next]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -112,7 +112,7 @@ TEST_CASE("makeNextStatement: Next with loop label", "[statements][next]")
     REQUIRE_FALSE(next_stmt->condition.has_value());
 }
 
-TEST_CASE("makeNextStatement: Next with label and condition", "[statements][next]")
+TEST_CASE("NextStatement: Next with label and condition", "[statements][next]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;

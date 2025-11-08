@@ -8,7 +8,7 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("makeExitStatement: Simple exit", "[statements][exit]")
+TEST_CASE("ExitStatement: Simple exit", "[statements][exit]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -44,7 +44,7 @@ TEST_CASE("makeExitStatement: Simple exit", "[statements][exit]")
     REQUIRE_FALSE(exit_stmt->condition.has_value());
 }
 
-TEST_CASE("makeExitStatement: Exit with condition", "[statements][exit]")
+TEST_CASE("ExitStatement: Exit with condition", "[statements][exit]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -75,7 +75,7 @@ TEST_CASE("makeExitStatement: Exit with condition", "[statements][exit]")
     REQUIRE_FALSE(exit_stmt->loop_label.has_value());
 }
 
-TEST_CASE("makeExitStatement: Exit with loop label", "[statements][exit]")
+TEST_CASE("ExitStatement: Exit with loop label", "[statements][exit]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -112,7 +112,7 @@ TEST_CASE("makeExitStatement: Exit with loop label", "[statements][exit]")
     REQUIRE_FALSE(exit_stmt->condition.has_value());
 }
 
-TEST_CASE("makeExitStatement: Exit with label and condition", "[statements][exit]")
+TEST_CASE("ExitStatement: Exit with label and condition", "[statements][exit]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
@@ -143,7 +143,7 @@ TEST_CASE("makeExitStatement: Exit with label and condition", "[statements][exit
     REQUIRE(exit_stmt->condition.has_value());
 }
 
-TEST_CASE("makeExitStatement: Exit from while loop", "[statements][exit]")
+TEST_CASE("ExitStatement: Exit from while loop", "[statements][exit]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity Test is end Test;
