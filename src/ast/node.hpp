@@ -1,7 +1,6 @@
 #ifndef AST_NODE_HPP
 #define AST_NODE_HPP
 
-#include <cstddef>
 #include <optional>
 #include <string>
 #include <variant>
@@ -19,7 +18,7 @@ struct Comments
 /// Used to preserve user's intentional grouping while allowing the formatter to normalize spacing.
 struct ParagraphBreak
 {
-    std::size_t blank_lines{ 1 }; ///< Number of visible blank lines
+    unsigned int blank_lines{ 1 }; ///< Number of visible blank lines
 };
 
 /// @brief A variant representing either a comment or a paragraph break to preserve order.

@@ -15,7 +15,7 @@ void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t start_index)
     // Tokens are given in source order
     const auto &hidden = tokens_.getHiddenTokensToLeft(start_index);
 
-    std::size_t linebreaks{ 0 };
+    unsigned int linebreaks{ 0 };
 
     // Iterate backward — closest token first
     for (const antlr4::Token *token : hidden | std::views::reverse) {
