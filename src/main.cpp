@@ -20,7 +20,7 @@ auto main(int argc, char *argv[]) -> int
         };
 
         cli::ConfigReader config_reader{ argparser.getConfigPath() };
-        auto config_result = config_reader.readConfigFile();
+        const auto config_result = config_reader.readConfigFile();
         const common::Config config = config_result.value();
 
         // Build AST from input file
