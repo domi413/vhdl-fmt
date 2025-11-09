@@ -7,7 +7,6 @@
 #include <utility>
 
 using emit::Doc;
-using emit::space;
 using emit::test::defaultConfig;
 
 TEST_CASE("Doc::empty creates empty document", "[doc]")
@@ -20,12 +19,6 @@ TEST_CASE("Doc::text creates text document", "[doc]")
 {
     const Doc doc = Doc::text("hello world");
     REQUIRE(doc.render(defaultConfig()) == "hello world");
-}
-
-TEST_CASE("Space helper creates single space", "[doc]")
-{
-    const Doc doc = space();
-    REQUIRE(doc.render(defaultConfig()) == " ");
 }
 
 TEST_CASE("Direct concatenation with operator+", "[doc]")

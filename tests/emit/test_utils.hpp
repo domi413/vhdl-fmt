@@ -1,12 +1,17 @@
 #ifndef EMIT_TEST_UTILS_HPP
 #define EMIT_TEST_UTILS_HPP
 
+#include "ast/node.hpp"
 #include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
 
+#include <concepts>
 #include <string>
 
 namespace emit::test {
+
+template<typename T>
+concept ASTNode = std::derived_from<T, ast::NodeBase>;
 
 // Default config for tests - uses indent_size of 2 to match existing test expectations
 constexpr auto defaultConfig() -> common::Config
@@ -21,8 +26,7 @@ constexpr auto defaultConfig() -> common::Config
 }
 
 // Helper to render an AST node with default config
-template<typename T>
-auto render(const T &node) -> std::string
+auto render(const ASTNode auto &node) -> std::string
 {
     emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(node);
@@ -30,8 +34,7 @@ auto render(const T &node) -> std::string
 }
 
 // Helper to render an AST node with custom config
-template<typename T>
-auto render(const T &node, const common::Config &config) -> std::string
+auto render(const ASTNode auto &node, const common::Config &config) -> std::string
 {
     emit::PrettyPrinter printer{ config };
     const auto doc = printer(node);

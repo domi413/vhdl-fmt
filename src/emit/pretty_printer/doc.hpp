@@ -59,9 +59,6 @@ class Doc final
     explicit Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}
 };
 
-// Helper functions
-auto space() -> Doc;
-
 } // namespace emit
 
 #endif // EMIT_DOC_HPP

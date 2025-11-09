@@ -40,7 +40,7 @@ auto Doc::operator+(const Doc &other) const -> Doc
 
 auto Doc::operator&(const Doc &other) const -> Doc
 {
-    return *this + space() + other;
+    return *this + Doc::text(" ") + other;
 }
 
 auto Doc::operator/(const Doc &other) const -> Doc
@@ -82,12 +82,6 @@ auto Doc::render(const common::Config &config) const -> std::string
 {
     Renderer renderer(config);
     return renderer.render(impl_);
-}
-
-// Helper functions
-auto space() -> Doc
-{
-    return Doc::text(" ");
 }
 
 } // namespace emit
