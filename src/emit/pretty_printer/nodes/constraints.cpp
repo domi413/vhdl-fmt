@@ -7,7 +7,6 @@ namespace emit {
 auto PrettyPrinter::operator()(const ast::IndexConstraint &node) -> Doc
 {
     // Index constraints are parenthesized ranges: (7 downto 0) or (0 to 15, 0 to 7)
-    // The GroupExpr visitor already adds the parentheses
     return visit(node.ranges);
 }
 

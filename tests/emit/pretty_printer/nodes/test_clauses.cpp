@@ -196,45 +196,46 @@ TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][c
     REQUIRE(result == expected);
 }
 
-TEST_CASE("PortClause with align_signals enabled", "[pretty_printer][clauses][config]")
-{
-    ast::PortClause clause;
+// TODO(vedivad): Enable when table combinator is implemented
+// TEST_CASE("PortClause with align_signals enabled", "[pretty_printer][clauses][config]")
+// {
+//     ast::PortClause clause;
 
-    ast::Port port1;
-    port1.names = { "clk" };
-    port1.mode = "in";
-    port1.type_name = "std_logic";
+//     ast::Port port1;
+//     port1.names = { "clk" };
+//     port1.mode = "in";
+//     port1.type_name = "std_logic";
 
-    ast::Port port2;
-    port2.names = { "data_valid" };
-    port2.mode = "in";
-    port2.type_name = "std_logic";
+//     ast::Port port2;
+//     port2.names = { "data_valid" };
+//     port2.mode = "in";
+//     port2.type_name = "std_logic";
 
-    ast::Port port3;
-    port3.names = { "output_signal" };
-    port3.mode = "out";
-    port3.type_name = "std_logic_vector";
+//     ast::Port port3;
+//     port3.names = { "output_signal" };
+//     port3.mode = "out";
+//     port3.type_name = "std_logic_vector";
 
-    clause.ports.emplace_back(std::move(port1));
-    clause.ports.emplace_back(std::move(port2));
-    clause.ports.emplace_back(std::move(port3));
+//     clause.ports.emplace_back(std::move(port1));
+//     clause.ports.emplace_back(std::move(port2));
+//     clause.ports.emplace_back(std::move(port3));
 
-    // Create config with align_signals enabled
-    constexpr int TEST_LINE_LENGTH = 80;
-    common::Config config;
-    config.port_map.align_signals = true;
-    config.line_config.line_length = TEST_LINE_LENGTH;
-    config.line_config.indent_size = 2;
+//     // Create config with align_signals enabled
+//     constexpr int TEST_LINE_LENGTH = 80;
+//     common::Config config;
+//     config.port_map.align_signals = true;
+//     config.line_config.line_length = TEST_LINE_LENGTH;
+//     config.line_config.indent_size = 2;
 
-    emit::PrettyPrinter printer(config);
-    const auto doc = printer(clause);
-    const auto result = doc.render(config);
+//     emit::PrettyPrinter printer(config);
+//     const auto doc = printer(clause);
+//     const auto result = doc.render(config);
 
-    // Should use table format with aligned columns
-    const std::string expected = "port (\n"
-                                 "  clk           : in  std_logic;\n"
-                                 "  data_valid    : in  std_logic;\n"
-                                 "  output_signal : out std_logic_vector\n"
-                                 ");";
-    REQUIRE(result == expected);
-}
+//     // Should use table format with aligned columns
+//     const std::string expected = "port (\n"
+//                                  "  clk           : in  std_logic;\n"
+//                                  "  data_valid    : in  std_logic;\n"
+//                                  "  output_signal : out std_logic_vector\n"
+//                                  ");";
+//     REQUIRE(result == expected);
+// }

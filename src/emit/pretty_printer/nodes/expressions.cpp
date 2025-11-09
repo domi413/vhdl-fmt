@@ -11,7 +11,7 @@ auto PrettyPrinter::operator()(const ast::TokenExpr &node) -> Doc
     return Doc::text(node.text);
 }
 
-auto PrettyPrinter::operator()(const ast::GroupExpr & node) -> Doc
+auto PrettyPrinter::operator()(const ast::GroupExpr &node) -> Doc
 {
     return Doc::text("(") + joinDocs(visit(node.children), Doc::text(", "), false) + Doc::text(")");
 }

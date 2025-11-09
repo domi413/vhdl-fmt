@@ -1,9 +1,7 @@
 #include "ast/nodes/design_units.hpp"
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
-
-#include <algorithm>
-#include <ranges>
+#include "emit/pretty_printer/doc_utils.hpp"
 
 namespace emit {
 
@@ -13,22 +11,18 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
         return Doc::empty();
     }
 
-    // Build list of generic parameters using fold_left
-    Doc params = std::ranges::fold_left(
-      node.generics | std::views::transform([this](const auto &g) { return visit(g); }),
-      Doc::empty(),
-      [first = true](const Doc &acc, const Doc &doc) mutable -> Doc {
-          if (first) {
-              first = false;
-              return doc;
-          }
-          return acc + Doc::text(";") / doc;
-      });
-
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    return Doc::bracket(opener, params, closer).group();
+    std::vector<Doc> params = toDocVectorVisit(node.generics, *this);
+
+    // TODO(vedivad): Implement table combinator for alignment
+    // if (config().port_map.align_signals) {
+
+    // }
+
+    Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
+    return Doc::bracket(opener, result, closer).group();
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
@@ -37,21 +31,16 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
         return Doc::empty();
     }
 
-    // Build list of ports using fold_left
-    Doc ports = std::ranges::fold_left(
-      node.ports | std::views::transform([this](const auto &p) { return visit(p); }),
-      Doc::empty(),
-      [first = true](const Doc &acc, const Doc &doc) mutable -> Doc {
-          if (first) {
-              first = false;
-              return doc;
-          }
-          return acc + Doc::text(";") / doc;
-      });
-
     const Doc opener = Doc::text("port") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
+    const auto docs = toDocVectorVisit(node.ports, *this);
+
+    // if (config().port_map.align_signals) {
+
+    // }
+
+    Doc ports = joinDocs(docs, Doc::text(";") + Doc::line(), false);
     return Doc::bracket(opener, ports, closer).group();
 }
 

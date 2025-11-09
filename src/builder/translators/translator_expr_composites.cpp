@@ -68,7 +68,8 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
 
 // ---------------------- Constraints/Ranges ----------------------
 
-auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::optional<ast::Constraint>
+auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx)
+  -> std::optional<ast::Constraint>
 {
     // Dispatch based on concrete constraint type
     if (auto *index = ctx->index_constraint()) {

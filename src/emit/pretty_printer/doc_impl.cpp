@@ -1,5 +1,6 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 
+#include "common/overload.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
 #include <memory>
@@ -46,13 +47,6 @@ auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr
     return std::make_shared<DocImpl>(Union{ .flat = std::move(flat), .broken = std::move(broken) });
 }
 
-// Helper for overload pattern
-template<typename... Ts>
-struct Overload : Ts... // NOLINT(fuchsia-multiple-inheritance)
-{
-    using Ts::operator()...;
-};
-
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr
 {
@@ -60,7 +54,7 @@ auto flatten(const DocPtr &doc) -> DocPtr
         return doc;
     }
 
-    return std::visit(Overload{
+    return std::visit(common::Overload{
                         [](const Empty &) -> DocPtr { return makeEmpty(); },
                         [](const Text &node) -> DocPtr { return makeText(node.content); },
                         [](const SoftLine &) -> DocPtr {

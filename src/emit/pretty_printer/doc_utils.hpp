@@ -14,7 +14,7 @@ namespace emit {
 /// @param transform Function to convert each item to a Doc
 /// @return Vector of Docs
 template<std::ranges::input_range Range, typename Transform>
-auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
+inline auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
 {
     std::vector<Doc> result;
 
@@ -35,32 +35,10 @@ auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
 /// @param visitor The visitor that can handle the items (must have a visit method or operator())
 /// @return Vector of Docs
 template<std::ranges::input_range Range, typename Visitor>
-auto toDocVectorVisit(Range &&items, Visitor &visitor) -> std::vector<Doc>
+inline auto toDocVectorVisit(Range &&items, Visitor &visitor) -> std::vector<Doc>
 {
     return toDocVector(std::forward<Range>(items),
-                      [&visitor](auto &&item) { return visitor.visit(item); });
-}
-
-/// Create a row of Docs from a variadic list of arguments
-/// Each argument is converted to text or kept as-is if already a Doc
-/// @param args Variable number of string-like or Doc arguments
-/// @return Vector of Docs representing a row
-template<typename... Args>
-auto makeRow(Args &&...args) -> std::vector<Doc>
-{
-    std::vector<Doc> row;
-    row.reserve(sizeof...(args));
-
-    (row.push_back([](auto &&arg) {
-        using T = std::decay_t<decltype(arg)>;
-        if constexpr (std::same_as<T, Doc>) {
-            return std::forward<decltype(arg)>(arg);
-        } else {
-            return Doc::text(std::forward<decltype(arg)>(arg));
-        }
-    }(std::forward<Args>(args))), ...);
-
-    return row;
+                       [&visitor](auto &&item) { return visitor(item); });
 }
 
 /// Join multiple Docs with a separator
@@ -68,9 +46,8 @@ auto makeRow(Args &&...args) -> std::vector<Doc>
 /// @param separator Separator doc (e.g., Doc::text(";"))
 /// @param include_trailing Whether to include separator after the last element
 /// @return Combined Doc
-inline auto joinDocs(const std::vector<Doc> &docs,
-                     const Doc &separator,
-                     bool include_trailing) -> Doc
+inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool include_trailing)
+  -> Doc
 {
     if (docs.empty()) {
         return Doc::empty();

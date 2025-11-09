@@ -14,7 +14,7 @@ constexpr auto defaultConfig() -> common::Config
     common::Config config;
     config.line_config.indent_size = TEST_INDENT_SIZE;
     config.line_config.line_length = TEST_LINE_LENGTH;
-    config.port_map.align_signals = false;  // Disable alignment by default
+    config.port_map.align_signals = false; // Disable alignment by default
     return config;
 }
 

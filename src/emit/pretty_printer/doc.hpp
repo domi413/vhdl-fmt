@@ -21,9 +21,6 @@ inline constexpr int DEFAULT_INDENT = 1;
 /// Document abstraction for pretty printing
 class Doc final
 {
-    std::shared_ptr<DocImpl> impl_;
-    explicit Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}
-
   public:
     Doc();
     ~Doc() = default;
@@ -62,6 +59,10 @@ class Doc final
     // Rendering
     [[nodiscard]]
     auto render(const common::Config &config) const -> std::string;
+
+  private:
+    std::shared_ptr<DocImpl> impl_;
+    explicit Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}
 };
 
 // Helper functions

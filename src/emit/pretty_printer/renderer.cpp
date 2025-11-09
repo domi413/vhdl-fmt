@@ -1,19 +1,13 @@
 #include "emit/pretty_printer/renderer.hpp"
 
 #include "common/config.hpp"
+#include "common/overload.hpp"
 #include "emit/pretty_printer/doc_impl.hpp"
 
 #include <string>
 #include <variant>
 
 namespace emit {
-
-// Helper for overload pattern
-template<typename... Ts>
-struct Overload : Ts... // NOLINT(fuchsia-multiple-inheritance)
-{
-    using Ts::operator()...;
-};
 
 Renderer::Renderer(const common::Config &config) :
   width_(config.line_config.line_length),
@@ -38,7 +32,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
         return;
     }
 
-    std::visit(Overload{
+    std::visit(common::Overload{
                  [&](const Empty &) -> void {
                      // Empty produces nothing
                  },
@@ -95,7 +89,7 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
     }
 
     return std::visit(
-      Overload{
+      common::Overload{
         [&](const Empty &) -> int { return width; },
         [&](const Text &node) -> int { return width - static_cast<int>(node.content.length()); },
         [&](const SoftLine &) -> int {

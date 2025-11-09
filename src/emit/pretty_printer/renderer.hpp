@@ -23,12 +23,6 @@ enum class Mode : std::uint8_t
 /// Renderer for the pretty printer
 class Renderer final
 {
-  private:
-    int width_;
-    int indent_size_;
-    int column_{ 0 };
-    std::string output_;
-
   public:
     explicit Renderer(const common::Config &config);
 
@@ -48,6 +42,12 @@ class Renderer final
     // Output helpers
     void write(std::string_view text);
     void newline(int indent);
+
+    // Member variables
+    int width_;
+    int indent_size_;
+    int column_{ 0 };
+    std::string output_;
 };
 
 } // namespace emit

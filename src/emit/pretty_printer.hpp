@@ -14,13 +14,6 @@ namespace emit {
 
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 {
-  private:
-    common::Config config_;
-
-  protected:
-    // Config accessor for visitor methods
-    [[nodiscard]] auto config() const -> const common::Config& { return config_; }
-
   public:
     PrettyPrinter() = default;
     explicit PrettyPrinter(common::Config config) : config_(config) {}
@@ -66,6 +59,17 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::CaseStatement &node) -> Doc;
     auto operator()(const ast::ForLoop &node) -> Doc;
     auto operator()(const ast::WhileLoop &node) -> Doc;
+
+  protected:
+    // Config accessor for visitor methods
+    [[nodiscard]]
+    auto config() const -> const common::Config &
+    {
+        return config_;
+    }
+
+  private:
+    common::Config config_;
 };
 
 } // namespace emit
