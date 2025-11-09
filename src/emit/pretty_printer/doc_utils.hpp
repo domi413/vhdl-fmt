@@ -14,7 +14,7 @@ namespace emit {
 /// @param transform Function to convert each item to a Doc
 /// @return Vector of Docs
 template<std::ranges::input_range Range, typename Transform>
-inline auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
+auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
 {
     std::vector<Doc> result;
 
