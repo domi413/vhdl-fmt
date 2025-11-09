@@ -3,20 +3,21 @@
 #include "emit/pretty_printer/doc.hpp"
 #include "emit/pretty_printer/doc_utils.hpp"
 
-#include <vector>
+#include <ranges>
 
 namespace emit {
 
 auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
 {
-    if (node.generics.empty()) {
+    if (std::ranges::empty(node.generics)) {
         return Doc::empty();
     }
 
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const std::vector<Doc> params = toDocVectorVisit(node.generics, *this);
+    const auto params
+      = toDocVector(node.generics, [this](const auto &param) { return visit(param); });
 
     // TODO(vedivad): Implement table combinator for alignment
     // if (config().port_map.align_signals) {
@@ -29,14 +30,14 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
 {
-    if (node.ports.empty()) {
+    if (std::ranges::empty(node.ports)) {
         return Doc::empty();
     }
 
     const Doc opener = Doc::text("port") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const auto ports = toDocVectorVisit(node.ports, *this);
+    const auto ports = toDocVector(node.ports, [this](const auto &port) { return visit(port); });
 
     // if (config().port_map.align_signals) {
 

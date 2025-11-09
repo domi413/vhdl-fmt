@@ -2,6 +2,7 @@
 
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
+#include "emit/pretty_printer/doc_utils.hpp"
 
 #include <ranges>
 
@@ -9,18 +10,13 @@ namespace emit {
 
 auto PrettyPrinter::operator()(const ast::DesignFile &node) const -> Doc
 {
-    if (node.units.empty()) {
+    if (std::ranges::empty(node.units)) {
         return Doc::empty();
     }
 
-    Doc result = Doc::empty();
-
-    for (const auto [i, unit] : std::views::enumerate(node.units)) {
-        if (i > 0) {
-            result /= Doc::line(); // Blank line separator
-        }
-        result += visit(unit);
-    }
+    const auto unit_docs
+      = toDocVector(node.units, [this](const auto &unit) { return visit(unit); });
+    const auto result = joinDocs(unit_docs, Doc::line() + Doc::line(), false);
 
     return result + Doc::line(); // Trailing newline
 }

@@ -3,33 +3,32 @@
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
+#include <algorithm>
+#include <ranges>
+
 namespace emit {
 
 auto PrettyPrinter::operator()(const ast::Entity &node) const -> Doc
 {
     Doc result = Doc::text("entity") & Doc::text(node.name) & Doc::text("is");
 
-    // Generic clause (if not empty)
-    if (!node.generic_clause.generics.empty()) {
+    if (!std::ranges::empty(node.generic_clause.generics)) {
         result <<= visit(node.generic_clause);
     }
 
-    // Port clause (if not empty)
-    if (!node.port_clause.ports.empty()) {
+    if (!std::ranges::empty(node.port_clause.ports)) {
         result <<= visit(node.port_clause);
     }
 
     // Declarations
-    for (const auto &decl : node.decls) {
-        result <<= visit(decl);
-    }
+    result = std::ranges::fold_left(
+      node.decls, result, [this](auto acc, const auto &decl) { return acc <<= visit(decl); });
 
     // Begin section (concurrent statements)
-    if (!node.stmts.empty()) {
+    if (!std::ranges::empty(node.stmts)) {
         result /= Doc::text("begin");
-        for (const auto &stmt : node.stmts) {
-            result <<= visit(stmt);
-        }
+        result = std::ranges::fold_left(
+          node.stmts, result, [this](auto acc, const auto &stmt) { return acc <<= visit(stmt); });
     }
 
     // end [entity] [<name>];
@@ -49,17 +48,15 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) const -> Doc
                & Doc::text("is");
 
     // Declarations
-    for (const auto &decl : node.decls) {
-        result <<= visit(decl);
-    }
+    result = std::ranges::fold_left(
+      node.decls, result, [this](auto acc, const auto &decl) { return acc <<= visit(decl); });
 
     // begin
     result /= Doc::text("begin");
 
     // Concurrent statements
-    for (const auto &stmt : node.stmts) {
-        result <<= visit(stmt);
-    }
+    result = std::ranges::fold_left(
+      node.stmts, result, [this](auto acc, const auto &stmt) { return acc <<= visit(stmt); });
 
     // end [architecture] [<name>];
     const Doc end_line

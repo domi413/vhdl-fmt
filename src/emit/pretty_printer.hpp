@@ -15,14 +15,7 @@ namespace emit {
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 {
   public:
-    PrettyPrinter() = default;
     explicit PrettyPrinter(common::Config config) : config_(config) {}
-
-    PrettyPrinter(const PrettyPrinter &) = delete;
-    auto operator=(const PrettyPrinter &) -> PrettyPrinter & = delete;
-    PrettyPrinter(PrettyPrinter &&) = delete;
-    auto operator=(PrettyPrinter &&) -> PrettyPrinter & = delete;
-    ~PrettyPrinter() = default;
 
     // Node visitors
     auto operator()(const ast::DesignFile &node) const -> Doc;

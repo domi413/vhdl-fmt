@@ -29,18 +29,6 @@ inline auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc
     return result;
 }
 
-/// Convert a range of items into a vector of Docs by visiting each with a visitor
-/// Convenience overload for visitor pattern
-/// @param items The input range of items
-/// @param visitor The visitor that can handle the items (must have a visit method or operator())
-/// @return Vector of Docs
-template<std::ranges::input_range Range, typename Visitor>
-inline auto toDocVectorVisit(Range &&items, Visitor &visitor) -> std::vector<Doc>
-{
-    return toDocVector(std::forward<Range>(items),
-                       [&visitor](auto &&item) { return visitor(item); });
-}
-
 /// Join multiple Docs with a separator
 /// @param docs Vector of docs to join
 /// @param separator Separator doc (e.g., Doc::text(";"))

@@ -19,7 +19,7 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
     result &= Doc::text(":") & Doc::text(node.type_name);
 
     // Default value
-    if (node.default_expr.has_value()) {
+    if (node.default_expr) {
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
 
@@ -39,12 +39,12 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
     result &= Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
 
     // Constraint (e.g., (7 downto 0) or range 0 to 255)
-    if (node.constraint.has_value()) {
+    if (node.constraint) {
         result += visit(node.constraint.value());
     }
 
     // Default value
-    if (node.default_expr.has_value()) {
+    if (node.default_expr) {
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
 
