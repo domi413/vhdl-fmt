@@ -20,22 +20,18 @@ struct Port;
 /// Variant type for all declarations
 using Declaration = std::variant<ConstantDecl, SignalDecl, GenericParam, Port>;
 
-// Base data common to all declarations
-struct DeclBase : NodeBase
+// Constant declaration: constant WIDTH : integer := 8;
+struct ConstantDecl : NodeBase
 {
     std::vector<std::string> names;
-};
-
-// Constant declaration: constant WIDTH : integer := 8;
-struct ConstantDecl : DeclBase
-{
     std::string type_name;
     std::optional<Expr> init_expr;
 };
 
 // Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');
-struct SignalDecl : DeclBase
+struct SignalDecl : NodeBase
 {
+    std::vector<std::string> names;
     std::string type_name;
     bool has_bus_kw{ false };
     std::optional<Constraint> constraint;
@@ -43,15 +39,17 @@ struct SignalDecl : DeclBase
 };
 
 // Generic parameter inside GENERIC clause
-struct GenericParam : DeclBase
+struct GenericParam : NodeBase
 {
+    std::vector<std::string> names;
     std::string type_name;
     std::optional<Expr> default_expr;
 };
 
 // Port entry inside PORT clause
-struct Port : DeclBase
+struct Port : NodeBase
 {
+    std::vector<std::string> names;
     std::string mode; // "in" / "out"
     std::string type_name;
     std::optional<Expr> default_expr;
