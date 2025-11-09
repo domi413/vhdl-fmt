@@ -6,13 +6,15 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
+#include <optional>
+#include <string>
 #include <utility>
 
 using emit::test::defaultConfig;
 
 TEST_CASE("Simple Entity without generics or ports", "[pretty_printer][design_units]")
 {
-    ast::Entity entity{ .name = "simple_entity" };
+    const ast::Entity entity{ .name = "simple_entity" };
 
     const std::string result = emit::test::render(entity);
     const std::string expected = "entity simple_entity is\n"
@@ -69,10 +71,11 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
     entity.generic_clause.generics.push_back(std::move(param));
 
     // Add constraint
-    ast::BinaryExpr constraint{ .left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" }),
+    auto left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" });
+    auto right = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "0" });
+    ast::BinaryExpr constraint{ .left = std::move(left),
                                 .op = "downto",
-                                .right
-                                = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "0" }) };
+                                .right = std::move(right) };
 
     // Create IndexConstraint with GroupExpr containing the range
     ast::IndexConstraint idx_constraint;
@@ -98,7 +101,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
 
 TEST_CASE("Entity with custom end label", "[pretty_printer][design_units]")
 {
-    ast::Entity entity{ .name = "my_entity", .end_label = "custom_label" };
+    const ast::Entity entity{ .name = "my_entity", .end_label = "custom_label" };
 
     const std::string result = emit::test::render(entity);
     const std::string expected = "entity my_entity is\n"
@@ -131,7 +134,7 @@ TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_
 
 TEST_CASE("Simple Architecture", "[pretty_printer][design_units]")
 {
-    ast::Architecture arch{ .name = "rtl", .entity_name = "counter" };
+    const ast::Architecture arch{ .name = "rtl", .entity_name = "counter" };
 
     const std::string result = emit::test::render(arch);
     const std::string expected = "architecture rtl of counter is\n"

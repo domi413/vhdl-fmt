@@ -5,6 +5,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
+#include <optional>
+#include <string>
 #include <utility>
 
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
@@ -75,10 +77,11 @@ TEST_CASE("PortClause with multiple ports (broken)", "[pretty_printer][clauses]"
     ast::Port port2{ .names = { "reset" }, .mode = "in", .type_name = "std_logic" };
 
     // Build constraint for port3
-    ast::BinaryExpr constraint{ .left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" }),
+    auto left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" });
+    auto right = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "0" });
+    ast::BinaryExpr constraint{ .left = std::move(left),
                                 .op = "downto",
-                                .right
-                                = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "0" }) };
+                                .right = std::move(right) };
 
     ast::IndexConstraint idx_constraint{};
     idx_constraint.ranges.children.emplace_back(std::move(constraint));
@@ -93,12 +96,13 @@ TEST_CASE("PortClause with multiple ports (broken)", "[pretty_printer][clauses]"
     clause.ports.emplace_back(std::move(port2));
     clause.ports.emplace_back(std::move(port3));
 
-    const auto result = emit::test::render(clause);
+    const std::string result = emit::test::render(clause);
     const std::string expected = "port (\n"
                                  "  clk : in std_logic;\n"
                                  "  reset : in std_logic;\n"
                                  "  data_out : out std_logic_vector(7 downto 0)\n"
                                  ");";
+
     REQUIRE(result == expected);
 }
 

@@ -6,32 +6,32 @@
 
 namespace emit {
 
-auto PrettyPrinter::operator()(const ast::TokenExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::TokenExpr &node) const -> Doc
 {
     return Doc::text(node.text);
 }
 
-auto PrettyPrinter::operator()(const ast::GroupExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::GroupExpr &node) const -> Doc
 {
     return Doc::text("(") + joinDocs(visit(node.children), Doc::text(", "), false) + Doc::text(")");
 }
 
-auto PrettyPrinter::operator()(const ast::UnaryExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::UnaryExpr &node) const -> Doc
 {
     return Doc::text(node.op) & visit(*node.value);
 }
 
-auto PrettyPrinter::operator()(const ast::BinaryExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::BinaryExpr &node) const -> Doc
 {
     return visit(*node.left) & Doc::text(node.op) & visit(*node.right);
 }
 
-auto PrettyPrinter::operator()(const ast::ParenExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::ParenExpr &node) const -> Doc
 {
     return Doc::text("(") + visit(*node.inner) + Doc::text(")");
 }
 
-auto PrettyPrinter::operator()(const ast::CallExpr &node) -> Doc
+auto PrettyPrinter::operator()(const ast::CallExpr &node) const -> Doc
 {
     return visit(*node.callee) + Doc::text("(") + visit(*node.args) + Doc::text(")");
 }

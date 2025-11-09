@@ -7,7 +7,7 @@
 
 namespace emit {
 
-auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
+auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
 {
     if (node.generics.empty()) {
         return Doc::empty();
@@ -27,7 +27,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
     return Doc::bracket(opener, result, closer).group();
 }
 
-auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
+auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
 {
     if (node.ports.empty()) {
         return Doc::empty();

@@ -5,7 +5,7 @@
 
 namespace emit {
 
-auto PrettyPrinter::operator()(const ast::Entity &node) -> Doc
+auto PrettyPrinter::operator()(const ast::Entity &node) const -> Doc
 {
     Doc result = Doc::text("entity") & Doc::text(node.name) & Doc::text("is");
 
@@ -40,7 +40,7 @@ auto PrettyPrinter::operator()(const ast::Entity &node) -> Doc
     return result / end_line;
 }
 
-auto PrettyPrinter::operator()(const ast::Architecture &node) -> Doc
+auto PrettyPrinter::operator()(const ast::Architecture &node) const -> Doc
 {
     Doc result = Doc::text("architecture")
                & Doc::text(node.name)

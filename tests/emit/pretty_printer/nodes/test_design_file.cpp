@@ -4,6 +4,7 @@
 #include "nodes/declarations.hpp"
 
 #include <catch2/catch_test_macros.hpp>
+#include <string>
 #include <utility>
 
 TEST_CASE("Empty DesignFile", "[pretty_printer][design_file]")

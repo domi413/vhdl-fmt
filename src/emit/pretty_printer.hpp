@@ -25,40 +25,40 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     ~PrettyPrinter() = default;
 
     // Node visitors
-    auto operator()(const ast::DesignFile &node) -> Doc;
-    auto operator()(const ast::Entity &node) -> Doc;
-    auto operator()(const ast::Architecture &node) -> Doc;
-    auto operator()(const ast::GenericClause &node) -> Doc;
-    auto operator()(const ast::PortClause &node) -> Doc;
-    auto operator()(const ast::GenericParam &node) -> Doc;
-    auto operator()(const ast::Port &node) -> Doc;
+    auto operator()(const ast::DesignFile &node) const -> Doc;
+    auto operator()(const ast::Entity &node) const -> Doc;
+    auto operator()(const ast::Architecture &node) const -> Doc;
+    auto operator()(const ast::GenericClause &node) const -> Doc;
+    auto operator()(const ast::PortClause &node) const -> Doc;
+    auto operator()(const ast::GenericParam &node) const -> Doc;
+    auto operator()(const ast::Port &node) const -> Doc;
 
     // Declarations
-    auto operator()(const ast::SignalDecl &node) -> Doc;
-    auto operator()(const ast::ConstantDecl &node) -> Doc;
+    auto operator()(const ast::SignalDecl &node) const -> Doc;
+    auto operator()(const ast::ConstantDecl &node) const -> Doc;
 
     // Expressions
-    auto operator()(const ast::TokenExpr &node) -> Doc;
-    auto operator()(const ast::GroupExpr &node) -> Doc;
-    auto operator()(const ast::UnaryExpr &node) -> Doc;
-    auto operator()(const ast::BinaryExpr &node) -> Doc;
-    auto operator()(const ast::ParenExpr &node) -> Doc;
-    auto operator()(const ast::CallExpr &node) -> Doc;
+    auto operator()(const ast::TokenExpr &node) const -> Doc;
+    auto operator()(const ast::GroupExpr &node) const -> Doc;
+    auto operator()(const ast::UnaryExpr &node) const -> Doc;
+    auto operator()(const ast::BinaryExpr &node) const -> Doc;
+    auto operator()(const ast::ParenExpr &node) const -> Doc;
+    auto operator()(const ast::CallExpr &node) const -> Doc;
 
     // Constraints
-    auto operator()(const ast::IndexConstraint &node) -> Doc;
-    auto operator()(const ast::RangeConstraint &node) -> Doc;
+    auto operator()(const ast::IndexConstraint &node) const -> Doc;
+    auto operator()(const ast::RangeConstraint &node) const -> Doc;
 
     // Concurrent Statements
-    auto operator()(const ast::ConcurrentAssign &node) -> Doc;
-    auto operator()(const ast::Process &node) -> Doc;
+    auto operator()(const ast::ConcurrentAssign &node) const -> Doc;
+    auto operator()(const ast::Process &node) const -> Doc;
 
     // Sequential Statements
-    auto operator()(const ast::SequentialAssign &node) -> Doc;
-    auto operator()(const ast::IfStatement &node) -> Doc;
-    auto operator()(const ast::CaseStatement &node) -> Doc;
-    auto operator()(const ast::ForLoop &node) -> Doc;
-    auto operator()(const ast::WhileLoop &node) -> Doc;
+    auto operator()(const ast::SequentialAssign &node) const -> Doc;
+    auto operator()(const ast::IfStatement &node) const -> Doc;
+    auto operator()(const ast::CaseStatement &node) const -> Doc;
+    auto operator()(const ast::ForLoop &node) const -> Doc;
+    auto operator()(const ast::WhileLoop &node) const -> Doc;
 
   protected:
     // Config accessor for visitor methods

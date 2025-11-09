@@ -30,12 +30,8 @@ auto main(int argc, char *argv[]) -> int
         // Build AST from input file
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
 
-        // Debug print the AST
-        // emit::DebugPrinter debug_printer(std::cout);
-        // debug_printer.visit(root);
-
         // Pretty print the AST
-        emit::PrettyPrinter printer{ config };
+        const emit::PrettyPrinter printer{ config };
         const auto doc = printer(root);
         std::cout << doc.render(config);
 

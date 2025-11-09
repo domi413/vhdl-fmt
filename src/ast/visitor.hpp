@@ -37,19 +37,19 @@ class VisitorBase
 {
   public:
     /// @brief Visit a DesignFile by visiting all its units
-    void visit(const ast::DesignFile &design) { visit(design.units); }
+    void visit(const ast::DesignFile &design) const { visit(design.units); }
 
   protected:
     /// @brief Visit a variant node, dispatching to the appropriate operator()
     template<typename... Ts>
-    auto visit(const std::variant<Ts...> &node) -> ReturnType
+    auto visit(const std::variant<Ts...> &node) const -> ReturnType
     {
         return std::visit([this](const auto &n) -> ReturnType { return derived()(n); }, node);
     }
 
     /// @brief Visit an optional or nullable wrapper (optional<T>, unique_ptr<T>)
     template<NullableWrapper T>
-    auto visit(const T &wrapper) -> ReturnType
+    auto visit(const T &wrapper) const -> ReturnType
     {
         if constexpr (std::is_void_v<ReturnType>) {
             if (wrapper) {
@@ -63,14 +63,14 @@ class VisitorBase
     /// @brief Visit a concrete node (delegates to derived class operator())
     template<typename T>
         requires std::is_base_of_v<NodeBase, T>
-    auto visit(const T &node) -> ReturnType
+    auto visit(const T &node) const -> ReturnType
     {
         return derived()(node);
     }
 
     /// @brief Visit a vector of nodes
     template<typename T>
-    auto visit(const std::vector<T> &nodes)
+    auto visit(const std::vector<T> &nodes) const
       -> std::conditional_t<std::is_void_v<ReturnType>, void, std::vector<ReturnType>>
     {
         if constexpr (std::is_void_v<ReturnType>) {
@@ -85,7 +85,7 @@ class VisitorBase
     }
 
   private:
-    auto derived() -> Derived & { return static_cast<Derived &>(*this); }
+    auto derived() const -> const Derived & { return static_cast<const Derived &>(*this); }
 };
 
 } // namespace ast

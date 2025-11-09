@@ -6,7 +6,7 @@
 
 namespace emit {
 
-auto PrettyPrinter::operator()(const ast::GenericParam &node) -> Doc
+auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 {
     // <name> : <type> [:= <default>]
     // Multiple names: name1, name2 : type
@@ -26,7 +26,7 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) -> Doc
     return result.group();
 }
 
-auto PrettyPrinter::operator()(const ast::Port &node) -> Doc
+auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
 {
     // <name> : <mode> <type> [:= <default>]
     // Multiple names: name1, name2 : in type
@@ -51,13 +51,13 @@ auto PrettyPrinter::operator()(const ast::Port &node) -> Doc
     return result.group();
 }
 
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) const -> Doc
 {
     // TODO(vedivad): Implement signal declaration printing
     return Doc::text("-- signal");
 }
 
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) const -> Doc
 {
     // TODO(vedivad): Implement constant declaration printing
     return Doc::text("-- constant");

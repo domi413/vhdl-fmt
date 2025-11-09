@@ -4,13 +4,14 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <memory>
+#include <optional>
 #include <utility>
 
 // TODO(vedivad): Should declarations ever be split into multiple lines in VHDL?
 
 TEST_CASE("GenericParam with single name", "[pretty_printer][declarations]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    const ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
 
     const auto result = emit::test::render(param);
     REQUIRE(result == "WIDTH : integer");
@@ -18,7 +19,7 @@ TEST_CASE("GenericParam with single name", "[pretty_printer][declarations]")
 
 TEST_CASE("GenericParam with multiple names", "[pretty_printer][declarations]")
 {
-    ast::GenericParam param{
+    const ast::GenericParam param{
         .names = { "WIDTH", "HEIGHT", "DEPTH" },
           .type_name = "positive"
     };
@@ -29,9 +30,9 @@ TEST_CASE("GenericParam with multiple names", "[pretty_printer][declarations]")
 
 TEST_CASE("GenericParam with default value", "[pretty_printer][declarations]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" },
-                             .type_name = "integer",
-                             .default_expr = ast::TokenExpr{ .text = "8" } };
+    const ast::GenericParam param{ .names = { "WIDTH" },
+                                   .type_name = "integer",
+                                   .default_expr = ast::TokenExpr{ .text = "8" } };
 
     const auto result = emit::test::render(param);
     REQUIRE(result == "WIDTH : integer := 8");
@@ -39,7 +40,7 @@ TEST_CASE("GenericParam with default value", "[pretty_printer][declarations]")
 
 TEST_CASE("GenericParam with multiple names and default", "[pretty_printer][declarations]")
 {
-    ast::GenericParam param{
+    const ast::GenericParam param{
         .names = { "A", "B" },
           .type_name = "natural", .default_expr = ast::TokenExpr{ .text = "0" }
     };
@@ -50,7 +51,7 @@ TEST_CASE("GenericParam with multiple names and default", "[pretty_printer][decl
 
 TEST_CASE("Port with single name and mode", "[pretty_printer][declarations]")
 {
-    ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
+    const ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
 
     const auto result = emit::test::render(port);
     REQUIRE(result == "clk : in std_logic");
@@ -58,7 +59,7 @@ TEST_CASE("Port with single name and mode", "[pretty_printer][declarations]")
 
 TEST_CASE("Port with multiple names", "[pretty_printer][declarations]")
 {
-    ast::Port port{
+    const ast::Port port{
         .names = { "data_in", "data_out" },
           .mode = "inout", .type_name = "std_logic_vector"
     };
@@ -79,11 +80,11 @@ TEST_CASE("Port with constraints", "[pretty_printer][declarations]")
     ast::IndexConstraint idx_constraint;
     idx_constraint.ranges.children.emplace_back(std::move(constraint));
 
-    ast::Port port{ .names = { "data" },
-                    .mode = "in",
-                    .type_name = "std_logic_vector",
-                    .default_expr = std::nullopt,
-                    .constraint = ast::Constraint(std::move(idx_constraint)) };
+    const ast::Port port{ .names = { "data" },
+                          .mode = "in",
+                          .type_name = "std_logic_vector",
+                          .default_expr = std::nullopt,
+                          .constraint = ast::Constraint(std::move(idx_constraint)) };
 
     const auto result = emit::test::render(port);
     REQUIRE(result == "data : in std_logic_vector(7 downto 0)");
@@ -108,11 +109,11 @@ TEST_CASE("Port with multiple constraints", "[pretty_printer][declarations]")
     idx_constraint.ranges.children.emplace_back(std::move(constraint1));
     idx_constraint.ranges.children.emplace_back(std::move(constraint2));
 
-    ast::Port port{ .names = { "matrix" },
-                    .mode = "out",
-                    .type_name = "matrix_type",
-                    .default_expr = std::nullopt,
-                    .constraint = ast::Constraint(std::move(idx_constraint)) };
+    const ast::Port port{ .names = { "matrix" },
+                          .mode = "out",
+                          .type_name = "matrix_type",
+                          .default_expr = std::nullopt,
+                          .constraint = ast::Constraint(std::move(idx_constraint)) };
 
     const auto result = emit::test::render(port);
     REQUIRE(result == "matrix : out matrix_type(7 downto 0, 3 downto 0)");
@@ -120,10 +121,10 @@ TEST_CASE("Port with multiple constraints", "[pretty_printer][declarations]")
 
 TEST_CASE("Port with default value", "[pretty_printer][declarations]")
 {
-    ast::Port port{ .names = { "enable" },
-                    .mode = "in",
-                    .type_name = "std_logic",
-                    .default_expr = ast::TokenExpr{ .text = "'0'" } };
+    const ast::Port port{ .names = { "enable" },
+                          .mode = "in",
+                          .type_name = "std_logic",
+                          .default_expr = ast::TokenExpr{ .text = "'0'" } };
 
     const auto result = emit::test::render(port);
     REQUIRE(result == "enable : in std_logic := '0'");
@@ -141,11 +142,11 @@ TEST_CASE("Port with constraints and default value", "[pretty_printer][declarati
     ast::IndexConstraint idx_constraint;
     idx_constraint.ranges.children.emplace_back(std::move(constraint));
 
-    ast::Port port{ .names = { "data" },
-                    .mode = "in",
-                    .type_name = "std_logic_vector",
-                    .default_expr = ast::TokenExpr{ .text = "X\"00\"" },
-                    .constraint = ast::Constraint(std::move(idx_constraint)) };
+    const ast::Port port{ .names = { "data" },
+                          .mode = "in",
+                          .type_name = "std_logic_vector",
+                          .default_expr = ast::TokenExpr{ .text = "X\"00\"" },
+                          .constraint = ast::Constraint(std::move(idx_constraint)) };
 
     const auto result = emit::test::render(port);
     REQUIRE(result == "data : in std_logic_vector(7 downto 0) := X\"00\"");
