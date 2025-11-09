@@ -7,8 +7,6 @@
 #include <optional>
 #include <utility>
 
-// TODO(vedivad): Should declarations ever be split into multiple lines in VHDL?
-
 TEST_CASE("GenericParam with single name", "[pretty_printer][declarations]")
 {
     const ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };

@@ -23,7 +23,7 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
 
-    return result.group();
+    return result;
 }
 
 auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
@@ -48,7 +48,7 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
 
-    return result.group();
+    return result;
 }
 
 auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) const -> Doc
