@@ -112,8 +112,8 @@ auto tryParseYaml(const YAML::Node &node, std::string_view name) -> std::optiona
     try {
         return node.as<T>();
     } catch (const YAML::BadConversion &e) {
-        throw std::runtime_error{ std::format(
-          "Invalid value for config field '{}': {}", name, e.what()) };
+        throw std::runtime_error(
+          std::format("Invalid value for config field '{}': {}", name, e.what()));
     }
 }
 
@@ -127,7 +127,7 @@ auto mapValueToConfig(const KeyType &style,
         return *result;
     }
 
-    throw std::invalid_argument{ std::format("Invalid {} config: {}", error_context, style) };
+    throw std::invalid_argument(std::format("Invalid {} config: {}", error_context, style));
 }
 
 /// Helper to parse and map a YAML value to a config enum

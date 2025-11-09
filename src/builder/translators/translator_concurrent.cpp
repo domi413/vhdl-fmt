@@ -26,24 +26,24 @@ auto Translator::makeConcurrentAssignStatement(
 auto Translator::makeConditionalAssignStatement(
   vhdlParser::Conditional_signal_assignmentContext *ctx) -> ast::ConcurrentSignalAssignmentStatement
 {
-    auto assign{ make<ast::ConcurrentSignalAssignmentStatement>(ctx) };
+    auto assign = make<ast::ConcurrentSignalAssignmentStatement>(ctx);
 
     if (auto *target_ctx = ctx->target()) {
         assign.target = makeTarget(target_ctx);
     }
 
     // Get the waveform - for now we'll take the first waveform element's expression
-    auto *cond_wave{ ctx->conditional_waveforms() };
+    auto *cond_wave = ctx->conditional_waveforms();
     if (cond_wave == nullptr) {
         return assign;
     }
 
-    auto *wave{ cond_wave->waveform() };
+    auto *wave = cond_wave->waveform();
     if (wave == nullptr) {
         return assign;
     }
 
-    auto wave_elems{ wave->waveform_element() };
+    auto wave_elems = wave->waveform_element();
     if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
         assign.value = makeExpression(wave_elems[0]->expression(0));
     }

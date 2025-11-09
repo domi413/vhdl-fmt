@@ -35,7 +35,7 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     tokens.fill();
 
     vhdlParser parser{ &tokens };
-    auto *tree{ parser.design_file() };
+    auto *tree = parser.design_file();
 
     // AST construction
     ast::DesignFile root{};

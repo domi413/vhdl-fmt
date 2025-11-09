@@ -5,6 +5,7 @@
 
 #include <filesystem>
 #include <istream>
+#include <string_view>
 
 namespace builder {
 

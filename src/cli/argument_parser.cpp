@@ -62,13 +62,13 @@ auto ArgumentParser::parseArguments(std::span<const char *const> args) -> void
           const std::filesystem::path input_path{ location };
 
           if (!std::filesystem::exists(input_path)) {
-              throw std::runtime_error{ std::format("Input path does not exist: {}", location) };
+              throw std::runtime_error(std::format("Input path does not exist: {}", location));
           }
 
           if (!std::filesystem::is_regular_file(input_path)
               && !std::filesystem::is_directory(input_path)) {
-              throw std::runtime_error{ std::format(
-                "Input path is not a regular file or directory: {}", location) };
+              throw std::runtime_error(
+                std::format("Input path is not a regular file or directory: {}", location));
           }
 
           input_path_ = std::filesystem::canonical(input_path);
@@ -90,13 +90,13 @@ auto ArgumentParser::parseArguments(std::span<const char *const> args) -> void
           const std::filesystem::path config_path{ location };
 
           if (!std::filesystem::exists(config_path)) {
-              throw std::runtime_error{ std::format("Configuration file does not exist: {}",
-                                                    location) };
+              throw std::runtime_error(
+                std::format("Configuration file does not exist: {}", location));
           }
 
           if (!std::filesystem::is_regular_file(config_path)) {
-              throw std::runtime_error{ std::format("Configuration path is not a regular file: {}",
-                                                    location) };
+              throw std::runtime_error(
+                std::format("Configuration path is not a regular file: {}", location));
           }
 
           config_file_path_ = std::filesystem::canonical(config_path);
