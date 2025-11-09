@@ -9,7 +9,7 @@
 
 using emit::test::defaultConfig;
 
-// TODO(user): Should declarations ever be split into multiple lines in VHDL?
+// TODO(vedivad): Should declarations ever be split into multiple lines in VHDL?
 
 TEST_CASE("GenericParam with single name", "[pretty_printer][declarations]")
 {

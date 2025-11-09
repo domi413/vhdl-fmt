@@ -56,34 +56,20 @@ auto Doc::operator|(const Doc &other) const -> Doc
 auto Doc::operator<<(const Doc &other) const -> Doc
 {
     // *this + (line() + other).nest(DEFAULT_INDENT)
-    auto nested = Doc(makeNest(DEFAULT_INDENT, makeConcat(line().impl_, other.impl_)));
-    return *this + nested;
-}
-
-auto Doc::operator>>(const Doc &other) const -> Doc
-{
-    // *this + (line() + other).nest(-DEFAULT_INDENT)
-    auto nested = Doc(makeNest(-DEFAULT_INDENT, makeConcat(line().impl_, other.impl_)));
+    auto nested = Doc(makeNest(makeConcat(line().impl_, other.impl_)));
     return *this + nested;
 }
 
 auto Doc::hardIndent(const Doc &other) const -> Doc
 {
     // *this + (hardline() + other).nest(DEFAULT_INDENT)
-    auto nested = Doc(makeNest(DEFAULT_INDENT, makeConcat(hardline().impl_, other.impl_)));
-    return *this + nested;
-}
-
-auto Doc::hardDedent(const Doc &other) const -> Doc
-{
-    // *this + (hardline() + other).nest(-DEFAULT_INDENT)
-    auto nested = Doc(makeNest(-DEFAULT_INDENT, makeConcat(hardline().impl_, other.impl_)));
+    auto nested = Doc(makeNest(makeConcat(hardline().impl_, other.impl_)));
     return *this + nested;
 }
 
 auto Doc::bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc
 {
-    return left << (inner >> right);
+    return (left << inner) / right;
 }
 
 auto Doc::group() const -> Doc

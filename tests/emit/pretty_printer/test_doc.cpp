@@ -53,13 +53,6 @@ TEST_CASE("Operator<< nests right-hand side", "[doc]")
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
 }
 
-TEST_CASE("Operator>> dedents right-hand side", "[doc]")
-{
-    const Doc doc = Doc::text("begin") << Doc::text("indented") >> Doc::text("back");
-    std::string expected = "begin\n  indented\nback";
-    REQUIRE(doc.render(defaultConfig()) == expected);
-}
-
 TEST_CASE("Nested indentation accumulates", "[doc]")
 {
     const Doc inner = Doc::text("inner");
@@ -97,7 +90,7 @@ TEST_CASE("Complex nested structure", "[doc]")
     const Doc header = Doc::text("if") & Doc::text("condition") & Doc::text("then");
     const Doc body = Doc::text("statement;");
     const Doc footer = Doc::text("end if;");
-    const Doc full = header << (body >> footer);
+    const Doc full = (header << body) / footer;
 
     const std::string expected = "if condition then\n  statement;\nend if;";
     REQUIRE(full.render(defaultConfig()) == expected);
@@ -156,14 +149,6 @@ TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
     const Doc doc = Doc::text("begin").hardIndent(Doc::text("end")).group();
     // Hard line never becomes space, even in a group
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
-}
-
-TEST_CASE("hardDedent reduces indentation with hard break", "[doc]")
-{
-    const Doc doc
-      = Doc::text("begin").hardIndent(Doc::text("indented")).hardDedent(Doc::text("back"));
-    const std::string expected = "begin\n  indented\nback";
-    REQUIRE(doc.render(defaultConfig()) == expected);
 }
 
 TEST_CASE("Soft vs hard indent comparison", "[doc]")

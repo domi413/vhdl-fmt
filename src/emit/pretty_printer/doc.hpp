@@ -15,9 +15,6 @@ namespace emit {
 // Forward declarations
 class DocImpl;
 
-// Default indentation amount for << and >> operators (in indent levels, not spaces)
-inline constexpr int DEFAULT_INDENT = 1;
-
 /// Document abstraction for pretty printing
 class Doc final
 {
@@ -42,12 +39,9 @@ class Doc final
     auto operator/(const Doc &other) const -> Doc;  ///< Softline
     auto operator|(const Doc &other) const -> Doc;  ///< Hardline
     auto operator<<(const Doc &other) const -> Doc; ///< Softline + indent rhs
-    auto operator>>(const Doc &other) const -> Doc; ///< Softline + dedent rhs
 
     [[nodiscard]]
     auto hardIndent(const Doc &other) const -> Doc; ///< Hardline + indent rhs
-    [[nodiscard]]
-    auto hardDedent(const Doc &other) const -> Doc; ///< Hardline + dedent rhs
 
     // Higher-level combinators for common patterns
     [[nodiscard]]

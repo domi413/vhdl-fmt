@@ -37,9 +37,9 @@ auto makeConcat(DocPtr left, DocPtr right) -> DocPtr
     return std::make_shared<DocImpl>(Concat{ .left = std::move(left), .right = std::move(right) });
 }
 
-auto makeNest(int indent, DocPtr doc) -> DocPtr
+auto makeNest(DocPtr doc) -> DocPtr
 {
-    return std::make_shared<DocImpl>(Nest{ .indent = indent, .doc = std::move(doc) });
+    return std::make_shared<DocImpl>(Nest{ .doc = std::move(doc) });
 }
 
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr
@@ -71,7 +71,7 @@ auto flatten(const DocPtr &doc) -> DocPtr
                         },
                         [](const Nest &node) -> DocPtr {
                             // Keep nest but flatten the inner doc
-                            return makeNest(node.indent, flatten(node.doc));
+                            return makeNest(flatten(node.doc));
                         },
                         [](const Union &node) -> DocPtr {
                             // Union already has flat version - just use it

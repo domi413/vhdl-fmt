@@ -56,7 +56,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
                  },
                  [&](const Nest &node) -> void {
                      // Increase indentation for nested content
-                     renderDoc(indent + (node.indent * indent_size_), mode, node.doc);
+                     renderDoc(indent + indent_size_, mode, node.doc);
                  },
                  [&](const Union &node) -> void {
                      // Decide: use flat or broken layout?
@@ -130,10 +130,8 @@ void Renderer::write(std::string_view text)
 void Renderer::newline(int indent)
 {
     output_ += '\n';
-    // Ensure indent is never negative
-    const int actual_indent = indent > 0 ? indent : 0;
-    output_.append(actual_indent, ' ');
-    column_ = actual_indent;
+    output_.append(indent, ' ');
+    column_ = indent;
 }
 
 } // namespace emit

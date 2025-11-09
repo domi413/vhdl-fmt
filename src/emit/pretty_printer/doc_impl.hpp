@@ -40,7 +40,6 @@ struct Concat
 /// Increase indentation level
 struct Nest
 {
-    int indent;
     DocPtr doc;
 };
 
@@ -68,7 +67,7 @@ auto makeText(std::string_view text) -> DocPtr;
 auto makeLine() -> DocPtr;
 auto makeHardLine() -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
-auto makeNest(int indent, DocPtr doc) -> DocPtr;
+auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
 
 // Utility functions
