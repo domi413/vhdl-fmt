@@ -52,7 +52,7 @@ inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool in
         first = false;
     }
 
-    if (include_trailing && !docs.empty()) {
+    if (include_trailing) {
         result = result + separator;
     }
 

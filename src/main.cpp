@@ -2,7 +2,6 @@
 #include "builder/ast_builder.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
-// #include "emit/debug_printer.hpp"
 #include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
 
@@ -21,7 +20,7 @@ auto main(int argc, char *argv[]) -> int
 
         cli::ConfigReader config_reader{ argparser.getConfigPath() };
         const auto config_result = config_reader.readConfigFile();
-        const common::Config config = config_result.value();
+        const auto &config = config_result.value();
 
         // Build AST from input file
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());

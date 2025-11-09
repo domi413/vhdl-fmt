@@ -5,6 +5,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string>
+#include <string_view>
 #include <utility>
 
 TEST_CASE("Empty DesignFile", "[pretty_printer][design_file]")
@@ -24,10 +25,10 @@ TEST_CASE("DesignFile with single entity", "[pretty_printer][design_file]")
     file.units.emplace_back(std::move(entity));
 
     const std::string result = emit::test::render(file);
-    const std::string expected = "entity test_entity is\n"
-                                 "end entity test_entity;\n";
+    constexpr std::string_view EXPECTED = "entity test_entity is\n"
+                                          "end entity test_entity;\n";
 
-    REQUIRE(result == expected);
+    REQUIRE(result == EXPECTED);
 }
 
 TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_file]")
@@ -46,14 +47,14 @@ TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_fi
     file.units.emplace_back(std::move(arch));
 
     const std::string result = emit::test::render(file);
-    const std::string expected = "entity counter is\n"
-                                 "  port ( clk : in std_logic );\n"
-                                 "end entity counter;\n\n"
-                                 "architecture rtl of counter is\n"
-                                 "begin\n"
-                                 "end architecture rtl;\n";
+    constexpr std::string_view EXPECTED = "entity counter is\n"
+                                          "  port ( clk : in std_logic );\n"
+                                          "end entity counter;\n\n"
+                                          "architecture rtl of counter is\n"
+                                          "begin\n"
+                                          "end architecture rtl;\n";
 
-    REQUIRE(result == expected);
+    REQUIRE(result == EXPECTED);
 }
 TEST_CASE("DesignFile with multiple design units", "[pretty_printer][design_file]")
 {
@@ -73,13 +74,13 @@ TEST_CASE("DesignFile with multiple design units", "[pretty_printer][design_file
     file.units.emplace_back(std::move(arch1));
 
     const std::string result = emit::test::render(file);
-    const std::string expected = "entity entity1 is\n"
-                                 "end entity entity1;\n\n"
-                                 "entity entity2 is\n"
-                                 "end entity entity2;\n\n"
-                                 "architecture behavioral of entity1 is\n"
-                                 "begin\n"
-                                 "end architecture behavioral;\n";
+    constexpr std::string_view EXPECTED = "entity entity1 is\n"
+                                          "end entity entity1;\n\n"
+                                          "entity entity2 is\n"
+                                          "end entity entity2;\n\n"
+                                          "architecture behavioral of entity1 is\n"
+                                          "begin\n"
+                                          "end architecture behavioral;\n";
 
-    REQUIRE(result == expected);
+    REQUIRE(result == EXPECTED);
 }

@@ -7,6 +7,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
@@ -97,13 +98,13 @@ TEST_CASE("PortClause with multiple ports (broken)", "[pretty_printer][clauses]"
     clause.ports.emplace_back(std::move(port3));
 
     const std::string result = emit::test::render(clause);
-    const std::string expected = "port (\n"
-                                 "  clk : in std_logic;\n"
-                                 "  reset : in std_logic;\n"
-                                 "  data_out : out std_logic_vector(7 downto 0)\n"
-                                 ");";
+    constexpr std::string_view EXPECTED = "port (\n"
+                                          "  clk : in std_logic;\n"
+                                          "  reset : in std_logic;\n"
+                                          "  data_out : out std_logic_vector(7 downto 0)\n"
+                                          ");";
 
-    REQUIRE(result == expected);
+    REQUIRE(result == EXPECTED);
 }
 
 TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][config]")
@@ -120,13 +121,13 @@ TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][c
 
     // Should use broken layout without alignment
     const auto result = emit::test::render(clause);
-    const std::string expected = "port (\n"
-                                 "  clk : in std_logic;\n"
-                                 "  data_valid : in std_logic;\n"
-                                 "  output_signal : out std_logic_vector\n"
-                                 ");";
+    constexpr std::string_view EXPECTED = "port (\n"
+                                          "  clk : in std_logic;\n"
+                                          "  data_valid : in std_logic;\n"
+                                          "  output_signal : out std_logic_vector\n"
+                                          ");";
 
-    REQUIRE(result == expected);
+    REQUIRE(result == EXPECTED);
 }
 
 // TODO(vedivad): Enable when table combinator is implemented

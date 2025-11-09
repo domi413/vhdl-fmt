@@ -13,7 +13,7 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 
     // Names (joined with comma and space)
     auto name_docs = toDocVector(node.names, [](const auto &name) { return Doc::text(name); });
-    Doc result = joinDocs(name_docs, Doc::text(",") & Doc::empty(), false);
+    Doc result = joinDocs(name_docs, Doc::text(", "), false);
 
     // Type
     result &= Doc::text(":") & Doc::text(node.type_name);
@@ -33,7 +33,7 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
 
     // Names (joined with comma and space)
     auto name_docs = toDocVector(node.names, [](const auto &name) { return Doc::text(name); });
-    Doc result = joinDocs(name_docs, Doc::text(",") & Doc::empty(), false);
+    Doc result = joinDocs(name_docs, Doc::text(", "), false);
 
     // Mode and type
     result &= Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
