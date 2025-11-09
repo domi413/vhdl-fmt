@@ -33,6 +33,8 @@ struct NodeTrivia
 };
 
 /// @brief Abstract base class for all AST nodes.
+/// @note Do not instantiate directly - There is no virtual destructor to leverage aggregate
+/// initialization.
 struct NodeBase
 {
     std::optional<NodeTrivia> trivia;
