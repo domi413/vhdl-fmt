@@ -10,6 +10,7 @@
 #include "vhdlParser.h"
 
 #include <CommonTokenStream.h>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>

@@ -15,38 +15,33 @@ auto PrettyPrinter::operator()(const ast::SequentialAssign &node) -> Doc
     return visit(node.target) & Doc::text(":=") & visit(node.value) + Doc::text(";");
 }
 
-auto PrettyPrinter::operator()(const ast::IfStatement &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::IfStatement &node) -> Doc
 {
-    // TODO(user): Implement if statement printing
-    (void)node;
+    // TODO(vedivad): Implement if statement printing
     return Doc::text("-- if statement");
 }
 
-auto PrettyPrinter::operator()(const ast::CaseStatement &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::CaseStatement &node) -> Doc
 {
-    // TODO(user): Implement case statement printing
-    (void)node;
+    // TODO(vedivad): Implement case statement printing
     return Doc::text("-- case statement");
 }
 
-auto PrettyPrinter::operator()(const ast::Process &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::Process &node) -> Doc
 {
-    // TODO(user): Implement process printing
-    (void)node;
+    // TODO(vedivad): Implement process printing
     return Doc::text("-- process");
 }
 
-auto PrettyPrinter::operator()(const ast::ForLoop &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::ForLoop &node) -> Doc
 {
-    // TODO(user): Implement for loop printing
-    (void)node;
+    // TODO(vedivad): Implement for loop printing
     return Doc::text("-- for loop");
 }
 
-auto PrettyPrinter::operator()(const ast::WhileLoop &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::WhileLoop &node) -> Doc
 {
-    // TODO(user): Implement while loop printing
-    (void)node;
+    // TODO(vedivad): Implement while loop printing
     return Doc::text("-- while loop");
 }
 

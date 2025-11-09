@@ -3,6 +3,8 @@
 #include "emit/pretty_printer/doc.hpp"
 #include "emit/pretty_printer/doc_utils.hpp"
 
+#include <vector>
+
 namespace emit {
 
 auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
@@ -14,14 +16,14 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) -> Doc
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    std::vector<Doc> params = toDocVectorVisit(node.generics, *this);
+    const std::vector<Doc> params = toDocVectorVisit(node.generics, *this);
 
     // TODO(vedivad): Implement table combinator for alignment
     // if (config().port_map.align_signals) {
 
     // }
 
-    Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
+    const Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
     return Doc::bracket(opener, result, closer).group();
 }
 
@@ -34,14 +36,14 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) -> Doc
     const Doc opener = Doc::text("port") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const auto docs = toDocVectorVisit(node.ports, *this);
+    const auto ports = toDocVectorVisit(node.ports, *this);
 
     // if (config().port_map.align_signals) {
 
     // }
 
-    Doc ports = joinDocs(docs, Doc::text(";") + Doc::line(), false);
-    return Doc::bracket(opener, ports, closer).group();
+    const Doc result = joinDocs(ports, Doc::text(";") + Doc::line(), false);
+    return Doc::bracket(opener, result, closer).group();
 }
 
 } // namespace emit

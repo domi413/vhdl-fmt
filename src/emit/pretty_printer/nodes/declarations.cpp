@@ -51,17 +51,15 @@ auto PrettyPrinter::operator()(const ast::Port &node) -> Doc
     return result.group();
 }
 
-auto PrettyPrinter::operator()(const ast::SignalDecl &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) -> Doc
 {
-    // TODO(user): Implement signal declaration printing
-    (void)node;
+    // TODO(vedivad): Implement signal declaration printing
     return Doc::text("-- signal");
 }
 
-auto PrettyPrinter::operator()(const ast::ConstantDecl &node) -> Doc
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) -> Doc
 {
-    // TODO(user): Implement constant declaration printing
-    (void)node;
+    // TODO(vedivad): Implement constant declaration printing
     return Doc::text("-- constant");
 }
 
