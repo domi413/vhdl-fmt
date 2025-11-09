@@ -11,7 +11,7 @@
 #include <span>
 
 /// The main entry point of the program
-auto main(int argc, char *argv[]) -> int
+auto main(int argc, char **argv) -> int
 {
     try {
         const cli::ArgumentParser argparser{
