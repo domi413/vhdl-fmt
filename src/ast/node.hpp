@@ -35,14 +35,6 @@ struct NodeTrivia
 /// @brief Abstract base class for all AST nodes.
 struct NodeBase
 {
-    NodeBase() = default;
-    virtual ~NodeBase() = default;
-
-    NodeBase(const NodeBase &) = default;
-    auto operator=(const NodeBase &) -> NodeBase & = default;
-    NodeBase(NodeBase &&) = default;
-    auto operator=(NodeBase &&) -> NodeBase & = default;
-
     std::optional<NodeTrivia> trivia;
 };
 
