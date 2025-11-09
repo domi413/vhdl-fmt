@@ -32,9 +32,8 @@ struct NodeTrivia
     std::vector<Comments> trailing;
 };
 
-/// @brief Abstract base class for all AST nodes.
-/// @note Do not instantiate directly - There is no virtual destructor to leverage aggregate
-/// initialization.
+/// @brief Abstract base class for all AST nodes - Do not instantiate directly.
+/// @note There is no virtual destructor to leverage aggregate initialization.
 struct NodeBase
 {
     std::optional<NodeTrivia> trivia;
