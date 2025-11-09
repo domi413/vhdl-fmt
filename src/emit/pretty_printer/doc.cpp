@@ -67,6 +67,37 @@ auto Doc::hardIndent(const Doc &other) const -> Doc
     return *this + nested;
 }
 
+// Compound assignment operators
+auto Doc::operator+=(const Doc &other) -> Doc &
+{
+    *this = *this + other;
+    return *this;
+}
+
+auto Doc::operator&=(const Doc &other) -> Doc &
+{
+    *this = *this & other;
+    return *this;
+}
+
+auto Doc::operator/=(const Doc &other) -> Doc &
+{
+    *this = *this / other;
+    return *this;
+}
+
+auto Doc::operator|=(const Doc &other) -> Doc &
+{
+    *this = *this | other;
+    return *this;
+}
+
+auto Doc::operator<<=(const Doc &other) -> Doc &
+{
+    *this = *this << other;
+    return *this;
+}
+
 auto Doc::bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc
 {
     return (left << inner) / right;

@@ -40,6 +40,13 @@ class Doc final
     auto operator|(const Doc &other) const -> Doc;  ///< Hardline
     auto operator<<(const Doc &other) const -> Doc; ///< Softline + indent rhs
 
+    // Compound assignment operators
+    auto operator+=(const Doc &other) -> Doc &;  ///< Direct concatenation assignment
+    auto operator&=(const Doc &other) -> Doc &;  ///< Space concatenation assignment
+    auto operator/=(const Doc &other) -> Doc &;  ///< Softline assignment
+    auto operator|=(const Doc &other) -> Doc &;  ///< Hardline assignment
+    auto operator<<=(const Doc &other) -> Doc &; ///< Softline + indent rhs assignment
+
     [[nodiscard]]
     auto hardIndent(const Doc &other) const -> Doc; ///< Hardline + indent rhs
 

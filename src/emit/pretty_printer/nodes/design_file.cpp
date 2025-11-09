@@ -17,9 +17,9 @@ auto PrettyPrinter::operator()(const ast::DesignFile &node) const -> Doc
 
     for (const auto [i, unit] : std::views::enumerate(node.units)) {
         if (i > 0) {
-            result = result / Doc::line(); // Blank line separator
+            result /= Doc::line(); // Blank line separator
         }
-        result = result + visit(unit);
+        result += visit(unit);
     }
 
     return result + Doc::line(); // Trailing newline

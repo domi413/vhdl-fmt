@@ -11,24 +11,24 @@ auto PrettyPrinter::operator()(const ast::Entity &node) const -> Doc
 
     // Generic clause (if not empty)
     if (!node.generic_clause.generics.empty()) {
-        result = result << visit(node.generic_clause);
+        result <<= visit(node.generic_clause);
     }
 
     // Port clause (if not empty)
     if (!node.port_clause.ports.empty()) {
-        result = result << visit(node.port_clause);
+        result <<= visit(node.port_clause);
     }
 
     // Declarations
     for (const auto &decl : node.decls) {
-        result = result << visit(decl);
+        result <<= visit(decl);
     }
 
     // Begin section (concurrent statements)
     if (!node.stmts.empty()) {
-        result = result / Doc::text("begin");
+        result /= Doc::text("begin");
         for (const auto &stmt : node.stmts) {
-            result = result << visit(stmt);
+            result <<= visit(stmt);
         }
     }
 
@@ -50,15 +50,15 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) const -> Doc
 
     // Declarations
     for (const auto &decl : node.decls) {
-        result = result << visit(decl);
+        result <<= visit(decl);
     }
 
     // begin
-    result = result / Doc::text("begin");
+    result /= Doc::text("begin");
 
     // Concurrent statements
     for (const auto &stmt : node.stmts) {
-        result = result << visit(stmt);
+        result <<= visit(stmt);
     }
 
     // end [architecture] [<name>];
