@@ -1,6 +1,5 @@
 #include "ast/nodes/design_units.hpp"
 #include "ast/nodes/expressions.hpp"
-#include "emit/pretty_printer.hpp"
 #include "emit/test_utils.hpp"
 #include "nodes/declarations.hpp"
 
@@ -8,142 +7,93 @@
 #include <memory>
 #include <utility>
 
-using emit::test::defaultConfig;
-
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
 {
     const ast::GenericClause clause{};
-    // Empty generics list
 
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-
+    const auto result = emit::test::render(clause);
     REQUIRE(result.empty());
 }
 
-TEST_CASE("GenericClause with single parameter", "[pretty_printer][clauses]")
+TEST_CASE("GenericClause with single parameter (flat)", "[pretty_printer][clauses]")
 {
-    ast::GenericClause clause;
+    ast::GenericClause clause{};
 
-    ast::GenericParam param;
-    param.names = { "WIDTH" };
-    param.type_name = "integer";
-    ast::TokenExpr default_val;
-    default_val.text = "8";
-    param.default_expr = default_val;
+    ast::GenericParam param{ .names = { "WIDTH" },
+                             .type_name = "integer",
+                             .default_expr = ast::TokenExpr{ .text = "8" } };
 
     clause.generics.push_back(std::move(param));
 
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-
-    // When it fits on one line, it should be compact
+    const auto result = emit::test::render(clause);
     REQUIRE(result == "generic ( WIDTH : integer := 8 );");
 }
 
-TEST_CASE("GenericClause with multiple parameters", "[pretty_printer][clauses]")
+TEST_CASE("GenericClause with multiple parameters (flat)", "[pretty_printer][clauses]")
 {
-    ast::GenericClause clause;
+    ast::GenericClause clause{};
 
-    ast::GenericParam param1;
-    param1.names = { "WIDTH" };
-    param1.type_name = "positive";
-    ast::TokenExpr default1;
-    default1.text = "8";
-    param1.default_expr = default1;
+    ast::GenericParam param1{ .names = { "WIDTH" },
+                              .type_name = "positive",
+                              .default_expr = ast::TokenExpr{ .text = "8" } };
 
-    ast::GenericParam param2;
-    param2.names = { "HEIGHT" };
-    param2.type_name = "positive";
-    ast::TokenExpr default2;
-    default2.text = "16";
-    param2.default_expr = default2;
+    ast::GenericParam param2{ .names = { "HEIGHT" },
+                              .type_name = "positive",
+                              .default_expr = ast::TokenExpr{ .text = "16" } };
 
     clause.generics.push_back(std::move(param1));
     clause.generics.push_back(std::move(param2));
 
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-
+    const auto result = emit::test::render(clause);
     REQUIRE(result == "generic ( WIDTH : positive := 8; HEIGHT : positive := 16 );");
 }
 
 TEST_CASE("Empty PortClause", "[pretty_printer][clauses]")
 {
-    const ast::PortClause clause;
-    // Empty ports list
+    const ast::PortClause clause{};
 
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-
+    const auto result = emit::test::render(clause);
     REQUIRE(result.empty());
 }
 
-TEST_CASE("PortClause with single port", "[pretty_printer][clauses]")
+TEST_CASE("PortClause with single port (flat)", "[pretty_printer][clauses]")
 {
-    ast::PortClause clause;
+    ast::PortClause clause{};
 
-    ast::Port port;
-    port.names = { "clk" };
-    port.mode = "in";
-    port.type_name = "std_logic";
+    ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
 
     clause.ports.push_back(std::move(port));
 
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-
+    const auto result = emit::test::render(clause);
     REQUIRE(result == "port ( clk : in std_logic );");
 }
-TEST_CASE("PortClause with multiple ports", "[pretty_printer][clauses]")
+TEST_CASE("PortClause with multiple ports (broken)", "[pretty_printer][clauses]")
 {
-    ast::PortClause clause;
+    ast::PortClause clause{};
 
-    ast::Port port1;
-    port1.names = { "clk" };
-    port1.mode = "in";
-    port1.type_name = "std_logic";
+    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port2{ .names = { "reset" }, .mode = "in", .type_name = "std_logic" };
 
-    ast::Port port2;
-    port2.names = { "reset" };
-    port2.mode = "in";
-    port2.type_name = "std_logic";
+    // Build constraint for port3
+    ast::BinaryExpr constraint{ .left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" }),
+                                .op = "downto",
+                                .right
+                                = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "0" }) };
 
-    ast::Port port3;
-    port3.names = { "data_out" };
-    port3.mode = "out";
-    port3.type_name = "std_logic_vector";
-
-    // Add constraint to port3
-    ast::BinaryExpr constraint;
-    ast::TokenExpr left_token;
-    left_token.text = "7";
-    ast::TokenExpr right_token;
-    right_token.text = "0";
-    auto left = std::make_unique<ast::Expr>(left_token);
-    auto right = std::make_unique<ast::Expr>(right_token);
-    constraint.left = std::move(left);
-    constraint.op = "downto";
-    constraint.right = std::move(right);
-
-    // Create IndexConstraint with GroupExpr containing the range
-    ast::IndexConstraint idx_constraint;
+    ast::IndexConstraint idx_constraint{};
     idx_constraint.ranges.children.emplace_back(std::move(constraint));
-    port3.constraint = ast::Constraint(std::move(idx_constraint));
+
+    ast::Port port3{ .names = { "data_out" },
+                     .mode = "out",
+                     .type_name = "std_logic_vector",
+                     .default_expr = std::nullopt,
+                     .constraint = ast::Constraint{ std::move(idx_constraint) } };
 
     clause.ports.emplace_back(std::move(port1));
     clause.ports.emplace_back(std::move(port2));
     clause.ports.emplace_back(std::move(port3));
 
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-
+    const auto result = emit::test::render(clause);
     const std::string expected = "port (\n"
                                  "  clk : in std_logic;\n"
                                  "  reset : in std_logic;\n"
@@ -154,33 +104,18 @@ TEST_CASE("PortClause with multiple ports", "[pretty_printer][clauses]")
 
 TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][config]")
 {
-    ast::PortClause clause;
+    ast::PortClause clause{};
 
-    ast::Port port1;
-    port1.names = { "clk" };
-    port1.mode = "in";
-    port1.type_name = "std_logic";
-
-    ast::Port port2;
-    port2.names = { "data_valid" };
-    port2.mode = "in";
-    port2.type_name = "std_logic";
-
-    ast::Port port3;
-    port3.names = { "output_signal" };
-    port3.mode = "out";
-    port3.type_name = "std_logic_vector";
+    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port2{ .names = { "data_valid" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port3{ .names = { "output_signal" }, .mode = "out", .type_name = "std_logic_vector" };
 
     clause.ports.emplace_back(std::move(port1));
     clause.ports.emplace_back(std::move(port2));
     clause.ports.emplace_back(std::move(port3));
 
-    // Create config with align_signals disabled
-
-    emit::PrettyPrinter printer{ defaultConfig() };
-    const auto doc = printer(clause);
-    const auto result = doc.render(defaultConfig());
-    // Should use inline format without alignment
+    // Should use broken layout without alignment
+    const auto result = emit::test::render(clause);
     const std::string expected = "port (\n"
                                  "  clk : in std_logic;\n"
                                  "  data_valid : in std_logic;\n"

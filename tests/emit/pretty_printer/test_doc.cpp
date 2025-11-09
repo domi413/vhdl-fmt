@@ -43,8 +43,7 @@ TEST_CASE("Space concatenation with operator&", "[doc]")
 TEST_CASE("Line break with operator/", "[doc]")
 {
     const Doc doc = Doc::text("hello") / Doc::text("world");
-    std::string expected = "hello\nworld";
-    REQUIRE(doc.render(defaultConfig()) == expected);
+    REQUIRE(doc.render(defaultConfig()) == "hello\nworld");
 }
 
 TEST_CASE("Operator<< nests right-hand side", "[doc]")
@@ -55,27 +54,19 @@ TEST_CASE("Operator<< nests right-hand side", "[doc]")
 
 TEST_CASE("Nested indentation accumulates", "[doc]")
 {
-    const Doc inner = Doc::text("inner");
-    const Doc middle = Doc::text("middle");
-    const Doc outer = Doc::text("outer");
-
-    const Doc full = outer << (middle << inner);
-
-    std::string expected = "outer\n  middle\n    inner";
-    REQUIRE(full.render(defaultConfig()) == expected);
+    const Doc doc = Doc::text("outer") << (Doc::text("middle") << Doc::text("inner"));
+    REQUIRE(doc.render(defaultConfig()) == "outer\n  middle\n    inner");
 }
 
 TEST_CASE("Soft line becomes space when grouped and fits", "[doc]")
 {
     const Doc doc = (Doc::text("hello") / Doc::text("world")).group();
-    // Soft line becomes space when it fits
     REQUIRE(doc.render(defaultConfig()) == "hello world");
 }
 
 TEST_CASE("Hard line never becomes space", "[doc]")
 {
     const Doc doc = (Doc::text("hello") | Doc::text("world")).group();
-    // Hard line always breaks, even when grouped
     REQUIRE(doc.render(defaultConfig()) == "hello\nworld");
 }
 
@@ -90,10 +81,10 @@ TEST_CASE("Complex nested structure", "[doc]")
     const Doc header = Doc::text("if") & Doc::text("condition") & Doc::text("then");
     const Doc body = Doc::text("statement;");
     const Doc footer = Doc::text("end if;");
-    const Doc full = (header << body) / footer;
 
-    const std::string expected = "if condition then\n  statement;\nend if;";
-    REQUIRE(full.render(defaultConfig()) == expected);
+    const Doc doc = (header << body) / footer;
+
+    REQUIRE(doc.render(defaultConfig()) == "if condition then\n  statement;\nend if;");
 }
 
 TEST_CASE("Doc is copyable", "[doc]")
@@ -130,16 +121,18 @@ TEST_CASE("Render with different widths", "[doc]")
     // Wide enough - should fit on one line
     REQUIRE(doc.render(defaultConfig()) == "short text");
 
-    // Too narrow - should break
     constexpr int TOO_NARROW = 5;
     auto config = defaultConfig();
     config.line_config.line_length = TOO_NARROW;
+
+    // Too narrow - should break into two lines
     REQUIRE(doc.render(config) == "short\ntext");
 }
 
 TEST_CASE("hardIndent forces line break with indentation", "[doc]")
 {
     const Doc doc = Doc::text("begin").hardIndent(Doc::text("end"));
+
     // Should always break, even if grouped
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
 }
@@ -147,6 +140,7 @@ TEST_CASE("hardIndent forces line break with indentation", "[doc]")
 TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
 {
     const Doc doc = Doc::text("begin").hardIndent(Doc::text("end")).group();
+
     // Hard line never becomes space, even in a group
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
 }
