@@ -25,7 +25,7 @@ TEST_CASE("GenericClause with single parameter (flat)", "[pretty_printer][clause
                              .type_name = "integer",
                              .default_expr = ast::TokenExpr{ .text = "8" } };
 
-    clause.generics.push_back(std::move(param));
+    clause.generics.emplace_back(std::move(param));
 
     const auto result = emit::test::render(clause);
     REQUIRE(result == "generic ( WIDTH : integer := 8 );");
@@ -43,8 +43,8 @@ TEST_CASE("GenericClause with multiple parameters (flat)", "[pretty_printer][cla
                               .type_name = "positive",
                               .default_expr = ast::TokenExpr{ .text = "16" } };
 
-    clause.generics.push_back(std::move(param1));
-    clause.generics.push_back(std::move(param2));
+    clause.generics.emplace_back(std::move(param1));
+    clause.generics.emplace_back(std::move(param2));
 
     const auto result = emit::test::render(clause);
     REQUIRE(result == "generic ( WIDTH : positive := 8; HEIGHT : positive := 16 );");
@@ -64,7 +64,7 @@ TEST_CASE("PortClause with single port (flat)", "[pretty_printer][clauses]")
 
     ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
 
-    clause.ports.push_back(std::move(port));
+    clause.ports.emplace_back(std::move(port));
 
     const auto result = emit::test::render(clause);
     REQUIRE(result == "port ( clk : in std_logic );");

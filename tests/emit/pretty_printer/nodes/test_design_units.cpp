@@ -31,7 +31,7 @@ TEST_CASE("Entity with generics", "[pretty_printer][design_units]")
                              .type_name = "positive",
                              .default_expr = ast::TokenExpr{ .text = "8" } };
 
-    entity.generic_clause.generics.push_back(std::move(param));
+    entity.generic_clause.generics.emplace_back(std::move(param));
 
     const std::string result = emit::test::render(entity);
     const std::string expected = "entity configurable is\n"
@@ -50,8 +50,8 @@ TEST_CASE("Entity with ports", "[pretty_printer][design_units]")
 
     ast::Port port2{ .names = { "count" }, .mode = "out", .type_name = "natural" };
 
-    entity.port_clause.ports.push_back(std::move(port1));
-    entity.port_clause.ports.push_back(std::move(port2));
+    entity.port_clause.ports.emplace_back(std::move(port1));
+    entity.port_clause.ports.emplace_back(std::move(port2));
 
     const std::string result = emit::test::render(entity);
     const std::string expected = "entity counter is\n"
@@ -68,7 +68,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
     ast::GenericParam param{ .names = { "DEPTH" },
                              .type_name = "positive",
                              .default_expr = ast::TokenExpr{ .text = "16" } };
-    entity.generic_clause.generics.push_back(std::move(param));
+    entity.generic_clause.generics.emplace_back(std::move(param));
 
     // Add constraint
     auto left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" });
@@ -88,7 +88,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
                     .default_expr = std::nullopt,
                     .constraint = ast::Constraint(std::move(idx_constraint)) };
 
-    entity.port_clause.ports.push_back(std::move(port));
+    entity.port_clause.ports.emplace_back(std::move(port));
 
     const std::string result = emit::test::render(entity);
     const std::string expected = "entity fifo is\n"
@@ -118,7 +118,7 @@ TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_
                              .type_name = "positive",
                              .default_expr = ast::TokenExpr{ .text = "8" } };
 
-    entity.generic_clause.generics.push_back(std::move(param));
+    entity.generic_clause.generics.emplace_back(std::move(param));
 
     // Create config with 4-space indent
     auto config = defaultConfig();

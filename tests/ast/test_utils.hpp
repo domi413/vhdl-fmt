@@ -34,7 +34,7 @@ inline auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vecto
     std::vector<std::string_view> out;
     out.reserve(tv.size());
     for (const auto &c : tv) {
-        out.push_back(c.text);
+        out.emplace_back(c.text);
     }
     return out;
 }

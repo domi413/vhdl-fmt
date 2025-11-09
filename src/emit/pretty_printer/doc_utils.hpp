@@ -23,7 +23,7 @@ inline auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc
     }
 
     for (auto &&item : std::forward<Range>(items)) {
-        result.push_back(std::invoke(std::forward<Transform>(transform), item));
+        result.emplace_back(std::invoke(std::forward<Transform>(transform), item));
     }
 
     return result;
