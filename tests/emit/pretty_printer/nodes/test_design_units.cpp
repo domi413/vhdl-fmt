@@ -16,7 +16,7 @@ TEST_CASE("Simple Entity without generics or ports", "[pretty_printer][design_un
     ast::Entity entity;
     entity.name = "simple_entity";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -40,7 +40,7 @@ TEST_CASE("Entity with generics", "[pretty_printer][design_units]")
     param.default_expr = default_val;
     entity.generic_clause.generics.push_back(std::move(param));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -70,7 +70,7 @@ TEST_CASE("Entity with ports", "[pretty_printer][design_units]")
     entity.port_clause.ports.push_back(std::move(port1));
     entity.port_clause.ports.push_back(std::move(port2));
 
-    emit::PrettyPrinter printer(defaultConfig());
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -119,7 +119,7 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
 
     entity.port_clause.ports.push_back(std::move(port));
 
-    emit::PrettyPrinter printer(defaultConfig());
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -138,7 +138,7 @@ TEST_CASE("Entity with custom end label", "[pretty_printer][design_units]")
     entity.name = "my_entity";
     entity.end_label = "custom_label";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(entity);
     const auto result = doc.render(defaultConfig());
 
@@ -166,8 +166,7 @@ TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_
     auto config = defaultConfig();
     config.line_config.indent_size = 4;
 
-    emit::PrettyPrinter printer(config);
-
+    emit::PrettyPrinter printer{ config };
     const auto doc = printer(entity);
     const auto result = doc.render(config);
 
@@ -185,7 +184,7 @@ TEST_CASE("Simple Architecture", "[pretty_printer][design_units]")
     arch.name = "rtl";
     arch.entity_name = "counter";
 
-    emit::PrettyPrinter printer(defaultConfig());
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(arch);
     const auto result = doc.render(defaultConfig());
 

@@ -35,7 +35,7 @@ auto main(int argc, char *argv[]) -> int
         // debug_printer.visit(root);
 
         // Pretty print the AST
-        emit::PrettyPrinter printer(config);
+        emit::PrettyPrinter printer{ config };
         const auto doc = printer(root);
         std::cout << doc.render(config);
 

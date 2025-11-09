@@ -12,10 +12,10 @@ using emit::test::defaultConfig;
 
 TEST_CASE("Empty GenericClause", "[pretty_printer][clauses]")
 {
-    const ast::GenericClause clause;
+    const ast::GenericClause clause{};
     // Empty generics list
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
     const auto result = doc.render(defaultConfig());
 
@@ -35,7 +35,7 @@ TEST_CASE("GenericClause with single parameter", "[pretty_printer][clauses]")
 
     clause.generics.push_back(std::move(param));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
     const auto result = doc.render(defaultConfig());
 
@@ -64,7 +64,7 @@ TEST_CASE("GenericClause with multiple parameters", "[pretty_printer][clauses]")
     clause.generics.push_back(std::move(param1));
     clause.generics.push_back(std::move(param2));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
     const auto result = doc.render(defaultConfig());
 
@@ -76,7 +76,7 @@ TEST_CASE("Empty PortClause", "[pretty_printer][clauses]")
     const ast::PortClause clause;
     // Empty ports list
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
     const auto result = doc.render(defaultConfig());
 
@@ -94,7 +94,7 @@ TEST_CASE("PortClause with single port", "[pretty_printer][clauses]")
 
     clause.ports.push_back(std::move(port));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
     const auto result = doc.render(defaultConfig());
 
@@ -140,10 +140,9 @@ TEST_CASE("PortClause with multiple ports", "[pretty_printer][clauses]")
     clause.ports.emplace_back(std::move(port2));
     clause.ports.emplace_back(std::move(port3));
 
-    auto config = defaultConfig();
-    emit::PrettyPrinter printer(config);
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
-    const auto result = doc.render(config);
+    const auto result = doc.render(defaultConfig());
 
     const std::string expected = "port (\n"
                                  "  clk : in std_logic;\n"
@@ -177,16 +176,10 @@ TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][c
     clause.ports.emplace_back(std::move(port3));
 
     // Create config with align_signals disabled
-    constexpr int TEST_LINE_LENGTH = 80;
-    common::Config config;
-    config.port_map.align_signals = false;
-    config.line_config.line_length = TEST_LINE_LENGTH;
-    config.line_config.indent_size = 2;
 
-    emit::PrettyPrinter printer(config);
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(clause);
-    const auto result = doc.render(config);
-
+    const auto result = doc.render(defaultConfig());
     // Should use inline format without alignment
     const std::string expected = "port (\n"
                                  "  clk : in std_logic;\n"

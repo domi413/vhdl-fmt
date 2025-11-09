@@ -17,7 +17,7 @@ TEST_CASE("GenericParam with single name", "[pretty_printer][declarations]")
     param.names = { "WIDTH" };
     param.type_name = "integer";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(param);
     const auto result = doc.render(defaultConfig());
 
@@ -30,7 +30,7 @@ TEST_CASE("GenericParam with multiple names", "[pretty_printer][declarations]")
     param.names = { "WIDTH", "HEIGHT", "DEPTH" };
     param.type_name = "positive";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(param);
     const auto result = doc.render(defaultConfig());
 
@@ -47,7 +47,7 @@ TEST_CASE("GenericParam with default value", "[pretty_printer][declarations]")
     default_val.text = "8";
     param.default_expr = default_val;
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(param);
     const auto result = doc.render(defaultConfig());
 
@@ -64,7 +64,7 @@ TEST_CASE("GenericParam with multiple names and default", "[pretty_printer][decl
     default_val.text = "0";
     param.default_expr = default_val;
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(param);
     const auto result = doc.render(defaultConfig());
 
@@ -78,7 +78,7 @@ TEST_CASE("Port with single name and mode", "[pretty_printer][declarations]")
     port.mode = "in";
     port.type_name = "std_logic";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(port);
     const auto result = doc.render(defaultConfig());
 
@@ -92,7 +92,7 @@ TEST_CASE("Port with multiple names", "[pretty_printer][declarations]")
     port.mode = "inout";
     port.type_name = "std_logic_vector";
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(port);
     const auto result = doc.render(defaultConfig());
 
@@ -123,7 +123,7 @@ TEST_CASE("Port with constraints", "[pretty_printer][declarations]")
     idx_constraint.ranges.children.emplace_back(std::move(constraint));
     port.constraint = ast::Constraint(std::move(idx_constraint));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(port);
     const auto result = doc.render(defaultConfig());
 
@@ -167,7 +167,7 @@ TEST_CASE("Port with multiple constraints", "[pretty_printer][declarations]")
     idx_constraint.ranges.children.emplace_back(std::move(constraint2));
     port.constraint = ast::Constraint(std::move(idx_constraint));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(port);
     const auto result = doc.render(defaultConfig());
 
@@ -185,7 +185,7 @@ TEST_CASE("Port with default value", "[pretty_printer][declarations]")
     default_val.text = "'0'";
     port.default_expr = default_val;
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(port);
     const auto result = doc.render(defaultConfig());
 
@@ -221,7 +221,7 @@ TEST_CASE("Port with constraints and default value", "[pretty_printer][declarati
     default_val.text = "X\"00\"";
     port.default_expr = default_val;
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(port);
     const auto result = doc.render(defaultConfig());
 

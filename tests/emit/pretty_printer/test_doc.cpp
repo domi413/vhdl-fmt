@@ -81,7 +81,7 @@ TEST_CASE("Hard line never becomes space", "[doc]")
 
 TEST_CASE("Empty documents don't affect output", "[doc]")
 {
-    const Doc doc = Doc::text("hello") + Doc::empty() + space() + Doc::text("world");
+    const Doc doc = Doc::text("hello") + Doc::empty() & Doc::text("world");
     REQUIRE(doc.render(defaultConfig()) == "hello world");
 }
 

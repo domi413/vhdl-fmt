@@ -14,7 +14,7 @@ TEST_CASE("Empty DesignFile", "[pretty_printer][design_file]")
     const ast::DesignFile file;
     // Empty units list
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(file);
     const auto result = doc.render(defaultConfig());
 
@@ -30,7 +30,7 @@ TEST_CASE("DesignFile with single entity", "[pretty_printer][design_file]")
 
     file.units.emplace_back(std::move(entity));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(file);
     const auto result = doc.render(defaultConfig());
     const std::string expected = "entity test_entity is\n"
@@ -61,7 +61,7 @@ TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_fi
     file.units.emplace_back(std::move(entity));
     file.units.emplace_back(std::move(arch));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(file);
     const auto result = doc.render(defaultConfig());
 
@@ -94,7 +94,7 @@ TEST_CASE("DesignFile with multiple design units", "[pretty_printer][design_file
     file.units.emplace_back(std::move(entity2));
     file.units.emplace_back(std::move(arch1));
 
-    emit::PrettyPrinter printer;
+    emit::PrettyPrinter printer{ defaultConfig() };
     const auto doc = printer(file);
     const auto result = doc.render(defaultConfig());
 
