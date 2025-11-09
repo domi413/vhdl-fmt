@@ -125,6 +125,7 @@ TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][c
                                  "  data_valid : in std_logic;\n"
                                  "  output_signal : out std_logic_vector\n"
                                  ");";
+
     REQUIRE(result == expected);
 }
 
