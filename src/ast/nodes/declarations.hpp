@@ -32,7 +32,7 @@ struct DeclBase : NodeBase
 struct ConstantDecl : DeclBase
 {
     std::string type_name;
-    std::optional<Expression> init_expr;
+    std::optional<Expression> init_expr{};
 };
 
 // Signal declaration: signal v : std_logic_vector(7 downto 0) := (others => '0');

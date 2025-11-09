@@ -92,7 +92,7 @@ auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vect
 auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
   -> std::vector<ast::BinaryExpr>
 {
-    std::vector<ast::BinaryExpr> constraints;
+    std::vector<ast::BinaryExpr> constraints{};
 
     for (auto *discrete_r : ctx->discrete_range()) {
         auto *range_decl = discrete_r->range_decl();
@@ -117,7 +117,7 @@ auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
 auto Translator::makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
   -> std::vector<ast::BinaryExpr>
 {
-    std::vector<ast::BinaryExpr> constraints;
+    std::vector<ast::BinaryExpr> constraints{};
 
     auto *range_decl = ctx->range_decl();
     if (range_decl == nullptr) {

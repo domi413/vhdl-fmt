@@ -14,15 +14,11 @@ auto DebugPrinter::operator()(const ast::ConcurrentSignalAssignmentStatement &no
     emitNodeLike(node, "ConcurrentAssign", "<=");
     const IndentGuard _{ indent_ };
     printLine("target:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.target);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.target);
     printLine("value:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.value);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.value);
 }
 
 auto DebugPrinter::operator()(const ast::ProcessStatement &node) -> void
@@ -50,15 +46,11 @@ auto DebugPrinter::operator()(const ast::SignalAssignmentStatement &node) -> voi
     emitNodeLike(node, "SequentialAssign", ":=");
     const IndentGuard _{ indent_ };
     printLine("target:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.target);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.target);
     printLine("value:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.value);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.value);
 }
 
 auto DebugPrinter::operator()(const ast::IfStatement &node) -> void
@@ -88,15 +80,11 @@ auto DebugPrinter::operator()(const ast::IfStatement &node) -> void
         {
             const IndentGuard _{ indent_ };
             printLine("condition:");
-            {
-                const IndentGuard _{ indent_ };
-                visit(elsif.condition);
-            }
+            const IndentGuard _{ indent_ };
+            visit(elsif.condition);
             printLine("then:");
-            {
-                const IndentGuard _{ indent_ };
-                visit(elsif.body);
-            }
+            const IndentGuard _{ indent_ };
+            visit(elsif.body);
         }
     }
 
@@ -114,26 +102,18 @@ auto DebugPrinter::operator()(const ast::CaseStatement &node) -> void
     const IndentGuard _{ indent_ };
 
     printLine("selector:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.selector);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.selector);
 
     for (const auto &when : node.when_clauses) {
         printLine("when:");
-        {
-            const IndentGuard _{ indent_ };
-            printLine("choices:");
-            {
-                const IndentGuard _{ indent_ };
-                visit(when.choices);
-            }
-            printLine("body:");
-            {
-                const IndentGuard _{ indent_ };
-                visit(when.body);
-            }
-        }
+        const IndentGuard _{ indent_ };
+        printLine("choices:");
+        const IndentGuard _{ indent_ };
+        visit(when.choices);
+        printLine("body:");
+        const IndentGuard _{ indent_ };
+        visit(when.body);
     }
 }
 
@@ -143,16 +123,12 @@ auto DebugPrinter::operator()(const ast::ForLoopStatement &node) -> void
     const IndentGuard _{ indent_ };
 
     printLine("range:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.range);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.range);
 
     printLine("body:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.body);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.body);
 }
 
 auto DebugPrinter::operator()(const ast::WhileLoopStatement &node) -> void
@@ -161,16 +137,12 @@ auto DebugPrinter::operator()(const ast::WhileLoopStatement &node) -> void
     const IndentGuard _{ indent_ };
 
     printLine("condition:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.condition);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.condition);
 
     printLine("body:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.body);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.body);
 }
 
 auto DebugPrinter::operator()(const ast::WaitStatement &node) -> void
@@ -206,10 +178,8 @@ auto DebugPrinter::operator()(const ast::AssertStatement &node) -> void
     const IndentGuard _{ indent_ };
 
     printLine("condition:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.condition);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.condition);
 
     if (node.report_expr) {
         printLine("report:");
@@ -231,10 +201,8 @@ auto DebugPrinter::operator()(const ast::ReportStatement &node) -> void
     const IndentGuard _{ indent_ };
 
     printLine("message:");
-    {
-        const IndentGuard _{ indent_ };
-        visit(node.message);
-    }
+    const IndentGuard _{ indent_ };
+    visit(node.message);
 
     if (node.severity_expr) {
         printLine("severity:");

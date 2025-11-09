@@ -24,10 +24,10 @@ auto main(int argc, char *argv[]) -> int
         // formatter{ argparser.getFlags(), config_reader.readConfigFile() };
 
         // Build AST from input file
-        const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
+        const ast::DesignFile root{ builder::buildFromFile(argparser.getInputPath()) };
 
         // Print AST for debugging
-        emit::DebugPrinter printer(std::cout);
+        emit::DebugPrinter printer{ std::cout };
         printer.visit(root);
 
     } catch (const std::exception &e) {

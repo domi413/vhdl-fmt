@@ -9,7 +9,7 @@ namespace emit {
 
 auto DebugPrinter::operator()(const ast::InterfaceConstantDecl &node) -> void
 {
-    std::ostringstream oss;
+    std::ostringstream oss{};
     oss << std::ranges::to<std::string>(node.names
                                         | std::views::join_with(std::string_view{ ", " }));
     oss << " : " << node.type_name;
@@ -22,7 +22,7 @@ auto DebugPrinter::operator()(const ast::InterfaceConstantDecl &node) -> void
 
 auto DebugPrinter::operator()(const ast::InterfacePortDecl &node) -> void
 {
-    std::ostringstream oss;
+    std::ostringstream oss{};
     oss << std::ranges::to<std::string>(node.names
                                         | std::views::join_with(std::string_view{ ", " }));
 
@@ -61,7 +61,7 @@ auto DebugPrinter::operator()(const ast::SignalDecl &node) -> void
 
 auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void
 {
-    std::ostringstream oss;
+    std::ostringstream oss{};
     oss << std::ranges::to<std::string>(node.names
                                         | std::views::join_with(std::string_view{ ", " }));
     oss << " : " << node.type_name;
@@ -74,7 +74,7 @@ auto DebugPrinter::operator()(const ast::ConstantDecl &node) -> void
 
 auto DebugPrinter::operator()(const ast::AliasDecl &node) -> void
 {
-    std::ostringstream oss;
+    std::ostringstream oss{};
     oss << node.name;
 
     if (node.type_indication) {

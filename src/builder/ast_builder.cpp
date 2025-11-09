@@ -14,13 +14,12 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 
 namespace builder {
 
 auto buildFromFile(const std::filesystem::path &path) -> ast::DesignFile
 {
-    std::ifstream file(path);
+    std::ifstream file{ path };
     if (!file) {
         throw std::runtime_error("Failed to open input file: " + path.string());
     }
@@ -30,18 +29,18 @@ auto buildFromFile(const std::filesystem::path &path) -> ast::DesignFile
 auto buildFromStream(std::istream &input) -> ast::DesignFile
 {
     // CST construction
-    antlr4::ANTLRInputStream antlr_input(input);
-    vhdlLexer lexer(&antlr_input);
-    antlr4::CommonTokenStream tokens(&lexer);
+    antlr4::ANTLRInputStream antlr_input{ input };
+    vhdlLexer lexer{ &antlr_input };
+    antlr4::CommonTokenStream tokens{ &lexer };
     tokens.fill();
 
-    vhdlParser parser(&tokens);
-    auto *tree = parser.design_file();
+    vhdlParser parser{ &tokens };
+    auto *tree{ parser.design_file() };
 
     // AST construction
-    ast::DesignFile root;
-    TriviaBinder trivia(tokens);
-    Translator translator(trivia, tokens);
+    ast::DesignFile root{};
+    TriviaBinder trivia{ tokens };
+    Translator translator{ trivia, tokens };
     translator.buildDesignFile(root, tree);
 
     return root;

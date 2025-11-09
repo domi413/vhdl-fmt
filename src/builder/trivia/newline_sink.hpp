@@ -1,5 +1,6 @@
 #ifndef BUILDER_TRIVIA_NEWLINE_SINK_HPP
 #define BUILDER_TRIVIA_NEWLINE_SINK_HPP
+
 // NOLINTBEGIN(readability-convert-member-functions-to-static)
 
 #include "ast/node.hpp"
@@ -30,4 +31,5 @@ class NewlineSink final
 } // namespace builder
 
 // NOLINTEND(readability-convert-member-functions-to-static)
+
 #endif /* BUILDER_TRIVIA_NEWLINE_SINK_HPP */

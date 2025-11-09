@@ -32,8 +32,8 @@ struct PortClause : NodeBase
 struct EntityDecl : NodeBase
 {
     std::string name;
-    GenericClause generic_clause;
-    PortClause port_clause;
+    GenericClause generic_clause{};
+    PortClause port_clause{};
     std::vector<Declaration> decls;
     std::vector<ConcurrentStatement> stmts;
     std::optional<std::string> end_label;
