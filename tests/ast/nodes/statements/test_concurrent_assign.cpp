@@ -75,7 +75,7 @@ TEST_CASE("ConcurrentAssign: Multiple assignments", "[statements][concurrent_ass
     REQUIRE(arch->stmts.size() == 3);
 
     // Check all three are concurrent assignments
-    for (size_t i = 0; i < 3; i++) {
+    for (std::size_t i = 0; i < 3; i++) {
         auto *assign = std::get_if<ast::ConcurrentAssign>(&arch->stmts[i]);
         REQUIRE(assign != nullptr);
     }

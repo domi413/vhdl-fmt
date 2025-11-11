@@ -1,9 +1,9 @@
 #include "emit/pretty_printer/doc.hpp"
 
+#include "common/config.hpp"
 #include "emit/pretty_printer/doc_impl.hpp"
 #include "emit/pretty_printer/renderer.hpp"
 
-#include <memory>
 #include <string>
 #include <string_view>
 
@@ -27,6 +27,11 @@ auto Doc::line() -> Doc
     return Doc(makeLine());
 }
 
+auto Doc::hardline() -> Doc
+{
+    return Doc(makeHardLine());
+}
+
 // Combinators
 auto Doc::operator+(const Doc &other) const -> Doc
 {
@@ -35,7 +40,7 @@ auto Doc::operator+(const Doc &other) const -> Doc
 
 auto Doc::operator&(const Doc &other) const -> Doc
 {
-    return *this + space() + other;
+    return *this + Doc::text(" ") + other;
 }
 
 auto Doc::operator/(const Doc &other) const -> Doc
@@ -43,9 +48,59 @@ auto Doc::operator/(const Doc &other) const -> Doc
     return *this + line() + other;
 }
 
-auto Doc::nest(int indent) const -> Doc
+auto Doc::operator|(const Doc &other) const -> Doc
 {
-    return Doc(makeNest(indent, impl_));
+    return *this + hardline() + other;
+}
+
+auto Doc::operator<<(const Doc &other) const -> Doc
+{
+    // *this + (line() + other).nest(DEFAULT_INDENT)
+    auto nested = Doc(makeNest(makeConcat(line().impl_, other.impl_)));
+    return *this + nested;
+}
+
+auto Doc::hardIndent(const Doc &other) const -> Doc
+{
+    // *this + (hardline() + other).nest(DEFAULT_INDENT)
+    auto nested = Doc(makeNest(makeConcat(hardline().impl_, other.impl_)));
+    return *this + nested;
+}
+
+// Compound assignment operators
+auto Doc::operator+=(const Doc &other) -> Doc &
+{
+    *this = *this + other;
+    return *this;
+}
+
+auto Doc::operator&=(const Doc &other) -> Doc &
+{
+    *this = *this & other;
+    return *this;
+}
+
+auto Doc::operator/=(const Doc &other) -> Doc &
+{
+    *this = *this / other;
+    return *this;
+}
+
+auto Doc::operator|=(const Doc &other) -> Doc &
+{
+    *this = *this | other;
+    return *this;
+}
+
+auto Doc::operator<<=(const Doc &other) -> Doc &
+{
+    *this = *this << other;
+    return *this;
+}
+
+auto Doc::bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc
+{
+    return (left << inner) / right;
 }
 
 auto Doc::group() const -> Doc
@@ -54,22 +109,10 @@ auto Doc::group() const -> Doc
 }
 
 // Rendering
-auto Doc::render(int width) const -> std::string
+auto Doc::render(const common::Config &config) const -> std::string
 {
-    Renderer renderer(width);
+    Renderer renderer(config);
     return renderer.render(impl_);
-}
-
-// Internal access
-auto Doc::impl() const -> const std::shared_ptr<DocImpl> &
-{
-    return impl_;
-}
-
-// Helper functions
-auto space() -> Doc
-{
-    return Doc::text(" ");
 }
 
 } // namespace emit

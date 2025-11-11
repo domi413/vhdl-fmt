@@ -23,7 +23,7 @@ class CommentSink final
             return;
         }
 
-        const auto idx = static_cast<std::size_t>(t->getTokenIndex());
+        const auto idx = t->getTokenIndex();
         if (!used_.insert(idx).second) {
             return; // already added elsewhere
         }

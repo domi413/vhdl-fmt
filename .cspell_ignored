@@ -5,12 +5,14 @@ bugprone
 combinators
 conanfile
 cppcoreguidelines
+dedents
 domi
 doublestar
 flto
 gersemi
 niekdomi
 nolintnextline
+RPAREN
 subnature
 testbench
 vedivad

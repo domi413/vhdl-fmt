@@ -1,4 +1,11 @@
-add_executable(emit_tests pretty_printer/test_doc.cpp)
+add_executable(
+    emit_tests
+    pretty_printer/test_doc.cpp
+    pretty_printer/nodes/test_declarations.cpp
+    pretty_printer/nodes/test_clauses.cpp
+    pretty_printer/nodes/test_design_units.cpp
+    pretty_printer/nodes/test_design_file.cpp
+)
 
 target_link_libraries(
     emit_tests

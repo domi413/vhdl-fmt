@@ -1,7 +1,7 @@
 #include "ast/node.hpp"
 #include "ast/nodes/design_units.hpp"
+#include "ast/test_utils.hpp"
 #include "builder/ast_builder.hpp"
-#include "common/test_utils.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
