@@ -92,12 +92,16 @@ auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
 
     // Collect all discrete ranges into the group
     for (auto *discrete_r : ctx->discrete_range()) {
-        if (auto *range_decl = discrete_r->range_decl()) {
-            if (auto *explicit_r = range_decl->explicit_range()) {
-                auto range_expr = makeRange(explicit_r);
-                group.children.push_back(std::move(range_expr));
-            }
+        auto *range_decl = discrete_r->range_decl();
+        if (range_decl == nullptr) {
+            continue;
         }
+        auto *explicit_r = range_decl->explicit_range();
+        if (explicit_r == nullptr) {
+            continue;
+        }
+        auto range_expr = makeRange(explicit_r);
+        group.children.push_back(std::move(range_expr));
     }
 
     constraint.ranges = std::move(group);
@@ -107,18 +111,22 @@ auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
 auto Translator::makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
   -> std::optional<ast::RangeConstraint>
 {
-    if (auto *range_decl = ctx->range_decl()) {
-        if (auto *explicit_r = range_decl->explicit_range()) {
-            if (auto range_expr = makeRange(explicit_r);
-                auto *bin = std::get_if<ast::BinaryExpr>(&range_expr)) {
-                auto constraint = make<ast::RangeConstraint>(ctx);
-                constraint.range = std::move(*bin);
-                return constraint;
-            }
-        }
+    auto *range_decl = ctx->range_decl();
+    if (range_decl == nullptr) {
+        return std::nullopt;
     }
-
-    return std::nullopt;
+    auto *explicit_r = range_decl->explicit_range();
+    if (explicit_r == nullptr) {
+        return std::nullopt;
+    }
+    auto range_expr = makeRange(explicit_r);
+    auto *bin = std::get_if<ast::BinaryExpr>(&range_expr);
+    if (bin == nullptr) {
+        return std::nullopt;
+    }
+    auto constraint = make<ast::RangeConstraint>(ctx);
+    constraint.range = std::move(*bin);
+    return constraint;
 }
 
 auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr

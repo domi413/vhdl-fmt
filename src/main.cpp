@@ -29,8 +29,8 @@ auto main(int argc, char *argv[]) -> int
         const auto doc = printer(root);
         std::cout << doc.render(config);
 
-    } catch (const std::exception &ex) {
-        std::cerr << "Error: " << ex.what() << '\n';
+    } catch (const std::exception &e) {
+        std::cerr << "Error: " << e.what() << '\n';
         return EXIT_FAILURE;
     } catch (...) {
         std::cerr << "Unknown error occurred." << '\n';

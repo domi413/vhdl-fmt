@@ -41,19 +41,14 @@ inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool in
         return Doc::empty();
     }
 
-    Doc result = Doc::empty();
-    bool first = true;
+    auto result = docs.front();
 
-    for (const auto &doc : docs) {
-        if (!first) {
-            result = result + separator;
-        }
-        result = result + doc;
-        first = false;
+    for (const auto &doc : docs | std::views::drop(1)) {
+        result = result + separator + doc;
     }
 
     if (include_trailing) {
-        result = result + separator;
+        result += separator;
     }
 
     return result;

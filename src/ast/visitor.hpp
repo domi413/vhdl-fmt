@@ -85,7 +85,7 @@ class VisitorBase
     }
 
   private:
-    auto derived() const -> const Derived & { return static_cast<const Derived &>(*this); }
+    auto derived() const noexcept -> const Derived & { return static_cast<const Derived &>(*this); }
 };
 
 } // namespace ast
