@@ -43,7 +43,7 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     //       result in incorrect parsing for VHDL. -> We should try to
     //       "optimize this" when everything else seems to be working.
     parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
-      antlr4::atn::PredictionMode::SLL);
+      antlr4::atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);
 
     vhdlParser::Design_fileContext *tree = nullptr;
 
