@@ -2,6 +2,7 @@
 
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
+#include "antlr4-runtime/atn/PredictionMode.h"
 #include "ast/nodes/design_file.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
