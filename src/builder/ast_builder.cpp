@@ -41,7 +41,7 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
 
     // NOTE: SLL would be a significant performance improvement, though may
     //       result in incorrect parsing for VHDL. -> We should try to
-    //       "optimize this" when everything else seems to be working.
+    //       "optimize" parsing when everything else seems to be working.
     parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
       antlr4::atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);
 
