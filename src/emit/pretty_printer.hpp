@@ -7,7 +7,6 @@
 #include "ast/nodes/expressions.hpp"
 #include "ast/nodes/statements.hpp"
 #include "ast/visitor.hpp"
-#include "common/config.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
 namespace emit {
@@ -15,8 +14,6 @@ namespace emit {
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 {
   public:
-    explicit PrettyPrinter(common::Config config) : config_(config) {}
-
     // Node visitors
     auto operator()(const ast::DesignFile &node) const -> Doc;
     auto operator()(const ast::Entity &node) const -> Doc;
@@ -52,17 +49,6 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::CaseStatement &node) const -> Doc;
     auto operator()(const ast::ForLoop &node) const -> Doc;
     auto operator()(const ast::WhileLoop &node) const -> Doc;
-
-  protected:
-    // Config accessor for visitor methods
-    [[nodiscard]]
-    auto config() const -> const common::Config &
-    {
-        return config_;
-    }
-
-  private:
-    common::Config config_;
 };
 
 } // namespace emit

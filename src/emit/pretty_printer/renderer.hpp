@@ -44,8 +44,8 @@ class Renderer final
     void newline(int indent);
 
     // Member variables
-    int width_;
-    int indent_size_;
+    int width_{};
+    int indent_size_{};
     int column_{ 0 };
     std::string output_;
 };

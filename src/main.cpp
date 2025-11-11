@@ -26,7 +26,7 @@ auto main(int argc, char *argv[]) -> int
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
 
         // Pretty print the AST
-        const emit::PrettyPrinter printer{ config };
+        const emit::PrettyPrinter printer{};
         const auto doc = printer(root);
         std::cout << doc.render(config);
 
