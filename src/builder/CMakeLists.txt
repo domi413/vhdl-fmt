@@ -19,6 +19,5 @@ target_link_libraries(
     builder
     PUBLIC
         ast
-        common
         vhdl_generated
 )

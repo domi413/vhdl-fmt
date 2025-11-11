@@ -6,7 +6,6 @@
 #include "ast/nodes/design_file.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
-#include "common/logger.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
@@ -31,39 +30,24 @@ auto buildFromFile(const std::filesystem::path &path) -> ast::DesignFile
 
 auto buildFromStream(std::istream &input) -> ast::DesignFile
 {
-    auto &logger = common::Logger::instance();
-
     // CST construction
     antlr4::ANTLRInputStream antlr_input(input);
     vhdlLexer lexer(&antlr_input);
-
-    lexer.removeErrorListeners();
 
     antlr4::CommonTokenStream tokens(&lexer);
     tokens.fill();
 
     vhdlParser parser(&tokens);
 
-    parser.removeErrorListeners();
-
-    // Performance optimization: Use SLL prediction mode
-    // NOTE: SLL might fail for VHDL in certain cases, so we may use a slower
-    // but more stable optimization at a certain point.
+    // NOTE: SLL would be a significant performance improvement, though may
+    //       result in incorrect parsing for VHDL. -> We should try to
+    //       "optimize this" when everything else seems to be working.
     parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
       antlr4::atn::PredictionMode::SLL);
 
     vhdlParser::Design_fileContext *tree = nullptr;
 
-    try {
-        tree = parser.design_file();
-    } catch (...) {
-        logger.error("SLL failed, retry with LL_EXACT_AMBIG_DETECTION prediction mode");
-        tokens.seek(0);
-        parser.reset();
-        parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
-          antlr4::atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);
-        tree = parser.design_file();
-    }
+    tree = parser.design_file();
 
     // AST construction
     ast::DesignFile root;
