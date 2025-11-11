@@ -89,7 +89,6 @@ auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept
     }
 
     const auto line = start_token->getLine();
-
     auto default_tokens_on_line = std::views::iota(start_index + 1)
                                 | std::views::take_while([this, line](const std::size_t i) -> bool {
                                       const auto *token = tokens_.get(i);
