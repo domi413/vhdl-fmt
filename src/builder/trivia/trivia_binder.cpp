@@ -89,21 +89,17 @@ auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept
     }
 
     const auto line = start_token->getLine();
-    auto default_tokens_on_line = std::views::iota(start_index + 1)
-                                | std::views::take_while([this, line](const std::size_t i) -> bool {
-                                      const auto *token = tokens_.get(i);
-                                      return (token != nullptr) && (token->getLine() == line);
-                                  })
-                                | std::views::filter([this](const std::size_t i) -> bool {
-                                      return isDefault(tokens_.get(i));
-                                  });
 
-    std::size_t last_default = start_index;
-    for (const auto i : default_tokens_on_line) {
-        last_default = i;
-    }
-
-    return last_default;
+    return std::ranges::fold_left(
+      std::views::iota(start_index + 1)
+        | std::views::take_while([this, line](const std::size_t i) -> bool {
+              const auto *token = tokens_.get(i);
+              return (token != nullptr) && (token->getLine() == line);
+          })
+        | std::views::filter(
+          [this](const std::size_t i) -> bool { return isDefault(tokens_.get(i)); }),
+      start_index,
+      [](std::size_t /* unused */, const std::size_t current) -> std::size_t { return current; });
 }
 
 } // namespace builder
