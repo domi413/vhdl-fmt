@@ -2,7 +2,6 @@
 #include "builder/ast_builder.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
-#include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
 
 #include <cstddef>
