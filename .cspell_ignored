@@ -1,3 +1,4 @@
+ambig
 antlr
 antlr4
 bugprone
@@ -8,6 +9,7 @@ domi
 doublestar
 flto
 gersemi
+niekdomi
 nolintnextline
 subnature
 testbench

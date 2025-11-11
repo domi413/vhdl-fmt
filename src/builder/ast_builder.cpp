@@ -2,6 +2,7 @@
 
 #include "ANTLRInputStream.h"
 #include "CommonTokenStream.h"
+#include "antlr4-runtime/atn/PredictionMode.h"
 #include "ast/nodes/design_file.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
@@ -32,11 +33,21 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     // CST construction
     antlr4::ANTLRInputStream antlr_input(input);
     vhdlLexer lexer(&antlr_input);
+
     antlr4::CommonTokenStream tokens(&lexer);
     tokens.fill();
 
     vhdlParser parser(&tokens);
-    auto *tree = parser.design_file();
+
+    // NOTE: SLL would be a significant performance improvement, though may
+    //       result in incorrect parsing for VHDL. -> We should try to
+    //       "optimize" parsing when everything else seems to be working.
+    parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
+      antlr4::atn::PredictionMode::LL_EXACT_AMBIG_DETECTION);
+
+    vhdlParser::Design_fileContext *tree = nullptr;
+
+    tree = parser.design_file();
 
     // AST construction
     ast::DesignFile root;
