@@ -27,8 +27,8 @@ auto main(int argc, char *argv[]) -> int
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
 
         // Print AST for debugging
-        // emit::DebugPrinter printer(std::cout);
-        // printer.visit(root);
+        emit::DebugPrinter printer(std::cout);
+        printer.visit(root);
 
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << '\n';
