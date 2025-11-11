@@ -83,19 +83,25 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
 
 auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t
 {
-    const auto &tokens = tokens_.getTokens();
-    const std::size_t line = tokens[start_index]->getLine();
+    const auto *start_token = tokens_.get(start_index);
+    if (start_token == nullptr) {
+        return start_index;
+    }
+
+    const auto line = start_token->getLine();
+
+    auto default_tokens_on_line = std::views::iota(start_index + 1)
+                                | std::views::take_while([this, line](const std::size_t i) -> bool {
+                                      const auto *token = tokens_.get(i);
+                                      return (token != nullptr) && (token->getLine() == line);
+                                  })
+                                | std::views::filter([this](const std::size_t i) -> bool {
+                                      return isDefault(tokens_.get(i));
+                                  });
 
     std::size_t last_default = start_index;
-
-    for (const auto *token : tokens | std::views::drop(start_index + 1)) {
-        if (token == nullptr || token->getLine() != line) {
-            break;
-        }
-
-        if (isDefault(token)) {
-            last_default = token->getTokenIndex();
-        }
+    for (const auto i : default_tokens_on_line) {
+        last_default = i;
     }
 
     return last_default;

@@ -32,11 +32,35 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     // CST construction
     antlr4::ANTLRInputStream antlr_input(input);
     vhdlLexer lexer(&antlr_input);
+
+    lexer.removeErrorListeners();
+
     antlr4::CommonTokenStream tokens(&lexer);
     tokens.fill();
 
     vhdlParser parser(&tokens);
-    auto *tree = parser.design_file();
+
+    parser.removeErrorListeners();
+
+    // TODO(niekdomi): Get familiar with the different parsers
+
+    // Performance optimization: Use SLL prediction mode first (faster)
+    // SLL mode is much faster but may fail on complex grammar constructs
+    parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
+      antlr4::atn::PredictionMode::SLL);
+
+    vhdlParser::Design_fileContext *tree = nullptr;
+
+    try {
+        tree = parser.design_file();
+    } catch (...) {
+        // SLL failed, retry with full LL prediction mode
+        tokens.seek(0);
+        parser.reset();
+        parser.getInterpreter<antlr4::atn::ParserATNSimulator>()->setPredictionMode(
+          antlr4::atn::PredictionMode::LL);
+        tree = parser.design_file();
+    }
 
     // AST construction
     ast::DesignFile root;
