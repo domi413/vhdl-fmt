@@ -40,7 +40,7 @@ $(CONAN_STAMP): conanfile.txt
 conan: $(CONAN_STAMP)
 
 run: $(BUILD_STAMP)
-	@./$(TARGET) ./tests/data/vhdl/simple.vhdl
+	@./$(TARGET) ./tests/data/vhdl/simple.vhd
 
 test: $(BUILD_STAMP)
 	@ctest --preset $(CMAKE_PRESET) --output-on-failure
