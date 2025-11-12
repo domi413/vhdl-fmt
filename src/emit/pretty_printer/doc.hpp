@@ -63,6 +63,9 @@ class Doc final
     static auto bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc;
 
     [[nodiscard]]
+    static auto align(const Doc &doc) -> Doc;
+
+    [[nodiscard]]
     auto group() const -> Doc;
 
     /// Transform document recursively using a callable that accepts each node type
@@ -80,9 +83,6 @@ class Doc final
     {
         return foldRecursive(impl_, std::move(init), std::forward<Fn>(fn));
     }
-
-    [[nodiscard]]
-    static auto resolveAlignment(const Doc &doc) -> Doc;
 
     // Rendering
     [[nodiscard]]

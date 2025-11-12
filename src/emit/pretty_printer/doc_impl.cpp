@@ -50,6 +50,11 @@ auto makeAlignPlaceholder(std::string_view text) -> DocPtr
     return std::make_shared<DocImpl>(AlignPlaceholder{ std::string(text) });
 }
 
+auto makeAlign(DocPtr doc) -> DocPtr
+{
+    return std::make_shared<DocImpl>(Align{ .doc = std::move(doc) });
+}
+
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr
 {
@@ -64,6 +69,35 @@ auto flatten(const DocPtr &doc) -> DocPtr
             return makeText(" ");
         } else if constexpr (std::is_same_v<T, Union>) {
             return node.flat;
+        } else {
+            return std::make_shared<DocImpl>(node);
+        }
+    });
+}
+
+auto resolveAlignment(const DocPtr &doc) -> DocPtr
+{
+    // === Pass 1: The "Fold" (using our new 'fold' method) ===
+    int max_width = foldRecursive(doc, 0, [](int current_max, const auto &node) {
+        using T = std::decay_t<decltype(node)>;
+        if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+            return std::max(current_max, static_cast<int>(node.content.length()));
+        }
+        return current_max; // Pass accumulator through
+    });
+
+    // Handle the case where no aligned text was found
+    if (max_width == 0) {
+        return doc;
+    }
+
+    // === Pass 2: The "Transform" (unchanged) ===
+    return transformRecursive(doc, [&](const auto &node) -> DocPtr {
+        using T = std::decay_t<decltype(node)>;
+
+        if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+            int padding = max_width - static_cast<int>(node.content.length());
+            return makeText(node.content + std::string(padding, ' '));
         } else {
             return std::make_shared<DocImpl>(node);
         }

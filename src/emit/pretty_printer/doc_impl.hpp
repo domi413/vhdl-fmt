@@ -109,12 +109,24 @@ struct AlignPlaceholder
     }
 };
 
+struct Align
+{
+    DocPtr doc;
+
+    template<typename Fn>
+    auto fmap(Fn &&fn) const -> Align
+    {
+        return { std::forward<Fn>(fn)(doc) };
+    }
+};
+
 /// Internal document representation using variant
 class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union, AlignPlaceholder> value;
+    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union, AlignPlaceholder, Align>
+      value;
 
     // Since all members are public, this class is considered an aggregate type and allows for
     // aggregate initialization.
@@ -174,9 +186,11 @@ auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
 auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
 auto makeAlignPlaceholder(std::string_view text) -> DocPtr;
+auto makeAlign(DocPtr doc) -> DocPtr;
 
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr;
+auto resolveAlignment(const DocPtr &doc) -> DocPtr;
 
 } // namespace emit
 

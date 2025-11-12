@@ -37,6 +37,11 @@ auto Doc::alignText(std::string_view str) -> Doc // NEW
     return Doc(makeAlignPlaceholder(str));
 }
 
+auto Doc::align(const Doc &doc) -> Doc
+{
+    return Doc(makeAlign(doc.impl_));
+}
+
 // Combinators
 auto Doc::operator+(const Doc &other) const -> Doc
 {
@@ -118,35 +123,6 @@ auto Doc::render(const common::Config &config) const -> std::string
 {
     Renderer renderer(config);
     return renderer.render(impl_);
-}
-
-auto Doc::resolveAlignment(const Doc &doc) -> Doc
-{
-    // === Pass 1: The "Fold" (using our new 'fold' method) ===
-    int max_width = doc.fold(0, [](int current_max, const auto &node) {
-        using T = std::decay_t<decltype(node)>;
-        if constexpr (std::is_same_v<T, AlignPlaceholder>) {
-            return std::max(current_max, static_cast<int>(node.content.length()));
-        }
-        return current_max; // Pass accumulator through
-    });
-
-    // Handle the case where no aligned text was found
-    if (max_width == 0) {
-        return doc;
-    }
-
-    // === Pass 2: The "Transform" (unchanged) ===
-    return doc.transform([&](const auto &node) -> DocPtr {
-        using T = std::decay_t<decltype(node)>;
-
-        if constexpr (std::is_same_v<T, AlignPlaceholder>) {
-            int padding = max_width - static_cast<int>(node.content.length());
-            return makeText(node.content + std::string(padding, ' '));
-        } else {
-            return std::make_shared<DocImpl>(node);
-        }
-    });
 }
 
 } // namespace emit

@@ -11,7 +11,8 @@ namespace emit {
 
 Renderer::Renderer(const common::Config &config) :
   width_(config.line_config.line_length),
-  indent_size_(config.line_config.indent_size)
+  indent_size_(config.line_config.indent_size),
+  align_(config.port_map.align_signals)
 {
 }
 
@@ -57,6 +58,15 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
           } else if constexpr (std::is_same_v<T, Nest>) {
               // Increase indentation for nested content
               renderDoc(indent + indent_size_, mode, node.doc);
+          } else if constexpr (std::is_same_v<T, Align>) {
+              DocPtr doc_to_render = node.doc;
+              if (align_) {
+                  // Run the two-pass logic to resolve alignment
+                  doc_to_render = resolveAlignment(node.doc);
+              }
+
+              // Render the (possibly) aligned inner document
+              renderDoc(indent, mode, doc_to_render);
           } else if constexpr (std::is_same_v<T, Union>) {
               // Decide: use flat or broken layout?
               if (mode == Mode::FLAT || fits(width_ - column_, node.flat)) {
