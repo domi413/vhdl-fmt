@@ -4,7 +4,6 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 
 #include <string>
-#include <type_traits>
 #include <variant>
 
 namespace emit {

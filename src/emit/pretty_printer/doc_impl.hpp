@@ -7,6 +7,7 @@
 #include <string>
 #include <string_view>
 #include <variant>
+
 namespace emit {
 
 // Forward declaration for recursive type
