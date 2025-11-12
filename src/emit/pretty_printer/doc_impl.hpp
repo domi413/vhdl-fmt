@@ -122,20 +122,6 @@ auto transformRecursive(const DocPtr &doc, Fn &&fn) -> DocPtr
       doc->value);
 }
 
-template<typename Fn, typename R>
-auto foldRecursive(const DocPtr &doc, Fn &&fn) -> R
-{
-    return std::visit(
-      [&fn](const MappableNode auto &node) -> R {
-          // Recursively fold children first
-          auto folded_node
-            = node.fmap([&fn](const DocPtr &inner) { return foldRecursive<Fn, R>(inner, fn); });
-          // Then apply the user’s fold function to this layer
-          return std::forward<Fn>(fn)(folded_node);
-      },
-      doc->value);
-}
-
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;
 auto makeText(std::string_view text) -> DocPtr;
