@@ -8,10 +8,10 @@
 #include <string_view>
 
 namespace emit {
+// ========================================================================
+// Static Factories (Document Primitives)
+// ========================================================================
 
-Doc::Doc() : impl_(makeEmpty()) {}
-
-// Basic constructors
 auto Doc::empty() -> Doc
 {
     return Doc(makeEmpty());
@@ -32,17 +32,15 @@ auto Doc::hardline() -> Doc
     return Doc(makeHardLine());
 }
 
-auto Doc::alignText(std::string_view str) -> Doc // NEW
+auto Doc::alignText(std::string_view str) -> Doc
 {
     return Doc(makeAlignPlaceholder(str));
 }
 
-auto Doc::align(const Doc &doc) -> Doc
-{
-    return Doc(makeAlign(doc.impl_));
-}
+// ========================================================================
+// Low-Level Combinators (Operators)
+// ========================================================================
 
-// Combinators
 auto Doc::operator+(const Doc &other) const -> Doc
 {
     return Doc(makeConcat(impl_, other.impl_));
@@ -65,19 +63,22 @@ auto Doc::operator|(const Doc &other) const -> Doc
 
 auto Doc::operator<<(const Doc &other) const -> Doc
 {
-    // *this + (line() + other).nest(DEFAULT_INDENT)
+    // *this + (line() + other).nest()
     auto nested = Doc(makeNest(makeConcat(line().impl_, other.impl_)));
     return *this + nested;
 }
 
 auto Doc::hardIndent(const Doc &other) const -> Doc
 {
-    // *this + (hardline() + other).nest(DEFAULT_INDENT)
+    // *this + (hardline() + other).nest()
     auto nested = Doc(makeNest(makeConcat(hardline().impl_, other.impl_)));
     return *this + nested;
 }
 
-// Compound assignment operators
+// ========================================================================
+// Compound Assignment Operators
+// ========================================================================
+
 auto Doc::operator+=(const Doc &other) -> Doc &
 {
     *this = *this + other;
@@ -108,17 +109,29 @@ auto Doc::operator<<=(const Doc &other) -> Doc &
     return *this;
 }
 
+// ========================================================================
+// High-Level Layout Patterns
+// ========================================================================
+
 auto Doc::bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc
 {
     return (left << inner) / right;
 }
 
-auto Doc::group() const -> Doc
+auto Doc::align(const Doc &doc) -> Doc
 {
-    return Doc(makeUnion(flatten(impl_), impl_));
+    return Doc(makeAlign(doc.impl_));
 }
 
+auto Doc::group(const Doc &doc) -> Doc
+{
+    return Doc(makeUnion(flatten(doc.impl_), doc.impl_));
+}
+
+// ========================================================================
 // Rendering
+// ========================================================================
+
 auto Doc::render(const common::Config &config) const -> std::string
 {
     Renderer renderer(config);

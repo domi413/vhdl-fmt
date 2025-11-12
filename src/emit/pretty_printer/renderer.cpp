@@ -32,58 +32,64 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
         return;
     }
 
-    std::visit(
-      [&](const auto &node) -> void {
-          using T = std::decay_t<decltype(node)>;
+    auto render_visitor = common::Overload{
+        // Empty produces nothing
+        [](const Empty &) -> void {},
 
-          // Dispatch logic using if constexpr
-          if constexpr (std::is_same_v<T, Empty>) {
-              // Empty produces nothing
-          } else if constexpr (std::is_same_v<T, Text>) {
-              write(node.content);
-          } else if constexpr (std::is_same_v<T, SoftLine>) {
-              if (mode == Mode::FLAT) {
-                  // In flat mode, line becomes space
-                  write(" ");
-              } else {
-                  // In break mode, line becomes newline + indent
-                  newline(indent);
-              }
-          } else if constexpr (std::is_same_v<T, HardLine>) {
-              // Hard line always breaks
-              newline(indent);
-          } else if constexpr (std::is_same_v<T, Concat>) {
-              renderDoc(indent, mode, node.left);
-              renderDoc(indent, mode, node.right);
-          } else if constexpr (std::is_same_v<T, Nest>) {
-              // Increase indentation for nested content
-              renderDoc(indent + indent_size_, mode, node.doc);
-          } else if constexpr (std::is_same_v<T, Align>) {
-              DocPtr doc_to_render = node.doc;
-              if (align_) {
-                  // Run the two-pass logic to resolve alignment
-                  doc_to_render = resolveAlignment(node.doc);
-              }
+        // Text
+        [&](const Text &node) -> void { write(node.content); },
 
-              // Render the (possibly) aligned inner document
-              renderDoc(indent, mode, doc_to_render);
-          } else if constexpr (std::is_same_v<T, AlignPlaceholder>) {
-              // In non-aligned mode - treat as text
-              write(node.content);
-          } else if constexpr (std::is_same_v<T, Union>) {
-              // Decide: use flat or broken layout?
-              if (mode == Mode::FLAT || fits(width_ - column_, node.flat)) {
-                  // Fits on current line - use flat version
-                  renderDoc(indent, Mode::FLAT, node.flat);
-              } else {
-                  // Doesn't fit - use broken version
-                  renderDoc(indent, Mode::BREAK, node.broken);
-              }
-          }
-      },
-      doc->value);
+        // SoftLine (depends on mode)
+        [&](const SoftLine &) -> void {
+            if (mode == Mode::FLAT) {
+                write(" ");
+            } else {
+                newline(indent);
+            }
+        },
+
+        // HardLine (always breaks)
+        [&](const HardLine &) -> void { newline(indent); },
+
+        // Concat (recursively renders children)
+        [&](const Concat &node) -> void {
+            renderDoc(indent, mode, node.left);
+            renderDoc(indent, mode, node.right);
+        },
+
+        // Nest (increases indentation)
+        [&](const Nest &node) -> void { renderDoc(indent + indent_size_, mode, node.doc); },
+
+        // Align (conditional pre-processing)
+        [&](const Align &node) -> void {
+            DocPtr doc_to_render = node.doc;
+            if (align_) {
+                // Run the two-pass logic to resolve alignment
+                doc_to_render = resolveAlignment(node.doc);
+            }
+
+            // Render the (possibly) aligned inner document
+            renderDoc(indent, mode, doc_to_render);
+        },
+
+        // AlignPlaceholder (base case for alignment, renders as text)
+        [&](const AlignPlaceholder &node) -> void { write(node.content); },
+
+        // Union (decision point)
+        [&](const Union &node) -> void {
+            // Decide: use flat or broken layout?
+            if (mode == Mode::FLAT || fits(width_ - column_, node.flat)) {
+                // Fits on current line - use flat version
+                renderDoc(indent, Mode::FLAT, node.flat);
+            } else {
+                // Doesn't fit - use broken version
+                renderDoc(indent, Mode::BREAK, node.broken);
+            }
+        }
+    };
+
+    std::visit(render_visitor, doc->value);
 }
-
 // Check if document fits on current line
 auto Renderer::fits(int width, const DocPtr &doc) -> bool
 {
@@ -100,45 +106,43 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
         return -1;
     }
 
-    // Use a single generic lambda to replace common::Overload
-    return std::visit(
-      [&](const auto &node) -> int {
-          using T = std::decay_t<decltype(node)>;
+    auto fits_visitor = common::Overload{
+        // Empty
+        [&](const Empty &) -> int { return width; },
 
-          // Dispatch logic using if constexpr
-          if constexpr (std::is_same_v<T, Empty>) {
-              return width;
-          } else if constexpr (std::is_same_v<T, Text>) {
-              return width - static_cast<int>(node.content.length());
-          } else if constexpr (std::is_same_v<T, SoftLine>) {
-              // In flat mode, line becomes space
-              return width - 1;
-          } else if constexpr (std::is_same_v<T, Concat>) {
-              // Thread remaining width through both sides
-              const int remaining = fitsImpl(width, node.left);
-              if (remaining < 0) {
-                  return -1;
-              }
-              return fitsImpl(remaining, node.right);
-          } else if constexpr (std::is_same_v<T, Nest>) {
-              // Nest doesn't consume width
-              return fitsImpl(width, node.doc);
-          } else if constexpr (std::is_same_v<T, Union>) {
-              // Check flat version only
-              return fitsImpl(width, node.flat);
-          } else if constexpr (std::is_same_v<T, AlignPlaceholder>) {
-              // AlignPlaceholder acts like text
-              return width - static_cast<int>(node.content.length());
-          } else if constexpr (std::is_same_v<T, Align>) {
-              // Align node just wraps an inner doc
-              return fitsImpl(width, node.doc);
-          }
-          // All others (like HardLine) do not fit
-          else {
-              return -1;
-          }
-      },
-      doc->value);
+        // Text
+        [&](const Text &node) -> int { return width - static_cast<int>(node.content.length()); },
+
+        // SoftLine (becomes space)
+        [&](const SoftLine &) -> int { return width - 1; },
+
+        // Concat (threads remaining width)
+        [&](const Concat &node) -> int {
+            const int remaining = fitsImpl(width, node.left);
+            if (remaining < 0) {
+                return -1;
+            }
+            return fitsImpl(remaining, node.right);
+        },
+
+        // Nest, Align, Union (Recursive call)
+        [&](const Nest &node) -> int { return fitsImpl(width, node.doc); },
+        [&](const Align &node) -> int { return fitsImpl(width, node.doc); },
+        [&](const Union &node) -> int {
+            // Check flat version only for fitting
+            return fitsImpl(width, node.flat);
+        },
+
+        // AlignPlaceholder (acts like Text)
+        [&](const AlignPlaceholder &node) -> int {
+            return width - static_cast<int>(node.content.length());
+        },
+
+        // All others (HardLine) do not fit
+        [](const auto &) { return -1; }
+    };
+
+    return std::visit(fits_visitor, doc->value);
 }
 
 // Output helpers

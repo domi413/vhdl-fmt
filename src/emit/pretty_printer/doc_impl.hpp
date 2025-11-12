@@ -1,6 +1,8 @@
 #ifndef EMIT_DOC_IMPL_HPP
 #define EMIT_DOC_IMPL_HPP
 
+#include "common/overload.hpp"
+
 #include <memory>
 #include <string>
 #include <string_view>
@@ -152,27 +154,63 @@ auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T
         return init;
     }
 
-    // std::visit handles the variant in doc->value
+    // 1. Define the visitor using Overload.
+    // The visitor takes the accumulator T and the node, and returns the new accumulator T.
+    auto recursive_folder = common::Overload{
+        // ------------------------------------
+        // Base Cases (Non-Recursive)
+        // These nodes have no children, so we just apply 'fn' and return the result.
+        // ------------------------------------
+        [&fn](T current_value, const Empty &node) {
+            return std::forward<Fn>(fn)(std::move(current_value), node);
+        },
+        [&fn](T current_value, const Text &node) {
+            return std::forward<Fn>(fn)(std::move(current_value), node);
+        },
+        [&fn](T current_value, const SoftLine &node) {
+            return std::forward<Fn>(fn)(std::move(current_value), node);
+        },
+        [&fn](T current_value, const HardLine &node) {
+            return std::forward<Fn>(fn)(std::move(current_value), node);
+        },
+        [&fn](T current_value, const AlignPlaceholder &node) {
+            return std::forward<Fn>(fn)(std::move(current_value), node);
+        },
+
+        // ------------------------------------
+        // Recursive Cases (These perform recursive calls after applying 'fn')
+        // ------------------------------------
+        [&](T current_value, const Concat &node) {
+            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
+            new_value = foldRecursive(node.left, std::move(new_value), fn);
+            new_value = foldRecursive(node.right, std::move(new_value), fn);
+            return new_value;
+        },
+        [&](T current_value, const Nest &node) {
+            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
+            return foldRecursive(node.doc, std::move(new_value), fn);
+        },
+        [&](T current_value, const Union &node) {
+            // Fold both branches for analysis purposes
+            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
+            new_value = foldRecursive(node.flat, std::move(new_value), fn);
+            new_value = foldRecursive(node.broken, std::move(new_value), fn);
+            return new_value;
+        },
+        [&](T current_value, const Align &node) {
+            // Recurse into the aligned sub-document
+            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
+            return foldRecursive(node.doc, std::move(new_value), fn);
+        }
+    };
+
+    // 2. Call std::visit with the explicit visitor.
+    // If DocImpl::value ever gets a new node type, the compiler will error here
+    // because recursive_folder won't have a matching overload.
     return std::visit(
       [&](const auto &node) {
-          // 1. Fold the current node
-          T new_value = std::forward<Fn>(fn)(std::move(init), node);
-
-          // 2. Recurse into children and thread the accumulator
-          using NodeType = std::decay_t<decltype(node)>;
-
-          if constexpr (std::is_same_v<NodeType, Concat>) {
-              new_value = foldRecursive(node.left, std::move(new_value), fn);
-              new_value = foldRecursive(node.right, std::move(new_value), fn);
-          } else if constexpr (std::is_same_v<NodeType, Nest>) {
-              new_value = foldRecursive(node.doc, std::move(new_value), fn);
-          } else if constexpr (std::is_same_v<NodeType, Union>) {
-              // Fold both branches, as alignment might be in either
-              new_value = foldRecursive(node.flat, std::move(new_value), fn);
-              new_value = foldRecursive(node.broken, std::move(new_value), fn);
-          }
-          // Base cases (Empty, Text, etc.) have no children and just return
-          return new_value;
+          // Pass the initial accumulator (init) and the node to the visitor
+          return recursive_folder(std::move(init), node);
       },
       doc->value);
 }

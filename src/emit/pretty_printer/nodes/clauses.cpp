@@ -22,7 +22,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
     const Doc aligned_result = Doc::align(result);
 
-    return Doc::bracket(opener, aligned_result, closer).group();
+    return Doc::group(Doc::bracket(opener, aligned_result, closer));
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
@@ -39,7 +39,7 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
     const Doc result = joinDocs(ports, Doc::text(";") + Doc::line(), false);
     const Doc aligned_result = Doc::align(result);
 
-    return Doc::bracket(opener, aligned_result, closer).group();
+    return Doc::group(Doc::bracket(opener, aligned_result, closer));
 }
 
 } // namespace emit
