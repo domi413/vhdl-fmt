@@ -100,9 +100,6 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
           } else if constexpr (std::is_same_v<T, SoftLine>) {
               // In flat mode, line becomes space
               return width - 1;
-          } else if constexpr (std::is_same_v<T, HardLine>) {
-              // Hard line never fits on the same line
-              return -1;
           } else if constexpr (std::is_same_v<T, Concat>) {
               // Thread remaining width through both sides
               const int remaining = fitsImpl(width, node.left);
@@ -117,7 +114,7 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
               // Check flat version only
               return fitsImpl(width, node.flat);
           }
-          // Fallback for unhandled types (shouldn't happen with a complete variant)
+          // All others (like HardLine) do not fit
           else {
               return -1;
           }
