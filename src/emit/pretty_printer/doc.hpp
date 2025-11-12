@@ -14,6 +14,11 @@ namespace emit {
 
 // Forward declarations
 class DocImpl;
+using DocPtr = std::shared_ptr<DocImpl>;
+
+/// Document transformer function
+template<typename Fn>
+auto transformRecursive(const DocPtr &doc, Fn &&fn) -> DocPtr;
 
 /// Document abstraction for pretty printing
 class Doc final
@@ -56,6 +61,14 @@ class Doc final
 
     [[nodiscard]]
     auto group() const -> Doc;
+
+    /// Transform document recursively using a callable that accepts each node type
+    template<typename Fn>
+    [[nodiscard]]
+    auto transform(Fn &&fn) const -> Doc
+    {
+        return Doc(transformRecursive(impl_, std::forward<Fn>(fn)));
+    }
 
     // Rendering
     [[nodiscard]]

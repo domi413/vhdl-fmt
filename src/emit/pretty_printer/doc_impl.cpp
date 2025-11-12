@@ -1,13 +1,11 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 
-#include "common/overload.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
-#include <variant>
 
 namespace emit {
 
@@ -54,31 +52,17 @@ auto flatten(const DocPtr &doc) -> DocPtr
         return doc;
     }
 
-    return std::visit(common::Overload{
-                        [](const Empty &) -> DocPtr { return makeEmpty(); },
-                        [](const Text &node) -> DocPtr { return makeText(node.content); },
-                        [](const SoftLine &) -> DocPtr {
-                            // Line becomes a space when flattened
-                            return makeText(" ");
-                        },
-                        [](const HardLine &) -> DocPtr {
-                            // Hard line never becomes a space
-                            return makeHardLine();
-                        },
-                        [](const Concat &node) -> DocPtr {
-                            // Recursively flatten both sides
-                            return makeConcat(flatten(node.left), flatten(node.right));
-                        },
-                        [](const Nest &node) -> DocPtr {
-                            // Keep nest but flatten the inner doc
-                            return makeNest(flatten(node.doc));
-                        },
-                        [](const Union &node) -> DocPtr {
-                            // Union already has flat version - just use it
-                            return flatten(node.flat);
-                        },
-                      },
-                      doc->value);
+    return transformRecursive(doc, [](const auto &node) {
+        using T = std::decay_t<decltype(node)>;
+
+        if constexpr (std::is_same_v<T, SoftLine>) {
+            return makeText(" ");
+        } else if constexpr (std::is_same_v<T, Union>) {
+            return node.flat;
+        } else {
+            return std::make_shared<DocImpl>(node);
+        }
+    });
 }
 
 } // namespace emit
