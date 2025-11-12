@@ -45,6 +45,11 @@ auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr
     return std::make_shared<DocImpl>(Union{ .flat = std::move(flat), .broken = std::move(broken) });
 }
 
+auto makeAlignPlaceholder(std::string_view text) -> DocPtr
+{
+    return std::make_shared<DocImpl>(AlignPlaceholder{ std::string(text) });
+}
+
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr
 {

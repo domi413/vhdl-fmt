@@ -98,12 +98,23 @@ struct Union
     }
 };
 
+struct AlignPlaceholder
+{
+    std::string content;
+
+    template<typename Fn>
+    auto fmap(Fn && /* fn */) const -> AlignPlaceholder
+    {
+        return { content };
+    }
+};
+
 /// Internal document representation using variant
 class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union> value;
+    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union, AlignPlaceholder> value;
 
     // Since all members are public, this class is considered an aggregate type and allows for
     // aggregate initialization.
@@ -122,6 +133,38 @@ auto transformRecursive(const DocPtr &doc, Fn &&fn) -> DocPtr
       doc->value);
 }
 
+template<typename T, typename Fn>
+auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T
+{
+    if (!doc) {
+        return init;
+    }
+
+    // std::visit handles the variant in doc->value
+    return std::visit(
+      [&](const auto &node) {
+          // 1. Fold the current node
+          T new_value = std::forward<Fn>(fn)(std::move(init), node);
+
+          // 2. Recurse into children and thread the accumulator
+          using NodeType = std::decay_t<decltype(node)>;
+
+          if constexpr (std::is_same_v<NodeType, Concat>) {
+              new_value = foldRecursive(node.left, std::move(new_value), fn);
+              new_value = foldRecursive(node.right, std::move(new_value), fn);
+          } else if constexpr (std::is_same_v<NodeType, Nest>) {
+              new_value = foldRecursive(node.doc, std::move(new_value), fn);
+          } else if constexpr (std::is_same_v<NodeType, Union>) {
+              // Fold both branches, as alignment might be in either
+              new_value = foldRecursive(node.flat, std::move(new_value), fn);
+              new_value = foldRecursive(node.broken, std::move(new_value), fn);
+          }
+          // Base cases (Empty, Text, etc.) have no children and just return
+          return new_value;
+      },
+      doc->value);
+}
+
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;
 auto makeText(std::string_view text) -> DocPtr;
@@ -130,6 +173,7 @@ auto makeHardLine() -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
 auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
+auto makeAlignPlaceholder(std::string_view text) -> DocPtr;
 
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr;

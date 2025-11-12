@@ -16,9 +16,11 @@ namespace emit {
 class DocImpl;
 using DocPtr = std::shared_ptr<DocImpl>;
 
-/// Document transformer function
 template<typename Fn>
 auto transformRecursive(const DocPtr &doc, Fn &&fn) -> DocPtr;
+
+template<typename T, typename Fn>
+auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T;
 
 /// Document abstraction for pretty printing
 class Doc final
@@ -37,6 +39,7 @@ class Doc final
     static auto text(std::string_view str) -> Doc;
     static auto line() -> Doc;
     static auto hardline() -> Doc;
+    static auto alignText(std::string_view str) -> Doc;
 
     // Combinators
     auto operator+(const Doc &other) const -> Doc;  ///< Direct concatenation
@@ -45,15 +48,15 @@ class Doc final
     auto operator|(const Doc &other) const -> Doc;  ///< Hardline
     auto operator<<(const Doc &other) const -> Doc; ///< Softline + indent rhs
 
+    [[nodiscard]]
+    auto hardIndent(const Doc &other) const -> Doc; ///< Hardline + indent rhs
+
     // Compound assignment operators
     auto operator+=(const Doc &other) -> Doc &;  ///< Direct concatenation assignment
     auto operator&=(const Doc &other) -> Doc &;  ///< Space concatenation assignment
     auto operator/=(const Doc &other) -> Doc &;  ///< Softline assignment
     auto operator|=(const Doc &other) -> Doc &;  ///< Hardline assignment
     auto operator<<=(const Doc &other) -> Doc &; ///< Softline + indent rhs assignment
-
-    [[nodiscard]]
-    auto hardIndent(const Doc &other) const -> Doc; ///< Hardline + indent rhs
 
     // Higher-level combinators for common patterns
     [[nodiscard]]
@@ -64,11 +67,22 @@ class Doc final
 
     /// Transform document recursively using a callable that accepts each node type
     template<typename Fn>
-    [[nodiscard]]
     auto transform(Fn &&fn) const -> Doc
     {
         return Doc(transformRecursive(impl_, std::forward<Fn>(fn)));
     }
+
+    /// Fold (reduce) the document tree into a single value.
+    /// @param init The initial value for the accumulator.
+    /// @param fn A callable: T f(T accumulator, const auto& node_variant)
+    template<typename T, typename Fn>
+    auto fold(T init, Fn &&fn) const -> T
+    {
+        return foldRecursive(impl_, std::move(init), std::forward<Fn>(fn));
+    }
+
+    [[nodiscard]]
+    static auto resolveAlignment(const Doc &doc) -> Doc;
 
     // Rendering
     [[nodiscard]]

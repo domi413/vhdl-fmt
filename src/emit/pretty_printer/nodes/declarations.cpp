@@ -13,7 +13,7 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
                       | std::views::join_with(std::string_view{ ", " })
                       | std::ranges::to<std::string>();
 
-    Doc result = Doc::text(names) & Doc::text(":") & Doc::text(node.type_name);
+    Doc result = Doc::alignText(names) & Doc::text(":") & Doc::text(node.type_name);
 
     if (node.default_expr) {
         result &= Doc::text(":=") & visit(node.default_expr.value());
@@ -31,7 +31,7 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
                       | std::ranges::to<std::string>();
 
     Doc result
-      = Doc::text(names) & Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
+      = Doc::alignText(names) & Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
 
     // Constraint (e.g., (7 downto 0) or range 0 to 255)
     if (node.constraint) {

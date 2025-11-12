@@ -20,7 +20,9 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
       = toDocVector(node.generics, [this](const auto &param) { return visit(param); });
 
     const Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
-    return Doc::bracket(opener, result, closer).group();
+    const Doc aligned_result = Doc::resolveAlignment(result);
+
+    return Doc::bracket(opener, aligned_result, closer);
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
@@ -35,7 +37,9 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
     const auto ports = toDocVector(node.ports, [this](const auto &port) { return visit(port); });
 
     const Doc result = joinDocs(ports, Doc::text(";") + Doc::line(), false);
-    return Doc::bracket(opener, result, closer).group();
+    const Doc aligned_result = Doc::resolveAlignment(result);
+
+    return Doc::bracket(opener, aligned_result, closer);
 }
 
 } // namespace emit
