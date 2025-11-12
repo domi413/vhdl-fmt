@@ -128,7 +128,7 @@ jobs:
     timeout-minutes: 15
 
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 
@@ -156,7 +156,7 @@ jobs:
     timeout-minutes: 2
 
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 
@@ -176,7 +176,7 @@ jobs:
     timeout-minutes: 20
 
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
       SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
@@ -211,7 +211,7 @@ jobs:
     timeout-minutes: 20
 
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
       SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
@@ -246,7 +246,7 @@ jobs:
     timeout-minutes: 10
 
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 
