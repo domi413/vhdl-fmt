@@ -106,11 +106,12 @@ struct Union
 struct AlignPlaceholder
 {
     std::string content;
+    int level;
 
     template<typename Fn>
     auto fmap(Fn && /* fn */) const -> AlignPlaceholder
     {
-        return { content };
+        return { .content = content, .level = level };
     }
 };
 
@@ -194,11 +195,9 @@ auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T
             return foldRecursive(node.doc, std::move(new_value), fn);
         },
         [&](T current_value, const Union &node) {
-            // Fold both branches for analysis purposes
+            // Fold ONLY the broken branch as it represents the actual layout
             T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
-            new_value = foldRecursive(node.flat, std::move(new_value), fn);
-            new_value = foldRecursive(node.broken, std::move(new_value), fn);
-            return new_value;
+            return foldRecursive(node.broken, std::move(new_value), fn);
         },
         [&](T current_value, const Align &node) {
             // Recurse into the aligned sub-document
@@ -208,11 +207,9 @@ auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T
     };
 
     // 2. Call std::visit with the explicit visitor.
-    // If DocImpl::value ever gets a new node type, the compiler will error here
-    // because recursive_folder won't have a matching overload.
     return std::visit(
       [&](const auto &node) {
-          // Pass the initial accumulator (init) and the node to the visitor
+          // Pass the initial accumulator (init) to the visitor
           return recursive_folder(std::move(init), node);
       },
       doc->value);
@@ -226,7 +223,7 @@ auto makeHardLine() -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
 auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
-auto makeAlignPlaceholder(std::string_view text) -> DocPtr;
+auto makeAlignPlaceholder(std::string_view text, int level) -> DocPtr;
 auto makeAlign(DocPtr doc) -> DocPtr;
 
 // Utility functions

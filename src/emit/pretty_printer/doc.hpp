@@ -51,7 +51,7 @@ class Doc final
     /// @brief Creates a special placeholder for alignment.
     /// @note The renderer will replace this with padded text based on other
     ///       placeholders within the same `Doc::align` group.
-    static auto alignText(std::string_view str) -> Doc;
+    static auto alignText(std::string_view str, int level) -> Doc;
 
     // ========================================================================
     // Low-Level Combinators (Operators)

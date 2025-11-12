@@ -32,9 +32,9 @@ auto Doc::hardline() -> Doc
     return Doc(makeHardLine());
 }
 
-auto Doc::alignText(std::string_view str) -> Doc
+auto Doc::alignText(std::string_view str, int level) -> Doc
 {
-    return Doc(makeAlignPlaceholder(str));
+    return Doc(makeAlignPlaceholder(str, level));
 }
 
 // ========================================================================

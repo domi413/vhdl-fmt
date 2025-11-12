@@ -3,6 +3,7 @@
 #include "emit/pretty_printer/doc.hpp"
 
 #include <algorithm>
+#include <map>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -47,9 +48,10 @@ auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr
     return std::make_shared<DocImpl>(Union{ .flat = std::move(flat), .broken = std::move(broken) });
 }
 
-auto makeAlignPlaceholder(std::string_view text) -> DocPtr
+auto makeAlignPlaceholder(std::string_view text, int level) -> DocPtr
 {
-    return std::make_shared<DocImpl>(AlignPlaceholder{ std::string(text) });
+    return std::make_shared<DocImpl>(
+      AlignPlaceholder{ .content = std::string(text), .level = level });
 }
 
 auto makeAlign(DocPtr doc) -> DocPtr
@@ -79,25 +81,31 @@ auto flatten(const DocPtr &doc) -> DocPtr
 
 auto resolveAlignment(const DocPtr &doc) -> DocPtr
 {
-    // === Pass 1: The "Fold" (using our new 'fold' method) ===
-    int max_width = foldRecursive(doc, 0, [](int current_max, const auto &node) {
-        using T = std::decay_t<decltype(node)>;
-        if constexpr (std::is_same_v<T, AlignPlaceholder>) {
-            return std::max(current_max, static_cast<int>(node.content.length()));
-        }
-        return current_max; // Pass accumulator through
-    });
+    // === Pass 1: Find max width FOR EACH level ===
+    std::map<int, int> max_widths_by_level;
+    max_widths_by_level = foldRecursive(
+      doc, std::move(max_widths_by_level), [](std::map<int, int> current_maxes, const auto &node) {
+          using T = std::decay_t<decltype(node)>;
+          if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+              const int current_max = current_maxes[node.level];
+              current_maxes[node.level]
+                = std::max(current_max, static_cast<int>(node.content.length()));
+          }
+          return current_maxes; // Pass accumulator through
+      });
 
     // Handle the case where no aligned text was found
-    if (max_width == 0) {
+    if (max_widths_by_level.empty()) {
         return doc;
     }
 
-    // === Pass 2: The "Transform" (unchanged) ===
+    // === Pass 2: Apply padding based on the level's max width ===
     return transformRecursive(doc, [&](const auto &node) -> DocPtr {
         using T = std::decay_t<decltype(node)>;
 
         if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+            // Look up the max width for this placeholder's level
+            const int max_width = max_widths_by_level.at(node.level);
             const int padding = max_width - static_cast<int>(node.content.length());
             return makeText(node.content + std::string(padding, ' '));
         } else {
