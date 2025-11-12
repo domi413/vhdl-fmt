@@ -67,6 +67,9 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
 
               // Render the (possibly) aligned inner document
               renderDoc(indent, mode, doc_to_render);
+          } else if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+              // In non-aligned mode - treat as text
+              write(node.content);
           } else if constexpr (std::is_same_v<T, Union>) {
               // Decide: use flat or broken layout?
               if (mode == Mode::FLAT || fits(width_ - column_, node.flat)) {
@@ -123,6 +126,12 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
           } else if constexpr (std::is_same_v<T, Union>) {
               // Check flat version only
               return fitsImpl(width, node.flat);
+          } else if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+              // AlignPlaceholder acts like text
+              return width - static_cast<int>(node.content.length());
+          } else if constexpr (std::is_same_v<T, Align>) {
+              // Align node just wraps an inner doc
+              return fitsImpl(width, node.doc);
           }
           // All others (like HardLine) do not fit
           else {
