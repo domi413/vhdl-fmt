@@ -73,6 +73,12 @@ auto flatten(const DocPtr &doc) -> DocPtr
             return makeText(" ");
         } else if constexpr (std::is_same_v<T, Union>) {
             return node.flat;
+        } else if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+            // In flat mode, an alignment placeholder is just its text content.
+            return makeText(node.content);
+        } else if constexpr (std::is_same_v<T, Align>) {
+            // In flat mode, an align group is just its inner content.
+            return node.doc;
         } else {
             return std::make_shared<DocImpl>(node);
         }
