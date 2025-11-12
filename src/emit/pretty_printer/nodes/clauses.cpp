@@ -19,11 +19,6 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const auto params
       = toDocVector(node.generics, [this](const auto &param) { return visit(param); });
 
-    // TODO(vedivad): Implement table combinator for alignment
-    // if (config().port_map.align_signals) {
-
-    // }
-
     const Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
     return Doc::bracket(opener, result, closer).group();
 }
@@ -38,10 +33,6 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
     const Doc closer = Doc::text(");");
 
     const auto ports = toDocVector(node.ports, [this](const auto &port) { return visit(port); });
-
-    // if (config().port_map.align_signals) {
-
-    // }
 
     const Doc result = joinDocs(ports, Doc::text(";") + Doc::line(), false);
     return Doc::bracket(opener, result, closer).group();
