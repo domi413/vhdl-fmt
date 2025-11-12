@@ -2,23 +2,19 @@
 
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
-#include "emit/pretty_printer/doc_utils.hpp"
 
 namespace emit {
 
 auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 {
     // <name> : <type> [:= <default>]
-    // Multiple names: name1, name2 : type
 
-    // Names (joined with comma and space)
-    auto name_docs = toDocVector(node.names, [](const auto &name) { return Doc::text(name); });
-    Doc result = joinDocs(name_docs, Doc::text(", "), false);
+    std::string names = node.names
+                      | std::views::join_with(std::string_view{ ", " })
+                      | std::ranges::to<std::string>();
 
-    // Type
-    result &= Doc::text(":") & Doc::text(node.type_name);
+    Doc result = Doc::text(names) & Doc::text(":") & Doc::text(node.type_name);
 
-    // Default value
     if (node.default_expr) {
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
@@ -29,21 +25,19 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
 {
     // <name> : <mode> <type> [:= <default>]
-    // Multiple names: name1, name2 : in type
 
-    // Names (joined with comma and space)
-    auto name_docs = toDocVector(node.names, [](const auto &name) { return Doc::text(name); });
-    Doc result = joinDocs(name_docs, Doc::text(", "), false);
+    std::string names = node.names
+                      | std::views::join_with(std::string_view{ ", " })
+                      | std::ranges::to<std::string>();
 
-    // Mode and type
-    result &= Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
+    Doc result
+      = Doc::text(names) & Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
 
     // Constraint (e.g., (7 downto 0) or range 0 to 255)
     if (node.constraint) {
         result += visit(node.constraint.value());
     }
 
-    // Default value
     if (node.default_expr) {
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
