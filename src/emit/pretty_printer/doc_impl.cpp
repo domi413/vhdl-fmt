@@ -2,9 +2,11 @@
 
 #include "emit/pretty_printer/doc.hpp"
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 namespace emit {
@@ -96,7 +98,7 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
         using T = std::decay_t<decltype(node)>;
 
         if constexpr (std::is_same_v<T, AlignPlaceholder>) {
-            int padding = max_width - static_cast<int>(node.content.length());
+            const int padding = max_width - static_cast<int>(node.content.length());
             return makeText(node.content + std::string(padding, ' '));
         } else {
             return std::make_shared<DocImpl>(node);

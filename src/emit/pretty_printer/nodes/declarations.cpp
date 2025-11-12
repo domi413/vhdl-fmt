@@ -3,15 +3,18 @@
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
+#include <ranges>
+#include <string>
+
 namespace emit {
 
 auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 {
     // <name> : <type> [:= <default>]
 
-    std::string names = node.names
-                      | std::views::join_with(std::string_view{ ", " })
-                      | std::ranges::to<std::string>();
+    const std::string names = node.names
+                            | std::views::join_with(std::string_view{ ", " })
+                            | std::ranges::to<std::string>();
 
     Doc result = Doc::alignText(names) & Doc::text(":") & Doc::text(node.type_name);
 
@@ -26,9 +29,9 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
 {
     // <name> : <mode> <type> [:= <default>]
 
-    std::string names = node.names
-                      | std::views::join_with(std::string_view{ ", " })
-                      | std::ranges::to<std::string>();
+    const std::string names = node.names
+                            | std::views::join_with(std::string_view{ ", " })
+                            | std::ranges::to<std::string>();
 
     Doc result
       = Doc::alignText(names) & Doc::text(":") & Doc::text(node.mode) & Doc::text(node.type_name);
