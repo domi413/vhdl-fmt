@@ -89,3 +89,10 @@ Otherwise if you prefer to use your own environment, the following tools are par
 
 - `clang` version 21 is required. This might not be the latest version on some Linux distributions.
 - `gersemi` and `clang-format` are not strictly required for development, but the CI pipeline will fail if files are not formatted correctly.
+- If you install `gersemi` and `conan` with a python package manager, e.g., `uv`, the following steps may help:
+  ```bash
+  uv venv
+  uv pip install conan gersemi==0.19.3
+  source .venv/bin/activate
+  ```
+  You may use `active.fish` or whatever shell you use. You can quit the `venv` with `deactivate`
