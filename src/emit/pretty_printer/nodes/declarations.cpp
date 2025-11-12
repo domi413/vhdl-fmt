@@ -8,6 +8,13 @@
 
 namespace emit {
 
+/// @brief Named constants for common alignment columns used in declarations.
+struct AlignmentLevel
+{
+    static constexpr int NAME = 0; ///< Column 0: Used for names (port, generic, signal, etc.)
+    static constexpr int TYPE = 1; ///< Column 1: Used for mode/type (port mode, type name)
+};
+
 auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 {
     // <name> : <type> [:= <default>]
@@ -16,7 +23,9 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
                             | std::views::join_with(std::string_view{ ", " })
                             | std::ranges::to<std::string>();
 
-    Doc result = Doc::alignText(names, 0) & Doc::text(":") & Doc::alignText(node.type_name, 1);
+    Doc result = Doc::alignText(names, AlignmentLevel::NAME)
+               & Doc::text(":")
+               & Doc::alignText(node.type_name, AlignmentLevel::TYPE);
 
     if (node.default_expr) {
         result &= Doc::text(":=") & visit(node.default_expr.value());
@@ -33,9 +42,9 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
                             | std::views::join_with(std::string_view{ ", " })
                             | std::ranges::to<std::string>();
 
-    Doc result = Doc::alignText(names, 0)
+    Doc result = Doc::alignText(names, AlignmentLevel::NAME)
                & Doc::text(":")
-               & Doc::alignText(node.mode, 1)
+               & Doc::alignText(node.mode, AlignmentLevel::TYPE)
                & Doc::text(node.type_name);
 
     // Constraint (e.g., (7 downto 0) or range 0 to 255)

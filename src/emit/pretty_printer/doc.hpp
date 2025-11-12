@@ -49,8 +49,10 @@ class Doc final
     static auto hardline() -> Doc;
 
     /// @brief Creates a special placeholder for alignment.
-    /// @note The renderer will replace this with padded text based on other
-    ///       placeholders within the same `Doc::align` group.
+    /// @note The renderer will append spaces based on other
+    ///       placeholders within the same alignment group.
+    /// @param str The text content for this placeholder.
+    /// @param level An integer key that defines the alignment group.
     static auto alignText(std::string_view str, int level) -> Doc;
 
     // ========================================================================
