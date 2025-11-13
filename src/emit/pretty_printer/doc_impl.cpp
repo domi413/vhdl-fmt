@@ -71,7 +71,7 @@ auto flatten(const DocPtr &doc) -> DocPtr
         return doc;
     }
 
-    return transformRecursive(doc, [](const auto &node) {
+    return transformImpl(doc, [](const auto &node) {
         using T = std::decay_t<decltype(node)>;
 
         if constexpr (std::is_same_v<T, SoftLine>) {
@@ -94,7 +94,7 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
 {
     // === Pass 1: Find max width FOR EACH level ===
     std::map<int, int> max_widths_by_level;
-    max_widths_by_level = foldRecursive(
+    max_widths_by_level = foldImpl(
       doc, std::move(max_widths_by_level), [](std::map<int, int> current_maxes, const auto &node) {
           using T = std::decay_t<decltype(node)>;
           if constexpr (std::is_same_v<T, AlignPlaceholder>) {
@@ -111,7 +111,7 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
     }
 
     // === Pass 2: Apply padding based on the level's max width ===
-    return transformRecursive(doc, [&](const auto &node) -> DocPtr {
+    return transformImpl(doc, [&](const auto &node) -> DocPtr {
         using T = std::decay_t<decltype(node)>;
 
         if constexpr (std::is_same_v<T, AlignPlaceholder>) {

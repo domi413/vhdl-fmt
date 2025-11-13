@@ -17,10 +17,10 @@ class DocImpl;
 using DocPtr = std::shared_ptr<DocImpl>;
 
 template<typename Fn>
-auto transformRecursive(const DocPtr &doc, Fn &&fn) -> DocPtr;
+auto transformImpl(const DocPtr &doc, Fn &&fn) -> DocPtr;
 
 template<typename T, typename Fn>
-auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T;
+auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T;
 
 /**
  * @brief An immutable abstraction for a pretty-printable document.
@@ -150,7 +150,7 @@ class Doc final
     template<typename Fn>
     auto transform(Fn &&fn) const -> Doc
     {
-        return Doc(transformRecursive(impl_, std::forward<Fn>(fn)));
+        return Doc(transformImpl(impl_, std::forward<Fn>(fn)));
     }
 
     /**
@@ -163,7 +163,7 @@ class Doc final
     template<typename T, typename Fn>
     auto fold(T init, Fn &&fn) const -> T
     {
-        return foldRecursive(impl_, std::move(init), std::forward<Fn>(fn));
+        return foldImpl(impl_, std::move(init), std::forward<Fn>(fn));
     }
 
     // ========================================================================

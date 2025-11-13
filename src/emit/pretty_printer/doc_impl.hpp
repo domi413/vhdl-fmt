@@ -1,8 +1,6 @@
 #ifndef EMIT_DOC_IMPL_HPP
 #define EMIT_DOC_IMPL_HPP
 
-#include "common/overload.hpp"
-
 #include <concepts>
 #include <memory>
 #include <string>
@@ -17,10 +15,11 @@ struct DocImpl;
 using DocPtr = std::shared_ptr<DocImpl>;
 
 template<typename T>
-concept MappableNode = requires(const T &node) {
-    // Test if T::fmap is callable with a function that takes const DocPtr&
-    // and returns DocPtr.
+concept DocNode = requires(const T &node) {
     { node.fmap(std::declval<DocPtr(const DocPtr &)>()) } -> std::same_as<T>;
+    {
+        node.fold(std::declval<int>(), std::declval<int(int, const DocPtr &)>())
+    } -> std::same_as<int>;
 };
 
 /// Empty document
@@ -30,6 +29,12 @@ struct Empty
     auto fmap(Fn && /* fn */) const -> Empty
     {
         return {};
+    }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        return init;
     }
 };
 
@@ -43,6 +48,12 @@ struct Text
     {
         return { content };
     }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        return init;
+    }
 };
 
 /// Line break (space when flattened, newline when broken)
@@ -53,6 +64,12 @@ struct SoftLine
     {
         return {};
     }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        return init;
+    }
 };
 
 /// Hard line break (always newline, never becomes space)
@@ -62,6 +79,12 @@ struct HardLine
     auto fmap(Fn && /* fn */) const -> HardLine
     {
         return {};
+    }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        return init;
     }
 };
 
@@ -76,6 +99,13 @@ struct Concat
     {
         return { std::forward<Fn>(fn)(left), std::forward<Fn>(fn)(right) };
     }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn &&fn) const -> T
+    {
+        T new_value = std::forward<Fn>(fn)(std::move(init), left);
+        return std::forward<Fn>(fn)(std::move(new_value), right);
+    }
 };
 
 /// Increase indentation level
@@ -87,6 +117,12 @@ struct Nest
     auto fmap(Fn &&fn) const -> Nest
     {
         return { std::forward<Fn>(fn)(doc) };
+    }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn &&fn) const -> T
+    {
+        return std::forward<Fn>(fn)(std::move(init), doc);
     }
 };
 
@@ -101,6 +137,13 @@ struct Union
     {
         return { std::forward<Fn>(fn)(flat), std::forward<Fn>(fn)(broken) };
     }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn &&fn) const -> T
+    {
+        // Only the broken branch is to be considered
+        return std::forward<Fn>(fn)(std::move(init), broken);
+    }
 };
 
 struct AlignPlaceholder
@@ -113,6 +156,13 @@ struct AlignPlaceholder
     {
         return { .content = content, .level = level };
     }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        // These nodes have no children, so they just return the accumulator.
+        return init;
+    }
 };
 
 struct Align
@@ -124,6 +174,13 @@ struct Align
     {
         return { std::forward<Fn>(fn)(doc) };
     }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn &&fn) const -> T
+    {
+        // Align knows it has one child.
+        return std::forward<Fn>(fn)(std::move(init), doc);
+    }
 };
 
 struct NoGroupMark
@@ -132,6 +189,13 @@ struct NoGroupMark
     auto fmap(Fn && /* fn */) const -> NoGroupMark
     {
         return {};
+    }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        // These nodes have no children, so they just return the accumulator.
+        return init;
     }
 };
 
@@ -158,80 +222,31 @@ class DocImpl
 
 /// Recursive document transformer using fmap
 template<typename Fn>
-auto transformRecursive(const DocPtr &doc, Fn &&fn) -> DocPtr
+auto transformImpl(const DocPtr &doc, Fn &&fn) -> DocPtr
 {
     return std::visit(
-      [&fn](const MappableNode auto &node) -> DocPtr {
-          auto mapped
-            = node.fmap([&fn](const DocPtr &inner) { return transformRecursive(inner, fn); });
+      [&fn](const DocNode auto &node) -> DocPtr {
+          auto mapped = node.fmap([&fn](const DocPtr &inner) { return transformImpl(inner, fn); });
           return std::forward<Fn>(fn)(mapped);
       },
       doc->value);
 }
 
 template<typename T, typename Fn>
-auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T
+auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T
 {
     if (!doc) {
         return init;
     }
 
-    // 1. Define the visitor using Overload.
-    // The visitor takes the accumulator T and the node, and returns the new accumulator T.
-    auto recursive_folder = common::Overload{
-        // ------------------------------------
-        // Base Cases (Non-Recursive)
-        // These nodes have no children, so we just apply 'fn' and return the result.
-        // ------------------------------------
-        [&fn](T current_value, const Empty &node) {
-            return std::forward<Fn>(fn)(std::move(current_value), node);
-        },
-        [&fn](T current_value, const Text &node) {
-            return std::forward<Fn>(fn)(std::move(current_value), node);
-        },
-        [&fn](T current_value, const SoftLine &node) {
-            return std::forward<Fn>(fn)(std::move(current_value), node);
-        },
-        [&fn](T current_value, const HardLine &node) {
-            return std::forward<Fn>(fn)(std::move(current_value), node);
-        },
-        [&fn](T current_value, const AlignPlaceholder &node) {
-            return std::forward<Fn>(fn)(std::move(current_value), node);
-        },
-        [&fn](T current_value, const NoGroupMark &node) {
-            return std::forward<Fn>(fn)(std::move(current_value), node);
-        },
-
-        // ------------------------------------
-        // Recursive Cases (These perform recursive calls after applying 'fn')
-        // ------------------------------------
-        [&](T current_value, const Concat &node) {
-            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
-            new_value = foldRecursive(node.left, std::move(new_value), fn);
-            new_value = foldRecursive(node.right, std::move(new_value), fn);
-            return new_value;
-        },
-        [&](T current_value, const Nest &node) {
-            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
-            return foldRecursive(node.doc, std::move(new_value), fn);
-        },
-        [&](T current_value, const Union &node) {
-            // Fold ONLY the broken branch as it represents the actual layout
-            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
-            return foldRecursive(node.broken, std::move(new_value), fn);
-        },
-        [&](T current_value, const Align &node) {
-            // Recurse into the aligned sub-document
-            T new_value = std::forward<Fn>(fn)(std::move(current_value), node);
-            return foldRecursive(node.doc, std::move(new_value), fn);
-        }
-    };
-
-    // 2. Call std::visit with the explicit visitor.
     return std::visit(
-      [&](const auto &node) {
-          // Pass the initial accumulator (init) to the visitor
-          return recursive_folder(std::move(init), node);
+      [&](const DocNode auto &node) -> T {
+          T new_value = std::forward<Fn>(fn)(std::move(init), node);
+
+          auto recurse_step
+            = [&fn](T acc, const DocPtr &child) { return foldImpl(child, std::move(acc), fn); };
+
+          return node.fold(std::move(new_value), recurse_step);
       },
       doc->value);
 }
