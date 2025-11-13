@@ -1,6 +1,7 @@
 #ifndef EMIT_PRETTY_PRINTER_HPP
 #define EMIT_PRETTY_PRINTER_HPP
 
+#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
@@ -8,6 +9,8 @@
 #include "ast/nodes/statements.hpp"
 #include "ast/visitor.hpp"
 #include "emit/pretty_printer/doc.hpp"
+
+#include <optional>
 
 namespace emit {
 

@@ -1,12 +1,13 @@
 #include "ast/node.hpp"
-#include "common/overload.hpp"
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 #include "emit/pretty_printer/doc_utils.hpp"
 
 #include <algorithm>
 #include <functional>
+#include <optional>
 #include <ranges>
+#include <variant>
 #include <vector>
 
 namespace emit {
@@ -15,21 +16,23 @@ namespace {
 /**
  * @brief Handles a single `ast::Trivia` variant (for leading trivia).
  */
-auto printTrivia(const ast::Trivia &trivia) -> Doc
+auto printTrivia(const ast::Trivia &trivia) noexcept -> Doc
 {
-    auto comments = [](const ast::Comments &comment) -> Doc {
-        return Doc::text(comment.text) + Doc::hardline();
-    };
+    if (const auto *comment = std::get_if<ast::Comments>(&trivia)) {
+        return Doc::text(comment->text) + Doc::hardline();
+    }
 
-    auto para_break = [](const ast::ParagraphBreak &para) -> Doc {
+    if (const auto *para = std::get_if<ast::ParagraphBreak>(&trivia)) {
         Doc result = Doc::empty();
-        for (unsigned int i = 0; i < para.blank_lines; ++i) {
+
+        for (unsigned int i = 0; i < para->blank_lines; ++i) {
             result += Doc::hardline();
         }
-        return result;
-    };
 
-    return std::visit(common::Overload{ comments, para_break }, trivia);
+        return result;
+    }
+
+    return Doc::empty();
 }
 } // namespace
 
@@ -42,8 +45,8 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) const ->
         return core_doc; // No trivia, return as-is
     }
 
-    Doc leading = handleLeading(node.trivia);
-    Doc trailing = handleTrailing(node.trivia);
+    const Doc leading = handleLeading(node.trivia);
+    const Doc trailing = handleTrailing(node.trivia);
 
     if (trailing.isEmpty()) {
         // No trailing comment, just prepend leading trivia
@@ -64,9 +67,10 @@ auto PrettyPrinter::handleLeading(const std::optional<ast::NodeTrivia> &trivia) 
         return Doc::empty();
     }
 
-    auto trivia_docs = trivia->leading | std::views::transform([this](const auto &t) -> Doc {
-                           return printTrivia(t);
-                       });
+    const std::vector<Doc> trivia_docs
+      = trivia->leading
+      | std::views::transform([this](const ast::Trivia &t) -> Doc { return printTrivia(t); })
+      | std::ranges::to<std::vector>();
 
     return std::ranges::fold_left(trivia_docs, Doc::empty(), std::plus<Doc>{});
 }
@@ -80,13 +84,12 @@ auto PrettyPrinter::handleTrailing(const std::optional<ast::NodeTrivia> &trivia)
         return Doc::empty();
     }
 
-    auto comment_docs
-      = trivia->trailing | std::views::transform([this](const ast::Comments &comment) -> Doc {
-            return Doc::text(comment.text);
-        });
+    const std::vector<Doc> comment_docs
+      = trivia->trailing
+      | std::views::transform([this](const ast::Comments &c) -> Doc { return Doc::text(c.text); })
+      | std::ranges::to<std::vector>();
 
-    std::vector<Doc> docs_vec = comment_docs | std::ranges::to<std::vector>();
-    return joinDocs(docs_vec, Doc::text(" "), false);
+    return joinDocs(comment_docs, Doc::text(" "), false);
 }
 
 } // namespace emit

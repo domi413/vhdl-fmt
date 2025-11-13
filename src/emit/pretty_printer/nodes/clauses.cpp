@@ -16,25 +16,25 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const Doc result = joinDocsConditional(
-      node.generics, [this](const ast::GenericParam &param, bool is_last) -> Doc {
-          // 1. Get the core doc from the child visitor
-          Doc core_doc = visit(param); //
+    const Doc result
+      = joinDocsConditional(node.generics, [this](const auto &param, bool is_last) -> Doc {
+            // 1. Get the core doc from the child visitor
+            Doc core_doc = visit(param); //
 
-          // 2. Append the semicolon *to the core doc* if needed
-          if (!is_last) {
-              core_doc += Doc::text(";");
-          }
+            // 2. Append the semicolon *to the core doc* if needed
+            if (!is_last) {
+                core_doc += Doc::text(";");
+            }
 
-          // 3. NOW, wrap the (core + optional ';') with its trivia
-          Doc full_doc = withTrivia(param, core_doc); //
+            // 3. NOW, wrap the (core + optional ';') with its trivia
+            Doc full_doc = withTrivia(param, core_doc); //
 
-          // 4. Add the newline separator *after* all trivia
-          if (!is_last) {
-              full_doc += Doc::line();
-          }
-          return full_doc;
-      });
+            // 4. Add the newline separator *after* all trivia
+            if (!is_last) {
+                full_doc += Doc::line();
+            }
+            return full_doc;
+        });
 
     const Doc aligned_result = Doc::align(result);
 
@@ -53,7 +53,7 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
 
     // Same logic for ports
     const Doc result
-      = joinDocsConditional(node.ports, [this](const ast::Port &port, bool is_last) -> Doc {
+      = joinDocsConditional(node.ports, [this](const auto &port, bool is_last) -> Doc {
             Doc core_doc = visit(port); //
 
             if (!is_last) {
