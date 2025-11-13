@@ -28,7 +28,7 @@ using Trivia = std::variant<Comments, ParagraphBreak>;
 struct NodeTrivia
 {
     std::vector<Trivia> leading;
-    std::vector<Comments> trailing;
+    std::optional<Comments> trailing;
 };
 
 /// @brief Abstract base class for all AST nodes - Do not instantiate directly.

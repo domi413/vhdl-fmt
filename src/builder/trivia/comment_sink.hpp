@@ -33,7 +33,7 @@ class CommentSink final
         if (to_leading) {
             dst.leading.emplace_back(c);
         } else {
-            dst.trailing.emplace_back(c);
+            dst.trailing.emplace(c);
         }
     }
 

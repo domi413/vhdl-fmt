@@ -26,19 +26,6 @@ inline auto leadingComments(const std::vector<ast::Trivia> &tv) -> std::vector<s
          | std::ranges::to<std::vector<std::string_view>>();
 }
 
-/// @brief Extract comment texts from trailing trivia (vector<Comments>)
-/// @param tv Vector of comment trivia
-/// @return Vector of comment text views
-inline auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vector<std::string_view>
-{
-    std::vector<std::string_view> out;
-    out.reserve(tv.size());
-    for (const auto &c : tv) {
-        out.emplace_back(c.text);
-    }
-    return out;
-}
-
 /// @brief Counts of different trivia types
 struct TriviaCounts
 {

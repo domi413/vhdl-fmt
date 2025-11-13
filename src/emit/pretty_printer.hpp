@@ -10,8 +10,6 @@
 #include "ast/visitor.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
-#include <optional>
-
 namespace emit {
 
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
@@ -56,15 +54,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
   private:
     /// @brief This is the main wrapper. It combines the core doc with trivia.
     [[nodiscard]]
-    auto withTrivia(const ast::NodeBase &node, Doc core_doc) const -> Doc;
-
-    /// @brief Generates the Doc for a node's leading trivia (comments, newlines).
-    [[nodiscard]]
-    auto handleLeading(const std::optional<ast::NodeTrivia> &trivia) const -> Doc;
-
-    /// @brief Generates the Doc for a node's trailing (same-line) comments.
-    [[nodiscard]]
-    auto handleTrailing(const std::optional<ast::NodeTrivia> &trivia) const -> Doc;
+    static auto withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc;
 };
 
 } // namespace emit

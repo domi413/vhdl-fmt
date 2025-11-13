@@ -8,7 +8,6 @@
 #include <variant>
 
 using test_utils::leadingComments;
-using test_utils::trailingComments;
 
 TEST_CASE("Entity captures top-level leading comments", "[design_units][comments]")
 {
@@ -52,13 +51,13 @@ TEST_CASE("Generic captures both leading and inline comments", "[design_units][c
 
     const auto &trivia = g.trivia.value();
     const auto lead = leadingComments(trivia.leading);
-    const auto trail = trailingComments(trivia.trailing);
+    const auto trail = trivia.trailing->text;
 
     REQUIRE_FALSE(lead.empty());
     REQUIRE(lead.front().contains("Leading for CONST_V"));
 
     REQUIRE_FALSE(trail.empty());
-    REQUIRE(trail.front().contains("Inline for CONST_V"));
+    REQUIRE(trail.contains("Inline for CONST_V"));
 }
 
 TEST_CASE("Ports capture leading and inline comments", "[design_units][comments]")
@@ -84,21 +83,21 @@ TEST_CASE("Ports capture leading and inline comments", "[design_units][comments]
         REQUIRE(clk.trivia.has_value());
         const auto &trivia = clk.trivia.value();
         const auto lead = leadingComments(trivia.leading);
-        const auto trail = trailingComments(trivia.trailing);
+        const auto trail = trivia.trailing->text;
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Clock input"));
         REQUIRE_FALSE(trail.empty());
-        REQUIRE(trail.front().contains("inline clock"));
+        REQUIRE(trail.contains("inline clock"));
     }
     {
         const auto &rst = entity->port_clause.ports[1];
         REQUIRE(rst.trivia.has_value());
         const auto &trivia = rst.trivia.value();
         const auto lead = leadingComments(trivia.leading);
-        const auto trail = trailingComments(trivia.trailing);
+        const auto trail = trivia.trailing->text;
         REQUIRE_FALSE(lead.empty());
         REQUIRE(lead.front().contains("Reset input"));
         REQUIRE_FALSE(trail.empty());
-        REQUIRE(trail.front().contains("inline reset"));
+        REQUIRE(trail.contains("inline reset"));
     }
 }
