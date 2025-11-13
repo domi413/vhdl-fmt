@@ -38,6 +38,11 @@ auto Doc::alignText(std::string_view str, int level) -> Doc
     return Doc(makeAlignPlaceholder(str, level));
 }
 
+auto Doc::noGroupMark() -> Doc
+{
+    return Doc(makeNoGroupMark());
+}
+
 // ========================================================================
 // Low-Level Combinators (Operators)
 // ========================================================================

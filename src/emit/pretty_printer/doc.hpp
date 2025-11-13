@@ -55,6 +55,9 @@ class Doc final
     /// @param level An integer key that defines the alignment group.
     static auto alignText(std::string_view str, int level) -> Doc;
 
+    /// @brief A marker indicating no grouping should occur. (trailing Comment)
+    static auto noGroupMark() -> Doc;
+
     // ========================================================================
     // Low-Level Combinators (Operators)
     // ========================================================================

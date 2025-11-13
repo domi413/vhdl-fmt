@@ -59,6 +59,11 @@ auto makeAlign(DocPtr doc) -> DocPtr
     return std::make_shared<DocImpl>(Align{ .doc = std::move(doc) });
 }
 
+auto makeNoGroupMark() -> DocPtr
+{
+    return std::make_shared<DocImpl>(NoGroupMark{});
+}
+
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr
 {

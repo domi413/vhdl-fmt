@@ -86,7 +86,8 @@ auto PrettyPrinter::handleTrailing(const std::optional<ast::NodeTrivia> &trivia)
 
     const std::vector<Doc> comment_docs
       = trivia->trailing
-      | std::views::transform([this](const ast::Comments &c) -> Doc { return Doc::text(c.text); })
+      | std::views::transform(
+          [this](const ast::Comments &c) -> Doc { return Doc::text(c.text) + Doc::noGroupMark(); })
       | std::ranges::to<std::vector>();
 
     return joinDocs(comment_docs, Doc::text(" "), false);

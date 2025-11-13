@@ -126,12 +126,30 @@ struct Align
     }
 };
 
+struct NoGroupMark
+{
+    template<typename Fn>
+    auto fmap(Fn && /* fn */) const -> NoGroupMark
+    {
+        return {};
+    }
+};
+
 /// Internal document representation using variant
 class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union, AlignPlaceholder, Align>
+    std::variant<Empty,
+                 Text,
+                 SoftLine,
+                 HardLine,
+                 Concat,
+                 Nest,
+                 Union,
+                 AlignPlaceholder,
+                 Align,
+                 NoGroupMark>
       value;
 
     // Since all members are public, this class is considered an aggregate type and allows for
@@ -180,6 +198,9 @@ auto foldRecursive(const DocPtr &doc, T init, Fn &&fn) -> T
         [&fn](T current_value, const AlignPlaceholder &node) {
             return std::forward<Fn>(fn)(std::move(current_value), node);
         },
+        [&fn](T current_value, const NoGroupMark &node) {
+            return std::forward<Fn>(fn)(std::move(current_value), node);
+        },
 
         // ------------------------------------
         // Recursive Cases (These perform recursive calls after applying 'fn')
@@ -225,6 +246,7 @@ auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
 auto makeAlignPlaceholder(std::string_view text, int level) -> DocPtr;
 auto makeAlign(DocPtr doc) -> DocPtr;
+auto makeNoGroupMark() -> DocPtr;
 
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr;
