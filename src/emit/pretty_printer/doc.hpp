@@ -172,6 +172,11 @@ class Doc final
     [[nodiscard]]
     auto render(const common::Config &config) const -> std::string;
 
+    /// @brief Checks if the document is an Empty node.
+    /// @return True if the document is 'Doc::empty()', false otherwise.
+    [[nodiscard]]
+    auto isEmpty() const -> bool;
+
   private:
     /// @brief Private constructor for internal factory functions.
     explicit Doc(std::shared_ptr<DocImpl> impl) : impl_(std::move(impl)) {}

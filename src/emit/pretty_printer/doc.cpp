@@ -138,4 +138,12 @@ auto Doc::render(const common::Config &config) const -> std::string
     return renderer.render(impl_);
 }
 
+auto Doc::isEmpty() const -> bool
+{
+    if (!impl_) {
+        return true;
+    }
+    return std::holds_alternative<Empty>(impl_->value);
+}
+
 } // namespace emit

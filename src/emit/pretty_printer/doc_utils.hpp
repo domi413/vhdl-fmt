@@ -54,6 +54,30 @@ inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool in
     return result;
 }
 
+/// @brief Joins a range of items, allowing a position-aware
+///        transform to handle separators and trivia correctly.
+/// @param items The input range of items (e.g., generics, ports)
+/// @param transform Function: Doc(const auto& item, bool is_last)
+/// @return Combined Doc
+template<std::ranges::input_range Range, typename Transform>
+auto joinDocsConditional(Range &items, Transform &&transform) -> Doc
+{
+    if (std::ranges::empty(items)) {
+        return Doc::empty();
+    }
+
+    Doc result = Doc::empty();
+    auto it = std::ranges::begin(items);
+    auto end = std::ranges::end(items);
+
+    while (it != end) {
+        const bool is_last = (std::next(it) == end);
+        result += std::invoke(std::forward<Transform>(transform), *it, is_last);
+        ++it;
+    }
+    return result;
+}
+
 } // namespace emit
 
 #endif // EMIT_DOC_UTILS_HPP

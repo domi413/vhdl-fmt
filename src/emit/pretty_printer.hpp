@@ -49,6 +49,19 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::CaseStatement &node) const -> Doc;
     auto operator()(const ast::ForLoop &node) const -> Doc;
     auto operator()(const ast::WhileLoop &node) const -> Doc;
+
+  private:
+    /// @brief This is the main wrapper. It combines the core doc with trivia.
+    [[nodiscard]]
+    auto withTrivia(const ast::NodeBase &node, Doc core_doc) const -> Doc;
+
+    /// @brief Generates the Doc for a node's leading trivia (comments, newlines).
+    [[nodiscard]]
+    auto handleLeading(const std::optional<ast::NodeTrivia> &trivia) const -> Doc;
+
+    /// @brief Generates the Doc for a node's trailing (same-line) comments.
+    [[nodiscard]]
+    auto handleTrailing(const std::optional<ast::NodeTrivia> &trivia) const -> Doc;
 };
 
 } // namespace emit
