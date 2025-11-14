@@ -7,7 +7,7 @@
 #include <string_view>
 #include <variant>
 
-/*
+
 TEST_CASE("GenericParam: Single generic with default", "[declarations][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -29,7 +29,7 @@ TEST_CASE("GenericParam: Single generic with default", "[declarations][generic]"
     REQUIRE(generic.type_name == "integer");
     REQUIRE(generic.default_expr.has_value());
 }
-*/
+
 
 TEST_CASE("GenericParam: Generic without default", "[declarations][generic]")
 {

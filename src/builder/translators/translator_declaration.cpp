@@ -61,6 +61,10 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
         param.type_name = stype->getText();
     }
 
+    if (auto *expr = ctx->expression()) {
+        param.default_expr = makeExpr(expr);
+    }
+
     return param;
 }
 
