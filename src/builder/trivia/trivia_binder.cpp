@@ -18,7 +18,7 @@ void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t start_index)
     unsigned int linebreaks{ 0 };
 
     // Iterate backward — closest token first
-    for (const antlr4::Token *token : hidden | std::views::reverse) {
+    for (const auto *token : hidden | std::views::reverse) {
         if (token == nullptr) {
             break;
         }
@@ -54,7 +54,7 @@ void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anch
     // Collect trailing comments that appear on the same line as the anchor
     const auto hidden = tokens_.getHiddenTokensToRight(anchor.index);
 
-    for (const antlr4::Token *token : hidden) {
+    for (const auto *token : hidden) {
         if (token == nullptr || isNewline(token)) {
             break;
         }

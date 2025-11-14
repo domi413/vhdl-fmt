@@ -7,12 +7,12 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("ConstantDecl: Simple constant with initialization", "[declarations][constant]")
+TEST_CASE("SignalDecl: Simple signal declaration", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
         architecture A of E is
-            constant WIDTH : integer := 8;
+            signal clk : std_logic;
         begin
         end A;
     )";
@@ -24,20 +24,21 @@ TEST_CASE("ConstantDecl: Simple constant with initialization", "[declarations][c
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 
-    const auto *constant = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
-    REQUIRE(constant != nullptr);
-    REQUIRE(constant->names.size() == 1);
-    REQUIRE(constant->names[0] == "WIDTH");
-    REQUIRE(constant->type_name == "integer");
-    REQUIRE(constant->init_expr.has_value());
+    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
+    REQUIRE(signal != nullptr);
+    REQUIRE(signal->names.size() == 1);
+    REQUIRE(signal->names[0] == "clk");
+    REQUIRE(signal->type_name == "std_logic");
+    REQUIRE_FALSE(signal->has_bus_kw);
+    REQUIRE_FALSE(signal->init_expr.has_value());
 }
 
-TEST_CASE("ConstantDecl: Multiple constants in same declaration", "[declarations][constant]")
+TEST_CASE("SignalDecl: Signal with initialization", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
         architecture A of E is
-            constant MIN, MAX, DEFAULT : integer := 42;
+            signal counter : integer := 0;
         begin
         end A;
     )";
@@ -49,22 +50,20 @@ TEST_CASE("ConstantDecl: Multiple constants in same declaration", "[declarations
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 
-    const auto *constant = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
-    REQUIRE(constant != nullptr);
-    REQUIRE(constant->names.size() == 3);
-    REQUIRE(constant->names[0] == "MIN");
-    REQUIRE(constant->names[1] == "MAX");
-    REQUIRE(constant->names[2] == "DEFAULT");
-    REQUIRE(constant->type_name == "integer");
-    REQUIRE(constant->init_expr.has_value());
+    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
+    REQUIRE(signal != nullptr);
+    REQUIRE(signal->names.size() == 1);
+    REQUIRE(signal->names[0] == "counter");
+    REQUIRE(signal->type_name == "integer");
+    REQUIRE(signal->init_expr.has_value());
 }
 
-TEST_CASE("ConstantDecl: Boolean constant", "[declarations][constant]")
+TEST_CASE("SignalDecl: Signal with vector type and constraint", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity E is end E;
         architecture A of E is
-            constant ENABLE : boolean := true;
+            signal data : std_logic_vector(7 downto 0);
         begin
         end A;
     )";
@@ -76,10 +75,10 @@ TEST_CASE("ConstantDecl: Boolean constant", "[declarations][constant]")
     REQUIRE(arch != nullptr);
     REQUIRE(arch->decls.size() == 1);
 
-    const auto *constant = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
-    REQUIRE(constant != nullptr);
-    REQUIRE(constant->names.size() == 1);
-    REQUIRE(constant->names[0] == "ENABLE");
-    REQUIRE(constant->type_name == "boolean");
-    REQUIRE(constant->init_expr.has_value());
+    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
+    REQUIRE(signal != nullptr);
+    REQUIRE(signal->names.size() == 1);
+    REQUIRE(signal->names[0] == "data");
+    REQUIRE(signal->type_name == "std_logic_vector");
+    REQUIRE(signal->constraint.has_value());
 }
