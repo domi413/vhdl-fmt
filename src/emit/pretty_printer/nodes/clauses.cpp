@@ -16,30 +16,13 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const Doc result
-      = joinDocsConditional(node.generics, [this](const auto &param, bool is_last) -> Doc {
-            // 1. Get the core doc from the child visitor
-            Doc core_doc = visit(param); //
+    const auto params = printList(node.generics, &PrettyPrinter::printGenericParam);
 
-            // 2. Append the semicolon *to the core doc* if needed
-            if (!is_last) {
-                core_doc += Doc::text(";");
-            }
-
-            // 3. NOW, wrap the (core + optional ';') with its trivia
-            Doc full_doc = withTrivia(param, core_doc); //
-
-            // 4. Add the newline separator *after* all trivia
-            if (!is_last) {
-                full_doc += Doc::line();
-            }
-            return full_doc;
-        });
-
-    const Doc aligned_result = Doc::align(result);
+    const Doc doc = joinDocs(params, Doc::line(), false);
+    const Doc result = Doc::align(doc);
 
     // This withTrivia handles trivia for the *entire clause*
-    return withTrivia(node, Doc::group(Doc::bracket(opener, aligned_result, closer)));
+    return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
@@ -51,26 +34,12 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
     const Doc opener = Doc::text("port") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    // Same logic for ports
-    const Doc result
-      = joinDocsConditional(node.ports, [this](const auto &port, bool is_last) -> Doc {
-            Doc core_doc = visit(port); //
+    const auto ports = printList(node.ports, &PrettyPrinter::printPort);
 
-            if (!is_last) {
-                core_doc += Doc::text(";");
-            }
+    const Doc doc = joinDocs(ports, Doc::line(), false);
+    const Doc result = Doc::align(doc);
 
-            Doc full_doc = withTrivia(port, core_doc); //
-
-            if (!is_last) {
-                full_doc += Doc::line();
-            }
-            return full_doc;
-        });
-
-    const Doc aligned_result = Doc::align(result);
-
-    return withTrivia(node, Doc::group(Doc::bracket(opener, aligned_result, closer)));
+    return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
 }
 
 } // namespace emit
