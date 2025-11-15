@@ -50,10 +50,7 @@ class CommentSink final
         dst.emplace(c);
     }
 
-    auto wasTokenUsed(std::size_t idx) const noexcept -> bool
-    {
-        return used_.contains(idx);
-    }
+    auto wasTokenUsed(std::size_t idx) const noexcept -> bool { return used_.contains(idx); }
 
   private:
     std::unordered_set<std::size_t> used_; ///< set of token indices already added

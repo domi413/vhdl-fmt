@@ -79,7 +79,7 @@ void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, std::size_t stop_index)
     }
 }
 
-auto TriviaBinder::collectInlineComment(ast::NodeTrivia &dst, std::size_t stop_index) -> antlr4::Token *
+auto TriviaBinder::collectInline(ast::NodeTrivia &dst, std::size_t stop_index) -> antlr4::Token *
 {
     const auto hidden = tokens_.getHiddenTokensToRight(stop_index);
 
@@ -116,7 +116,7 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     const auto stop_index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex());
 
     collectLeading(trivia, start_index);
-    auto *inline_comment_token = collectInlineComment(trivia, stop_index);
+    auto *inline_comment_token = collectInline(trivia, stop_index);
 
     if (inline_comment_token == nullptr) {
         collectTrailing(trivia, stop_index);

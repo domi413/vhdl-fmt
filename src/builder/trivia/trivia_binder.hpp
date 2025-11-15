@@ -61,7 +61,7 @@ class TriviaBinder final
     void collectLeading(ast::NodeTrivia &dst, std::size_t start_index);
     void collectTrailing(ast::NodeTrivia &dst, std::size_t stop_index);
 
-    auto collectInlineComment(ast::NodeTrivia &dst, std::size_t stop_index) -> antlr4::Token *;
+    auto collectInline(ast::NodeTrivia &dst, std::size_t stop_index) -> antlr4::Token *;
 
     auto findLastDefaultOnLine(std::size_t start_index) const -> std::size_t;
 };

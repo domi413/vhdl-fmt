@@ -17,24 +17,24 @@ struct AlignmentLevel
 
 auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 {
-    return printGenericParam(node, /* is_last = */ true);
+    return withTrivia(node, printGenericParam(node, /* is_last = */ true));
 }
 
 auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
 {
-    return printPort(node, /* is_last = */ true);
+    return withTrivia(node, printPort(node, /* is_last = */ true));
 }
 
 auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) const -> Doc
 {
     // TODO(vedivad): Implement signal declaration printing
-    return Doc::text("-- signal");
+    return withTrivia(node, Doc::text("-- signal"));
 }
 
 auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) const -> Doc
 {
     // TODO(vedivad): Implement constant declaration printing
-    return Doc::text("-- constant");
+    return withTrivia(node, Doc::text("-- constant"));
 }
 
 auto PrettyPrinter::printGenericParam(const ast::GenericParam &node, bool is_last) const -> Doc
@@ -55,7 +55,7 @@ auto PrettyPrinter::printGenericParam(const ast::GenericParam &node, bool is_las
         result += Doc::text(";");
     }
 
-    return withTrivia(node, result);
+    return result;
 }
 
 auto PrettyPrinter::printPort(const ast::Port &node, bool is_last) const -> Doc
@@ -82,7 +82,7 @@ auto PrettyPrinter::printPort(const ast::Port &node, bool is_last) const -> Doc
         result += Doc::text(";");
     }
 
-    return withTrivia(node, result);
+    return result;
 }
 
 } // namespace emit
