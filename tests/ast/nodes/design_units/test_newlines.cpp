@@ -26,9 +26,9 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[design
     const auto &lead = trivia.leading;
 
     // Expect: Comment("A"), ParagraphBreak(1 blank line), Comment("B")
-    REQUIRE(std::holds_alternative<ast::Comments>(lead[0]));
+    REQUIRE(std::holds_alternative<ast::Comment>(lead[0]));
     REQUIRE(std::holds_alternative<ast::ParagraphBreak>(lead[1]));
-    REQUIRE(std::holds_alternative<ast::Comments>(lead[2]));
+    REQUIRE(std::holds_alternative<ast::Comment>(lead[2]));
 
     if (std::holds_alternative<ast::ParagraphBreak>(lead[1])) {
         const auto &pb = std::get<ast::ParagraphBreak>(lead[1]);

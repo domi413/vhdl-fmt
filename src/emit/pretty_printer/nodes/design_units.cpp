@@ -36,7 +36,7 @@ auto PrettyPrinter::operator()(const ast::Entity &node) const -> Doc
     const Doc end_line
       = Doc::text("end") & Doc::text("entity") & Doc::text(end_label) + Doc::text(";");
 
-    return result / end_line;
+    return withTrivia(node, result / end_line);
 }
 
 auto PrettyPrinter::operator()(const ast::Architecture &node) const -> Doc
@@ -62,7 +62,7 @@ auto PrettyPrinter::operator()(const ast::Architecture &node) const -> Doc
     const Doc end_line
       = Doc::text("end") & Doc::text("architecture") & Doc::text(node.name) + Doc::text(";");
 
-    return result / end_line;
+    return withTrivia(node, result / end_line);
 }
 
 } // namespace emit

@@ -53,13 +53,13 @@ TEST_CASE("Nested indentation accumulates", "[doc]")
 
 TEST_CASE("Soft line becomes space when grouped and fits", "[doc]")
 {
-    const Doc doc = (Doc::text("hello") / Doc::text("world")).group();
+    const Doc doc = Doc::group(Doc::text("hello") / Doc::text("world"));
     REQUIRE(doc.render(defaultConfig()) == "hello world");
 }
 
 TEST_CASE("Hard line never becomes space", "[doc]")
 {
-    const Doc doc = (Doc::text("hello") | Doc::text("world")).group();
+    const Doc doc = Doc::group(Doc::text("hello") | Doc::text("world"));
     REQUIRE(doc.render(defaultConfig()) == "hello\nworld");
 }
 
@@ -109,7 +109,7 @@ TEST_CASE("Structural sharing works correctly", "[doc]")
 
 TEST_CASE("Render with different widths", "[doc]")
 {
-    const Doc doc = (Doc::text("short") + Doc::line() + Doc::text("text")).group();
+    const Doc doc = Doc::group(Doc::text("short") + Doc::line() + Doc::text("text"));
 
     // Wide enough - should fit on one line
     REQUIRE(doc.render(defaultConfig()) == "short text");
@@ -132,7 +132,7 @@ TEST_CASE("hardIndent forces line break with indentation", "[doc]")
 
 TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
 {
-    const Doc doc = Doc::text("begin").hardIndent(Doc::text("end")).group();
+    const Doc doc = Doc::group(Doc::text("begin").hardIndent(Doc::text("end")));
 
     // Hard line never becomes space, even in a group
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
@@ -140,8 +140,8 @@ TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
 
 TEST_CASE("Soft vs hard indent comparison", "[doc]")
 {
-    const Doc soft = (Doc::text("x") << Doc::text("y")).group();
-    const Doc hard = Doc::text("x").hardIndent(Doc::text("y")).group();
+    const Doc soft = Doc::group(Doc::text("x") << Doc::text("y"));
+    const Doc hard = Doc::group(Doc::text("x").hardIndent(Doc::text("y")));
 
     // Soft can collapse when grouped and fits
     REQUIRE(soft.render(defaultConfig()) == "x y");

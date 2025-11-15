@@ -7,7 +7,6 @@
 #include <string_view>
 #include <variant>
 
-/*
 TEST_CASE("GenericParam: Single generic with default", "[declarations][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -29,7 +28,6 @@ TEST_CASE("GenericParam: Single generic with default", "[declarations][generic]"
     REQUIRE(generic.type_name == "integer");
     REQUIRE(generic.default_expr.has_value());
 }
-*/
 
 TEST_CASE("GenericParam: Generic without default", "[declarations][generic]")
 {
@@ -50,7 +48,6 @@ TEST_CASE("GenericParam: Generic without default", "[declarations][generic]")
     REQUIRE_FALSE(generic.default_expr.has_value());
 }
 
-/*
 TEST_CASE("GenericParam: Multiple generics same declaration", "[declarations][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -72,7 +69,6 @@ TEST_CASE("GenericParam: Multiple generics same declaration", "[declarations][ge
     REQUIRE(generic.type_name == "integer");
     REQUIRE(generic.default_expr.has_value());
 }
-*/
 
 TEST_CASE("GenericParam: Multiple separate generic declarations", "[declarations][generic]")
 {
@@ -101,7 +97,6 @@ TEST_CASE("GenericParam: Multiple separate generic declarations", "[declarations
     REQUIRE(entity->generic_clause.generics[2].type_name == "boolean");
 }
 
-/*
 TEST_CASE("GenericParam: Generic with expression default", "[declarations][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -119,4 +114,3 @@ TEST_CASE("GenericParam: Generic with expression default", "[declarations][gener
     REQUIRE(generic.names[0] == "ADDR_WIDTH");
     REQUIRE(generic.default_expr.has_value());
 }
-*/

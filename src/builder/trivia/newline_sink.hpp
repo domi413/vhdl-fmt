@@ -4,6 +4,8 @@
 
 #include "ast/node.hpp"
 
+#include <vector>
+
 namespace builder {
 
 /// @brief Appends paragraph break trivia to a node.
@@ -12,7 +14,7 @@ class NewlineSink final
 {
   public:
     /// @brief Push paragraph break trivia. Expects newline_count >= 2.
-    constexpr void push(ast::NodeTrivia &dst, unsigned int newline_count)
+    constexpr void push(std::vector<ast::Trivia> &dst, unsigned int newline_count)
     {
         if (newline_count < 2) {
             return;
@@ -21,7 +23,7 @@ class NewlineSink final
         // Convert newline count to blank line count
         const unsigned int blank_lines = newline_count - 1;
         ast::ParagraphBreak pb{ blank_lines };
-        dst.leading.emplace_back(pb);
+        dst.emplace_back(pb);
     }
 };
 

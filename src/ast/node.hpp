@@ -8,7 +8,7 @@
 
 namespace ast {
 
-struct Comments
+struct Comment
 {
     std::string text;
 };
@@ -22,13 +22,14 @@ struct ParagraphBreak
 };
 
 /// @brief A variant representing either a comment or a paragraph break to preserve order.
-using Trivia = std::variant<Comments, ParagraphBreak>;
+using Trivia = std::variant<Comment, ParagraphBreak>;
 
 /// @brief Container for leading and trailing trivia (Newlines are only counted leading).
 struct NodeTrivia
 {
     std::vector<Trivia> leading;
-    std::vector<Comments> trailing;
+    std::vector<Trivia> trailing;
+    std::optional<Comment> inline_comment;
 };
 
 /// @brief Abstract base class for all AST nodes - Do not instantiate directly.

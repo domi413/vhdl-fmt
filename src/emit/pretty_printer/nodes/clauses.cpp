@@ -16,16 +16,13 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const Doc opener = Doc::text("generic") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const auto params
-      = toDocVector(node.generics, [this](const auto &param) { return visit(param); });
+    const auto params = printList(node.generics, &PrettyPrinter::printGenericParam);
 
-    // TODO(vedivad): Implement table combinator for alignment
-    // if (config().port_map.align_signals) {
+    const Doc doc = joinDocs(params, Doc::line(), false);
+    const Doc result = Doc::align(doc);
 
-    // }
-
-    const Doc result = joinDocs(params, Doc::text(";") + Doc::line(), false);
-    return Doc::bracket(opener, result, closer).group();
+    // This withTrivia handles trivia for the *entire clause*
+    return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
@@ -37,14 +34,12 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
     const Doc opener = Doc::text("port") & Doc::text("(");
     const Doc closer = Doc::text(");");
 
-    const auto ports = toDocVector(node.ports, [this](const auto &port) { return visit(port); });
+    const auto ports = printList(node.ports, &PrettyPrinter::printPort);
 
-    // if (config().port_map.align_signals) {
+    const Doc doc = joinDocs(ports, Doc::line(), false);
+    const Doc result = Doc::align(doc);
 
-    // }
-
-    const Doc result = joinDocs(ports, Doc::text(";") + Doc::line(), false);
-    return Doc::bracket(opener, result, closer).group();
+    return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
 }
 
 } // namespace emit

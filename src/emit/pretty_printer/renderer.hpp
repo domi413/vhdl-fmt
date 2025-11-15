@@ -46,6 +46,7 @@ class Renderer final
     // Member variables
     int width_{};
     int indent_size_{};
+    bool align_{ false };
     int column_{ 0 };
     std::string output_;
 };

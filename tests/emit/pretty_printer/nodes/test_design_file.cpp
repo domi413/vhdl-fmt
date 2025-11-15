@@ -49,7 +49,7 @@ TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_fi
     const std::string result = emit::test::render(file);
     constexpr std::string_view EXPECTED = "entity counter is\n"
                                           "  port ( clk : in std_logic );\n"
-                                          "end entity counter;\n\n"
+                                          "end entity counter;\n"
                                           "architecture rtl of counter is\n"
                                           "begin\n"
                                           "end architecture rtl;\n";
@@ -75,9 +75,9 @@ TEST_CASE("DesignFile with multiple design units", "[pretty_printer][design_file
 
     const std::string result = emit::test::render(file);
     constexpr std::string_view EXPECTED = "entity entity1 is\n"
-                                          "end entity entity1;\n\n"
+                                          "end entity entity1;\n"
                                           "entity entity2 is\n"
-                                          "end entity entity2;\n\n"
+                                          "end entity entity2;\n"
                                           "architecture behavioral of entity1 is\n"
                                           "begin\n"
                                           "end architecture behavioral;\n";
