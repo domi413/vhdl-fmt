@@ -22,12 +22,12 @@ TEST_CASE("ParenExpr: Parenthesized expression for precedence", "[expressions][p
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto& binary = std::get<ast::BinaryExpr>(assign.value);
+    const auto &binary = std::get<ast::BinaryExpr>(assign.value);
     REQUIRE(binary.op == "or");
 }
 
@@ -44,11 +44,11 @@ TEST_CASE("ParenExpr: Nested parentheses", "[expressions][paren_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.init_expr.has_value());
 
-    const auto& paren = std::get<ast::ParenExpr>(constant.init_expr.value());
+    const auto &paren = std::get<ast::ParenExpr>(constant.init_expr.value());
 }

@@ -17,7 +17,7 @@ TEST_CASE("PortClause: Single port", "[clauses][port]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.port_clause.ports.size() == 1);
     REQUIRE(entity.port_clause.ports[0].names[0] == "clk");
     REQUIRE(entity.port_clause.ports[0].mode == "in");
@@ -40,7 +40,7 @@ TEST_CASE("PortClause: Multiple ports with different modes", "[clauses][port]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.port_clause.ports.size() == 4);
     REQUIRE(entity.port_clause.ports[0].names[0] == "clk");
     REQUIRE(entity.port_clause.ports[0].mode == "in");

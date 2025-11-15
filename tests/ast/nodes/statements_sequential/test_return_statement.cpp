@@ -21,7 +21,7 @@ TEST_CASE("ReturnStatement: Simple return in function", "[statements_sequential]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
 }
 
 TEST_CASE("ReturnStatement: Return with expression", "[statements_sequential][return_statement]")
@@ -41,7 +41,7 @@ TEST_CASE("ReturnStatement: Return with expression", "[statements_sequential][re
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
 }
 
 TEST_CASE("ReturnStatement: Return in procedure (no value)",
@@ -62,5 +62,5 @@ TEST_CASE("ReturnStatement: Return in procedure (no value)",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
 }

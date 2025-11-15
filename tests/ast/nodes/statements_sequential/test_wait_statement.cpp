@@ -23,10 +23,10 @@ TEST_CASE("WaitStatement: Simple wait statement", "[statements_sequential][wait_
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
     // Check if wait statement exists in body
@@ -51,10 +51,10 @@ TEST_CASE("WaitStatement: Wait until with condition", "[statements_sequential][w
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 }
 
@@ -76,9 +76,9 @@ TEST_CASE("WaitStatement: Wait on sensitivity list", "[statements_sequential][wa
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 }

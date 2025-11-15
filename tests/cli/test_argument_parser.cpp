@@ -13,7 +13,7 @@
 
 namespace {
 
-auto createArgs(const std::vector<std::string_view> &args) . std::vector<char *>
+auto createArgs(const std::vector<std::string_view> &args) -> std::vector<char *>
 {
     std::vector<char *> c_args;
     c_args.reserve(args.size());

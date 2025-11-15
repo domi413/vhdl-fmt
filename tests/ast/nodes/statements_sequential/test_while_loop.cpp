@@ -25,13 +25,13 @@ TEST_CASE("WhileLoop: Simple while loop", "[statements_sequential][while_loop]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
     REQUIRE(while_loop.body.empty());
 }
 
@@ -55,13 +55,13 @@ TEST_CASE("WhileLoop: While loop with boolean condition", "[statements_sequentia
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
 }
 
 TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential][while_loop]")
@@ -85,14 +85,14 @@ TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
     REQUIRE(while_loop.body.size() == 1);
 
-    const auto& assign = std::get<ast::SequentialAssign>(while_loop.body[0]);
+    const auto &assign = std::get<ast::SequentialAssign>(while_loop.body[0]);
 }

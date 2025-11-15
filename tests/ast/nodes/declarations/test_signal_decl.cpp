@@ -18,10 +18,10 @@ TEST_CASE("SignalDecl: Simple signal declaration", "[declarations][signal]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    const auto &signal = std::get<ast::SignalDecl>(arch.decls[0]);
     REQUIRE(signal.names.size() == 1);
     REQUIRE(signal.names[0] == "clk");
     REQUIRE(signal.type_name == "std_logic");
@@ -42,10 +42,10 @@ TEST_CASE("SignalDecl: Signal with initialization", "[declarations][signal]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    const auto &signal = std::get<ast::SignalDecl>(arch.decls[0]);
     REQUIRE(signal.names.size() == 1);
     REQUIRE(signal.names[0] == "counter");
     REQUIRE(signal.type_name == "integer");
@@ -65,10 +65,10 @@ TEST_CASE("SignalDecl: Signal with vector type and constraint", "[declarations][
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    const auto &signal = std::get<ast::SignalDecl>(arch.decls[0]);
     REQUIRE(signal.names.size() == 1);
     REQUIRE(signal.names[0] == "data");
     REQUIRE(signal.type_name == "std_logic_vector");

@@ -17,7 +17,7 @@ TEST_CASE("Port: Single input port", "[declarations][port]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.port_clause.ports.size() == 1);
 
     const auto &port = entity.port_clause.ports[0];
@@ -41,7 +41,7 @@ TEST_CASE("Port: Multiple names in single port declaration", "[declarations][por
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.port_clause.ports.size() == 1);
 
     const auto &port = entity.port_clause.ports[0];
@@ -66,7 +66,7 @@ TEST_CASE("Port: Output port with vector type and constraint", "[declarations][p
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.port_clause.ports.size() == 1);
 
     const auto &port = entity.port_clause.ports[0];

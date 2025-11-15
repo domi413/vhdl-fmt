@@ -17,7 +17,7 @@ TEST_CASE("GenericParam: Single generic parameter with default", "[declarations]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.generic_clause.generics.size() == 1);
 
     const auto &param = entity.generic_clause.generics[0];
@@ -40,7 +40,7 @@ TEST_CASE("GenericParam: Multiple names in single declaration", "[declarations][
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.generic_clause.generics.size() == 1);
 
     const auto &param = entity.generic_clause.generics[0];
@@ -65,7 +65,7 @@ TEST_CASE("GenericParam: Generic without default value", "[declarations][generic
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.generic_clause.generics.size() == 1);
 
     const auto &param = entity.generic_clause.generics[0];

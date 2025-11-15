@@ -26,15 +26,15 @@ TEST_CASE("CallExpr: Function call expression", "[expressions][call_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& if_stmt = std::get<ast::IfStatement>(proc.body[0]);
+    const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
 
-    const auto& call = std::get<ast::CallExpr>(if_stmt.if_branch.condition);
+    const auto &call = std::get<ast::CallExpr>(if_stmt.if_branch.condition);
 }
 
 TEST_CASE("CallExpr: Array indexing as call expression", "[expressions][call_expr]")
@@ -52,10 +52,10 @@ TEST_CASE("CallExpr: Array indexing as call expression", "[expressions][call_exp
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto& call = std::get<ast::CallExpr>(assign.value);
+    const auto &call = std::get<ast::CallExpr>(assign.value);
 }

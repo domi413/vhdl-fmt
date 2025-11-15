@@ -27,10 +27,10 @@ TEST_CASE("ProcedureCallStatement: Simple procedure call without parameters",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
 }
 
@@ -58,10 +58,10 @@ TEST_CASE("ProcedureCallStatement: Procedure call with parameters",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
 }
 
@@ -85,9 +85,9 @@ TEST_CASE("ProcedureCallStatement: Built-in procedure call",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
 }

@@ -19,13 +19,13 @@ TEST_CASE("GroupExpr: Aggregate with others clause", "[expressions][group_expr]"
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    const auto &signal = std::get<ast::SignalDecl>(arch.decls[0]);
     REQUIRE(signal.init_expr.has_value());
 
-    const auto& group = std::get<ast::GroupExpr>(signal.init_expr.value());
+    const auto &group = std::get<ast::GroupExpr>(signal.init_expr.value());
     REQUIRE_FALSE(group.children.empty());
 }
 
@@ -42,12 +42,12 @@ TEST_CASE("GroupExpr: Positional aggregate", "[expressions][group_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    const auto &signal = std::get<ast::SignalDecl>(arch.decls[0]);
     REQUIRE(signal.init_expr.has_value());
 
-    const auto& group = std::get<ast::GroupExpr>(signal.init_expr.value());
+    const auto &group = std::get<ast::GroupExpr>(signal.init_expr.value());
     REQUIRE(group.children.size() == 4);
 }

@@ -1,7 +1,11 @@
 # AST Node Tests - Simplified with automatic test discovery
 
 # Get all test files from subdirectories
-file(GLOB_RECURSE TEST_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "nodes/*/*.cpp")
+file(
+    GLOB_RECURSE TEST_FILES
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    "nodes/*/*.cpp"
+)
 
 # Create one test executable per file
 foreach(TEST_FILE ${TEST_FILES})

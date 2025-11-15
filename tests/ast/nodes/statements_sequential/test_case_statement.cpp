@@ -30,13 +30,13 @@ TEST_CASE("CaseStatement: Simple case statement", "[statements_sequential][case_
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].body.size() == 1);
     REQUIRE(case_stmt.when_clauses[1].body.size() == 1);
@@ -68,13 +68,13 @@ TEST_CASE("CaseStatement: Case with multiple choices", "[statements_sequential][
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].choices.size() == 3);
     REQUIRE(case_stmt.when_clauses[1].choices.size() == 3);
@@ -109,13 +109,13 @@ TEST_CASE("CaseStatement: Case with multiple statements per when",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].body.size() == 2);
     REQUIRE(case_stmt.when_clauses[1].body.size() == 2);

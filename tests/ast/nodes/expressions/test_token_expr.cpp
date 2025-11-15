@@ -22,15 +22,15 @@ TEST_CASE("TokenExpr: Simple identifier token", "[expressions][token_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto& token_target = std::get<ast::TokenExpr>(assign.target);
+    const auto &token_target = std::get<ast::TokenExpr>(assign.target);
     REQUIRE(token_target.text == "b");
 
-    const auto& token_value = std::get<ast::TokenExpr>(assign.value);
+    const auto &token_value = std::get<ast::TokenExpr>(assign.value);
     REQUIRE(token_value.text == "a");
 }
 
@@ -47,13 +47,13 @@ TEST_CASE("TokenExpr: Numeric literal token", "[expressions][token_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.init_expr.has_value());
 
-    const auto& token = std::get<ast::TokenExpr>(constant.init_expr.value());
+    const auto &token = std::get<ast::TokenExpr>(constant.init_expr.value());
     REQUIRE(token.text == "8");
 }
 
@@ -77,12 +77,12 @@ TEST_CASE("TokenExpr: Character literal token", "[expressions][token_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& if_stmt = std::get<ast::IfStatement>(proc.body[0]);
+    const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(if_stmt.if_branch.body.size() == 1);
 }

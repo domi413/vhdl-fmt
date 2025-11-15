@@ -24,13 +24,13 @@ TEST_CASE("SequentialAssign: Simple signal assignment in process",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& assign = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &assign = std::get<ast::SequentialAssign>(proc.body[0]);
 }
 
 TEST_CASE("SequentialAssign: Variable assignment with expression",
@@ -53,13 +53,13 @@ TEST_CASE("SequentialAssign: Variable assignment with expression",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& assign = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &assign = std::get<ast::SequentialAssign>(proc.body[0]);
 }
 
 TEST_CASE("SequentialAssign: Multiple sequential assignments",
@@ -82,13 +82,13 @@ TEST_CASE("SequentialAssign: Multiple sequential assignments",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
 
-    const auto& assign1 = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &assign1 = std::get<ast::SequentialAssign>(proc.body[0]);
 
-    const auto& assign2 = std::get<ast::SequentialAssign>(proc.body[1]);
+    const auto &assign2 = std::get<ast::SequentialAssign>(proc.body[1]);
 }

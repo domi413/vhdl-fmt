@@ -23,12 +23,12 @@ TEST_CASE("BinaryExpr: Simple binary expression with logical operator",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto& binary = std::get<ast::BinaryExpr>(assign.value);
+    const auto &binary = std::get<ast::BinaryExpr>(assign.value);
     REQUIRE(binary.op == "and");
 }
 
@@ -43,13 +43,13 @@ TEST_CASE("BinaryExpr: Range expression with downto", "[expressions][binary_expr
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.port_clause.ports.size() == 1);
 
     const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.constraint.has_value());
 
-    const auto& index_constraint = std::get<ast::IndexConstraint>(port.constraint.value());
+    const auto &index_constraint = std::get<ast::IndexConstraint>(port.constraint.value());
 }
 
 TEST_CASE("BinaryExpr: Arithmetic expression with multiple operators", "[expressions][binary_expr]")
@@ -65,12 +65,12 @@ TEST_CASE("BinaryExpr: Arithmetic expression with multiple operators", "[express
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.init_expr.has_value());
 
-    const auto& binary = std::get<ast::BinaryExpr>(constant.init_expr.value());
+    const auto &binary = std::get<ast::BinaryExpr>(constant.init_expr.value());
     REQUIRE(binary.op == "+");
 }

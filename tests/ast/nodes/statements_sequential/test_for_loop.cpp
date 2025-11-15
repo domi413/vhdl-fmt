@@ -24,13 +24,13 @@ TEST_CASE("ForLoop: Simple for loop with range", "[statements_sequential][for_lo
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& for_loop = std::get<ast::ForLoop>(proc.body[0]);
+    const auto &for_loop = std::get<ast::ForLoop>(proc.body[0]);
     REQUIRE(for_loop.iterator == "i");
     REQUIRE(for_loop.body.empty());
 }
@@ -54,13 +54,13 @@ TEST_CASE("ForLoop: For loop with downto range", "[statements_sequential][for_lo
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& for_loop = std::get<ast::ForLoop>(proc.body[0]);
+    const auto &for_loop = std::get<ast::ForLoop>(proc.body[0]);
     REQUIRE(for_loop.iterator == "j");
 }
 
@@ -84,15 +84,15 @@ TEST_CASE("ForLoop: For loop with body statements", "[statements_sequential][for
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& for_loop = std::get<ast::ForLoop>(proc.body[0]);
+    const auto &for_loop = std::get<ast::ForLoop>(proc.body[0]);
     REQUIRE(for_loop.iterator == "k");
     REQUIRE(for_loop.body.size() == 1);
 
-    const auto& assign = std::get<ast::SequentialAssign>(for_loop.body[0]);
+    const auto &assign = std::get<ast::SequentialAssign>(for_loop.body[0]);
 }

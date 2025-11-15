@@ -15,7 +15,7 @@ TEST_CASE("Entity: Simple entity without ports or generics", "[design_units][ent
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.name == "SimpleEntity");
     REQUIRE(entity.generic_clause.generics.empty());
     REQUIRE(entity.port_clause.ports.empty());
@@ -38,7 +38,7 @@ TEST_CASE("Entity: Entity with ports", "[design_units][entity]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.name == "Counter");
     REQUIRE(entity.port_clause.ports.size() == 3);
     REQUIRE(entity.generic_clause.generics.empty());
@@ -62,7 +62,7 @@ TEST_CASE("Entity: Entity with generics and ports", "[design_units][entity]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
     REQUIRE(entity.name == "GenericEntity");
     REQUIRE(entity.generic_clause.generics.size() == 2);
     REQUIRE(entity.port_clause.ports.size() == 2);

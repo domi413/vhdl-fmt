@@ -9,13 +9,13 @@
 
 namespace builder {
 
-auto Translator::makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::IfStatement
+auto Translator::makeIfStatement(vhdlParser::If_statementContext &ctx) -> ast::IfStatement
 {
     auto stmt = make<ast::IfStatement>(ctx);
 
     // Main if branch
-    auto conditions = ctx->condition();
-    auto sequences = ctx->sequence_of_statements();
+    auto conditions = ctx.condition();
+    auto sequences = ctx.sequence_of_statements();
 
     if (conditions.empty() || sequences.empty()) {
         return stmt;

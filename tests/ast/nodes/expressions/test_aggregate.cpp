@@ -21,19 +21,19 @@ TEST_CASE("Aggregate: Positional aggregate", "[expressions][aggregate]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
     // Aggregates are represented as GroupExpr in the generic AST
-    const auto& agg = std::get<ast::GroupExpr>(assign.value);
+    const auto &agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(agg.children.size() == 3);
 
     // Each element is wrapped in a BinaryExpr with "=>" operator
     // For positional aggregates, the left side is null and right side has the value
     for (const auto &child : agg.children) {
-        const auto& assoc = std::get<ast::BinaryExpr>(child);
+        const auto &assoc = std::get<ast::BinaryExpr>(child);
         REQUIRE(assoc.op == "=>");
     }
 }
@@ -53,18 +53,18 @@ TEST_CASE("Aggregate: Named aggregate with others", "[expressions][aggregate]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
     // Aggregates with named associations are represented as GroupExpr
     // containing BinaryExpr nodes with "=>" operator
-    const auto& agg = std::get<ast::GroupExpr>(assign.value);
+    const auto &agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE_FALSE(agg.children.empty());
 
     // The first child should be a BinaryExpr representing "others => '0'"
-    const auto& assoc = std::get<ast::BinaryExpr>(agg.children[0]);
+    const auto &assoc = std::get<ast::BinaryExpr>(agg.children[0]);
     REQUIRE(assoc.op == "=>");
 }
 
@@ -83,13 +83,13 @@ TEST_CASE("Aggregate: Mixed positional and named", "[expressions][aggregate]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
     // Mixed aggregates are also GroupExpr
-    const auto& agg = std::get<ast::GroupExpr>(assign.value);
+    const auto &agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(agg.children.size() == 3);
 }
 
@@ -109,17 +109,17 @@ TEST_CASE("Aggregate: Nested aggregate", "[expressions][aggregate]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
     // Outer aggregate
-    const auto& outer_agg = std::get<ast::GroupExpr>(assign.value);
+    const auto &outer_agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(outer_agg.children.size() == 2);
 
     // Each child of outer aggregate is a BinaryExpr (element association)
-    const auto& first_assoc = std::get<ast::BinaryExpr>(outer_agg.children[0]);
+    const auto &first_assoc = std::get<ast::BinaryExpr>(outer_agg.children[0]);
     REQUIRE(first_assoc.op == "=>");
 
     // The right side of the association should be the inner aggregate
@@ -142,18 +142,18 @@ TEST_CASE("Aggregate: Range choice in aggregate", "[expressions][aggregate]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
     // Aggregates with range choices
-    const auto& agg = std::get<ast::GroupExpr>(assign.value);
+    const auto &agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(agg.children.size() == 2);
 
     // Each child should be a named association (BinaryExpr with "=>")
     for (const auto &child : agg.children) {
-        const auto& assoc = std::get<ast::BinaryExpr>(child);
+        const auto &assoc = std::get<ast::BinaryExpr>(child);
         REQUIRE(assoc.op == "=>");
     }
 }

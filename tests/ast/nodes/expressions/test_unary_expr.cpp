@@ -22,12 +22,12 @@ TEST_CASE("UnaryExpr: Logical not operator", "[expressions][unary_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
+    const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto& unary = std::get<ast::UnaryExpr>(assign.value);
+    const auto &unary = std::get<ast::UnaryExpr>(assign.value);
     REQUIRE(unary.op == "not");
 }
 
@@ -44,12 +44,12 @@ TEST_CASE("UnaryExpr: Unary minus operator", "[expressions][unary_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.init_expr.has_value());
 
-    const auto& unary = std::get<ast::UnaryExpr>(constant.init_expr.value());
+    const auto &unary = std::get<ast::UnaryExpr>(constant.init_expr.value());
     REQUIRE(unary.op == "-");
 }

@@ -64,7 +64,7 @@ class Translator final
     [[nodiscard]] auto makeTarget(vhdlParser::TargetContext *ctx) -> ast::Expr;
     [[nodiscard]] auto makeSequentialAssign(vhdlParser::Signal_assignment_statementContext *ctx) -> ast::SequentialAssign;
     [[nodiscard]] auto makeVariableAssign(vhdlParser::Variable_assignment_statementContext *ctx) -> ast::SequentialAssign;
-    [[nodiscard]] auto makeIfStatement(vhdlParser::If_statementContext *ctx) -> ast::IfStatement;
+    [[nodiscard]] auto makeIfStatement(vhdlParser::If_statementContext &ctx) -> ast::IfStatement;
     [[nodiscard]] auto makeCaseStatement(vhdlParser::Case_statementContext *ctx) -> ast::CaseStatement;
     [[nodiscard]] auto makeProcess(vhdlParser::Process_statementContext *ctx) -> ast::Process;
     [[nodiscard]] auto makeForLoop(vhdlParser::Loop_statementContext *ctx) -> ast::ForLoop;
@@ -120,7 +120,7 @@ class Translator final
     /// @brief Helper to create and bind an AST node with trivia
     template<typename T, typename Ctx>
     [[nodiscard]]
-    auto make(const Ctx *ctx) -> T
+    auto make(const Ctx &ctx) -> T
     {
         T node;
         trivia_.bind(node, ctx);

@@ -18,10 +18,10 @@ TEST_CASE("ConstantDecl: Simple constant with initialization", "[declarations][c
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.names.size() == 1);
     REQUIRE(constant.names[0] == "WIDTH");
     REQUIRE(constant.type_name == "integer");
@@ -41,10 +41,10 @@ TEST_CASE("ConstantDecl: Multiple constants in same declaration", "[declarations
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.names.size() == 3);
     REQUIRE(constant.names[0] == "MIN");
     REQUIRE(constant.names[1] == "MAX");
@@ -66,10 +66,10 @@ TEST_CASE("ConstantDecl: Boolean constant", "[declarations][constant]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
 
-    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.names.size() == 1);
     REQUIRE(constant.names[0] == "ENABLE");
     REQUIRE(constant.type_name == "boolean");

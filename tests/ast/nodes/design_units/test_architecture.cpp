@@ -16,7 +16,7 @@ TEST_CASE("Architecture: Simple empty architecture", "[design_units][architectur
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.name == "Empty");
     REQUIRE(arch.entity_name == "E");
     REQUIRE(arch.decls.empty());
@@ -37,7 +37,7 @@ TEST_CASE("Architecture: Architecture with declarations", "[design_units][archit
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.name == "RTL");
     REQUIRE(arch.entity_name == "E");
     REQUIRE(arch.decls.size() == 2);
@@ -64,7 +64,7 @@ TEST_CASE("Architecture: Architecture with concurrent statements", "[design_unit
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.name == "Behavioral");
     REQUIRE(arch.entity_name == "E");
     REQUIRE(arch.stmts.size() == 2);

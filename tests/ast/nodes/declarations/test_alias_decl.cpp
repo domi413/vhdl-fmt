@@ -19,7 +19,7 @@ TEST_CASE("AliasDecl: Simple signal alias", "[declarations][alias_decl]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 2);
 }
 
@@ -39,7 +39,7 @@ TEST_CASE("AliasDecl: Alias for bit slice", "[declarations][alias_decl]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 3);
 }
 
@@ -58,6 +58,6 @@ TEST_CASE("AliasDecl: Alias with different subtype", "[declarations][alias_decl]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 2);
 }

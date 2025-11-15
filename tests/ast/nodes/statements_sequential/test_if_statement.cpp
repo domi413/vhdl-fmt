@@ -25,13 +25,13 @@ TEST_CASE("IfStatement: Simple if statement", "[statements_sequential][if_statem
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& if_stmt = std::get<ast::IfStatement>(proc.body[0]);
+    const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(if_stmt.if_branch.body.size() == 1);
     REQUIRE(if_stmt.elsif_branches.empty());
     REQUIRE_FALSE(if_stmt.else_branch.has_value());
@@ -61,13 +61,13 @@ TEST_CASE("IfStatement: If-elsif-else statement", "[statements_sequential][if_st
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& if_stmt = std::get<ast::IfStatement>(proc.body[0]);
+    const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(if_stmt.if_branch.body.size() == 1);
     REQUIRE(if_stmt.elsif_branches.size() == 1);
     REQUIRE(if_stmt.elsif_branches[0].body.size() == 1);
@@ -97,15 +97,15 @@ TEST_CASE("IfStatement: Nested if statements", "[statements_sequential][if_state
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& outer_if = std::get<ast::IfStatement>(proc.body[0]);
+    const auto &outer_if = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(outer_if.if_branch.body.size() == 1);
 
-    const auto& inner_if = std::get<ast::IfStatement>(outer_if.if_branch.body[0]);
+    const auto &inner_if = std::get<ast::IfStatement>(outer_if.if_branch.body[0]);
     REQUIRE(inner_if.if_branch.body.size() == 1);
 }

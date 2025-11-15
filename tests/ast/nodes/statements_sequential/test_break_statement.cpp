@@ -21,13 +21,13 @@ TEST_CASE("BreakStatement: Simple break statement", "[statements_sequential][bre
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
+    const auto &break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
     REQUIRE(break_stmt.break_elements.empty());
     // Simple break with when condition
     REQUIRE(break_stmt.condition.has_value());
@@ -50,13 +50,13 @@ TEST_CASE("BreakStatement: Break with elements", "[statements_sequential][break_
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.stmts.size() == 1);
 
-    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    const auto& break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
+    const auto &break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
     // Break with elements and when condition
     REQUIRE_FALSE(break_stmt.break_elements.empty());
     REQUIRE(break_stmt.condition.has_value());
