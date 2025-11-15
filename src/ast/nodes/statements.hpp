@@ -19,13 +19,34 @@ struct CaseStatement;
 struct Process;
 struct ForLoop;
 struct WhileLoop;
+struct NullStatement;
+struct WaitStatement;
+struct ReturnStatement;
+struct NextStatement;
+struct ExitStatement;
+struct ReportStatement;
+struct AssertStatement;
+struct BreakStatement;
+struct ProcedureCall;
 
 /// Variant type for concurrent statements (outside processes)
 using ConcurrentStatement = std::variant<ConcurrentAssign, Process>;
 
 /// Variant type for sequential statements (inside processes)
-using SequentialStatement
-  = std::variant<SequentialAssign, IfStatement, CaseStatement, ForLoop, WhileLoop>;
+using SequentialStatement = std::variant<SequentialAssign,
+                                         IfStatement,
+                                         CaseStatement,
+                                         ForLoop,
+                                         WhileLoop,
+                                         NullStatement,
+                                         WaitStatement,
+                                         ReturnStatement,
+                                         NextStatement,
+                                         ExitStatement,
+                                         ReportStatement,
+                                         AssertStatement,
+                                         BreakStatement,
+                                         ProcedureCall>;
 
 /// @brief Concurrent signal assignment: target <= value;
 struct ConcurrentAssign : NodeBase
@@ -91,6 +112,69 @@ struct WhileLoop : NodeBase
 {
     Expr condition;
     std::vector<SequentialStatement> body;
+};
+
+/// @brief Null statement: null;
+struct NullStatement : NodeBase
+{
+    // Empty - just a placeholder statement
+};
+
+/// @brief Wait statement: wait; | wait until condition; | wait on signals; | wait for time;
+struct WaitStatement : NodeBase
+{
+    std::optional<Expr> condition;             // wait until <condition>
+    std::vector<std::string> sensitivity_list; // wait on <signal>, <signal>
+    std::optional<Expr> timeout;               // wait for <time>
+};
+
+/// @brief Return statement: return; | return expression;
+struct ReturnStatement : NodeBase
+{
+    std::optional<Expr> value; // Optional return value (empty for procedures)
+};
+
+/// @brief Next statement: next; | next loop_label; | next when condition;
+struct NextStatement : NodeBase
+{
+    std::optional<std::string> loop_label; // Optional loop label to exit
+    std::optional<Expr> condition;         // Optional when condition
+};
+
+/// @brief Exit statement: exit; | exit loop_label; | exit when condition;
+struct ExitStatement : NodeBase
+{
+    std::optional<std::string> loop_label; // Optional loop label to exit
+    std::optional<Expr> condition;         // Optional when condition
+};
+
+/// @brief Report statement: report string_expr severity severity_level;
+struct ReportStatement : NodeBase
+{
+    Expr message;                 // Report message expression
+    std::optional<Expr> severity; // Optional severity level
+};
+
+/// @brief Assert statement: assert condition report message severity level;
+struct AssertStatement : NodeBase
+{
+    Expr condition;               // Assertion condition
+    std::optional<Expr> message;  // Optional report message
+    std::optional<Expr> severity; // Optional severity level
+};
+
+/// @brief Break statement (VHDL-2008/VHDL-AMS): break; | break when condition; | break elements on
+/// condition;
+struct BreakStatement : NodeBase
+{
+    std::vector<Expr> break_elements; // Optional break elements (for VHDL-AMS)
+    std::optional<Expr> condition;    // Optional condition (on/when clause)
+};
+
+/// @brief Procedure call statement: procedure_name(args);
+struct ProcedureCall : NodeBase
+{
+    Expr call; // Stored as CallExpr in the Expr variant
 };
 
 } // namespace ast

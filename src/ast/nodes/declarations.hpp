@@ -16,9 +16,13 @@ struct ConstantDecl;
 struct SignalDecl;
 struct GenericParam;
 struct Port;
+struct AliasDecl;
+struct TypeDecl;
+struct SubtypeDecl;
 
 /// Variant type for all declarations
-using Declaration = std::variant<ConstantDecl, SignalDecl, GenericParam, Port>;
+using Declaration
+  = std::variant<ConstantDecl, SignalDecl, GenericParam, Port, AliasDecl, TypeDecl, SubtypeDecl>;
 
 // Constant declaration: constant WIDTH : integer := 8;
 struct ConstantDecl : NodeBase
@@ -53,6 +57,31 @@ struct Port : NodeBase
     std::string mode; // "in" / "out"
     std::string type_name;
     std::optional<Expr> default_expr;
+    std::optional<Constraint> constraint;
+};
+
+// Alias declaration: alias byte_data : std_logic_vector(7 downto 0) is data;
+struct AliasDecl : NodeBase
+{
+    std::string name;
+    std::string type_name;
+    Expr target; // The aliased object (can be a name, slice, etc.)
+};
+
+// Type declaration: type state_t is (IDLE, RUNNING, DONE);
+struct TypeDecl : NodeBase
+{
+    std::string name;
+    // Type definition stored as generic Expr for now
+    // Could be an enumeration, array type, record type, etc.
+    std::optional<Expr> definition;
+};
+
+// Subtype declaration: subtype small_int is integer range 0 to 100;
+struct SubtypeDecl : NodeBase
+{
+    std::string name;
+    std::string base_type;
     std::optional<Constraint> constraint;
 };
 

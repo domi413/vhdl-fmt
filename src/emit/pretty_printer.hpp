@@ -26,6 +26,9 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     // Declarations
     auto operator()(const ast::SignalDecl &node) const -> Doc;
     auto operator()(const ast::ConstantDecl &node) const -> Doc;
+    auto operator()(const ast::AliasDecl &node) const -> Doc;
+    auto operator()(const ast::TypeDecl &node) const -> Doc;
+    auto operator()(const ast::SubtypeDecl &node) const -> Doc;
 
     // Expressions
     auto operator()(const ast::TokenExpr &node) const -> Doc;

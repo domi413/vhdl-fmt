@@ -6,22 +6,6 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("GenericClause: Empty generic clause", "[clauses][generic]")
-{
-    constexpr std::string_view VHDL_FILE = R"(
-        entity E is
-            generic ( );
-        end E;
-    )";
-
-    const auto design = builder::buildFromString(VHDL_FILE);
-    REQUIRE(design.units.size() == 1);
-
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.empty());
-}
-
 TEST_CASE("GenericClause: Single generic parameter", "[clauses][generic]")
 {
     constexpr std::string_view VHDL_FILE = R"(

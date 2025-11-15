@@ -72,9 +72,14 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
                 arch.decls.emplace_back(makeConstantDecl(const_ctx));
             } else if (auto *sig_ctx = item->signal_declaration()) {
                 arch.decls.emplace_back(makeSignalDecl(sig_ctx));
+            } else if (auto *alias_ctx = item->alias_declaration()) {
+                arch.decls.emplace_back(makeAliasDecl(alias_ctx));
+            } else if (auto *type_ctx = item->type_declaration()) {
+                arch.decls.emplace_back(makeTypeDecl(type_ctx));
+            } else if (auto *subtype_ctx = item->subtype_declaration()) {
+                arch.decls.emplace_back(makeSubtypeDecl(subtype_ctx));
             }
-            // TODO(someone): Add more declaration types as needed (variables, types, subprograms,
-            // etc.)
+            // TODO(someone): Add more declaration types as needed (variables, subprograms, etc.)
         }
     }
 
@@ -92,6 +97,81 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
     }
 
     return arch;
+}
+
+// ---------------------- Alias, Type, Subtype Declarations ----------------------
+
+auto Translator::makeAliasDecl(vhdlParser::Alias_declarationContext *ctx) -> ast::AliasDecl
+{
+    auto alias_decl = make<ast::AliasDecl>(ctx);
+
+    // Get alias name
+    if (auto *designator = ctx->alias_designator()) {
+        if (auto *id = designator->identifier()) {
+            alias_decl.name = id->getText();
+        }
+    }
+
+    // Get type indication if present
+    if (auto *indication = ctx->alias_indication()) {
+        if (auto *subtype_ind = indication->subtype_indication()) {
+            if (!subtype_ind->selected_name().empty()) {
+                alias_decl.type_name = subtype_ind->selected_name(0)->getText();
+            }
+        }
+    }
+
+    // Get the aliased target (the name after 'is')
+    if (auto *name = ctx->name()) {
+        alias_decl.target = makeName(name);
+    }
+
+    return alias_decl;
+}
+
+auto Translator::makeTypeDecl(vhdlParser::Type_declarationContext *ctx) -> ast::TypeDecl
+{
+    auto type_decl = make<ast::TypeDecl>(ctx);
+
+    // Get type name
+    if (auto *id = ctx->identifier()) {
+        type_decl.name = id->getText();
+    }
+
+    // Get type definition - store as optional Expr for now
+    // Could be enumeration, array, record, etc.
+    if (auto *def = ctx->type_definition()) {
+        // For now, just store the text representation
+        // TODO: Parse specific type definitions if needed
+        type_decl.definition = makeToken(ctx, def->getText());
+    }
+
+    return type_decl;
+}
+
+auto Translator::makeSubtypeDecl(vhdlParser::Subtype_declarationContext *ctx) -> ast::SubtypeDecl
+{
+    auto subtype_decl = make<ast::SubtypeDecl>(ctx);
+
+    // Get subtype name
+    if (auto *id = ctx->identifier()) {
+        subtype_decl.name = id->getText();
+    }
+
+    // Get subtype indication (base type and constraint)
+    if (auto *subtype_ind = ctx->subtype_indication()) {
+        // Get base type name
+        if (!subtype_ind->selected_name().empty()) {
+            subtype_decl.base_type = subtype_ind->selected_name(0)->getText();
+        }
+
+        // Get constraint if present
+        if (auto *constraint = subtype_ind->constraint()) {
+            subtype_decl.constraint = makeConstraint(constraint);
+        }
+    }
+
+    return subtype_decl;
 }
 
 } // namespace builder

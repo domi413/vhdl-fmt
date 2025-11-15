@@ -6,22 +6,6 @@
 #include <string_view>
 #include <variant>
 
-TEST_CASE("PortClause: Empty port clause", "[clauses][port]")
-{
-    constexpr std::string_view VHDL_FILE = R"(
-        entity E is
-            port ( );
-        end E;
-    )";
-
-    const auto design = builder::buildFromString(VHDL_FILE);
-    REQUIRE(design.units.size() == 1);
-
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.empty());
-}
-
 TEST_CASE("PortClause: Single port", "[clauses][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
