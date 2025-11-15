@@ -260,6 +260,7 @@ auto Translator::makeBreakStatement(vhdlParser::Break_statementContext &ctx) -> 
             if (auto *name = elem->name()) {
                 assoc.left = box(makeName(*name));
             }
+
             if (auto *expr = elem->expression()) {
                 assoc.right = box(makeExpr(*expr));
             }
