@@ -1,63 +1,83 @@
 #include "ast/node.hpp"
+#include "common/overload.hpp"
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
-#include <algorithm>
-#include <functional>
-#include <optional>
 #include <ranges>
-#include <variant>
 
 namespace emit {
 
 namespace {
+
 auto printTrivia(const ast::Trivia &trivia) noexcept -> Doc
 {
-    if (const auto *comment = std::get_if<ast::Comments>(&trivia)) {
-        return Doc::text(comment->text) + Doc::hardline();
-    }
+    auto comment_func
+      = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); };
 
-    if (const auto *para = std::get_if<ast::ParagraphBreak>(&trivia)) {
+    auto paragraph_func = [](const ast::ParagraphBreak &p) -> Doc {
         Doc result = Doc::empty();
-
-        for (unsigned int i = 0; i < para->blank_lines; ++i) {
+        for (unsigned i = 0; i < p.blank_lines; ++i) {
             result += Doc::hardline();
         }
-
         return result;
+    };
+
+    return std::visit(common::Overload{ comment_func, paragraph_func }, trivia);
+}
+
+auto printTrailingTriviaList(const std::vector<ast::Trivia> &list) noexcept -> Doc
+{
+    if (list.empty()) {
+        return Doc::empty();
     }
 
-    return Doc::empty();
+    // Process all but the last trivia using the standard printer
+    Doc result = Doc::empty();
+    for (const auto &trivia : list | std::views::take(list.size() - 1)) {
+        result += printTrivia(trivia);
+    }
+
+    // Append last trivia: if it's a comment, omit the trailing hardline
+    result += std::visit(
+      common::Overload{ [](const ast::Comment &c) -> Doc { return Doc::text(c.text); },
+                        [](const auto &other) { return printTrivia(other); } },
+      list.back());
+
+    return result;
 }
+
 } // namespace
 
 /**
- * @brief This is the main wrapper. It combines the core doc with trivia.
+ * @brief Combines the core doc with leading, inline, and trailing trivia.
  */
 auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
 {
     if (!node.trivia) {
-        return core_doc; // No trivia, return as-is
+        return core_doc;
     }
 
-    const Doc head = node.trivia
-                       .transform([](const ast::NodeTrivia &t) -> emit::Doc {
-                           auto docs_view = t.leading | std::views::transform(printTrivia);
-                           return std::ranges::fold_left(docs_view, Doc::empty(), std::plus<Doc>{});
-                       })
-                       .value_or(Doc::empty());
+    const auto &trivia = *node.trivia;
 
-    const Doc foot = node.trivia->trailing
-                       .transform([](const ast::Comments &c) -> Doc {
-                           return Doc::text(c.text) + Doc::noGroupMark();
-                       })
-                       .value_or(Doc::empty());
+    // Build the on-line part (head + core + inline comment)
+    Doc result = Doc::empty();
+    for (const auto &t : trivia.leading) {
+        result += printTrivia(t);
+    }
+    result += core_doc;
 
-    if (foot.isEmpty()) {
-        return head + core_doc;
+    if (trivia.inline_comment) {
+        result += Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::noGroupMark();
     }
 
-    return head + core_doc & foot;
+    // Append trailing trivia
+    const Doc foot = printTrailingTriviaList(trivia.trailing);
+
+    if (!foot.isEmpty()) {
+        return result.isEmpty() ? foot : (result / foot);
+    }
+
+    return result;
 }
 
 } // namespace emit

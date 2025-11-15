@@ -14,20 +14,6 @@
 namespace builder {
 
 /// @brief Builds ordered trivia streams (comments + newlines) for AST nodes.
-///
-/// Implements a *left-stick* policy:
-/// every comment or newline sequence appearing before a node in source order
-/// is attached to that node as **leading** trivia, regardless of spacing or
-/// paragraph boundaries. This ensures that all comment blocks and blank-line
-/// runs are preserved and follow the next syntactic construct.
-///
-/// Trailing trivia only captures **inline** comments that occur on the same
-/// line as a node’s final token; vertical spacing below a node is always
-/// considered part of the next node’s leading trivia.
-///
-/// The resulting trivia stream maintains the original ordering of comments
-/// and newlines exactly as they appear in the source, enabling precise
-/// round-tripping and faithful pretty-printing.
 class TriviaBinder final
 {
   public:
@@ -72,11 +58,12 @@ class TriviaBinder final
         return (t != nullptr) && t->getChannel() == vhdlLexer::DEFAULT_TOKEN_CHANNEL;
     }
 
-    [[nodiscard]]
-    auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;
-
     void collectLeading(ast::NodeTrivia &dst, std::size_t start_index);
-    void collectTrailing(ast::NodeTrivia &dst, const AnchorToken &anchor);
+    void collectTrailing(ast::NodeTrivia &dst, std::size_t stop_index);
+
+    auto collectInlineComment(ast::NodeTrivia &dst, std::size_t stop_index) -> antlr4::Token *;
+
+    auto findLastDefaultOnLine(std::size_t start_index) const -> std::size_t;
 };
 
 } // namespace builder

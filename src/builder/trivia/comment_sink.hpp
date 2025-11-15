@@ -17,7 +17,7 @@ class CommentSink final
     CommentSink() = default;
 
     /// @brief Push a comment token into the node’s comment list, unless already added.
-    void push(ast::NodeTrivia &dst, bool to_leading, const antlr4::Token *t)
+    void push(std::vector<ast::Trivia> &dst, const antlr4::Token *t)
     {
         if (t == nullptr) {
             return;
@@ -28,13 +28,31 @@ class CommentSink final
             return; // already added elsewhere
         }
 
-        const ast::Comments c{ t->getText() };
+        const ast::Comment c{ t->getText() };
 
-        if (to_leading) {
-            dst.leading.emplace_back(c);
-        } else {
-            dst.trailing.emplace(c);
+        dst.emplace_back(c);
+    }
+
+    /// @brief Push a comment token into the node’s comment list, unless already added.
+    void push(std::optional<ast::Comment> &dst, const antlr4::Token *t)
+    {
+        if (t == nullptr) {
+            return;
         }
+
+        const auto idx = t->getTokenIndex();
+        if (!used_.insert(idx).second) {
+            return; // already added elsewhere
+        }
+
+        const ast::Comment c{ t->getText() };
+
+        dst.emplace(c);
+    }
+
+    auto wasTokenUsed(std::size_t idx) const noexcept -> bool
+    {
+        return used_.contains(idx);
     }
 
   private:
