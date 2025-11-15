@@ -1,5 +1,7 @@
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
+#include "ast/nodes/expressions.hpp"
+#include "ast/nodes/statements.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -184,5 +186,5 @@ TEST_CASE("Name: Attribute name", "[expressions][name]")
 
     // Just verify the process parses correctly
     // Attribute names are complex and may be represented differently
-    REQUIRE(proc->body.size() >= 1);
+    REQUIRE_FALSE(proc->body.empty());
 }

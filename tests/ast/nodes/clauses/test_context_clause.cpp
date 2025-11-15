@@ -1,10 +1,8 @@
 #include "ast/nodes/design_file.hpp"
-#include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("ContextClause: Simple context declaration", "[clauses][context_clause]")
 {
@@ -18,7 +16,7 @@ TEST_CASE("ContextClause: Simple context declaration", "[clauses][context_clause
     // Context declarations not yet implemented - just verify parsing succeeds
     const auto design = builder::buildFromString(VHDL_FILE);
     // Note: context declarations are not yet stored in design.units
-    REQUIRE(design.units.size() == 0);
+    REQUIRE(design.units.empty());
 }
 
 TEST_CASE("ContextClause: Context with multiple libraries and uses", "[clauses][context_clause]")
@@ -34,5 +32,5 @@ TEST_CASE("ContextClause: Context with multiple libraries and uses", "[clauses][
     // Context declarations not yet implemented - just verify parsing succeeds
     const auto design = builder::buildFromString(VHDL_FILE);
     // Note: context declarations are not yet stored in design.units
-    REQUIRE(design.units.size() == 0);
+    REQUIRE(design.units.empty());
 }

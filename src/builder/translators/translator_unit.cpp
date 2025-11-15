@@ -1,3 +1,4 @@
+#include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/translator.hpp"
@@ -142,7 +143,7 @@ auto Translator::makeTypeDecl(vhdlParser::Type_declarationContext *ctx) -> ast::
     // Could be enumeration, array, record, etc.
     if (auto *def = ctx->type_definition()) {
         // For now, just store the text representation
-        // TODO: Parse specific type definitions if needed
+        // TODO(domi): Parse specific type definitions if needed
         type_decl.definition = makeToken(ctx, def->getText());
     }
 

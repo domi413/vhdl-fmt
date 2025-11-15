@@ -3,6 +3,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <utility>
 #include <vector>
 
 namespace builder {
@@ -264,7 +265,7 @@ auto Translator::makeBreakStatement(vhdlParser::Break_statementContext *ctx) -> 
                 assoc.right = box(makeExpr(expr));
             }
 
-            stmt.break_elements.push_back(std::move(assoc));
+            stmt.break_elements.emplace_back(std::move(assoc));
         }
     }
 

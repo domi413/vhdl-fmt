@@ -1,4 +1,3 @@
-#include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/ast_builder.hpp"
