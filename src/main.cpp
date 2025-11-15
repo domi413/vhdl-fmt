@@ -19,15 +19,15 @@ auto main(int argc, char *argv[]) -> int
 
         cli::ConfigReader config_reader{ argparser.getConfigPath() };
         const auto config_result = config_reader.readConfigFile();
-        const auto &config = config_result.value();
+        // const auto &config = config_result.value();
 
         // Build AST from input file
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
 
         // Pretty print the AST
-        const emit::PrettyPrinter printer{};
-        const auto doc = printer(root);
-        std::cout << doc.render(config);
+        // const emit::PrettyPrinter printer{};
+        // const auto doc = printer(root);
+        // std::cout << doc.render(config);
 
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << '\n';
