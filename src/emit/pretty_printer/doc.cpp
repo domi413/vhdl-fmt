@@ -40,7 +40,7 @@ auto Doc::alignText(std::string_view str, int level) -> Doc
 
 auto Doc::noGroup() -> Doc
 {
-    return Doc(makeNoGroupMark());
+    return Doc(makeNoGroup());
 }
 
 // ========================================================================

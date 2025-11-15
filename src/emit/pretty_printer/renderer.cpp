@@ -36,7 +36,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
         // Empty produces nothing
         [](const Empty &) -> void {},
 
-        // NoGroupMark produces nothing
+        // NoGroup produces nothing
         [](const NoGroup &) -> void {},
 
         // Text
@@ -141,7 +141,7 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
             return width - static_cast<int>(node.content.length());
         },
 
-        // All others (HardLine, NoGroupMark) do not fit
+        // All others (HardLine, NoGroup) do not fit
         [](const HardLine &) -> int { return -1; },
         [](const NoGroup &) -> int { return -1; }
     };
