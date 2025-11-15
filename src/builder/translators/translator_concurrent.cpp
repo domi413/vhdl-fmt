@@ -13,6 +13,7 @@ auto Translator::makeConcurrentAssign(
     if (auto *cond = ctx.conditional_signal_assignment()) {
         return makeConditionalAssign(*cond);
     }
+
     if (auto *sel = ctx.selected_signal_assignment()) {
         return makeSelectedAssign(*sel);
     }
@@ -30,14 +31,19 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
         assign.target = makeTarget(*target_ctx);
     }
 
-    // Get the waveform - for now we'll take the first waveform element's expression
-    if (auto *cond_wave = ctx.conditional_waveforms()) {
-        if (auto *wave = cond_wave->waveform()) {
-            auto wave_elems = wave->waveform_element();
-            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpr(*wave_elems[0]->expression(0));
-            }
-        }
+    auto *cond_wave = ctx.conditional_waveforms();
+    if (cond_wave == nullptr) {
+        return assign;
+    }
+
+    auto *wave = cond_wave->waveform();
+    if (wave == nullptr) {
+        return assign;
+    }
+
+    const auto wave_elems = wave->waveform_element();
+    if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
+        assign.value = makeExpr(*wave_elems[0]->expression(0));
     }
 
     return assign;
@@ -54,14 +60,19 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
 
     // For selected assignments (with...select), we'll take the first waveform
     // TODO(someone): Handle full selected waveforms structure
-    if (auto *sel_waves = ctx.selected_waveforms()) {
-        auto waves = sel_waves->waveform();
-        if (!waves.empty()) {
-            auto wave_elems = waves[0]->waveform_element();
-            if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-                assign.value = makeExpr(*wave_elems[0]->expression(0));
-            }
-        }
+    auto *sel_waves = ctx.selected_waveforms();
+    if (sel_waves == nullptr) {
+        return assign;
+    }
+
+    const auto waves = sel_waves->waveform();
+    if (waves.empty()) {
+        return assign;
+    }
+
+    const auto wave_elems = waves[0]->waveform_element();
+    if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
+        assign.value = makeExpr(*wave_elems[0]->expression(0));
     }
 
     return assign;

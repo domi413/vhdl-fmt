@@ -136,23 +136,23 @@ auto Translator::makeWaitStatement(vhdlParser::Wait_statementContext &ctx) -> as
 {
     auto stmt = make<ast::WaitStatement>(ctx);
 
-    // wait until condition
+    // Extract condition (wait until condition)
     if (auto *cond_clause = ctx.condition_clause()) {
         if (auto *cond = cond_clause->condition()) {
             stmt.condition = tryMakeExpr(cond->expression());
         }
     }
 
-    // wait on sensitivity_list
+    // Extract sensitivity list (wait on signals)
     if (auto *sens = ctx.sensitivity_clause()) {
         if (auto *list = sens->sensitivity_list()) {
-            for (auto *name : list->name()) {
-                stmt.sensitivity_list.push_back(name->getText());
-            }
+            stmt.sensitivity_list = list->name()
+                                  | std::views::transform([](auto *n) { return n->getText(); })
+                                  | std::ranges::to<std::vector>();
         }
     }
 
-    // wait for timeout
+    // Extract timeout (wait for duration)
     if (auto *timeout_clause = ctx.timeout_clause()) {
         stmt.timeout = tryMakeExpr(timeout_clause->expression());
     }
@@ -232,14 +232,16 @@ auto Translator::makeAssertStatement(vhdlParser::Assertion_statementContext &ctx
         }
     }
 
-    // Report clause - REPORT keyword followed by expression
-    if (assertion->REPORT() != nullptr && !assertion->expression().empty()) {
-        stmt.message = makeExpr(*assertion->expression(0));
+    const auto &expressions = assertion->expression();
+
+    // Extract report message (REPORT keyword followed by expression)
+    if (assertion->REPORT() != nullptr && !expressions.empty()) {
+        stmt.message = makeExpr(*expressions[0]);
     }
 
-    // Severity clause - SEVERITY keyword followed by expression
-    if (assertion->SEVERITY() != nullptr && assertion->expression().size() > 1) {
-        stmt.severity = makeExpr(*assertion->expression(1));
+    // Extract severity level (SEVERITY keyword followed by expression)
+    if (assertion->SEVERITY() != nullptr && expressions.size() > 1) {
+        stmt.severity = makeExpr(*expressions[1]);
     }
 
     return stmt;
@@ -249,27 +251,28 @@ auto Translator::makeBreakStatement(vhdlParser::Break_statementContext &ctx) -> 
 {
     auto stmt = make<ast::BreakStatement>(ctx);
 
-    // Parse break elements (quantity => expression pairs)
+    // Extract break elements (quantity => expression pairs)
     if (auto *break_list = ctx.break_list()) {
-        for (auto *elem : break_list->break_element()) {
-            // Each break element is "name => expression"
-            // Store as BinaryExpr with "=>" operator
+        auto make_element = [this](auto *elem) {
             auto assoc = make<ast::BinaryExpr>(elem);
             assoc.op = "=>";
 
             if (auto *name = elem->name()) {
                 assoc.left = box(makeName(*name));
             }
-
             if (auto *expr = elem->expression()) {
                 assoc.right = box(makeExpr(*expr));
             }
 
-            stmt.break_elements.emplace_back(std::move(assoc));
-        }
+            return ast::Expr{ std::move(assoc) };
+        };
+
+        stmt.break_elements = break_list->break_element()
+                            | std::views::transform(make_element)
+                            | std::ranges::to<std::vector>();
     }
 
-    // Parse condition (when clause)
+    // Extract condition (when clause)
     if (auto *cond = ctx.condition()) {
         stmt.condition = tryMakeExpr(cond->expression());
     }
