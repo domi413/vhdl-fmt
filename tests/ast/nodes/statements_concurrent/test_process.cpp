@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("Process: Simple process with sensitivity list", "[statements_concurrent][process]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -24,15 +22,13 @@ TEST_CASE("Process: Simple process with sensitivity list", "[statements_concurre
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->sensitivity_list.size() == 1);
-    REQUIRE(proc->sensitivity_list[0] == "clk");
-    REQUIRE(proc->body.empty());
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.sensitivity_list.size() == 1);
+    REQUIRE(proc.sensitivity_list[0] == "clk");
+    REQUIRE(proc.body.empty());
 }
 
 TEST_CASE("Process: Process with multiple signals in sensitivity list",
@@ -53,15 +49,13 @@ TEST_CASE("Process: Process with multiple signals in sensitivity list",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->sensitivity_list.size() == 2);
-    REQUIRE(proc->sensitivity_list[0] == "clk");
-    REQUIRE(proc->sensitivity_list[1] == "reset");
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.sensitivity_list.size() == 2);
+    REQUIRE(proc.sensitivity_list[0] == "clk");
+    REQUIRE(proc.sensitivity_list[1] == "reset");
 }
 
 TEST_CASE("Process: Process with sequential statements", "[statements_concurrent][process]")
@@ -82,12 +76,10 @@ TEST_CASE("Process: Process with sequential statements", "[statements_concurrent
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->sensitivity_list.size() == 1);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.sensitivity_list.size() == 1);
+    REQUIRE(proc.body.size() == 1);
 }

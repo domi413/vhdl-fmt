@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("BreakStatement: Simple break statement", "[statements_sequential][break_statement]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -23,19 +21,16 @@ TEST_CASE("BreakStatement: Simple break statement", "[statements_sequential][bre
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *break_stmt = std::get_if<ast::BreakStatement>(&proc->body[0]);
-    REQUIRE(break_stmt != nullptr);
-    REQUIRE(break_stmt->break_elements.empty());
+    const auto& break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
+    REQUIRE(break_stmt.break_elements.empty());
     // Simple break with when condition
-    REQUIRE(break_stmt->condition.has_value());
+    REQUIRE(break_stmt.condition.has_value());
 }
 
 TEST_CASE("BreakStatement: Break with elements", "[statements_sequential][break_statement]")
@@ -55,17 +50,14 @@ TEST_CASE("BreakStatement: Break with elements", "[statements_sequential][break_
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *break_stmt = std::get_if<ast::BreakStatement>(&proc->body[0]);
-    REQUIRE(break_stmt != nullptr);
+    const auto& break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
     // Break with elements and when condition
-    REQUIRE_FALSE(break_stmt->break_elements.empty());
-    REQUIRE(break_stmt->condition.has_value());
+    REQUIRE_FALSE(break_stmt.break_elements.empty());
+    REQUIRE(break_stmt.condition.has_value());
 }

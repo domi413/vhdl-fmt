@@ -4,7 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("GenericClause: Single generic parameter", "[clauses][generic]")
 {
@@ -19,12 +18,11 @@ TEST_CASE("GenericClause: Single generic parameter", "[clauses][generic]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
-    REQUIRE(entity->generic_clause.generics[0].names[0] == "WIDTH");
-    REQUIRE(entity->generic_clause.generics[0].type_name == "integer");
-    REQUIRE(entity->generic_clause.generics[0].default_expr.has_value());
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
+    REQUIRE(entity.generic_clause.generics[0].names[0] == "WIDTH");
+    REQUIRE(entity.generic_clause.generics[0].type_name == "integer");
+    REQUIRE(entity.generic_clause.generics[0].default_expr.has_value());
 }
 
 TEST_CASE("GenericClause: Multiple generic parameters", "[clauses][generic]")
@@ -42,10 +40,9 @@ TEST_CASE("GenericClause: Multiple generic parameters", "[clauses][generic]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 3);
-    REQUIRE(entity->generic_clause.generics[0].names[0] == "WIDTH");
-    REQUIRE(entity->generic_clause.generics[1].names[0] == "DEPTH");
-    REQUIRE(entity->generic_clause.generics[2].names[0] == "ENABLE");
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 3);
+    REQUIRE(entity.generic_clause.generics[0].names[0] == "WIDTH");
+    REQUIRE(entity.generic_clause.generics[1].names[0] == "DEPTH");
+    REQUIRE(entity.generic_clause.generics[2].names[0] == "ENABLE");
 }

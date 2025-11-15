@@ -4,8 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("GenericParam: Single generic parameter with default", "[declarations][generic_param]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -19,11 +17,10 @@ TEST_CASE("GenericParam: Single generic parameter with default", "[declarations]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    const auto &param = entity->generic_clause.generics[0];
+    const auto &param = entity.generic_clause.generics[0];
     REQUIRE(param.names.size() == 1);
     REQUIRE(param.names[0] == "WIDTH");
     REQUIRE(param.type_name == "integer");
@@ -43,11 +40,10 @@ TEST_CASE("GenericParam: Multiple names in single declaration", "[declarations][
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    const auto &param = entity->generic_clause.generics[0];
+    const auto &param = entity.generic_clause.generics[0];
     REQUIRE(param.names.size() == 3);
     REQUIRE(param.names[0] == "MIN");
     REQUIRE(param.names[1] == "MAX");
@@ -69,11 +65,10 @@ TEST_CASE("GenericParam: Generic without default value", "[declarations][generic
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    const auto &param = entity->generic_clause.generics[0];
+    const auto &param = entity.generic_clause.generics[0];
     REQUIRE(param.names.size() == 1);
     REQUIRE(param.names[0] == "DATA_WIDTH");
     REQUIRE(param.type_name == "positive");

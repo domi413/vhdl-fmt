@@ -11,10 +11,9 @@ namespace builder {
 void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileContext *ctx)
 {
     for (auto *unit_ctx : ctx->design_unit()) {
-        // TODO: Context clause parsing disabled - needs more work
-        // if (auto *ctx_clause = unit_ctx->context_clause()) {
-        //     auto context_clause = makeContextClause(ctx_clause);
-        // }
+        if (auto *ctx_clause = unit_ctx->context_clause()) {
+            auto context_clause = makeContextClause(ctx_clause);
+        }
 
         auto *lib_unit = unit_ctx->library_unit();
         if (lib_unit == nullptr) {
@@ -22,10 +21,12 @@ void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileC
         }
 
         // Check primary units (entity_declaration | configuration_declaration |
-        // package_declaration)
+        // package_declaration | context_declaration)
         if (auto *primary = lib_unit->primary_unit()) {
             if (auto *entity_ctx = primary->entity_declaration()) {
                 dest.units.emplace_back(makeEntity(entity_ctx));
+            } else if (auto *context_ctx = primary->context_declaration()) {
+                dest.units.emplace_back(makeContextDeclaration(context_ctx));
             }
             // TODO(someone): Handle configuration_declaration and package_declaration
         }
@@ -105,6 +106,22 @@ auto Translator::makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> 
     return arch;
 }
 
+auto Translator::makeContextDeclaration(vhdlParser::Context_declarationContext *ctx)
+  -> ast::ContextDeclaration
+{
+    auto context_decl = make<ast::ContextDeclaration>(ctx);
+
+    // Get the context name (first identifier)
+    context_decl.name = ctx->identifier(0)->getText();
+
+    // Parse the context clause to get library/use clauses
+    if (auto *ctx_clause = ctx->context_clause()) {
+        context_decl.items = makeContextClause(ctx_clause);
+    }
+
+    return context_decl;
+}
+
 // ---------------------- Alias, Type, Subtype Declarations ----------------------
 
 auto Translator::makeAliasDecl(vhdlParser::Alias_declarationContext *ctx) -> ast::AliasDecl
@@ -181,6 +198,25 @@ auto Translator::makeSubtypeDecl(vhdlParser::Subtype_declarationContext *ctx) ->
 }
 
 // ---------------------- Context Clauses ----------------------
+
+auto Translator::makeContextClause(vhdlParser::Context_clauseContext *ctx)
+  -> std::vector<ast::ContextItem>
+{
+    std::vector<ast::ContextItem> items;
+
+    if (ctx == nullptr) {
+        return items;
+    }
+
+    // Iterate through all context items in the clause
+    for (auto *item_ctx : ctx->context_item()) {
+        if (item_ctx != nullptr) {
+            items.push_back(makeContextItem(item_ctx));
+        }
+    }
+
+    return items;
+}
 
 auto Translator::makeContextItem(vhdlParser::Context_itemContext *ctx) -> ast::ContextItem
 {

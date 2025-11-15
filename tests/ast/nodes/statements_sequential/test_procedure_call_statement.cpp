@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("ProcedureCallStatement: Simple procedure call without parameters",
           "[statements_sequential][procedure_call_statement]")
 {
@@ -29,13 +27,11 @@ TEST_CASE("ProcedureCallStatement: Simple procedure call without parameters",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 2);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 2);
 }
 
 TEST_CASE("ProcedureCallStatement: Procedure call with parameters",
@@ -62,13 +58,11 @@ TEST_CASE("ProcedureCallStatement: Procedure call with parameters",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 2);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 2);
 }
 
 TEST_CASE("ProcedureCallStatement: Built-in procedure call",
@@ -91,11 +85,9 @@ TEST_CASE("ProcedureCallStatement: Built-in procedure call",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 2);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 2);
 }

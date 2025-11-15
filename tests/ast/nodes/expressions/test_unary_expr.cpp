@@ -7,8 +7,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("UnaryExpr: Logical not operator", "[expressions][unary_expr]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -24,16 +22,13 @@ TEST_CASE("UnaryExpr: Logical not operator", "[expressions][unary_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *assign = std::get_if<ast::ConcurrentAssign>(&arch->stmts[0]);
-    REQUIRE(assign != nullptr);
+    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto *unary = std::get_if<ast::UnaryExpr>(&assign->value);
-    REQUIRE(unary != nullptr);
-    REQUIRE(unary->op == "not");
+    const auto& unary = std::get<ast::UnaryExpr>(assign.value);
+    REQUIRE(unary.op == "not");
 }
 
 TEST_CASE("UnaryExpr: Unary minus operator", "[expressions][unary_expr]")
@@ -49,15 +44,12 @@ TEST_CASE("UnaryExpr: Unary minus operator", "[expressions][unary_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *constant = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
-    REQUIRE(constant != nullptr);
-    REQUIRE(constant->init_expr.has_value());
+    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    REQUIRE(constant.init_expr.has_value());
 
-    const auto *unary = std::get_if<ast::UnaryExpr>(&constant->init_expr.value());
-    REQUIRE(unary != nullptr);
-    REQUIRE(unary->op == "-");
+    const auto& unary = std::get<ast::UnaryExpr>(constant.init_expr.value());
+    REQUIRE(unary.op == "-");
 }

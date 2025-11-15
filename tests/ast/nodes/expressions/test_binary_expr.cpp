@@ -7,8 +7,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("BinaryExpr: Simple binary expression with logical operator",
           "[expressions][binary_expr]")
 {
@@ -25,16 +23,13 @@ TEST_CASE("BinaryExpr: Simple binary expression with logical operator",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *assign = std::get_if<ast::ConcurrentAssign>(&arch->stmts[0]);
-    REQUIRE(assign != nullptr);
+    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto *binary = std::get_if<ast::BinaryExpr>(&assign->value);
-    REQUIRE(binary != nullptr);
-    REQUIRE(binary->op == "and");
+    const auto& binary = std::get<ast::BinaryExpr>(assign.value);
+    REQUIRE(binary.op == "and");
 }
 
 TEST_CASE("BinaryExpr: Range expression with downto", "[expressions][binary_expr]")
@@ -48,15 +43,13 @@ TEST_CASE("BinaryExpr: Range expression with downto", "[expressions][binary_expr
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 1);
 
-    const auto &port = entity->port_clause.ports[0];
+    const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.constraint.has_value());
 
-    const auto *index_constraint = std::get_if<ast::IndexConstraint>(&port.constraint.value());
-    REQUIRE(index_constraint != nullptr);
+    const auto& index_constraint = std::get<ast::IndexConstraint>(port.constraint.value());
 }
 
 TEST_CASE("BinaryExpr: Arithmetic expression with multiple operators", "[expressions][binary_expr]")
@@ -72,15 +65,12 @@ TEST_CASE("BinaryExpr: Arithmetic expression with multiple operators", "[express
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *constant = std::get_if<ast::ConstantDecl>(&arch->decls[0]);
-    REQUIRE(constant != nullptr);
-    REQUIRE(constant->init_expr.has_value());
+    const auto& constant = std::get<ast::ConstantDecl>(arch.decls[0]);
+    REQUIRE(constant.init_expr.has_value());
 
-    const auto *binary = std::get_if<ast::BinaryExpr>(&constant->init_expr.value());
-    REQUIRE(binary != nullptr);
-    REQUIRE(binary->op == "+");
+    const auto& binary = std::get<ast::BinaryExpr>(constant.init_expr.value());
+    REQUIRE(binary.op == "+");
 }

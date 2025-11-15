@@ -4,8 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("AliasDecl: Simple signal alias", "[declarations][alias_decl]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -21,9 +19,8 @@ TEST_CASE("AliasDecl: Simple signal alias", "[declarations][alias_decl]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 2);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 2);
 }
 
 TEST_CASE("AliasDecl: Alias for bit slice", "[declarations][alias_decl]")
@@ -42,9 +39,8 @@ TEST_CASE("AliasDecl: Alias for bit slice", "[declarations][alias_decl]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 3);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 3);
 }
 
 TEST_CASE("AliasDecl: Alias with different subtype", "[declarations][alias_decl]")
@@ -62,7 +58,6 @@ TEST_CASE("AliasDecl: Alias with different subtype", "[declarations][alias_decl]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 2);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 2);
 }

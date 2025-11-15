@@ -4,8 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("SelectedAssign: Simple with statement", "[statements_concurrent][selected_assign]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -24,9 +22,8 @@ TEST_CASE("SelectedAssign: Simple with statement", "[statements_concurrent][sele
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 }
 
 TEST_CASE("SelectedAssign: With statement using integer selector",
@@ -50,9 +47,8 @@ TEST_CASE("SelectedAssign: With statement using integer selector",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 }
 
 TEST_CASE("SelectedAssign: With statement using range", "[statements_concurrent][selected_assign]")
@@ -73,7 +69,6 @@ TEST_CASE("SelectedAssign: With statement using range", "[statements_concurrent]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 }

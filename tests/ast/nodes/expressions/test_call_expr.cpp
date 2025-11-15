@@ -6,8 +6,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("CallExpr: Function call expression", "[expressions][call_expr]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -28,19 +26,15 @@ TEST_CASE("CallExpr: Function call expression", "[expressions][call_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *if_stmt = std::get_if<ast::IfStatement>(&proc->body[0]);
-    REQUIRE(if_stmt != nullptr);
+    const auto& if_stmt = std::get<ast::IfStatement>(proc.body[0]);
 
-    const auto *call = std::get_if<ast::CallExpr>(&if_stmt->if_branch.condition);
-    REQUIRE(call != nullptr);
+    const auto& call = std::get<ast::CallExpr>(if_stmt.if_branch.condition);
 }
 
 TEST_CASE("CallExpr: Array indexing as call expression", "[expressions][call_expr]")
@@ -58,13 +52,10 @@ TEST_CASE("CallExpr: Array indexing as call expression", "[expressions][call_exp
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *assign = std::get_if<ast::ConcurrentAssign>(&arch->stmts[0]);
-    REQUIRE(assign != nullptr);
+    const auto& assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
-    const auto *call = std::get_if<ast::CallExpr>(&assign->value);
-    REQUIRE(call != nullptr);
+    const auto& call = std::get<ast::CallExpr>(assign.value);
 }

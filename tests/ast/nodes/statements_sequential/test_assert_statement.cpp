@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("AssertStatement: Simple assert without message",
           "[statements_sequential][assert_statement]")
 {
@@ -26,13 +24,11 @@ TEST_CASE("AssertStatement: Simple assert without message",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 }
 
 TEST_CASE("AssertStatement: Assert with report message",
@@ -56,13 +52,11 @@ TEST_CASE("AssertStatement: Assert with report message",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 }
 
 TEST_CASE("AssertStatement: Assert with complex condition",
@@ -86,11 +80,9 @@ TEST_CASE("AssertStatement: Assert with complex condition",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 }

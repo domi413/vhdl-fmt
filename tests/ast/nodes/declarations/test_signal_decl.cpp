@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("SignalDecl: Simple signal declaration", "[declarations][signal]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -20,17 +18,15 @@ TEST_CASE("SignalDecl: Simple signal declaration", "[declarations][signal]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
-    REQUIRE(signal != nullptr);
-    REQUIRE(signal->names.size() == 1);
-    REQUIRE(signal->names[0] == "clk");
-    REQUIRE(signal->type_name == "std_logic");
-    REQUIRE_FALSE(signal->has_bus_kw);
-    REQUIRE_FALSE(signal->init_expr.has_value());
+    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    REQUIRE(signal.names.size() == 1);
+    REQUIRE(signal.names[0] == "clk");
+    REQUIRE(signal.type_name == "std_logic");
+    REQUIRE_FALSE(signal.has_bus_kw);
+    REQUIRE_FALSE(signal.init_expr.has_value());
 }
 
 TEST_CASE("SignalDecl: Signal with initialization", "[declarations][signal]")
@@ -46,16 +42,14 @@ TEST_CASE("SignalDecl: Signal with initialization", "[declarations][signal]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
-    REQUIRE(signal != nullptr);
-    REQUIRE(signal->names.size() == 1);
-    REQUIRE(signal->names[0] == "counter");
-    REQUIRE(signal->type_name == "integer");
-    REQUIRE(signal->init_expr.has_value());
+    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    REQUIRE(signal.names.size() == 1);
+    REQUIRE(signal.names[0] == "counter");
+    REQUIRE(signal.type_name == "integer");
+    REQUIRE(signal.init_expr.has_value());
 }
 
 TEST_CASE("SignalDecl: Signal with vector type and constraint", "[declarations][signal]")
@@ -71,14 +65,12 @@ TEST_CASE("SignalDecl: Signal with vector type and constraint", "[declarations][
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
-    REQUIRE(signal != nullptr);
-    REQUIRE(signal->names.size() == 1);
-    REQUIRE(signal->names[0] == "data");
-    REQUIRE(signal->type_name == "std_logic_vector");
-    REQUIRE(signal->constraint.has_value());
+    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    REQUIRE(signal.names.size() == 1);
+    REQUIRE(signal.names[0] == "data");
+    REQUIRE(signal.type_name == "std_logic_vector");
+    REQUIRE(signal.constraint.has_value());
 }

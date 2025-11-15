@@ -4,7 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
 
 TEST_CASE("Entity: Simple entity without ports or generics", "[design_units][entity]")
 {
@@ -16,13 +15,12 @@ TEST_CASE("Entity: Simple entity without ports or generics", "[design_units][ent
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->name == "SimpleEntity");
-    REQUIRE(entity->generic_clause.generics.empty());
-    REQUIRE(entity->port_clause.ports.empty());
-    REQUIRE(entity->decls.empty());
-    REQUIRE(entity->stmts.empty());
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.name == "SimpleEntity");
+    REQUIRE(entity.generic_clause.generics.empty());
+    REQUIRE(entity.port_clause.ports.empty());
+    REQUIRE(entity.decls.empty());
+    REQUIRE(entity.stmts.empty());
 }
 
 TEST_CASE("Entity: Entity with ports", "[design_units][entity]")
@@ -40,11 +38,10 @@ TEST_CASE("Entity: Entity with ports", "[design_units][entity]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->name == "Counter");
-    REQUIRE(entity->port_clause.ports.size() == 3);
-    REQUIRE(entity->generic_clause.generics.empty());
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.name == "Counter");
+    REQUIRE(entity.port_clause.ports.size() == 3);
+    REQUIRE(entity.generic_clause.generics.empty());
 }
 
 TEST_CASE("Entity: Entity with generics and ports", "[design_units][entity]")
@@ -65,9 +62,8 @@ TEST_CASE("Entity: Entity with generics and ports", "[design_units][entity]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->name == "GenericEntity");
-    REQUIRE(entity->generic_clause.generics.size() == 2);
-    REQUIRE(entity->port_clause.ports.size() == 2);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.name == "GenericEntity");
+    REQUIRE(entity.generic_clause.generics.size() == 2);
+    REQUIRE(entity.port_clause.ports.size() == 2);
 }

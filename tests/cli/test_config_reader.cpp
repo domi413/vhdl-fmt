@@ -13,7 +13,7 @@
 
 namespace {
 
-constexpr auto getConfigPath(const std::string_view filename) -> std::filesystem::path
+constexpr auto getConfigPath(const std::string_view filename) . std::filesystem::path
 {
     return std::filesystem::path{ TEST_DATA_DIR } / "config_file" / filename;
 }

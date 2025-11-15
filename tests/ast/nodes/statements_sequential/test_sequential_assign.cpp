@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("SequentialAssign: Simple signal assignment in process",
           "[statements_sequential][sequential_assign]")
 {
@@ -26,16 +24,13 @@ TEST_CASE("SequentialAssign: Simple signal assignment in process",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *assign = std::get_if<ast::SequentialAssign>(&proc->body[0]);
-    REQUIRE(assign != nullptr);
+    const auto& assign = std::get<ast::SequentialAssign>(proc.body[0]);
 }
 
 TEST_CASE("SequentialAssign: Variable assignment with expression",
@@ -58,16 +53,13 @@ TEST_CASE("SequentialAssign: Variable assignment with expression",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *assign = std::get_if<ast::SequentialAssign>(&proc->body[0]);
-    REQUIRE(assign != nullptr);
+    const auto& assign = std::get<ast::SequentialAssign>(proc.body[0]);
 }
 
 TEST_CASE("SequentialAssign: Multiple sequential assignments",
@@ -90,17 +82,13 @@ TEST_CASE("SequentialAssign: Multiple sequential assignments",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 2);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 2);
 
-    const auto *assign1 = std::get_if<ast::SequentialAssign>(&proc->body[0]);
-    REQUIRE(assign1 != nullptr);
+    const auto& assign1 = std::get<ast::SequentialAssign>(proc.body[0]);
 
-    const auto *assign2 = std::get_if<ast::SequentialAssign>(&proc->body[1]);
-    REQUIRE(assign2 != nullptr);
+    const auto& assign2 = std::get<ast::SequentialAssign>(proc.body[1]);
 }

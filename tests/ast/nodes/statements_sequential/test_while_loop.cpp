@@ -5,8 +5,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("WhileLoop: Simple while loop", "[statements_sequential][while_loop]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -27,17 +25,14 @@ TEST_CASE("WhileLoop: Simple while loop", "[statements_sequential][while_loop]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *while_loop = std::get_if<ast::WhileLoop>(&proc->body[0]);
-    REQUIRE(while_loop != nullptr);
-    REQUIRE(while_loop->body.empty());
+    const auto& while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    REQUIRE(while_loop.body.empty());
 }
 
 TEST_CASE("WhileLoop: While loop with boolean condition", "[statements_sequential][while_loop]")
@@ -60,16 +55,13 @@ TEST_CASE("WhileLoop: While loop with boolean condition", "[statements_sequentia
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *while_loop = std::get_if<ast::WhileLoop>(&proc->body[0]);
-    REQUIRE(while_loop != nullptr);
+    const auto& while_loop = std::get<ast::WhileLoop>(proc.body[0]);
 }
 
 TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential][while_loop]")
@@ -93,18 +85,14 @@ TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential]
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *while_loop = std::get_if<ast::WhileLoop>(&proc->body[0]);
-    REQUIRE(while_loop != nullptr);
-    REQUIRE(while_loop->body.size() == 1);
+    const auto& while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    REQUIRE(while_loop.body.size() == 1);
 
-    const auto *assign = std::get_if<ast::SequentialAssign>(&while_loop->body[0]);
-    REQUIRE(assign != nullptr);
+    const auto& assign = std::get<ast::SequentialAssign>(while_loop.body[0]);
 }

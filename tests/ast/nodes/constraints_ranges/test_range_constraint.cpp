@@ -4,8 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("RangeConstraint: Range constraint with integer subtype",
           "[constraints_ranges][range_constraint]")
 {
@@ -20,9 +18,8 @@ TEST_CASE("RangeConstraint: Range constraint with integer subtype",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 }
 
 TEST_CASE("RangeConstraint: Range constraint with downto direction",
@@ -39,7 +36,6 @@ TEST_CASE("RangeConstraint: Range constraint with downto direction",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 }

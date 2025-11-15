@@ -44,8 +44,10 @@ class Translator final
     // clang-format off
     [[nodiscard]] auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity;
     [[nodiscard]] auto makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture;
+    [[nodiscard]] auto makeContextDeclaration(vhdlParser::Context_declarationContext *ctx) -> ast::ContextDeclaration;
     [[nodiscard]] auto makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause;
     [[nodiscard]] auto makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause;
+    [[nodiscard]] auto makeContextClause(vhdlParser::Context_clauseContext *ctx) -> std::vector<ast::ContextItem>;
     [[nodiscard]] auto makeContextItem(vhdlParser::Context_itemContext *ctx) -> ast::ContextItem;
     [[nodiscard]] auto makeLibraryClause(vhdlParser::Library_clauseContext *ctx) -> ast::LibraryClause;
     [[nodiscard]] auto makeUseClause(vhdlParser::Use_clauseContext *ctx) -> ast::UseClause;

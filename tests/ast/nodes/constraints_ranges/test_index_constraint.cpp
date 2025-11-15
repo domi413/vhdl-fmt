@@ -6,8 +6,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("IndexConstraint: Single range constraint", "[constraints_ranges][index_constraint]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -19,16 +17,14 @@ TEST_CASE("IndexConstraint: Single range constraint", "[constraints_ranges][inde
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 1);
 
-    const auto &port = entity->port_clause.ports[0];
+    const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.constraint.has_value());
 
-    const auto *index_constraint = std::get_if<ast::IndexConstraint>(&port.constraint.value());
-    REQUIRE(index_constraint != nullptr);
-    REQUIRE_FALSE(index_constraint->ranges.children.empty());
+    const auto& index_constraint = std::get<ast::IndexConstraint>(port.constraint.value());
+    REQUIRE_FALSE(index_constraint.ranges.children.empty());
 }
 
 TEST_CASE("IndexConstraint: Ascending range constraint", "[constraints_ranges][index_constraint]")
@@ -42,16 +38,14 @@ TEST_CASE("IndexConstraint: Ascending range constraint", "[constraints_ranges][i
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 1);
 
-    const auto &port = entity->port_clause.ports[0];
+    const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.constraint.has_value());
 
-    const auto *index_constraint = std::get_if<ast::IndexConstraint>(&port.constraint.value());
-    REQUIRE(index_constraint != nullptr);
-    REQUIRE_FALSE(index_constraint->ranges.children.empty());
+    const auto& index_constraint = std::get<ast::IndexConstraint>(port.constraint.value());
+    REQUIRE_FALSE(index_constraint.ranges.children.empty());
 }
 
 TEST_CASE("IndexConstraint: Multi-dimensional array constraint",
@@ -69,9 +63,8 @@ TEST_CASE("IndexConstraint: Multi-dimensional array constraint",
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 2);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 2);
 }
 
 TEST_CASE("Constraint: Range constraint in subtype", "[constraints_ranges][constraint]")
@@ -88,8 +81,7 @@ TEST_CASE("Constraint: Range constraint in subtype", "[constraints_ranges][const
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
     // Note: subtype declarations not yet stored in decls
 }
 
@@ -111,21 +103,17 @@ TEST_CASE("DiscreteRange: Explicit range in for loop", "[constraints_ranges][dis
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->stmts.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.stmts.size() == 1);
 
-    const auto *proc = std::get_if<ast::Process>(&arch->stmts[0]);
-    REQUIRE(proc != nullptr);
-    REQUIRE(proc->body.size() == 1);
+    const auto& proc = std::get<ast::Process>(arch.stmts[0]);
+    REQUIRE(proc.body.size() == 1);
 
-    const auto *loop = std::get_if<ast::ForLoop>(&proc->body[0]);
-    REQUIRE(loop != nullptr);
-    REQUIRE(loop->iterator == "i");
+    const auto& loop = std::get<ast::ForLoop>(proc.body[0]);
+    REQUIRE(loop.iterator == "i");
     // Range is stored as generic Expr - verify it exists
-    const auto *range_binary = std::get_if<ast::BinaryExpr>(&loop->range);
-    REQUIRE(range_binary != nullptr);
-    REQUIRE(range_binary->op == "to");
+    const auto& range_binary = std::get<ast::BinaryExpr>(loop.range);
+    REQUIRE(range_binary.op == "to");
 }
 
 TEST_CASE("ExplicitRange: Range in array type", "[constraints_ranges][explicit_range]")
@@ -142,7 +130,6 @@ TEST_CASE("ExplicitRange: Range in array type", "[constraints_ranges][explicit_r
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
     // Note: type declarations not yet stored in decls
 }

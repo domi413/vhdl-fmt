@@ -6,8 +6,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("GroupExpr: Aggregate with others clause", "[expressions][group_expr]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -21,17 +19,14 @@ TEST_CASE("GroupExpr: Aggregate with others clause", "[expressions][group_expr]"
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
-    REQUIRE(signal != nullptr);
-    REQUIRE(signal->init_expr.has_value());
+    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    REQUIRE(signal.init_expr.has_value());
 
-    const auto *group = std::get_if<ast::GroupExpr>(&signal->init_expr.value());
-    REQUIRE(group != nullptr);
-    REQUIRE_FALSE(group->children.empty());
+    const auto& group = std::get<ast::GroupExpr>(signal.init_expr.value());
+    REQUIRE_FALSE(group.children.empty());
 }
 
 TEST_CASE("GroupExpr: Positional aggregate", "[expressions][group_expr]")
@@ -47,15 +42,12 @@ TEST_CASE("GroupExpr: Positional aggregate", "[expressions][group_expr]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 2);
 
-    const auto *arch = std::get_if<ast::Architecture>(&design.units[1]);
-    REQUIRE(arch != nullptr);
-    REQUIRE(arch->decls.size() == 1);
+    const auto& arch = std::get<ast::Architecture>(design.units[1]);
+    REQUIRE(arch.decls.size() == 1);
 
-    const auto *signal = std::get_if<ast::SignalDecl>(&arch->decls[0]);
-    REQUIRE(signal != nullptr);
-    REQUIRE(signal->init_expr.has_value());
+    const auto& signal = std::get<ast::SignalDecl>(arch.decls[0]);
+    REQUIRE(signal.init_expr.has_value());
 
-    const auto *group = std::get_if<ast::GroupExpr>(&signal->init_expr.value());
-    REQUIRE(group != nullptr);
-    REQUIRE(group->children.size() == 4);
+    const auto& group = std::get<ast::GroupExpr>(signal.init_expr.value());
+    REQUIRE(group.children.size() == 4);
 }

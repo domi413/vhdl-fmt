@@ -4,8 +4,6 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
-#include <variant>
-
 TEST_CASE("Port: Single input port", "[declarations][port]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -19,11 +17,10 @@ TEST_CASE("Port: Single input port", "[declarations][port]")
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 1);
 
-    const auto &port = entity->port_clause.ports[0];
+    const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.names.size() == 1);
     REQUIRE(port.names[0] == "clk");
     REQUIRE(port.mode == "in");
@@ -44,11 +41,10 @@ TEST_CASE("Port: Multiple names in single port declaration", "[declarations][por
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 1);
 
-    const auto &port = entity->port_clause.ports[0];
+    const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.names.size() == 3);
     REQUIRE(port.names[0] == "a");
     REQUIRE(port.names[1] == "b");
@@ -70,11 +66,10 @@ TEST_CASE("Port: Output port with vector type and constraint", "[declarations][p
     const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    const auto *entity = std::get_if<ast::Entity>(&design.units[0]);
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 1);
+    const auto& entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 1);
 
-    const auto &port = entity->port_clause.ports[0];
+    const auto &port = entity.port_clause.ports[0];
     REQUIRE(port.names.size() == 1);
     REQUIRE(port.names[0] == "data");
     REQUIRE(port.mode == "out");
