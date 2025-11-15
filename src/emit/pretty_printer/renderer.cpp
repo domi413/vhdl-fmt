@@ -75,7 +75,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
             renderDoc(indent, mode, doc_to_render);
         },
 
-        // AlignPlaceholder (base case for alignment, renders as text)
+        // AlignText (base case for alignment, renders as text)
         [&](const AlignText &node) -> void { write(node.content); },
 
         // Union (decision point)
@@ -136,7 +136,7 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
             return fitsImpl(width, node.flat);
         },
 
-        // AlignPlaceholder (acts like Text)
+        // AlignText (acts like Text)
         [&](const AlignText &node) -> int {
             return width - static_cast<int>(node.content.length());
         },

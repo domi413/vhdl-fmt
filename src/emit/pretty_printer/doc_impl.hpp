@@ -250,7 +250,7 @@ auto makeHardLine() -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
 auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
-auto makeAlignPlaceholder(std::string_view text, int level) -> DocPtr;
+auto makeAlignText(std::string_view text, int level) -> DocPtr;
 auto makeAlign(DocPtr doc) -> DocPtr;
 auto makeNoGroup() -> DocPtr;
 

@@ -48,7 +48,7 @@ auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr
     return std::make_shared<DocImpl>(Union{ .flat = std::move(flat), .broken = std::move(broken) });
 }
 
-auto makeAlignPlaceholder(std::string_view text, int level) -> DocPtr
+auto makeAlignText(std::string_view text, int level) -> DocPtr
 {
     return std::make_shared<DocImpl>(AlignText{ .content = std::string(text), .level = level });
 }
@@ -78,7 +78,7 @@ auto flatten(const DocPtr &doc) -> DocPtr
         } else if constexpr (std::is_same_v<T, Union>) {
             return node.flat;
         } else if constexpr (std::is_same_v<T, AlignText>) {
-            // In flat mode, an alignment placeholder is just its text content.
+            // In flat mode, an alignment text is just its text content.
             return makeText(node.content);
         } else if constexpr (std::is_same_v<T, Align>) {
             // In flat mode, an align group is just its inner content.
@@ -114,7 +114,7 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
         using T = std::decay_t<decltype(node)>;
 
         if constexpr (std::is_same_v<T, AlignText>) {
-            // Look up the max width for this placeholder's level
+            // Look up the max width for this text's level
             const int max_width = max_widths_by_level.at(node.level);
             const int padding = max_width - static_cast<int>(node.content.length());
             return makeText(node.content + std::string(padding, ' '));

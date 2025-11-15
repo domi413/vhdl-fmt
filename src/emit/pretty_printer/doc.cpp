@@ -35,7 +35,7 @@ auto Doc::hardline() -> Doc
 
 auto Doc::alignText(std::string_view str, int level) -> Doc
 {
-    return Doc(makeAlignPlaceholder(str, level));
+    return Doc(makeAlignText(str, level));
 }
 
 auto Doc::noGroup() -> Doc

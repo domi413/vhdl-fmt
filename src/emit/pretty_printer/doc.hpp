@@ -48,10 +48,10 @@ class Doc final
     /// @brief A "hard" line break. Always renders as a newline.
     static auto hardline() -> Doc;
 
-    /// @brief Creates a special placeholder for alignment.
+    /// @brief Creates a special text for alignment.
     /// @note The renderer will append spaces based on other
-    ///       placeholders within the same alignment group.
-    /// @param str The text content for this placeholder.
+    ///       texts within the same alignment group.
+    /// @param str The text content for this text.
     /// @param level An integer key that defines the alignment group.
     static auto alignText(std::string_view str, int level) -> Doc;
 
@@ -130,7 +130,7 @@ class Doc final
 
     /**
      * @brief Defines a scope for alignment.
-     * @param doc The document sub-tree containing `Doc::alignText` placeholders.
+     * @param doc The document sub-tree containing `Doc::alignText` texts.
      * @return A new `Doc` node that instructs the renderer to process
      * alignment for the `doc` sub-tree.
      */
