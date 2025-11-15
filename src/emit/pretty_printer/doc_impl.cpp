@@ -50,8 +50,7 @@ auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr
 
 auto makeAlignPlaceholder(std::string_view text, int level) -> DocPtr
 {
-    return std::make_shared<DocImpl>(
-      AlignPlaceholder{ .content = std::string(text), .level = level });
+    return std::make_shared<DocImpl>(AlignText{ .content = std::string(text), .level = level });
 }
 
 auto makeAlign(DocPtr doc) -> DocPtr
@@ -61,7 +60,7 @@ auto makeAlign(DocPtr doc) -> DocPtr
 
 auto makeNoGroupMark() -> DocPtr
 {
-    return std::make_shared<DocImpl>(NoGroupMark{});
+    return std::make_shared<DocImpl>(NoGroup{});
 }
 
 // Utility functions
@@ -78,7 +77,7 @@ auto flatten(const DocPtr &doc) -> DocPtr
             return makeText(" ");
         } else if constexpr (std::is_same_v<T, Union>) {
             return node.flat;
-        } else if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+        } else if constexpr (std::is_same_v<T, AlignText>) {
             // In flat mode, an alignment placeholder is just its text content.
             return makeText(node.content);
         } else if constexpr (std::is_same_v<T, Align>) {
@@ -97,7 +96,7 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
     max_widths_by_level = foldImpl(
       doc, std::move(max_widths_by_level), [](std::map<int, int> current_maxes, const auto &node) {
           using T = std::decay_t<decltype(node)>;
-          if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+          if constexpr (std::is_same_v<T, AlignText>) {
               const int current_max = current_maxes[node.level];
               current_maxes[node.level]
                 = std::max(current_max, static_cast<int>(node.content.length()));
@@ -114,7 +113,7 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
     return transformImpl(doc, [&](const auto &node) -> DocPtr {
         using T = std::decay_t<decltype(node)>;
 
-        if constexpr (std::is_same_v<T, AlignPlaceholder>) {
+        if constexpr (std::is_same_v<T, AlignText>) {
             // Look up the max width for this placeholder's level
             const int max_width = max_widths_by_level.at(node.level);
             const int padding = max_width - static_cast<int>(node.content.length());

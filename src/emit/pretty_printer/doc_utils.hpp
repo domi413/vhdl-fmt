@@ -16,7 +16,7 @@ namespace emit {
 template<std::ranges::input_range Range, typename Transform>
 auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
 {
-    std::vector<Doc> result;
+    std::vector<Doc> result{};
 
     if constexpr (std::ranges::sized_range<Range>) {
         result.reserve(std::ranges::size(items));
@@ -32,10 +32,9 @@ auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
 /// Join multiple Docs with a separator
 /// @param docs Vector of docs to join
 /// @param separator Separator doc (e.g., Doc::text(";"))
-/// @param include_trailing Whether to include separator after the last element
+/// @param with_trailing Whether to include separator after the last element
 /// @return Combined Doc
-inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool include_trailing)
-  -> Doc
+inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool with_trailing) -> Doc
 {
     if (docs.empty()) {
         return Doc::empty();
@@ -47,7 +46,7 @@ inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool in
         result += separator + doc;
     }
 
-    if (include_trailing) {
+    if (with_trailing) {
         result += separator;
     }
 

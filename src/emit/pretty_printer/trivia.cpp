@@ -69,7 +69,7 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
     result += core_doc;
 
     if (trivia.inline_comment) {
-        result += Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::noGroupMark();
+        result += Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::noGroup();
     }
 
     // Append trailing trivia

@@ -71,7 +71,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     template<std::ranges::range Range, typename PrintHelper>
     auto printList(Range &items, PrintHelper &&print_func) const -> std::vector<Doc>
     {
-        std::vector<Doc> results;
+        std::vector<Doc> results{};
         if (std::ranges::empty(items)) {
             return results;
         }

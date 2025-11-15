@@ -146,13 +146,13 @@ struct Union
     }
 };
 
-struct AlignPlaceholder
+struct AlignText
 {
     std::string content;
     int level;
 
     template<typename Fn>
-    auto fmap(Fn && /* fn */) const -> AlignPlaceholder
+    auto fmap(Fn && /* fn */) const -> AlignText
     {
         return { .content = content, .level = level };
     }
@@ -183,10 +183,10 @@ struct Align
     }
 };
 
-struct NoGroupMark
+struct NoGroup
 {
     template<typename Fn>
-    auto fmap(Fn && /* fn */) const -> NoGroupMark
+    auto fmap(Fn && /* fn */) const -> NoGroup
     {
         return {};
     }
@@ -204,16 +204,7 @@ class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty,
-                 Text,
-                 SoftLine,
-                 HardLine,
-                 Concat,
-                 Nest,
-                 Union,
-                 AlignPlaceholder,
-                 Align,
-                 NoGroupMark>
+    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union, AlignText, Align, NoGroup>
       value;
 
     // Since all members are public, this class is considered an aggregate type and allows for

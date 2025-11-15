@@ -56,7 +56,7 @@ class Doc final
     static auto alignText(std::string_view str, int level) -> Doc;
 
     /// @brief A marker indicating no grouping should occur. (trailing Comment)
-    static auto noGroupMark() -> Doc;
+    static auto noGroup() -> Doc;
 
     // ========================================================================
     // Low-Level Combinators (Operators)

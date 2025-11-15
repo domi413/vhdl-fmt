@@ -37,7 +37,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
         [](const Empty &) -> void {},
 
         // NoGroupMark produces nothing
-        [](const NoGroupMark &) -> void {},
+        [](const NoGroup &) -> void {},
 
         // Text
         [&](const Text &node) -> void { write(node.content); },
@@ -76,7 +76,7 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
         },
 
         // AlignPlaceholder (base case for alignment, renders as text)
-        [&](const AlignPlaceholder &node) -> void { write(node.content); },
+        [&](const AlignText &node) -> void { write(node.content); },
 
         // Union (decision point)
         [&](const Union &node) -> void {
@@ -137,12 +137,13 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
         },
 
         // AlignPlaceholder (acts like Text)
-        [&](const AlignPlaceholder &node) -> int {
+        [&](const AlignText &node) -> int {
             return width - static_cast<int>(node.content.length());
         },
 
         // All others (HardLine, NoGroupMark) do not fit
-        [](const auto &) { return -1; }
+        [](const HardLine &) -> int { return -1; },
+        [](const NoGroup &) -> int { return -1; }
     };
 
     return std::visit(fits_visitor, doc->value);
