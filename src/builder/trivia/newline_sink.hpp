@@ -4,6 +4,8 @@
 
 #include "ast/node.hpp"
 
+#include <vector>
+
 namespace builder {
 
 /// @brief Appends paragraph break trivia to a node.

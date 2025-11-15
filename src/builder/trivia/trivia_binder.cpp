@@ -10,10 +10,10 @@
 
 namespace builder {
 
-void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t start_index)
+void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t index)
 {
     // Tokens are given in source order
-    const auto &hidden = tokens_.getHiddenTokensToLeft(start_index);
+    const auto &hidden = tokens_.getHiddenTokensToLeft(index);
     unsigned int linebreaks{ 0 };
 
     // Iterate backward — closest token first
@@ -48,9 +48,9 @@ void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t start_index)
     std::ranges::reverse(dst.leading);
 }
 
-void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, std::size_t stop_index)
+void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, std::size_t index)
 {
-    const auto hidden = tokens_.getHiddenTokensToRight(stop_index);
+    const auto hidden = tokens_.getHiddenTokensToRight(index);
     unsigned int linebreaks{ 0 };
 
     for (const antlr4::Token *token : hidden) {
@@ -79,13 +79,13 @@ void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, std::size_t stop_index)
     }
 }
 
-auto TriviaBinder::collectInline(ast::NodeTrivia &dst, std::size_t stop_index) -> antlr4::Token *
+auto TriviaBinder::collectInline(ast::NodeTrivia &dst, std::size_t index) -> const antlr4::Token *
 {
-    const auto hidden = tokens_.getHiddenTokensToRight(stop_index);
+    const auto hidden = tokens_.getHiddenTokensToRight(index);
 
-    antlr4::Token *result{};
+    const antlr4::Token *result{};
 
-    for (antlr4::Token *token : hidden) {
+    for (const antlr4::Token *token : hidden) {
         if (token == nullptr) {
             break;
         }
@@ -116,7 +116,7 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     const auto stop_index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex());
 
     collectLeading(trivia, start_index);
-    auto *inline_comment_token = collectInline(trivia, stop_index);
+    const auto *inline_comment_token = collectInline(trivia, stop_index);
 
     if (inline_comment_token == nullptr) {
         collectTrailing(trivia, stop_index);

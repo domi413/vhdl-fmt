@@ -11,6 +11,8 @@
 #include "emit/pretty_printer/doc.hpp"
 
 #include <functional>
+#include <ranges>
+#include <vector>
 
 namespace emit {
 

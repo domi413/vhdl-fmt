@@ -4,12 +4,14 @@
 #include "emit/pretty_printer/doc.hpp"
 
 #include <ranges>
+#include <variant>
+#include <vector>
 
 namespace emit {
 
 namespace {
 
-auto printTrivia(const ast::Trivia &trivia) noexcept -> Doc
+auto printTrivia(const ast::Trivia &trivia) -> Doc
 {
     auto comment_func
       = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); };
@@ -25,7 +27,7 @@ auto printTrivia(const ast::Trivia &trivia) noexcept -> Doc
     return std::visit(common::Overload{ comment_func, paragraph_func }, trivia);
 }
 
-auto printTrailingTriviaList(const std::vector<ast::Trivia> &list) noexcept -> Doc
+auto printTrailingTriviaList(const std::vector<ast::Trivia> &list) -> Doc
 {
     if (list.empty()) {
         return Doc::empty();

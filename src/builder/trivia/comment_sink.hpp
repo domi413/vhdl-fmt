@@ -5,8 +5,10 @@
 #include "ast/node.hpp"
 
 #include <cstddef>
+#include <optional>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 namespace builder {
 
