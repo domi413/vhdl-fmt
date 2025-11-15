@@ -53,7 +53,7 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
     ast::DesignFile root;
     TriviaBinder trivia(tokens);
     Translator translator(trivia, tokens);
-    translator.buildDesignFile(root, tree);
+    translator.buildDesignFile(root, *tree);
 
     return root;
 }

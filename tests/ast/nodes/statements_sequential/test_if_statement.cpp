@@ -72,7 +72,7 @@ TEST_CASE("IfStatement: If-elsif-else statement", "[statements_sequential][if_st
     REQUIRE(if_stmt.elsif_branches.size() == 1);
     REQUIRE(if_stmt.elsif_branches[0].body.size() == 1);
     REQUIRE(if_stmt.else_branch.has_value());
-    REQUIRE(if_stmt.else_branch.body.size() == 1);
+    REQUIRE(if_stmt.else_branch->body.size() == 1);
 }
 
 TEST_CASE("IfStatement: Nested if statements", "[statements_sequential][if_statement]")

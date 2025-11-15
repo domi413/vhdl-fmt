@@ -124,7 +124,7 @@ TEST_CASE("Aggregate: Nested aggregate", "[expressions][aggregate]")
 
     // The right side of the association should be the inner aggregate
     const auto *inner_agg = std::get_if<ast::GroupExpr>(first_assoc.right.get());
-    REQUIRE(inner_agg.children.size() == 2);
+    REQUIRE(inner_agg->children.size() == 2);
 }
 
 TEST_CASE("Aggregate: Range choice in aggregate", "[expressions][aggregate]")
