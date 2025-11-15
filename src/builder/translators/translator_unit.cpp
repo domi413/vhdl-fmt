@@ -11,6 +11,11 @@ namespace builder {
 void Translator::buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileContext *ctx)
 {
     for (auto *unit_ctx : ctx->design_unit()) {
+        // TODO: Context clause parsing disabled - needs more work
+        // if (auto *ctx_clause = unit_ctx->context_clause()) {
+        //     auto context_clause = makeContextClause(ctx_clause);
+        // }
+
         auto *lib_unit = unit_ctx->library_unit();
         if (lib_unit == nullptr) {
             continue;
@@ -173,6 +178,63 @@ auto Translator::makeSubtypeDecl(vhdlParser::Subtype_declarationContext *ctx) ->
     }
 
     return subtype_decl;
+}
+
+// ---------------------- Context Clauses ----------------------
+
+auto Translator::makeContextItem(vhdlParser::Context_itemContext *ctx) -> ast::ContextItem
+{
+
+    if (ctx == nullptr) {
+        return ast::LibraryClause{};
+    }
+
+    if (auto *lib_clause = ctx->library_clause()) {
+        return makeLibraryClause(lib_clause);
+    }
+
+    if (auto *use_clause = ctx->use_clause()) {
+        return makeUseClause(use_clause);
+    }
+
+    // Fallback - should not reach here with valid grammar
+    return ast::LibraryClause{};
+}
+
+auto Translator::makeLibraryClause(vhdlParser::Library_clauseContext *ctx) -> ast::LibraryClause
+{
+    auto clause = make<ast::LibraryClause>(ctx);
+
+    if (ctx == nullptr) {
+        return clause;
+    }
+
+    // Extract all library logical names
+    for (auto *logical_name : ctx->logical_name_list()->logical_name()) {
+        if (logical_name != nullptr) {
+            clause.logical_names.push_back(logical_name->getText());
+        }
+    }
+
+    return clause;
+}
+
+auto Translator::makeUseClause(vhdlParser::Use_clauseContext *ctx) -> ast::UseClause
+{
+    auto clause = make<ast::UseClause>(ctx);
+
+    if (ctx == nullptr) {
+        return clause;
+    }
+
+    // Extract all selected names
+    for (auto *selected_name : ctx->selected_name()) {
+        if (selected_name != nullptr) {
+            clause.selected_names.push_back(selected_name->getText());
+        }
+    }
+
+    return clause;
 }
 
 } // namespace builder

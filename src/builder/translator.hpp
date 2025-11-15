@@ -39,11 +39,16 @@ class Translator final
     auto operator=(Translator &&) -> Translator & = delete;
 
   private:
+    // reference: https://faculty-web.msoe.edu/johnsontimoj/Common/FILES/VHDL_2008.pdf
+
     // clang-format off
     [[nodiscard]] auto makeEntity(vhdlParser::Entity_declarationContext *ctx) -> ast::Entity;
     [[nodiscard]] auto makeArchitecture(vhdlParser::Architecture_bodyContext *ctx) -> ast::Architecture;
     [[nodiscard]] auto makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> ast::GenericClause;
     [[nodiscard]] auto makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause;
+    [[nodiscard]] auto makeContextItem(vhdlParser::Context_itemContext *ctx) -> ast::ContextItem;
+    [[nodiscard]] auto makeLibraryClause(vhdlParser::Library_clauseContext *ctx) -> ast::LibraryClause;
+    [[nodiscard]] auto makeUseClause(vhdlParser::Use_clauseContext *ctx) -> ast::UseClause;
     [[nodiscard]] auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx) -> ast::GenericParam;
     [[nodiscard]] auto makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port;
     [[nodiscard]] auto makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) -> ast::ConstantDecl;
