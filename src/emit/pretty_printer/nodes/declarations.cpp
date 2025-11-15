@@ -63,22 +63,4 @@ auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) c
     return Doc::text("-- constant");
 }
 
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::AliasDecl &node) const -> Doc
-{
-    // TODO(domi): Implement alias declaration printing
-    return Doc::text("-- alias");
-}
-
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::TypeDecl &node) const -> Doc
-{
-    // TOD(domi): Implement type declaration printing
-    return Doc::text("-- type");
-}
-
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::SubtypeDecl &node) const -> Doc
-{
-    // TODO(domi): Implement subtype declaration printing
-    return Doc::text("-- subtype");
-}
-
 } // namespace emit
