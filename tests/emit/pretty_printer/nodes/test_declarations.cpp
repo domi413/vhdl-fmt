@@ -66,7 +66,6 @@ TEST_CASE("Port with multiple names", "[pretty_printer][declarations]")
         .names = { "data_in", "data_out" },
         .mode = "inout",
         .type_name = "std_logic_vector",
-        .is_last = true,
         .is_last = true
     };
 
