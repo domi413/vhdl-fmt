@@ -3,7 +3,7 @@
 # ==================================================
 FROM fedora:43 AS builder
 
-# Install system dependencies including coverage tools
+# Install system dependencies
 RUN dnf install -y --setopt=install_weak_deps=false \
     python3 \
     clang \
