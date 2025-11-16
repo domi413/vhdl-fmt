@@ -2,7 +2,7 @@
 #include "builder/ast_builder.hpp"
 #include "cli/argument_parser.hpp"
 #include "cli/config_reader.hpp"
-#include "emit/debug_printer.hpp"
+#include "emit/pretty_printer.hpp"
 
 #include <cstddef>
 #include <cstdlib>
@@ -10,7 +10,6 @@
 #include <iostream>
 #include <span>
 
-/// The main entry point of the program
 auto main(int argc, char *argv[]) -> int
 {
     try {
@@ -18,17 +17,17 @@ auto main(int argc, char *argv[]) -> int
             std::span<const char *const>{ argv, static_cast<std::size_t>(argc) }
         };
 
-        const cli::ConfigReader config_reader{ argparser.getConfigPath() };
-
-        // Call the formatter and pass the flag status & config object
-        // formatter{ argparser.getFlags(), config_reader.readConfigFile() };
+        cli::ConfigReader config_reader{ argparser.getConfigPath() };
+        const auto config_result = config_reader.readConfigFile();
+        const auto &config = config_result.value();
 
         // Build AST from input file
         const ast::DesignFile root = builder::buildFromFile(argparser.getInputPath());
 
-        // Print AST for debugging
-        emit::DebugPrinter printer(std::cout);
-        printer.visit(root);
+        // Pretty print the AST
+        const emit::PrettyPrinter printer{};
+        const auto doc = printer(root);
+        std::cout << doc.render(config);
 
     } catch (const std::exception &e) {
         std::cerr << "Error: " << e.what() << '\n';

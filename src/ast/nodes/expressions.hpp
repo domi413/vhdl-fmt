@@ -66,6 +66,29 @@ struct CallExpr : NodeBase
     Box<Expr> args;   ///< Arguments (single expr or GroupExpr for multiple args).
 };
 
+// Forward declarations for constraints
+struct IndexConstraint;
+struct RangeConstraint;
+
+/// Variant type for constraints used in type declarations
+using Constraint = std::variant<IndexConstraint, RangeConstraint>;
+
+/// Index constraint with parentheses: (7 downto 0) or (0 to 15, 0 to 7)
+/// Grammar: LPAREN discrete_range (COMMA discrete_range)* RPAREN
+/// Uses GroupExpr to represent the parenthesized list of ranges
+struct IndexConstraint : NodeBase
+{
+    GroupExpr ranges; ///< Parenthesized group of range expressions
+};
+
+/// Range constraint with RANGE keyword: range 0 to 255
+/// Grammar: RANGE range_decl
+/// Note: The RANGE keyword is implicit in the constraint type, not stored
+struct RangeConstraint : NodeBase
+{
+    BinaryExpr range; ///< Single range expression (e.g., "0 to 255" or "7 downto 0")
+};
+
 } // namespace ast
 
 #endif /* AST_NODES_EXPRESSIONS_HPP */

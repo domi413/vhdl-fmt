@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <variant>
 
 namespace emit {
@@ -24,7 +23,11 @@ struct Text
 };
 
 /// Line break (space when flattened, newline when broken)
-struct LineBreak
+struct SoftLine
+{};
+
+/// Hard line break (always newline, never becomes space)
+struct HardLine
 {};
 
 /// Concatenation of two documents
@@ -37,7 +40,6 @@ struct Concat
 /// Increase indentation level
 struct Nest
 {
-    int indent;
     DocPtr doc;
 };
 
@@ -53,23 +55,19 @@ class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty, Text, LineBreak, Concat, Nest, Union> value;
+    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union> value;
 
-    // Convenience constructors
-    explicit DocImpl(Empty e) : value(e) {}
-    explicit DocImpl(Text t) : value(std::move(t)) {}
-    explicit DocImpl(LineBreak l) : value(l) {}
-    explicit DocImpl(Concat c) : value(std::move(c)) {}
-    explicit DocImpl(Nest n) : value(std::move(n)) {}
-    explicit DocImpl(Union u) : value(std::move(u)) {}
+    // Since all members are public, this class is considered an aggregate type and allows for
+    // aggregate initialization.
 };
 
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;
 auto makeText(std::string_view text) -> DocPtr;
 auto makeLine() -> DocPtr;
+auto makeHardLine() -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
-auto makeNest(int indent, DocPtr doc) -> DocPtr;
+auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
 
 // Utility functions

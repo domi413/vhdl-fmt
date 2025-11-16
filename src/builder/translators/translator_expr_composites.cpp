@@ -2,6 +2,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <optional>
 #include <ranges>
 #include <utility>
 #include <variant>
@@ -68,7 +69,8 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext *ctx) -> ast::Expr
 
 // ---------------------- Constraints/Ranges ----------------------
 
-auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vector<ast::BinaryExpr>
+auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx)
+  -> std::optional<ast::Constraint>
 {
     // Dispatch based on concrete constraint type
     if (auto *index = ctx->index_constraint()) {
@@ -78,44 +80,53 @@ auto Translator::makeConstraint(vhdlParser::ConstraintContext *ctx) -> std::vect
         return makeRangeConstraint(range);
     }
 
-    // Fallback: return empty vector
-    return {};
+    // Fallback: return empty optional
+    return std::nullopt;
 }
 
 auto Translator::makeIndexConstraint(vhdlParser::Index_constraintContext *ctx)
-  -> std::vector<ast::BinaryExpr>
+  -> ast::IndexConstraint
 {
-    std::vector<ast::BinaryExpr> constraints;
+    auto constraint = make<ast::IndexConstraint>(ctx);
+    auto group = make<ast::GroupExpr>(ctx);
 
+    // Collect all discrete ranges into the group
     for (auto *discrete_r : ctx->discrete_range()) {
-        if (auto *range_decl = discrete_r->range_decl()) {
-            if (auto *explicit_r = range_decl->explicit_range()) {
-                if (auto range_expr = makeRange(explicit_r);
-                    auto *bin = std::get_if<ast::BinaryExpr>(&range_expr)) {
-                    constraints.push_back(std::move(*bin));
-                }
-            }
+        auto *range_decl = discrete_r->range_decl();
+        if (range_decl == nullptr) {
+            continue;
         }
+        auto *explicit_r = range_decl->explicit_range();
+        if (explicit_r == nullptr) {
+            continue;
+        }
+        auto range_expr = makeRange(explicit_r);
+        group.children.push_back(std::move(range_expr));
     }
 
-    return constraints;
+    constraint.ranges = std::move(group);
+    return constraint;
 }
 
 auto Translator::makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
-  -> std::vector<ast::BinaryExpr>
+  -> std::optional<ast::RangeConstraint>
 {
-    std::vector<ast::BinaryExpr> constraints;
-
-    if (auto *range_decl = ctx->range_decl()) {
-        if (auto *explicit_r = range_decl->explicit_range()) {
-            if (auto range_expr = makeRange(explicit_r);
-                auto *bin = std::get_if<ast::BinaryExpr>(&range_expr)) {
-                constraints.push_back(std::move(*bin));
-            }
-        }
+    auto *range_decl = ctx->range_decl();
+    if (range_decl == nullptr) {
+        return std::nullopt;
     }
-
-    return constraints;
+    auto *explicit_r = range_decl->explicit_range();
+    if (explicit_r == nullptr) {
+        return std::nullopt;
+    }
+    auto range_expr = makeRange(explicit_r);
+    auto *bin = std::get_if<ast::BinaryExpr>(&range_expr);
+    if (bin == nullptr) {
+        return std::nullopt;
+    }
+    auto constraint = make<ast::RangeConstraint>(ctx);
+    constraint.range = std::move(*bin);
+    return constraint;
 }
 
 auto Translator::makeRange(vhdlParser::Explicit_rangeContext *ctx) -> ast::Expr

@@ -34,7 +34,7 @@ inline auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vecto
     std::vector<std::string_view> out;
     out.reserve(tv.size());
     for (const auto &c : tv) {
-        out.push_back(c.text);
+        out.emplace_back(c.text);
     }
     return out;
 }
@@ -42,9 +42,9 @@ inline auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vecto
 /// @brief Counts of different trivia types
 struct TriviaCounts
 {
-    std::size_t comments{ 0 };       ///< Number of comment trivia items
-    std::size_t newlines_items{ 0 }; ///< Number of ParagraphBreak trivia items
-    std::size_t newline_breaks{ 0 }; ///< Total blank lines across all ParagraphBreak items
+    std::size_t comments{ 0 };        ///< Number of comment trivia items
+    std::size_t newlines_items{ 0 };  ///< Number of ParagraphBreak trivia items
+    unsigned int newline_breaks{ 0 }; ///< Total blank lines across all ParagraphBreak items
 };
 
 /// @brief Tally different types of trivia in a vector

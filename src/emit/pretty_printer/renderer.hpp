@@ -7,6 +7,10 @@
 #include <string>
 #include <string_view>
 
+namespace common {
+struct Config;
+} // namespace common
+
 namespace emit {
 
 /// Rendering mode for layout algorithm
@@ -19,13 +23,8 @@ enum class Mode : std::uint8_t
 /// Renderer for the pretty printer
 class Renderer final
 {
-  private:
-    int width_;
-    int column_{ 0 };
-    std::string output_;
-
   public:
-    explicit Renderer(int width) : width_(width) {}
+    explicit Renderer(const common::Config &config);
 
     // Core rendering function
     auto render(const DocPtr &doc) -> std::string;
@@ -43,6 +42,12 @@ class Renderer final
     // Output helpers
     void write(std::string_view text);
     void newline(int indent);
+
+    // Member variables
+    int width_{};
+    int indent_size_{};
+    int column_{ 0 };
+    std::string output_;
 };
 
 } // namespace emit
