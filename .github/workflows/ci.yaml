@@ -87,7 +87,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -127,6 +127,7 @@ jobs:
     name: Build
     timeout-minutes: 15
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -155,6 +156,7 @@ jobs:
     name: Formatter Check
     timeout-minutes: 2
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -164,7 +166,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check formatting
         run: make check-format
@@ -175,6 +177,7 @@ jobs:
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 20
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -210,6 +213,7 @@ jobs:
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 20
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -241,14 +245,18 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    name: Test
+    name: Test & Coverage
     needs: build
     timeout-minutes: 10
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
+
+    permissions:
+      pull-requests: write
 
     if: ${{ !github.event.pull_request.draft }}
 
@@ -265,8 +273,50 @@ jobs:
             conan-${{ runner.os }}-v1
             conan-${{ runner.os }}-
 
-      - name: Build
-        run: make
+      - name: Build and run tests with coverage
+        run: make coverage-report
 
-      - name: Run tests
-        run: make test
+      - name: Convert coverage to Markdown
+        if: github.event_name == 'pull_request'
+        run: |
+          INPUT="build/Debug/coverage/coverage.txt"
+          OUTPUT="coverage.md"
+
+          if [[ ! -f "$INPUT" ]]; then
+            echo "Warning: Coverage file not found at $INPUT" >&2
+            exit 0
+          fi
+
+          echo "### 📊 Test Coverage Report" > "$OUTPUT"
+          echo "" >> "$OUTPUT"
+          echo '```' >> "$OUTPUT"
+          cat "$INPUT" >> "$OUTPUT"
+          echo '```' >> "$OUTPUT"
+          echo "" >> "$OUTPUT"
+
+          # Extract total coverage percentage
+          TOTAL_LINE=$(grep -i "TOTAL" "$INPUT" || echo "")
+          if [[ -n "$TOTAL_LINE" ]]; then
+            PERCENT=$(echo "$TOTAL_LINE" | grep -oP '\d+\.\d+%' | head -1 || echo "N/A")
+            echo "> **Overall Coverage**: $PERCENT" >> "$OUTPUT"
+          fi
+
+          echo "" >> "$OUTPUT"
+          echo "_Generated on $(date -u '+%Y-%m-%d %H:%M:%S UTC')_" >> "$OUTPUT"
+
+          echo "" >> "$OUTPUT"
+          echo "<details>" >> "$OUTPUT"
+          echo "<summary>📝 How to view locally</summary>" >> "$OUTPUT"
+          echo "" >> "$OUTPUT"
+          echo '```bash' >> "$OUTPUT"
+          echo "make coverage" >> "$OUTPUT"
+          echo "make coverage-show" >> "$OUTPUT"
+          echo '```' >> "$OUTPUT"
+          echo "</details>" >> "$OUTPUT"
+
+      - name: Post coverage comment
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: coverage-report
+          path: coverage.md
