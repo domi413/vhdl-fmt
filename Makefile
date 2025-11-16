@@ -62,13 +62,18 @@ clean:
 # -----------------------------
 # Build with coverage enabled
 coverage-build:
+	@if [ ! -f "$(CONAN_STAMP)" ]; then \
+		echo "Running Conan..."; \
+		$(MAKE) conan BUILD_TYPE=Debug; \
+	fi
 	@echo "Building with coverage instrumentation..."
-	@$(MAKE) clean
-	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON
+	@cmake --preset conan-debug -DENABLE_COVERAGE=ON
+	@cmake --build --preset conan-debug
+	@touch $(BUILD_STAMP)
 
-# Generate full coverage report (HTML + text)
+# Generate full coverage report (HTML)
 coverage: coverage-build
-	@echo "Generating coverage report..."
+	@echo "Generating HTML coverage report..."
 	@cmake --build build/Debug --target coverage
 
 # Generate text-only coverage report (for CI/PR comments)
@@ -76,14 +81,14 @@ coverage-report: coverage-build
 	@echo "Generating coverage summary..."
 	@cmake --build build/Debug --target coverage-report
 
-# Alias
+# Alias for CI workflow compatibility
 test-coverage: coverage-report
 
-# Clean coverage data
+# Clean coverage data only (keep build artifacts)
 coverage-clean:
 	@echo "Cleaning coverage data..."
 	@rm -rf build/Debug/coverage
-	@find build/Debug -name '*.profraw' -o -name '*.profdata' | xargs rm -f 2>/dev/null || true
+	@find build/Debug -name '*.profraw' -o -name '*.profdata' 2>/dev/null | xargs rm -f || true
 
 # -----------------------------
 # Utility Targets

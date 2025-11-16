@@ -139,78 +139,47 @@ if(ENABLE_COVERAGE)
 
     # Common test execution step
     set(RUN_TESTS_WITH_COVERAGE
-        COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        make_directory
-        ${COVERAGE_DIR}
-        COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        echo
-        "Running tests with coverage instrumentation..."
-        COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        env
-        LLVM_PROFILE_FILE=${PROFRAW_PATTERN}
-        ${CMAKE_CTEST_COMMAND}
-        --output-on-failure
-        COMMAND
-        ${CMAKE_COMMAND}
-        -E
-        echo
-        "Merging coverage data..."
-        COMMAND
-        ${LLVM_PROFDATA}
-        merge
-        -sparse
-        ${COVERAGE_DIR}/*.profraw
-        -o
-        ${PROFDATA_FILE}
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${COVERAGE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "Running tests with coverage instrumentation..."
+        COMMAND ${CMAKE_COMMAND} -E env LLVM_PROFILE_FILE=${PROFRAW_PATTERN}
+                ${CMAKE_CTEST_COMMAND} --test-dir ${CMAKE_BINARY_DIR} --output-on-failure
+        COMMAND ${CMAKE_COMMAND} -E echo "Merging coverage data..."
+        COMMAND ${LLVM_PROFDATA} merge -sparse ${COVERAGE_DIR}/*.profraw -o ${PROFDATA_FILE}
     )
 
     # Full HTML coverage report
-    add_custom_target(
-        coverage
+    add_custom_target(coverage
         ${RUN_TESTS_WITH_COVERAGE}
-        COMMAND
-            ${CMAKE_COMMAND} -E echo "Generating HTML report..."
-        COMMAND
-            ${LLVM_COV} show ${TARGET_BINARY} -instr-profile=${PROFDATA_FILE}
-            -format=html -output-dir=${COVERAGE_DIR}/html
-            -ignore-filename-regex=${IGNORE_REGEX} ${CMAKE_SOURCE_DIR}/src/
-        COMMAND
-            ${CMAKE_COMMAND} -E echo
-            "Coverage report: ${COVERAGE_DIR}/html/index.html"
+        COMMAND ${CMAKE_COMMAND} -E echo "Generating HTML report..."
+        COMMAND ${LLVM_COV} show ${TARGET_BINARY}
+                -instr-profile=${PROFDATA_FILE}
+                -format=html
+                -output-dir=${COVERAGE_DIR}/html
+                -ignore-filename-regex=${IGNORE_REGEX}
+                ${CMAKE_SOURCE_DIR}/src/
+        COMMAND ${CMAKE_COMMAND} -E echo "Coverage report: ${COVERAGE_DIR}/html/index.html"
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Generating HTML coverage report"
     )
 
     # Text summary for CI
-    add_custom_target(
-        coverage-report
+    add_custom_target(coverage-report
         ${RUN_TESTS_WITH_COVERAGE}
-        COMMAND
-            ${CMAKE_COMMAND} -E echo "Generating coverage summary..."
-        COMMAND
-            ${LLVM_COV} report ${TARGET_BINARY} -instr-profile=${PROFDATA_FILE}
-            -ignore-filename-regex=${IGNORE_REGEX} ${CMAKE_SOURCE_DIR}/src/ >
-            ${COVERAGE_DIR}/coverage.txt
-        COMMAND
-            ${CMAKE_COMMAND} -E echo
-            "Coverage summary written to ${COVERAGE_DIR}/coverage.txt"
-        COMMAND
-            ${CMAKE_COMMAND} -E cat ${COVERAGE_DIR}/coverage.txt
+        COMMAND ${CMAKE_COMMAND} -E echo "Generating coverage summary..."
+        COMMAND ${LLVM_COV} report ${TARGET_BINARY}
+                -instr-profile=${PROFDATA_FILE}
+                -ignore-filename-regex=${IGNORE_REGEX}
+                ${CMAKE_SOURCE_DIR}/src/
+                > ${COVERAGE_DIR}/coverage.txt
+        COMMAND ${CMAKE_COMMAND} -E echo "Coverage summary written to ${COVERAGE_DIR}/coverage.txt"
+        COMMAND ${CMAKE_COMMAND} -E cat ${COVERAGE_DIR}/coverage.txt
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         COMMENT "Generating text coverage summary"
     )
 
     # Clean coverage data
-    add_custom_target(
-        coverage-clean
-        COMMAND
-            ${CMAKE_COMMAND} -E rm -rf ${COVERAGE_DIR}
+    add_custom_target(coverage-clean
+        COMMAND ${CMAKE_COMMAND} -E rm -rf ${COVERAGE_DIR}
         COMMENT "Cleaning coverage data"
     )
 endif()
