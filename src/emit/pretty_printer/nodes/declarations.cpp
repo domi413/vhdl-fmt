@@ -17,28 +17,6 @@ struct AlignmentLevel
 
 auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
 {
-    return withTrivia(node, printGenericParam(node, /* is_last = */ true));
-}
-
-auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
-{
-    return withTrivia(node, printPort(node, /* is_last = */ true));
-}
-
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) const -> Doc
-{
-    // TODO(vedivad): Implement signal declaration printing
-    return withTrivia(node, Doc::text("-- signal"));
-}
-
-auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) const -> Doc
-{
-    // TODO(vedivad): Implement constant declaration printing
-    return withTrivia(node, Doc::text("-- constant"));
-}
-
-auto PrettyPrinter::printGenericParam(const ast::GenericParam &node, bool is_last) const -> Doc
-{
     const std::string names = node.names
                             | std::views::join_with(std::string_view{ ", " })
                             | std::ranges::to<std::string>();
@@ -51,14 +29,14 @@ auto PrettyPrinter::printGenericParam(const ast::GenericParam &node, bool is_las
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
 
-    if (!is_last) {
+    if (node.is_terminated) {
         result += Doc::text(";");
     }
 
-    return result;
+    return withTrivia(node, result);
 }
 
-auto PrettyPrinter::printPort(const ast::Port &node, bool is_last) const -> Doc
+auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
 {
     const std::string names = node.names
                             | std::views::join_with(std::string_view{ ", " })
@@ -78,11 +56,23 @@ auto PrettyPrinter::printPort(const ast::Port &node, bool is_last) const -> Doc
         result &= Doc::text(":=") & visit(node.default_expr.value());
     }
 
-    if (!is_last) {
+    if (node.is_terminated) {
         result += Doc::text(";");
     }
 
-    return result;
+    return withTrivia(node, result);
+}
+
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) const -> Doc
+{
+    // TODO(vedivad): Implement signal declaration printing
+    return withTrivia(node, Doc::text("-- signal"));
+}
+
+auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) const -> Doc
+{
+    // TODO(vedivad): Implement constant declaration printing
+    return withTrivia(node, Doc::text("-- constant"));
 }
 
 } // namespace emit

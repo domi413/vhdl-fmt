@@ -13,13 +13,17 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
 {
     auto clause = make<ast::GenericClause>(ctx);
 
-    auto *list = ctx->generic_list();
-    if (list == nullptr) {
-        return clause;
-    }
+    if (auto *list = ctx->generic_list()) {
+        const auto &decls = list->interface_constant_declaration();
 
-    for (auto *decl : list->interface_constant_declaration()) {
-        clause.generics.push_back(makeGenericParam(decl));
+        clause.generics = decls
+                        | std::views::enumerate
+                        | std::views::transform([&](auto &&pair) {
+                              auto [i, decl] = pair;
+                              bool is_last = (i == decls.size() - 1);
+                              return makeGenericParam(decl, !is_last);
+                          })
+                        | std::ranges::to<std::vector>();
     }
 
     return clause;
@@ -28,19 +32,22 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
 auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause
 {
     auto clause = make<ast::PortClause>(ctx);
-
     auto *list = ctx->port_list();
     if (list == nullptr) {
         return clause;
     }
 
-    auto *iface = list->interface_port_list();
-    if (iface == nullptr) {
-        return clause;
-    }
+    if (auto *iface = list->interface_port_list()) {
+        const auto &decls = iface->interface_port_declaration();
 
-    for (auto *decl : iface->interface_port_declaration()) {
-        clause.ports.push_back(makeSignalPort(decl));
+        clause.ports = decls
+                     | std::views::enumerate
+                     | std::views::transform([&](auto &&pair) {
+                           auto [i, decl] = pair;
+                           bool is_last = (i == decls.size() - 1);
+                           return makeSignalPort(decl, !is_last);
+                       })
+                     | std::ranges::to<std::vector>();
     }
 
     return clause;
@@ -48,8 +55,8 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
 
 // ---------------------- Interface declarations ----------------------
 
-auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
-  -> ast::GenericParam
+auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx,
+                                  bool has_semi) -> ast::GenericParam
 {
     auto param = make<ast::GenericParam>(ctx);
 
@@ -65,12 +72,15 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
         param.default_expr = makeExpr(expr);
     }
 
+    param.is_terminated = has_semi;
+
     return param;
 }
 
 // ---------------------- Object declarations ----------------------
 
-auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port
+auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx, bool has_semi)
+  -> ast::Port
 {
     auto port = make<ast::Port>(ctx);
 
@@ -93,6 +103,8 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
     if (auto *expr = ctx->expression()) {
         port.default_expr = makeExpr(expr);
     }
+
+    port.is_terminated = has_semi;
 
     return port;
 }
