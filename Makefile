@@ -1,4 +1,4 @@
-.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored docker-dev-build docker-dev docker-make docker-test docker-publish-ci
+.PHONY: all run clean conan test test-rerun test-verbose lint check-format format sort-dictionary cleanup-dictionary check-cspell-ignored docker-dev-build docker-dev docker-make docker-test docker-publish-ci coverage coverage-clean coverage-report
 
 # -----------------------------
 # Build Configuration
@@ -6,6 +6,9 @@
 # Default preset, override with `make BUILD_TYPE=Release`
 BUILD_TYPE ?= Debug
 CMAKE_PRESET := conan-$(shell echo $(BUILD_TYPE) | tr A-Z a-z)
+
+# Coverage configuration
+ENABLE_COVERAGE ?= OFF
 
 TARGET := build/$(BUILD_TYPE)/bin/vhdl_formatter
 CONAN_STAMP := build/.conan.$(BUILD_TYPE).stamp
@@ -20,8 +23,8 @@ SOURCES_CMAKE := $(shell find src tests . -name 'CMakeLists.txt')
 all: $(BUILD_STAMP)
 
 $(BUILD_STAMP): $(SOURCES) $(SOURCES_CMAKE) $(CONAN_STAMP)
-	@echo "Building project ($(BUILD_TYPE))..."
-	@cmake --preset $(CMAKE_PRESET)
+	@echo "Building project ($(BUILD_TYPE), Coverage=$(ENABLE_COVERAGE))..."
+	@cmake --preset $(CMAKE_PRESET) -DENABLE_COVERAGE=$(ENABLE_COVERAGE)
 	@cmake --build --preset $(CMAKE_PRESET)
 	@touch $@
 	@echo "Build complete."
@@ -55,12 +58,35 @@ clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
 
 # -----------------------------
+# Coverage Targets
+# -----------------------------
+# Build with coverage enabled
+coverage-build:
+	@echo "Building with coverage instrumentation..."
+	@$(MAKE) clean
+	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON
+
+# Generate coverage report
+coverage: coverage-build
+	@echo "Generating coverage report..."
+	@cmake --build build/Debug --target coverage
+
+# Quick coverage report (text summary only)
+coverage-report: coverage-build
+	@echo "Generating coverage summary..."
+	@cmake --build build/Debug --target coverage-report
+
+# Clean coverage data
+coverage-clean:
+	@echo "Cleaning coverage data..."
+	@cmake --build build/Debug --target coverage-clean
+
+# -----------------------------
 # Utility Targets
 # -----------------------------
 CLANG_TIDY_CMD := clang-tidy
 RUN_CLANG_TIDY_CMD := run-clang-tidy
 CLANG_FORMAT_CMD := clang-format
-CONAN_CMD := conan
 GERSEMI_CMD := gersemi
 
 LINT_COMMON_FLAGS = -p build/$(BUILD_TYPE)/ -quiet
@@ -186,6 +212,10 @@ docker-make:
 docker-test:
 	@echo "Building project in container..."
 	@$(CONTAINER_CMD) compose run --rm dev bash -c "make clean && make test"
+
+docker-coverage:
+	@echo "Generating coverage in container..."
+	@$(CONTAINER_CMD) compose run --rm dev bash -c "make coverage"
 
 docker-publish-ci:
 	@echo "Building and publishing CI image to $(CI_IMAGE_NAME)..."

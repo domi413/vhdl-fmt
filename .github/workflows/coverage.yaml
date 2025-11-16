@@ -1,0 +1,58 @@
+name: Post Coverage to PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run tests and generate coverage
+        run: |
+          # Replace with your actual command
+          make test-coverage > coverage_raw.txt
+          # Or if output goes to stdout:
+          # your-coverage-tool --format=table > coverage_raw.txt
+
+      - name: Convert coverage to Markdown
+        run: |
+          INPUT="coverage_raw.txt"
+          OUTPUT="coverage.md"
+
+          echo "### Test Coverage Report" > "$OUTPUT"
+          echo "" >> "$OUTPUT"
+
+          echo "| Filename | Regions Missed | Regions Cover | Functions Missed | Functions Executed | Lines Missed | Lines Cover | Branches Missed | Branches Cover |" >> "$OUTPUT"
+          echo "|----------|----------------|---------------|------------------|--------------------|--------------|-------------|-----------------|----------------|" >> "$OUTPUT"
+
+          grep -v "Filename\|----\|TOTAL" "$INPUT" | while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+
+            echo "$line" | awk '{
+              fname = $1; gsub(/.*\//, "", fname)  # Optional: strip path
+              printf "| **%s** | %s | **%s** | %s | **%s** | %s | **%s** | %s | **%s** |\n",
+                $1, $3, $4, $6, $7, $9, $10, $12, $13
+            }' >> "$OUTPUT"
+          done
+
+          grep "TOTAL" "$INPUT" | awk '{
+            printf "\n**TOTAL** | **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | **%s**\n",
+              $3, $4, $6, $7, $9, $10, $12, $13
+          }' >> "$OUTPUT"
+
+          echo "" >> "$OUTPUT"
+          echo "> **Coverage Summary**: %.2f%% lines covered. Focus on low-coverage files!" \
+            $(grep "TOTAL" "$INPUT" | awk '{printf "%.2f", $10}') >> "$OUTPUT"
+
+      - name: Update PR comment with coverage
+        uses: smtkl/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          header: coverage-report
+          path: coverage.md
