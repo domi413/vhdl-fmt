@@ -13,7 +13,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/niekdomi/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 

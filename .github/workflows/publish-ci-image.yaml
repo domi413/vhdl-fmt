@@ -5,10 +5,10 @@ on:
     branches:
       - main
     paths:
-      - 'Dockerfile'
-      - 'conanfile.txt'
-      - 'clang.profile'
-      - '.github/workflows/publish-ci-image.yaml'
+      - "Dockerfile"
+      - "conanfile.txt"
+      - "clang.profile"
+      - ".github/workflows/publish-ci-image.yaml"
 
 permissions:
   packages: write
@@ -31,14 +31,14 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: niekdomi
-          password: ${{ secrets.NIEKDOMI_GHCR_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/niekdomi/vhdlfmt-ci
+          images: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci
           tags: |
             type=raw,value=latest
             type=sha,prefix={{branch}}-
@@ -56,4 +56,4 @@ jobs:
 
       - name: Image published successfully
         run: |
-          echo "✓ CI image published to ghcr.io/niekdomi/vhdlfmt-ci:latest"
+          echo "✓ CI image published to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest"
