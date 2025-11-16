@@ -60,35 +60,40 @@ clean:
 # -----------------------------
 # Coverage Targets
 # -----------------------------
-# Build with coverage enabled
-coverage-build:
+# Internal target to ensure coverage build
+.PHONY: _ensure-coverage-build
+_ensure-coverage-build:
 	@if [ ! -f "$(CONAN_STAMP)" ]; then \
 		echo "Running Conan..."; \
 		$(MAKE) conan BUILD_TYPE=Debug; \
 	fi
-	@echo "Building with coverage instrumentation..."
-	@cmake --preset conan-debug -DENABLE_COVERAGE=ON
-	@cmake --build --preset conan-debug
-	@touch $(BUILD_STAMP)
+	@if [ ! -f "$(BUILD_STAMP)" ] || ! grep -q "ENABLE_COVERAGE=ON" build/Debug/CMakeCache.txt 2>/dev/null; then \
+		echo "Building with coverage instrumentation..."; \
+		cmake --preset conan-debug -DENABLE_COVERAGE=ON; \
+		cmake --build --preset conan-debug; \
+		touch $(BUILD_STAMP); \
+	fi
 
-# Generate full coverage report (HTML)
-coverage: coverage-build
-	@echo "Generating HTML coverage report..."
+# Generate HTML coverage report
+coverage: _ensure-coverage-build
 	@cmake --build build/Debug --target coverage
+	@echo ""
+	@echo "✓ HTML coverage report: build/Debug/coverage/html/index.html"
 
-# Generate text-only coverage report (for CI/PR comments)
-coverage-report: coverage-build
-	@echo "Generating coverage summary..."
+# Generate text coverage summary
+coverage-report: _ensure-coverage-build
 	@cmake --build build/Debug --target coverage-report
 
-# Alias for CI workflow compatibility
-test-coverage: coverage-report
+# Open HTML coverage report in browser
+coverage-show: coverage
+	@xdg-open build/Debug/coverage/html/index.html 2>/dev/null || \
+		open build/Debug/coverage/html/index.html 2>/dev/null || \
+		echo "Please open build/Debug/coverage/html/index.html in your browser"
 
-# Clean coverage data only (keep build artifacts)
+# Clean coverage data
 coverage-clean:
-	@echo "Cleaning coverage data..."
-	@rm -rf build/Debug/coverage
-	@find build/Debug -name '*.profraw' -o -name '*.profdata' 2>/dev/null | xargs rm -f || true
+	@cmake --build build/Debug --target coverage-clean 2>/dev/null || \
+		rm -rf build/Debug/coverage
 
 # -----------------------------
 # Utility Targets
