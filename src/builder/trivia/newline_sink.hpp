@@ -20,10 +20,7 @@ class NewlineSink final
             return;
         }
 
-        // Convert newline count to blank line count
-        const unsigned int blank_lines = newline_count - 1;
-        ast::ParagraphBreak pb{ blank_lines };
-        dst.emplace_back(pb);
+        dst.emplace_back(ast::ParagraphBreak{ newline_count - 1 });
     }
 };
 

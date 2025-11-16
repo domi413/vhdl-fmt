@@ -12,8 +12,8 @@ namespace builder {
 
 void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t index)
 {
-    // Tokens are given in source order
     const auto &hidden = tokens_.getHiddenTokensToLeft(index);
+
     unsigned int linebreaks{ 0 };
 
     // Iterate backward — closest token first
@@ -29,17 +29,15 @@ void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t index)
 
         if (isComment(token)) {
             // If there were newlines before this comment, push them
-            if (linebreaks != 0) {
+            if (linebreaks > 0) {
                 newlines_.push(dst.leading, linebreaks);
                 linebreaks = 0;
             }
-
             comments_.push(dst.leading, token);
         }
     }
 
     // Push any remaining paragraph breaks (2+ newlines = 1+ blank lines)
-    // We only capture these to preserve intentional grouping, not every single newline
     if (linebreaks >= 2) {
         newlines_.push(dst.leading, linebreaks);
     }
@@ -58,24 +56,23 @@ void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, std::size_t index)
             break;
         }
 
-        // Stop if we hit a token that belongs to the next node
-        // (This is where your "cache" idea comes in)
-        if (comments_.wasTokenUsed(token->getTokenIndex())) {
-            break;
-        }
-
         if (isNewline(token)) {
             ++linebreaks;
             continue;
         }
 
         if (isComment(token)) {
-            if (linebreaks >= 2) {
+            if (linebreaks > 0) {
                 newlines_.push(dst.trailing, linebreaks);
+                linebreaks = 0;
             }
-            linebreaks = 0;
             comments_.push(dst.trailing, token);
         }
+    }
+
+    // Push any remaining paragraph breaks (2+ newlines = 1+ blank lines)
+    if (linebreaks >= 2) {
+        newlines_.push(dst.leading, linebreaks);
     }
 }
 
@@ -116,13 +113,8 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     const auto stop_index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex());
 
     collectLeading(trivia, start_index);
-    const auto *inline_comment_token = collectInline(trivia, stop_index);
-
-    if (inline_comment_token == nullptr) {
-        collectTrailing(trivia, stop_index);
-    } else {
-        collectTrailing(trivia, inline_comment_token->getTokenIndex());
-    }
+    collectInline(trivia, stop_index);
+    collectTrailing(trivia, stop_index + 1);
 }
 
 auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const -> std::size_t

@@ -9,7 +9,7 @@
 TEST_CASE("withTrivia: No trivia", "[pretty_printer][trivia]")
 {
     // A node with trivia = std::nullopt
-    const ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    const ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
 
     const auto result = emit::test::render(param);
     // Should just render the core doc
@@ -19,7 +19,7 @@ TEST_CASE("withTrivia: No trivia", "[pretty_printer][trivia]")
 TEST_CASE("withTrivia: Empty trivia", "[pretty_printer][trivia]")
 {
     // A node with trivia object, but empty lists
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{};
 
     const auto result = emit::test::render(param);
@@ -29,7 +29,7 @@ TEST_CASE("withTrivia: Empty trivia", "[pretty_printer][trivia]")
 
 TEST_CASE("withTrivia: Single leading comment", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{ .leading = { ast::Comment{ .text = "-- a leading comment" } } };
 
     const auto result = emit::test::render(param);
@@ -39,7 +39,7 @@ TEST_CASE("withTrivia: Single leading comment", "[pretty_printer][trivia]")
 
 TEST_CASE("withTrivia: Multiple leading comments", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{
         .leading = { ast::Comment{ .text = "-- line 1" }, ast::Comment{ .text = "-- line 2" } }
     };
@@ -50,7 +50,7 @@ TEST_CASE("withTrivia: Multiple leading comments", "[pretty_printer][trivia]")
 
 TEST_CASE("withTrivia: Leading paragraph break (1 blank line)", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{ .leading = { ast::ParagraphBreak{ .blank_lines = 1 } } };
 
     const auto result = emit::test::render(param);
@@ -60,7 +60,7 @@ TEST_CASE("withTrivia: Leading paragraph break (1 blank line)", "[pretty_printer
 
 TEST_CASE("withTrivia: Leading paragraph break (2 blank lines)", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{ .leading = { ast::ParagraphBreak{ .blank_lines = 2 } } };
 
     const auto result = emit::test::render(param);
@@ -70,7 +70,7 @@ TEST_CASE("withTrivia: Leading paragraph break (2 blank lines)", "[pretty_printe
 
 TEST_CASE("withTrivia: Leading comments and newlines", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{
         .leading = { ast::Comment{ .text = "-- header" },
                     ast::ParagraphBreak{ .blank_lines = 1 },
@@ -88,7 +88,7 @@ TEST_CASE("withTrivia: Leading comments and newlines", "[pretty_printer][trivia]
 
 TEST_CASE("withTrivia: Inline comment only", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{ .inline_comment = ast::Comment{ .text = "-- inline" } };
 
     const auto result = emit::test::render(param);
@@ -98,7 +98,7 @@ TEST_CASE("withTrivia: Inline comment only", "[pretty_printer][trivia]")
 
 TEST_CASE("withTrivia: Single trailing comment", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{ .trailing = { ast::Comment{ .text = "-- inline comment" } } };
 
     const auto result = emit::test::render(param);
@@ -108,7 +108,7 @@ TEST_CASE("withTrivia: Single trailing comment", "[pretty_printer][trivia]")
 
 TEST_CASE("withTrivia: Leading and trailing comments", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{ .leading = { ast::Comment{ .text = "-- leading" } },
                                     .trailing = { ast::Comment{ .text = "-- trailing" } } };
 
@@ -118,7 +118,7 @@ TEST_CASE("withTrivia: Leading and trailing comments", "[pretty_printer][trivia]
 
 TEST_CASE("withTrivia: Complex mix", "[pretty_printer][trivia]")
 {
-    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer" };
+    ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
     param.trivia = ast::NodeTrivia{
         .leading = { ast::Comment{ .text = "-- header comment" },
                     ast::ParagraphBreak{ .blank_lines = 2 },

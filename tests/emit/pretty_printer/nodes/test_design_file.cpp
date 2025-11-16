@@ -37,7 +37,7 @@ TEST_CASE("DesignFile with entity and architecture", "[pretty_printer][design_fi
 
     ast::Entity entity{ .name = "counter" };
 
-    ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic", .is_last = true };
     entity.port_clause.ports.emplace_back(std::move(port));
 
     // Create architecture

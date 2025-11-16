@@ -24,7 +24,8 @@ TEST_CASE("GenericClause with single parameter (flat)", "[pretty_printer][clause
 
     ast::GenericParam param{ .names = { "WIDTH" },
                              .type_name = "integer",
-                             .default_expr = ast::TokenExpr{ .text = "8" } };
+                             .default_expr = ast::TokenExpr{ .text = "8" },
+                             .is_last = true };
 
     clause.generics.emplace_back(std::move(param));
 
@@ -38,11 +39,13 @@ TEST_CASE("GenericClause with multiple parameters (flat)", "[pretty_printer][cla
 
     ast::GenericParam param1{ .names = { "WIDTH" },
                               .type_name = "positive",
-                              .default_expr = ast::TokenExpr{ .text = "8" } };
+                              .default_expr = ast::TokenExpr{ .text = "8" },
+                              .is_last = false };
 
     ast::GenericParam param2{ .names = { "HEIGHT" },
                               .type_name = "positive",
-                              .default_expr = ast::TokenExpr{ .text = "16" } };
+                              .default_expr = ast::TokenExpr{ .text = "16" },
+                              .is_last = true };
 
     clause.generics.emplace_back(std::move(param1));
     clause.generics.emplace_back(std::move(param2));
@@ -63,7 +66,7 @@ TEST_CASE("PortClause with single port (flat)", "[pretty_printer][clauses]")
 {
     ast::PortClause clause{};
 
-    ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port{ .names = { "clk" }, .mode = "in", .type_name = "std_logic", .is_last = true };
 
     clause.ports.emplace_back(std::move(port));
 
@@ -74,8 +77,10 @@ TEST_CASE("PortClause with multiple ports (broken)", "[pretty_printer][clauses]"
 {
     ast::PortClause clause{};
 
-    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
-    ast::Port port2{ .names = { "reset" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic", .is_last = false };
+    ast::Port port2{
+        .names = { "reset" }, .mode = "in", .type_name = "std_logic", .is_last = false
+    };
 
     // Build constraint for port3
     auto left = std::make_unique<ast::Expr>(ast::TokenExpr{ .text = "7" });
@@ -91,7 +96,8 @@ TEST_CASE("PortClause with multiple ports (broken)", "[pretty_printer][clauses]"
                      .mode = "out",
                      .type_name = "std_logic_vector",
                      .default_expr = std::nullopt,
-                     .constraint = ast::Constraint{ std::move(idx_constraint) } };
+                     .constraint = ast::Constraint{ std::move(idx_constraint) },
+                     .is_last = true };
 
     clause.ports.emplace_back(std::move(port1));
     clause.ports.emplace_back(std::move(port2));
@@ -111,9 +117,14 @@ TEST_CASE("PortClause with align_signals disabled", "[pretty_printer][clauses][c
 {
     ast::PortClause clause{};
 
-    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
-    ast::Port port2{ .names = { "data_valid" }, .mode = "in", .type_name = "std_logic" };
-    ast::Port port3{ .names = { "output_signal" }, .mode = "out", .type_name = "std_logic_vector" };
+    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic", .is_last = false };
+    ast::Port port2{
+        .names = { "data_valid" }, .mode = "in", .type_name = "std_logic", .is_last = false
+    };
+    ast::Port port3{ .names = { "output_signal" },
+                     .mode = "out",
+                     .type_name = "std_logic_vector",
+                     .is_last = true };
 
     clause.ports.emplace_back(std::move(port1));
     clause.ports.emplace_back(std::move(port2));

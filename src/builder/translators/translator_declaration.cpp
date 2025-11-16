@@ -21,7 +21,7 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
                         | std::views::transform([&](auto &&pair) {
                               const auto [i, decl] = pair;
                               const bool is_last = (i == decls.size() - 1);
-                              return makeGenericParam(decl, !is_last);
+                              return makeGenericParam(decl, is_last);
                           })
                         | std::ranges::to<std::vector>();
     }
@@ -46,7 +46,7 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
                      | std::views::transform([&](auto &&pair) {
                            const auto [i, decl] = pair;
                            const bool is_last = (i == decls.size() - 1);
-                           return makeSignalPort(decl, !is_last);
+                           return makeSignalPort(decl, is_last);
                        })
                      | std::ranges::to<std::vector>();
     }
@@ -73,7 +73,7 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
         param.default_expr = makeExpr(expr);
     }
 
-    param.is_terminated = has_semi;
+    param.is_last = has_semi;
 
     return param;
 }
@@ -105,7 +105,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         port.default_expr = makeExpr(expr);
     }
 
-    port.is_terminated = has_semi;
+    port.is_last = has_semi;
 
     return port;
 }
