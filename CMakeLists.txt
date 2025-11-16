@@ -17,19 +17,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
 
 if(ENABLE_COVERAGE)
-    message(STATUS "  Coverage: ENABLED")
-
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        # Use LLVM source-based coverage for Clang
-        add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
-        add_link_options(-fprofile-instr-generate -fcoverage-mapping)
-        message(STATUS "  Using LLVM source-based coverage")
-    else()
-        # Use gcov-compatible coverage for GCC
-        add_compile_options(--coverage)
-        add_link_options(--coverage)
-        message(STATUS "  Using gcov-compatible coverage")
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "Coverage is only supported with Clang compiler")
     endif()
+
+    message(STATUS "  Coverage: ENABLED")
+    add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
+    add_link_options(-fprofile-instr-generate -fcoverage-mapping)
 endif()
 
 message(STATUS "Project: ${PROJECT_NAME}")
@@ -121,107 +115,60 @@ enable_testing()
 add_subdirectory(tests)
 
 # --------------------------------------------------------------------
-# Coverage Target
+# Coverage Targets
 # --------------------------------------------------------------------
 if(ENABLE_COVERAGE)
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        # Use LLVM coverage tools for Clang
-        find_program(LLVM_PROFDATA_EXECUTABLE llvm-profdata REQUIRED)
-        find_program(LLVM_COV_EXECUTABLE llvm-cov REQUIRED)
+    find_program(LLVM_PROFDATA llvm-profdata REQUIRED)
+    find_program(LLVM_COV llvm-cov REQUIRED)
 
-        add_custom_target(
-            coverage
-            COMMAND ${CMAKE_COMMAND} -E echo "Running tests to generate coverage data..."
-            COMMAND ${CMAKE_COMMAND} -E env LLVM_PROFILE_FILE=${CMAKE_BINARY_DIR}/coverage/vhdl_fmt-%p.profraw
-                    ${CMAKE_CTEST_COMMAND} --preset conan-debug --output-on-failure || true
-            COMMAND ${CMAKE_COMMAND} -E echo "Merging coverage data..."
-            COMMAND ${LLVM_PROFDATA_EXECUTABLE} merge -sparse ${CMAKE_BINARY_DIR}/coverage/vhdl_fmt-*.profraw
-                    -o ${CMAKE_BINARY_DIR}/coverage/vhdl_fmt.profdata
-            COMMAND ${CMAKE_COMMAND} -E echo "Generating coverage report..."
-            COMMAND ${LLVM_COV_EXECUTABLE} show ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vhdl_formatter
-                    -instr-profile=${CMAKE_BINARY_DIR}/coverage/vhdl_fmt.profdata
-                    -format=html -output-dir=${CMAKE_BINARY_DIR}/coverage/html
-                    -ignore-filename-regex='${CMAKE_BINARY_DIR}/generated/.*'
-                    -ignore-filename-regex='${CMAKE_BINARY_DIR}/.*_autogen/.*'
-                    ${CMAKE_SOURCE_DIR}/src/
-            COMMAND ${CMAKE_COMMAND} -E echo "Coverage HTML report: ${CMAKE_BINARY_DIR}/coverage/html/index.html"
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMENT "Generating coverage report with llvm-cov"
-        )
+    # Ensure coverage directory exists
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/coverage)
 
-        add_custom_target(
-            coverage-report
-            COMMAND ${CMAKE_COMMAND} -E echo "Running tests to generate coverage data..."
-            COMMAND ${CMAKE_COMMAND} -E env LLVM_PROFILE_FILE=${CMAKE_BINARY_DIR}/coverage/vhdl_fmt-%p.profraw
-                    ${CMAKE_CTEST_COMMAND} --preset conan-debug --output-on-failure || true
-            COMMAND ${CMAKE_COMMAND} -E echo "Merging coverage data..."
-            COMMAND ${LLVM_PROFDATA_EXECUTABLE} merge -sparse ${CMAKE_BINARY_DIR}/coverage/vhdl_fmt-*.profraw
-                    -o ${CMAKE_BINARY_DIR}/coverage/vhdl_fmt.profdata
-            COMMAND ${CMAKE_COMMAND} -E echo "Coverage Summary:"
-            COMMAND ${LLVM_COV_EXECUTABLE} report ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vhdl_formatter
-                    -instr-profile=${CMAKE_BINARY_DIR}/coverage/vhdl_fmt.profdata
-                    -ignore-filename-regex='${CMAKE_BINARY_DIR}/generated/.*'
-                    ${CMAKE_SOURCE_DIR}/src/
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMENT "Printing coverage summary"
-        )
+    set(COVERAGE_DIR ${CMAKE_BINARY_DIR}/coverage)
+    set(PROFRAW_PATTERN ${COVERAGE_DIR}/vhdl_fmt-%p.profraw)
+    set(PROFDATA_FILE ${COVERAGE_DIR}/vhdl_fmt.profdata)
+    set(TARGET_BINARY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vhdl_formatter)
 
-        # Clean coverage data
-        add_custom_target(
-            coverage-clean
-            COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_BINARY_DIR}/coverage
-            COMMAND ${CMAKE_COMMAND} -E echo "Removing .profraw and .profdata files..."
-            COMMAND ${CMAKE_COMMAND} -E rm -f ${CMAKE_BINARY_DIR}/**/*.profraw ${CMAKE_BINARY_DIR}/**/*.profdata
-            COMMENT "Cleaning coverage data"
-        )
-    else()
-        # Use gcovr for GCC
-        find_program(GCOVR_EXECUTABLE gcovr REQUIRED)
+    # Full coverage with HTML output
+    add_custom_target(coverage
+        COMMAND ${CMAKE_COMMAND} -E echo "Running tests..."
+        COMMAND ${CMAKE_COMMAND} -E env LLVM_PROFILE_FILE=${PROFRAW_PATTERN}
+                ${CMAKE_CTEST_COMMAND} --output-on-failure || true
+        COMMAND ${CMAKE_COMMAND} -E echo "Merging coverage data..."
+        COMMAND ${LLVM_PROFDATA} merge -sparse ${COVERAGE_DIR}/*.profraw -o ${PROFDATA_FILE}
+        COMMAND ${CMAKE_COMMAND} -E echo "Generating HTML report..."
+        COMMAND ${LLVM_COV} show ${TARGET_BINARY}
+                -instr-profile=${PROFDATA_FILE}
+                -format=html
+                -output-dir=${COVERAGE_DIR}/html
+                -ignore-filename-regex='${CMAKE_BINARY_DIR}'
+                ${CMAKE_SOURCE_DIR}/src/
+        COMMAND ${CMAKE_COMMAND} -E echo "Report: ${COVERAGE_DIR}/html/index.html"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Generating HTML coverage report"
+    )
 
-        add_custom_target(
-            coverage
-            COMMAND ${CMAKE_COMMAND} -E echo "Running tests to generate coverage data..."
-            COMMAND ${CMAKE_CTEST_COMMAND} --preset conan-debug --output-on-failure || true
-            COMMAND ${CMAKE_COMMAND} -E echo "Generating coverage report..."
-            COMMAND ${GCOVR_EXECUTABLE}
-                    --root ${CMAKE_SOURCE_DIR}
-                    --filter '${CMAKE_SOURCE_DIR}/src/.*'
-                    --exclude '${CMAKE_BINARY_DIR}/.*'
-                    --exclude '.*/generated/.*'
-                    --exclude '.*/tests/.*'
-                    --exclude '.*/build/.*'
-                    --html-details ${CMAKE_BINARY_DIR}/coverage/coverage.html
-                    --xml ${CMAKE_BINARY_DIR}/coverage/coverage.xml
-                    --txt ${CMAKE_BINARY_DIR}/coverage/coverage.txt
-                    --print-summary
-            COMMAND ${CMAKE_COMMAND} -E echo "Coverage HTML report: ${CMAKE_BINARY_DIR}/coverage/coverage.html"
-            COMMAND ${CMAKE_COMMAND} -E echo "Coverage summary: ${CMAKE_BINARY_DIR}/coverage/coverage.txt"
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Generating coverage report with gcovr"
-        )
+    # Text-only summary for CI
+    add_custom_target(coverage-report
+        COMMAND ${CMAKE_COMMAND} -E echo "Running tests..."
+        COMMAND ${CMAKE_COMMAND} -E env LLVM_PROFILE_FILE=${PROFRAW_PATTERN}
+                ${CMAKE_CTEST_COMMAND} --output-on-failure || true
+        COMMAND ${CMAKE_COMMAND} -E echo "Merging coverage data..."
+        COMMAND ${LLVM_PROFDATA} merge -sparse ${COVERAGE_DIR}/*.profraw -o ${PROFDATA_FILE}
+        COMMAND ${CMAKE_COMMAND} -E echo "Generating coverage summary..."
+        COMMAND ${LLVM_COV} report ${TARGET_BINARY}
+                -instr-profile=${PROFDATA_FILE}
+                -ignore-filename-regex='${CMAKE_BINARY_DIR}'
+                ${CMAKE_SOURCE_DIR}/src/
+                | tee ${COVERAGE_DIR}/coverage.txt
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Generating text coverage summary"
+    )
 
-        add_custom_target(
-            coverage-report
-            COMMAND ${CMAKE_COMMAND} -E echo "Coverage Summary:"
-            COMMAND ${GCOVR_EXECUTABLE}
-                    --root ${CMAKE_SOURCE_DIR}
-                    --filter '${CMAKE_SOURCE_DIR}/src/.*'
-                    --exclude '${CMAKE_BINARY_DIR}/.*'
-                    --exclude '.*/generated/.*'
-                    --exclude '.*/tests/.*'
-                    --exclude '.*/build/.*'
-                    --print-summary
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-            COMMENT "Printing coverage summary"
-        )
-
-        # Clean coverage data
-        add_custom_target(
-            coverage-clean
-            COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_BINARY_DIR}/coverage
-            COMMAND ${CMAKE_COMMAND} -E echo "Removing .gcda files..."
-            COMMAND ${CMAKE_COMMAND} -E rm -f ${CMAKE_BINARY_DIR}/**/*.gcda
-            COMMENT "Cleaning coverage data"
-        )
-    endif()
+    # Clean coverage data
+    add_custom_target(coverage-clean
+        COMMAND ${CMAKE_COMMAND} -E rm -rf ${COVERAGE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E echo "Coverage data cleaned"
+        COMMENT "Cleaning coverage data"
+    )
 endif()

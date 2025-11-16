@@ -250,6 +250,9 @@ jobs:
     env:
       CONAN_HOME: /root/.conan2
 
+    permissions:
+      pull-requests: write
+
     if: ${{ !github.event.pull_request.draft }}
 
     steps:
@@ -270,3 +273,41 @@ jobs:
 
       - name: Run tests
         run: make test
+
+      - name: Generate coverage report
+        run: make test-coverage
+
+      - name: Convert coverage to Markdown
+        if: github.event_name == 'pull_request'
+        run: |
+          INPUT="build/Debug/coverage/coverage.txt"
+          OUTPUT="coverage.md"
+
+          if [[ ! -f "$INPUT" ]]; then
+            echo "Warning: Coverage file not found at $INPUT" >&2
+            exit 0
+          fi
+
+          echo "### 📊 Test Coverage Report" > "$OUTPUT"
+          echo "" >> "$OUTPUT"
+          echo '```' >> "$OUTPUT"
+          cat "$INPUT" >> "$OUTPUT"
+          echo '```' >> "$OUTPUT"
+          echo "" >> "$OUTPUT"
+
+          # Extract total coverage percentage
+          TOTAL_LINE=$(grep -i "TOTAL" "$INPUT" || echo "")
+          if [[ -n "$TOTAL_LINE" ]]; then
+            PERCENT=$(echo "$TOTAL_LINE" | grep -oP '\d+\.\d+%' | head -1 || echo "N/A")
+            echo "> **Overall Coverage**: $PERCENT" >> "$OUTPUT"
+          fi
+
+          echo "" >> "$OUTPUT"
+          echo "_Generated on $(date -u '+%Y-%m-%d %H:%M:%S UTC')_" >> "$OUTPUT"
+
+      - name: Post coverage comment
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: coverage-report
+          path: coverage.md

@@ -66,20 +66,24 @@ coverage-build:
 	@$(MAKE) clean
 	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON
 
-# Generate coverage report
+# Generate full coverage report (HTML + text)
 coverage: coverage-build
 	@echo "Generating coverage report..."
 	@cmake --build build/Debug --target coverage
 
-# Quick coverage report (text summary only)
+# Generate text-only coverage report (for CI/PR comments)
 coverage-report: coverage-build
 	@echo "Generating coverage summary..."
 	@cmake --build build/Debug --target coverage-report
 
+# Alias
+test-coverage: coverage-report
+
 # Clean coverage data
 coverage-clean:
 	@echo "Cleaning coverage data..."
-	@cmake --build build/Debug --target coverage-clean
+	@rm -rf build/Debug/coverage
+	@find build/Debug -name '*.profraw' -o -name '*.profdata' | xargs rm -f 2>/dev/null || true
 
 # -----------------------------
 # Utility Targets
