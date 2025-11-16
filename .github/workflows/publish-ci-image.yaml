@@ -18,7 +18,7 @@ jobs:
   publish-ci-image:
     runs-on: ubuntu-latest
     name: Build and Publish CI Image
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
