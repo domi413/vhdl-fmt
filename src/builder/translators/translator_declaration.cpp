@@ -19,8 +19,8 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
         clause.generics = decls
                         | std::views::enumerate
                         | std::views::transform([&](auto &&pair) {
-                              auto [i, decl] = pair;
-                              bool is_last = (i == decls.size() - 1);
+                              const auto [i, decl] = pair;
+                              const bool is_last = (i == decls.size() - 1);
                               return makeGenericParam(decl, !is_last);
                           })
                         | std::ranges::to<std::vector>();
@@ -32,6 +32,7 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
 auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::PortClause
 {
     auto clause = make<ast::PortClause>(ctx);
+
     auto *list = ctx->port_list();
     if (list == nullptr) {
         return clause;
@@ -43,8 +44,8 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
         clause.ports = decls
                      | std::views::enumerate
                      | std::views::transform([&](auto &&pair) {
-                           auto [i, decl] = pair;
-                           bool is_last = (i == decls.size() - 1);
+                           const auto [i, decl] = pair;
+                           const bool is_last = (i == decls.size() - 1);
                            return makeSignalPort(decl, !is_last);
                        })
                      | std::ranges::to<std::vector>();
