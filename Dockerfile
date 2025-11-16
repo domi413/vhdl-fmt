@@ -9,6 +9,7 @@ RUN dnf install -y --setopt=install_weak_deps=false \
     clang \
     clang-tools-extra \
     llvm \
+    compiler-rt \
     cmake \
     git \
     make \
