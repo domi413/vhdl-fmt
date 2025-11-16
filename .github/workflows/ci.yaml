@@ -127,6 +127,7 @@ jobs:
     name: Build
     timeout-minutes: 15
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -155,6 +156,7 @@ jobs:
     name: Formatter Check
     timeout-minutes: 2
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -175,6 +177,7 @@ jobs:
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 20
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -210,6 +213,7 @@ jobs:
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 20
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
@@ -245,6 +249,7 @@ jobs:
     needs: build
     timeout-minutes: 10
 
+    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
       image: ghcr.io/vedivad/vhdlfmt-ci:latest
     env:
