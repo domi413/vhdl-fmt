@@ -127,9 +127,8 @@ jobs:
     name: Build
     timeout-minutes: 15
 
-    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 
@@ -156,9 +155,8 @@ jobs:
     name: Formatter Check
     timeout-minutes: 2
 
-    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 
@@ -177,9 +175,8 @@ jobs:
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 20
 
-    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
       SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_source_files }}
@@ -213,9 +210,8 @@ jobs:
     needs: [get-changed-cpp-files, build]
     timeout-minutes: 20
 
-    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
       SOURCES_TO_LINT: ${{ needs.get-changed-cpp-files.outputs.changed_cpp_header_files }}
@@ -249,9 +245,8 @@ jobs:
     needs: build
     timeout-minutes: 10
 
-    # TODO: Change to ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest after new image is published
     container:
-      image: ghcr.io/vedivad/vhdlfmt-ci:latest
+      image: ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
     env:
       CONAN_HOME: /root/.conan2
 
