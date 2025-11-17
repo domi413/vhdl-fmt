@@ -52,7 +52,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::WhileLoop &node) const -> Doc;
 
   private:
-    /// @brief This is the main wrapper. It combines the core doc with trivia.
+    /// @brief Combines the core doc with leading, inline, and trailing trivia.
     [[nodiscard]]
     static auto withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc;
 };

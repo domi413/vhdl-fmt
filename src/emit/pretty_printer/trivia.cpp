@@ -3,37 +3,36 @@
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
+#include <algorithm>
 #include <ranges>
+#include <span>
 #include <variant>
-#include <vector>
 
 namespace emit {
 
 namespace {
 
-auto printTrivia(const ast::Trivia &trivia) -> Doc
+constexpr auto printLines(const unsigned count) -> Doc
 {
-    auto comment_func
-      = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); };
-
-    auto paragraph_func = [](const ast::ParagraphBreak &p) -> Doc {
-        Doc result = Doc::empty();
-        for (unsigned i = 0; i < p.blank_lines; ++i) {
-            result += Doc::hardline();
-        }
-        return result;
-    };
-
-    return std::visit(common::Overload{ comment_func, paragraph_func }, trivia);
+    auto hardlines = std::views::repeat(Doc::hardline(), count);
+    return std::ranges::fold_left(hardlines, Doc::empty(), std::plus<>());
 }
 
-auto printTrailingTriviaList(const std::vector<ast::Trivia> &list) -> Doc
+constexpr auto printTrivia(const ast::Trivia &trivia) -> Doc
+{
+    auto com = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); };
+    auto par = [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines); };
+
+    return std::visit(common::Overload{ com, par }, trivia);
+}
+
+auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
 {
     if (list.empty()) {
         return Doc::empty();
     }
 
-    Doc result = Doc::empty();
+    Doc result = Doc::line();
 
     // Print all but last trivia normally
     for (const auto &trivia : list | std::views::take(list.size() - 1)) {
@@ -43,36 +42,16 @@ auto printTrailingTriviaList(const std::vector<ast::Trivia> &list) -> Doc
     // Print last trivia with special rules
     const auto &last = list.back();
 
-    result += std::visit(
-      common::Overload{
-        // Last trivia = comment: omit trailing newline
-        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::noGroup(); },
+    auto com = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::noGroup(); };
+    auto par = [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines - 1); };
 
-        // Last trivia = paragraph break: print blank_lines - 1
-        [](const ast::ParagraphBreak &p) -> Doc {
-            if (p.blank_lines == 0) {
-                return Doc::empty();
-            }
-            Doc d = Doc::empty();
-            for (unsigned i = 0; i < p.blank_lines - 1; ++i) {
-                d += Doc::hardline();
-            }
-            return d;
-        },
-
-        // Fallback: unchanged
-        [](const auto &other) -> Doc { return printTrivia(other); },
-      },
-      last);
+    result += std::visit(common::Overload{ com, par }, last);
 
     return result;
 }
 
 } // namespace
 
-/**
- * @brief Combines the core doc with leading, inline, and trailing trivia.
- */
 auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
 {
     if (!node.trivia) {
@@ -81,23 +60,16 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
 
     const auto &trivia = *node.trivia;
 
-    // Build the on-line part (head + core + inline comment)
-    Doc result = Doc::empty();
-    for (const auto &t : trivia.leading) {
-        result += printTrivia(t);
-    }
+    Doc result = std::ranges::fold_left(
+      trivia.leading | std::views::transform(printTrivia), Doc::empty(), std::plus<>());
+
     result += core_doc;
 
-    if (trivia.inline_comment) {
-        result += Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::noGroup();
-    }
+    result += trivia.inline_comment
+              ? Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::noGroup()
+              : Doc::empty();
 
-    // Append trailing trivia
-    const Doc foot = printTrailingTriviaList(trivia.trailing);
-
-    if (!foot.isEmpty()) {
-        return result.isEmpty() ? foot : (result / foot);
-    }
+    result += printTrailingTriviaList(trivia.trailing);
 
     return result;
 }
