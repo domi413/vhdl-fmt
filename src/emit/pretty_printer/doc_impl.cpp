@@ -10,6 +10,7 @@
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 namespace emit {
 
@@ -132,8 +133,8 @@ auto optimizeImpl(const DocPtr &doc) -> DocPtr
         // === Concat nodes ===
         [](const Concat &node) -> DocPtr {
             // Rule 1: Identity (Empty) elimination
-            bool left_is_empty = std::holds_alternative<Empty>(node.left->value);
-            bool right_is_empty = std::holds_alternative<Empty>(node.right->value);
+            const bool left_is_empty = std::holds_alternative<Empty>(node.left->value);
+            const bool right_is_empty = std::holds_alternative<Empty>(node.right->value);
 
             if (left_is_empty && right_is_empty) {
                 return makeEmpty(); // (empty + empty) -> empty
@@ -164,9 +165,9 @@ auto optimizeImpl(const DocPtr &doc) -> DocPtr
                 return 0; // Not a line node
             };
 
-            unsigned left_lines = get_lines(node.left);
+            const unsigned left_lines = get_lines(node.left);
             if (left_lines > 0) {
-                unsigned right_lines = get_lines(node.right);
+                const unsigned right_lines = get_lines(node.right);
                 if (right_lines > 0) {
                     // (hardlines(A) + hardlines(B)) -> hardlines(A + B)
                     return makeHardLines(left_lines + right_lines);

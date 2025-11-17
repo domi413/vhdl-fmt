@@ -22,7 +22,7 @@ auto transformImpl(const DocPtr &doc, Fn &&fn) -> DocPtr;
 template<typename T, typename Fn>
 auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T;
 
-auto optimizeImpl(const DocPtr& doc) -> DocPtr;
+auto optimizeImpl(const DocPtr &doc) -> DocPtr;
 
 /**
  * @brief An immutable abstraction for a pretty-printable document.

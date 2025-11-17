@@ -11,7 +11,7 @@
 namespace emit {
 
 // Forward declaration for recursive type
-struct DocImpl;
+class DocImpl;
 using DocPtr = std::shared_ptr<DocImpl>;
 
 template<typename T>
@@ -244,7 +244,7 @@ auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T
       doc->value);
 }
 
-auto optimizeImpl(const DocPtr& doc) -> DocPtr;
+auto optimizeImpl(const DocPtr &doc) -> DocPtr;
 
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;

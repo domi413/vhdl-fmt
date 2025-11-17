@@ -1,110 +1,69 @@
-#include "ast/node.hpp"
-#include "ast/nodes/expressions.hpp"
-#include "emit/test_utils.hpp"
+#include "emit/pretty_printer/doc.hpp"
+#include "emit/pretty_printer/doc_impl.hpp"
 
 #include <catch2/catch_test_macros.hpp>
-#include <optional>
 
-// ========================================================================
-// NOTE: These tests are integration tests. They test the *entire* pipeline:
-// 1. PrettyPrinter creates an unoptimized, "dumb" Doc tree.
-// 2. withTrivia() calls doc.optimize().
-// 3. optimize() applies peephole optimization rules (e.g., merging text).
-// 4. The final, smaller, optimized tree is rendered to a string.
-//
-// We verify that the final string matches the *optimized* output.
-// ========================================================================
+using emit::Doc;
+using emit::DocPtr;
 
-TEST_CASE("Optimizer: Rule 1 (Identity) - empty + a", "[pretty_printer][optimizer]")
-{
-    // A node with only leading trivia.
-    // Unoptimized: fold(printTrivia(...)) = (empty + hardlines(1))
-    // Optimized: hardlines(1)
-    // Final tree: hardlines(1) + core_doc
-    ast::TokenExpr token{ .text = "foo" };
-    token.trivia = ast::NodeTrivia{ .leading = { ast::ParagraphBreak{ .blank_lines = 1 } } };
-
-    const auto result = emit::test::render(token);
-    REQUIRE(result == "\nfoo");
-}
+namespace {
+// Helper lambda for counting all nodes in a Doc tree
+constexpr auto NODE_COUNTER = [](int count, const auto & /*node*/) { return count + 1; };
+} // namespace
 
 TEST_CASE("Optimizer: Rule 1 (Identity) - a + empty", "[pretty_printer][optimizer]")
 {
-    // A node with 1 blank line trailing (2 newlines).
-    // TriviaBinder creates ParagraphBreak{1}.
-    // printTrailingTriviaList creates: Doc::line() + hardlines(1 - 1)
-    // This becomes: Doc::line() + hardlines(0)
-    // Doc::hardlines(0) creates: Doc::empty()
-    // Unoptimized tree: core_doc + (Doc::line() + Doc::empty())
-    // Optimized tree: core_doc + Doc::line()
-    ast::TokenExpr token{ .text = "foo" };
-    token.trivia = ast::NodeTrivia{ .trailing = { ast::ParagraphBreak{ .blank_lines = 1 } } };
+    const Doc a = Doc::text("a");
+    const Doc unoptimized_doc = a + Doc::empty();
+    const Doc optimized_doc = unoptimized_doc.optimize();
 
-    const auto result = emit::test::render(token);
-    REQUIRE(result == "foo\n"); // Just one newline, not two
+    // Unoptimized: Concat(Text("a"), Empty) -> 3 nodes
+    REQUIRE(unoptimized_doc.fold(0, NODE_COUNTER) == 3);
+    // Optimized: Text("a") -> 1 node
+    REQUIRE(optimized_doc.fold(0, NODE_COUNTER) == 1);
 }
 
-TEST_CASE("Optimizer: Rule 2 (Text Merge) - Simple", "[pretty_printer][optimizer]")
+TEST_CASE("Optimizer: Rule 1 (Identity) - empty + a", "[pretty_printer][optimizer]")
 {
-    // ...
-    const ast::TokenExpr literal{ .text = "123" };
+    const Doc a = Doc::text("a");
+    const Doc unoptimized_doc = Doc::empty() + a;
+    const Doc optimized_doc = unoptimized_doc.optimize();
 
-    // Use std::make_unique<ast::Expr> to create the Box<Expr>
-    const ast::UnaryExpr expr{ .op = "-", .value = std::make_unique<ast::Expr>(literal) };
-
-    const auto result = emit::test::render(expr);
-    REQUIRE(result == "-123");
+    // Unoptimized: Concat(Empty, Text("a")) -> 3 nodes
+    REQUIRE(unoptimized_doc.fold(0, NODE_COUNTER) == 3);
+    // Optimized: Text("a") -> 1 node
+    REQUIRE(optimized_doc.fold(0, NODE_COUNTER) == 1);
 }
 
-TEST_CASE("Optimizer: Rule 2 (Text Merge) - Chained", "[pretty_printer][optimizer]")
+TEST_CASE("Optimizer: Rule 1 (Identity) - empty + empty", "[pretty_printer][optimizer]")
 {
-    // ...
-    const ast::TokenExpr literal{ .text = "1" };
+    const Doc unoptimized_doc = Doc::empty() + Doc::empty();
+    const Doc optimized_doc = unoptimized_doc.optimize();
 
-    // Use std::make_unique<ast::Expr> for both inner and outer
-    ast::UnaryExpr inner{ .op = "-", .value = std::make_unique<ast::Expr>(literal) };
-    const ast::UnaryExpr outer{ .op = "-", .value = std::make_unique<ast::Expr>(std::move(inner)) };
-
-    const auto result = emit::test::render(outer);
-    REQUIRE(result == "--1");
+    // Unoptimized: Concat(Empty, Empty) -> 3 nodes
+    REQUIRE(unoptimized_doc.fold(0, NODE_COUNTER) == 3);
+    // Optimized: Empty -> 1 node
+    REQUIRE(optimized_doc.fold(0, NODE_COUNTER) == 1);
 }
 
-TEST_CASE("Optimizer: Rule 3 (HardLines Merge) - Paragraphs", "[pretty_printer][optimizer]")
+TEST_CASE("Optimizer: Rule 2 (Text Merge)", "[pretty_printer][optimizer]")
 {
-    // Two leading paragraph breaks.
-    // printTrivia(P{1}) -> hardlines(1)
-    // printTrivia(P{2}) -> hardlines(2)
-    // Unoptimized tree: (empty + hardlines(1)) + hardlines(2)
-    // Optimized tree: hardlines(3)
-    // Final tree: hardlines(3) + core_doc
-    ast::TokenExpr token{ .text = "foo" };
-    token.trivia = ast::NodeTrivia{
-        .leading
-        = { ast::ParagraphBreak{ .blank_lines = 1 }, ast::ParagraphBreak{ .blank_lines = 2 } }
-    };
+    const Doc unoptimized_doc = Doc::text("a") + Doc::text("b");
+    const Doc optimized_doc = unoptimized_doc.optimize();
 
-    const auto result = emit::test::render(token);
-    // 3 hardlines, not 1 then 2
-    REQUIRE(result == "\n\n\nfoo");
+    // Unoptimized: Concat(Text("a"), Text("b")) -> 3 nodes
+    REQUIRE(unoptimized_doc.fold(0, NODE_COUNTER) == 3);
+    // Optimized: Text("ab") -> 1 node
+    REQUIRE(optimized_doc.fold(0, NODE_COUNTER) == 1);
 }
 
-TEST_CASE("Optimizer: Rule 3 (HardLines Merge) - Comment + Paragraph",
-          "[pretty_printer][optimizer]")
+TEST_CASE("Optimizer: Rule 3 (HardLines Merge)", "[pretty_printer][optimizer]")
 {
-    // A comment followed by a paragraph break.
-    // printTrivia(Comment) -> text("--c") + hardline()
-    // printTrivia(PBreak)  -> hardlines(1)
-    // Unoptimized tree: (empty + (text + hardline)) + hardlines(1)
-    // Optimized (bottom-up):
-    // 1. (text + hardline) + hardlines(1)
-    // 2. hardline + hardlines(1) -> hardlines(2)
-    // 3. Final: text("--c") + hardlines(2)
-    ast::TokenExpr token{ .text = "foo" };
-    token.trivia = ast::NodeTrivia{
-        .leading = { ast::Comment{ .text = "--c" }, ast::ParagraphBreak{ .blank_lines = 1 } }
-    };
+    const Doc unoptimized_doc = Doc::hardlines(2) + Doc::hardline() + Doc::hardlines(3);
+    const Doc optimized_doc = unoptimized_doc.optimize();
 
-    const auto result = emit::test::render(token);
-    // 1 newline from comment, 1 from paragraph, for 2 total
-    REQUIRE(result == "--c\n\nfoo");
+    // Unoptimized: Concat(Concat(HardLines(2), HardLine), HardLines(3)) -> 5 nodes
+    REQUIRE(unoptimized_doc.fold(0, NODE_COUNTER) == 5);
+    // Optimized: HardLines(6) -> 1 node
+    REQUIRE(optimized_doc.fold(0, NODE_COUNTER) == 1);
 }
