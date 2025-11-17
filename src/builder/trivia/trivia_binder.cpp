@@ -1,5 +1,6 @@
 #include "builder/trivia/trivia_binder.hpp"
 
+#include "CommonTokenStream.h"
 #include "ParserRuleContext.h"
 #include "Token.h"
 #include "ast/node.hpp"
@@ -7,7 +8,9 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <optional>
 #include <ranges>
+#include <vector>
 
 namespace builder {
 

@@ -1,11 +1,18 @@
 #ifndef BUILDER_TRIVIA_TRIVIA_BINDER_HPP
 #define BUILDER_TRIVIA_TRIVIA_BINDER_HPP
 
-#include "CommonTokenStream.h"
-#include "ParserRuleContext.h"
 #include "ast/node.hpp"
 
 #include <cstddef>
+#include <optional>
+#include <unordered_set>
+#include <vector>
+
+namespace antlr4 {
+class CommonTokenStream;
+class ParserRuleContext;
+class Token;
+} // namespace antlr4
 
 namespace builder {
 
