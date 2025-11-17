@@ -20,10 +20,11 @@ constexpr auto printLines(const unsigned count) -> Doc
 
 constexpr auto printTrivia(const ast::Trivia &trivia) -> Doc
 {
-    auto com = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); };
-    auto par = [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines); };
-
-    return std::visit(common::Overload{ com, par }, trivia);
+    return std::visit(
+      common::Overload{
+        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); },
+        [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines); } },
+      trivia);
 }
 
 auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
@@ -32,20 +33,17 @@ auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
         return Doc::empty();
     }
 
-    Doc result = Doc::line();
-
-    // Print all but last trivia normally
-    for (const auto &trivia : list | std::views::take(list.size() - 1)) {
-        result += printTrivia(trivia);
-    }
+    Doc result = std::ranges::fold_left(
+      list | std::views::take(list.size() - 1) | std::views::transform(printTrivia),
+      Doc::line(),
+      std::plus<>());
 
     // Print last trivia with special rules
-    const auto &last = list.back();
-
-    auto com = [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::noGroup(); };
-    auto par = [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines - 1); };
-
-    result += std::visit(common::Overload{ com, par }, last);
+    result += std::visit(
+      common::Overload{
+        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::noGroup(); },
+        [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines - 1); } },
+      list.back());
 
     return result;
 }
