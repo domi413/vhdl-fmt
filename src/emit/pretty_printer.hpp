@@ -10,6 +10,8 @@
 #include "ast/visitor.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
+#include <utility>
+
 namespace emit {
 
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
@@ -52,7 +54,8 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::WhileLoop &node) const -> Doc;
 
     template<typename T>
-    auto wrapResult(const T &node, Doc result) const -> Doc {
+    auto wrapResult(const T &node, Doc result) const -> Doc
+    {
         return withTrivia(node, std::move(result)).optimize();
     }
 
