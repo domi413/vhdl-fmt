@@ -38,7 +38,7 @@ auto Doc::hardlines(unsigned count) -> Doc
     if (count == 1) {
         return Doc(makeHardLine());
     }
-    // Count 0 acts as a marker to prevent flattening
+    // Count 0 can act as a marker to prevent flattening
     return Doc(makeHardLines(count));
 }
 

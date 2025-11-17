@@ -103,3 +103,19 @@ TEST_CASE("Optimizer: Rule 3 (HardLines Merge)", "[pretty_printer][optimizer]")
     REQUIRE(lines_node != nullptr);
     REQUIRE(lines_node->count == EXPECTED);
 }
+
+TEST_CASE("Optimizer: Rule 3 (1 HardLines merges to HardLine)", "[pretty_printer][optimizer]")
+{
+    constexpr unsigned EXPECTED = 0;
+
+    const DocPtr unoptimized = makeConcat(makeHardLines(0), makeHardLines(1));
+    const DocPtr optimized = optimizeImpl(unoptimized);
+
+    // Unoptimized: Concat(HardLines(0), HardLines(1)) -> 2 nodes
+    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 3);
+    // Optimized: HardLine -> 1 node
+    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
+
+    // Check that optimized doc matches expected
+    REQUIRE(std::get_if<emit::HardLine>(&optimized->value) != nullptr);
+}

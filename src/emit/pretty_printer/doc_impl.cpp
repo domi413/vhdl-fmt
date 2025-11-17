@@ -156,23 +156,22 @@ auto optimizeImpl(const DocPtr &doc) -> DocPtr
             }
 
             // Rule 3: Merge adjacent HardLines/HardLine nodes
-            auto get_lines = [](const DocPtr &d) -> unsigned {
+            auto get_lines = [](const DocPtr &d) -> std::optional<unsigned> {
                 if (std::holds_alternative<HardLine>(d->value)) {
                     return 1;
                 }
                 if (auto *hl = std::get_if<HardLines>(&d->value)) {
                     return hl->count;
                 }
-                return 0; // Not a line node
+                return std::nullopt; // Not a line node
             };
 
-            const unsigned left_lines = get_lines(node.left);
-            if (left_lines > 0) {
-                const unsigned right_lines = get_lines(node.right);
-                if (right_lines > 0) {
-                    // (hardlines(A) + hardlines(B)) -> hardlines(A + B)
-                    return makeHardLines(left_lines + right_lines);
+            if (auto lhs = get_lines(node.left), rhs = get_lines(node.right); lhs && rhs) {
+                const unsigned total_lines = *lhs + *rhs;
+                if (total_lines == 1) {
+                    return makeHardLine();
                 }
+                return makeHardLines(total_lines);
             }
 
             // If no Concat-specific rule matched, just return the node
