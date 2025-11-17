@@ -27,7 +27,7 @@ auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
         return Doc::empty();
     }
 
-    Doc result = std::ranges::fold_left(
+    const Doc result = std::ranges::fold_left(
       list | std::views::take(list.size() - 1) | std::views::transform(printTrivia),
       Doc::line(),
       std::plus<>());
