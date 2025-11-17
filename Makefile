@@ -169,7 +169,7 @@ check-cspell-ignored:
 # Docker Development Environment
 # -----------------------------
 CONTAINER_CMD ?= docker
-CI_IMAGE_NAME ?= ghcr.io/vedivad/vhdlfmt-ci:latest
+CI_IMAGE_NAME ?= ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
 
 docker-dev-build:
 	@echo "Building development environment with $(CONTAINER_CMD)..."
