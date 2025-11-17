@@ -3,11 +3,7 @@
 
 #include "CommonTokenStream.h"
 #include "ParserRuleContext.h"
-#include "Token.h"
 #include "ast/node.hpp"
-#include "builder/trivia/comment_sink.hpp"
-#include "builder/trivia/newline_sink.hpp"
-#include "vhdlLexer.h"
 
 #include <cstddef>
 
@@ -30,39 +26,13 @@ class TriviaBinder final
     void bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ctx);
 
   private:
-    struct AnchorToken
-    {
-        std::size_t index{};
-        std::size_t line{};
-    };
-
     antlr4::CommonTokenStream &tokens_;
-    CommentSink comments_;
-    NewlineSink newlines_;
+    std::unordered_set<std::size_t> used_; ///< set of token indices already added as trivia
+
+    void collect(std::vector<ast::Trivia> &dst, const std::vector<antlr4::Token *> &tokens);
+    auto collectInline(std::optional<ast::Comment> &dst, std::size_t index);
 
     [[nodiscard]]
-    static constexpr auto isComment(const antlr4::Token *t) noexcept -> bool
-    {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::COMMENTS;
-    }
-
-    [[nodiscard]]
-    static constexpr auto isNewline(const antlr4::Token *t) noexcept -> bool
-    {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::NEWLINES;
-    }
-
-    [[nodiscard]]
-    static constexpr auto isDefault(const antlr4::Token *t) noexcept -> bool
-    {
-        return (t != nullptr) && t->getChannel() == vhdlLexer::DEFAULT_TOKEN_CHANNEL;
-    }
-
-    void collectLeading(ast::NodeTrivia &dst, std::size_t start_index);
-    void collectTrailing(ast::NodeTrivia &dst, std::size_t stop_index);
-
-    auto collectInline(ast::NodeTrivia &dst, std::size_t stop_index) -> const antlr4::Token *;
-
     auto findLastDefaultOnLine(std::size_t start_index) const -> std::size_t;
 };
 

@@ -3,6 +3,7 @@
 #include "ParserRuleContext.h"
 #include "Token.h"
 #include "ast/node.hpp"
+#include "builder/trivia/utils.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -10,17 +11,18 @@
 
 namespace builder {
 
-void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t index)
+void TriviaBinder::collect(std::vector<ast::Trivia> &dst, const std::vector<antlr4::Token *> &tokens)
 {
-    const auto &hidden = tokens_.getHiddenTokensToLeft(index);
-
     unsigned int linebreaks{ 0 };
 
-    // Iterate backward — closest token first
-    for (const antlr4::Token *token : hidden | std::views::reverse) {
-        if (token == nullptr) {
-            break;
+    for (const antlr4::Token *token : tokens) {
+        const auto index = token->getTokenIndex();
+
+        if (used_.contains(index)) {
+            continue;
         }
+
+        used_.insert(index);
 
         if (isNewline(token)) {
             ++linebreaks;
@@ -28,77 +30,37 @@ void TriviaBinder::collectLeading(ast::NodeTrivia &dst, std::size_t index)
         }
 
         if (isComment(token)) {
-            // If there were newlines before this comment, push them
-            if (linebreaks > 0) {
-                newlines_.push(dst.leading, linebreaks);
-                linebreaks = 0;
+            if (linebreaks >= 2) {
+                dst.emplace_back(ast::ParagraphBreak{ .blank_lines = linebreaks - 1 });
             }
-            comments_.push(dst.leading, token);
+            linebreaks = 0; // reset linebreak count
+
+            dst.emplace_back(ast::Comment{ token->getText() });
         }
     }
 
-    // Push any remaining paragraph breaks (2+ newlines = 1+ blank lines)
     if (linebreaks >= 2) {
-        newlines_.push(dst.leading, linebreaks);
-    }
-
-    // Iteration went backward - restore to source order
-    std::ranges::reverse(dst.leading);
-}
-
-void TriviaBinder::collectTrailing(ast::NodeTrivia &dst, std::size_t index)
-{
-    const auto hidden = tokens_.getHiddenTokensToRight(index);
-    unsigned int linebreaks{ 0 };
-
-    for (const antlr4::Token *token : hidden) {
-        if (token == nullptr) {
-            break;
-        }
-
-        if (isNewline(token)) {
-            ++linebreaks;
-            continue;
-        }
-
-        if (isComment(token)) {
-            if (linebreaks > 0) {
-                newlines_.push(dst.trailing, linebreaks);
-                linebreaks = 0;
-            }
-            comments_.push(dst.trailing, token);
-        }
-    }
-
-    // Push any remaining paragraph breaks (2+ newlines = 1+ blank lines)
-    if (linebreaks >= 2) {
-        newlines_.push(dst.leading, linebreaks);
+        dst.emplace_back(ast::ParagraphBreak{ .blank_lines = linebreaks - 1 });
     }
 }
 
-auto TriviaBinder::collectInline(ast::NodeTrivia &dst, std::size_t index) -> const antlr4::Token *
+auto TriviaBinder::collectInline(std::optional<ast::Comment> &dst, std::size_t index)
 {
-    const auto hidden = tokens_.getHiddenTokensToRight(index);
+    const auto &token = tokens_.get(index);
 
-    const antlr4::Token *result{};
-
-    for (const antlr4::Token *token : hidden) {
-        if (token == nullptr) {
-            break;
-        }
-
-        if (isComment(token)) {
-            result = token;
-            comments_.push(dst.inline_comment, token);
-            break; // only one inline comment per node
-        }
-
-        if (isNewline(token)) {
-            break; // no inline comment found
-        }
+    if (used_.contains(index)) {
+        return;
     }
 
-    return result;
+    if (isComment(token)) {
+        used_.insert(index);
+        dst.emplace(ast::Comment{ token->getText() });
+        return; // only one inline comment per node
+    }
+
+    if (isNewline(token)) {
+        return; // no inline comment found
+    }
 }
 
 void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ctx)
@@ -112,9 +74,12 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     const auto start_index = ctx->getStart()->getTokenIndex();
     const auto stop_index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex());
 
-    collectLeading(trivia, start_index);
-    collectInline(trivia, stop_index);
-    collectTrailing(trivia, stop_index + 1);
+    const auto hidden_left = tokens_.getHiddenTokensToLeft(start_index);
+    const auto hidden_right = tokens_.getHiddenTokensToRight(stop_index);
+
+    collect(trivia.leading, hidden_left);
+    collectInline(trivia.inline_comment, stop_index + 1);
+    collect(trivia.trailing, hidden_right);
 }
 
 auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const -> std::size_t

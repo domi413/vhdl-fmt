@@ -98,3 +98,162 @@ TEST_CASE("Ports capture leading, trailing and inline comments", "[design_units]
     REQUIRE(rst_trail.front().contains("trailing rst"));
     REQUIRE(rst_inline.contains("inline rst"));
 }
+
+TEST_CASE("Generic captures paragraph breaks after comments with blank lines", "[design_units][comments]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity ExampleEntity is
+            generic (
+                one : integer := 1;
+
+                -- test
+
+                two : integer := 2
+            );
+        end ExampleEntity;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    REQUIRE(entity != nullptr);
+    REQUIRE(entity->generic_clause.generics.size() == 2);
+
+    const auto &one = entity->generic_clause.generics[0];
+    const auto &two = entity->generic_clause.generics[1];
+
+    // 'one' should have trailing trivia with: paragraph break, comment, paragraph break
+    REQUIRE(one.trivia.has_value());
+    const auto &one_trivia = one.trivia.value();
+
+    // Should have 3 elements: ParagraphBreak, Comment, ParagraphBreak
+    REQUIRE(one_trivia.trailing.size() == 3);
+
+    // First should be a paragraph break (blank line before comment)
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(one_trivia.trailing[0]));
+    const auto &para_before = std::get<ast::ParagraphBreak>(one_trivia.trailing[0]);
+    REQUIRE(para_before.blank_lines == 1);
+
+    // Second should be the comment
+    REQUIRE(std::holds_alternative<ast::Comment>(one_trivia.trailing[1]));
+    const auto &comment = std::get<ast::Comment>(one_trivia.trailing[1]);
+    REQUIRE(comment.text.contains("test"));
+
+    // Third should be a paragraph break (blank line after comment)
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(one_trivia.trailing[2]));
+    const auto &para_after = std::get<ast::ParagraphBreak>(one_trivia.trailing[2]);
+    REQUIRE(para_after.blank_lines == 1);
+
+    // 'two' should have no leading trivia (it was captured by 'one's trailing)
+    if (two.trivia.has_value()) {
+        const auto &two_trivia = two.trivia.value();
+        REQUIRE(two_trivia.leading.empty());
+    }
+}
+
+TEST_CASE("Generic with inline comment captures paragraph breaks correctly", "[design_units][comments]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity ExampleEntity is
+            generic (
+                one : integer := 1; -- inline
+
+                -- test
+
+                two : integer := 2
+            );
+        end ExampleEntity;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    REQUIRE(entity != nullptr);
+    REQUIRE(entity->generic_clause.generics.size() == 2);
+
+    const auto &one = entity->generic_clause.generics[0];
+    const auto &two = entity->generic_clause.generics[1];
+
+    // 'one' should have an inline comment AND trailing trivia with: paragraph break, comment, paragraph break
+    REQUIRE(one.trivia.has_value());
+    const auto &one_trivia = one.trivia.value();
+
+    // Check inline comment
+    REQUIRE(one_trivia.inline_comment.has_value());
+    REQUIRE(one_trivia.inline_comment->text.contains("inline"));
+
+    // Should have 3 elements in trailing: ParagraphBreak, Comment, ParagraphBreak
+    REQUIRE(one_trivia.trailing.size() == 3);
+
+    // First should be a paragraph break (blank line before comment)
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(one_trivia.trailing[0]));
+    const auto &para_before = std::get<ast::ParagraphBreak>(one_trivia.trailing[0]);
+    REQUIRE(para_before.blank_lines == 1);
+
+    // Second should be the comment
+    REQUIRE(std::holds_alternative<ast::Comment>(one_trivia.trailing[1]));
+    const auto &comment = std::get<ast::Comment>(one_trivia.trailing[1]);
+    REQUIRE(comment.text.contains("test"));
+
+    // Third should be a paragraph break (blank line after comment)
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(one_trivia.trailing[2]));
+    const auto &para_after = std::get<ast::ParagraphBreak>(one_trivia.trailing[2]);
+    REQUIRE(para_after.blank_lines == 1);
+
+    // 'two' should have no leading trivia (it was captured by 'one's trailing)
+    if (two.trivia.has_value()) {
+        const auto &two_trivia = two.trivia.value();
+        REQUIRE(two_trivia.leading.empty());
+    }
+}
+
+TEST_CASE("Generic captures paragraph breaks after comments with 2 blank lines", "[design_units][comments]")
+{
+    constexpr std::string_view VHDL_FILE = R"(
+        entity ExampleEntity is
+            generic (
+                one : integer := 1;
+
+
+                -- test
+
+
+                two : integer := 2
+            );
+        end ExampleEntity;
+    )";
+
+    auto design = builder::buildFromString(VHDL_FILE);
+    auto *entity = std::get_if<ast::Entity>(design.units.data());
+    REQUIRE(entity != nullptr);
+    REQUIRE(entity->generic_clause.generics.size() == 2);
+
+    const auto &one = entity->generic_clause.generics[0];
+    const auto &two = entity->generic_clause.generics[1];
+
+    // 'one' should have trailing trivia with: paragraph break, comment, paragraph break
+    REQUIRE(one.trivia.has_value());
+    const auto &one_trivia = one.trivia.value();
+
+    // Should have 3 elements: ParagraphBreak, Comment, ParagraphBreak
+    REQUIRE(one_trivia.trailing.size() == 3);
+
+    // First should be a paragraph break (blank line before comment)
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(one_trivia.trailing[0]));
+    const auto &para_before = std::get<ast::ParagraphBreak>(one_trivia.trailing[0]);
+    REQUIRE(para_before.blank_lines == 2);
+
+    // Second should be the comment
+    REQUIRE(std::holds_alternative<ast::Comment>(one_trivia.trailing[1]));
+    const auto &comment = std::get<ast::Comment>(one_trivia.trailing[1]);
+    REQUIRE(comment.text.contains("test"));
+
+    // Third should be a paragraph break (blank line after comment)
+    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(one_trivia.trailing[2]));
+    const auto &para_after = std::get<ast::ParagraphBreak>(one_trivia.trailing[2]);
+    REQUIRE(para_after.blank_lines == 2);
+
+    // 'two' should have no leading trivia (it was captured by 'one's trailing)
+    if (two.trivia.has_value()) {
+        const auto &two_trivia = two.trivia.value();
+        REQUIRE(two_trivia.leading.empty());
+    }
+}

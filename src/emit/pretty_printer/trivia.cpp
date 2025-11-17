@@ -33,17 +33,37 @@ auto printTrailingTriviaList(const std::vector<ast::Trivia> &list) -> Doc
         return Doc::empty();
     }
 
-    // Process all but the last trivia using the standard printer
     Doc result = Doc::empty();
+
+    // Print all but last trivia normally
     for (const auto &trivia : list | std::views::take(list.size() - 1)) {
         result += printTrivia(trivia);
     }
 
-    // Append last trivia: if it's a comment, omit the trailing hardline
+    // Print last trivia with special rules
+    const auto &last = list.back();
+
     result += std::visit(
-      common::Overload{ [](const ast::Comment &c) -> Doc { return Doc::text(c.text); },
-                        [](const auto &other) { return printTrivia(other); } },
-      list.back());
+      common::Overload{
+        // Last trivia = comment: omit trailing newline
+        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::noGroup(); },
+
+        // Last trivia = paragraph break: print blank_lines - 1
+        [](const ast::ParagraphBreak &p) -> Doc {
+            if (p.blank_lines == 0) {
+                return Doc::empty();
+            }
+            Doc d = Doc::empty();
+            for (unsigned i = 0; i < p.blank_lines - 1; ++i) {
+                d += Doc::hardline();
+            }
+            return d;
+        },
+
+        // Fallback: unchanged
+        [](const auto &other) -> Doc { return printTrivia(other); },
+      },
+      last);
 
     return result;
 }
