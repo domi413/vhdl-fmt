@@ -13,7 +13,7 @@
 
 namespace builder {
 
-TriviaBinder::TriviaBinder(antlr4::CommonTokenStream &ts) noexcept : tokens_(ts), used_(ts.size())
+TriviaBinder::TriviaBinder(antlr4::CommonTokenStream &ts) : tokens_(ts), used_(ts.size())
 {
 }
 

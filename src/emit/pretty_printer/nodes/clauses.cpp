@@ -21,7 +21,6 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const Doc doc = joinDocs(params, Doc::line(), false);
     const Doc result = Doc::align(doc);
 
-    // This withTrivia handles trivia for the *entire clause*
     return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
 }
 

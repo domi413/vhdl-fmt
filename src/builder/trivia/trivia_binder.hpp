@@ -20,7 +20,7 @@ namespace builder {
 class TriviaBinder final
 {
   public:
-    explicit TriviaBinder(antlr4::CommonTokenStream &ts) noexcept;
+    explicit TriviaBinder(antlr4::CommonTokenStream &ts);
 
     ~TriviaBinder() = default;
 
