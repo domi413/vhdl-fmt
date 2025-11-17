@@ -17,9 +17,6 @@ RUN dnf install -y --setopt=install_weak_deps=false \
     nodejs \
     && dnf clean all
 
-# Verify LLVM coverage tools are available
-RUN llvm-profdata --version && llvm-cov --version
-
 # Get the latest version of uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 

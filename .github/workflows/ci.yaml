@@ -292,7 +292,7 @@ jobs:
           # Extract total coverage percentage
           TOTAL_LINE=$(grep -i "TOTAL" "$INPUT" || echo "")
           if [[ -n "$TOTAL_LINE" ]]; then
-            PERCENT=$(echo "$TOTAL_LINE" | grep -oP '\d+\.\d+%' | head -1 || echo "N/A")
+            PERCENT=$(echo "$TOTAL_LINE" | grep -oP '\d+\.\d+%' | tail -1 || echo "N/A")
             echo "> **Overall Coverage**: $PERCENT" >> "$OUTPUT"
           fi
 

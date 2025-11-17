@@ -60,28 +60,16 @@ clean:
 # -----------------------------
 # Coverage Targets
 # -----------------------------
-# Internal target to ensure coverage build
-.PHONY: _ensure-coverage-build
-_ensure-coverage-build:
-	@if [ ! -f "$(CONAN_STAMP)" ]; then \
-		echo "Running Conan..."; \
-		$(MAKE) conan BUILD_TYPE=Debug; \
-	fi
-	@if [ ! -f "$(BUILD_STAMP)" ] || ! grep -q "ENABLE_COVERAGE=ON" build/Debug/CMakeCache.txt 2>/dev/null; then \
-		echo "Building with coverage instrumentation..."; \
-		cmake --preset conan-debug -DENABLE_COVERAGE=ON; \
-		cmake --build --preset conan-debug; \
-		touch $(BUILD_STAMP); \
-	fi
-
 # Generate HTML coverage report
-coverage: _ensure-coverage-build
+coverage:
+	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON all
 	@cmake --build build/Debug --target coverage
 	@echo ""
 	@echo "✓ HTML coverage report: build/Debug/coverage/html/index.html"
 
 # Generate text coverage summary
-coverage-report: _ensure-coverage-build
+coverage-report:
+	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON all
 	@cmake --build build/Debug --target coverage-report
 
 # Open HTML coverage report in browser
