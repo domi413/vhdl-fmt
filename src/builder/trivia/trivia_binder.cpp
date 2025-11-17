@@ -78,12 +78,9 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     const auto start_index = ctx->getStart()->getTokenIndex();
     const auto stop_index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex());
 
-    const auto hidden_left = tokens_.getHiddenTokensToLeft(start_index);
-    const auto hidden_right = tokens_.getHiddenTokensToRight(stop_index);
-
-    collect(trivia.leading, hidden_left);
+    collect(trivia.leading, tokens_.getHiddenTokensToLeft(start_index));
     collectInline(trivia.inline_comment, stop_index + 1);
-    collect(trivia.trailing, hidden_right);
+    collect(trivia.trailing, tokens_.getHiddenTokensToRight(stop_index));
 }
 
 auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const -> std::size_t
