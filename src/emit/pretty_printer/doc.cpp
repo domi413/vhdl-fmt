@@ -35,9 +35,6 @@ auto Doc::hardline() -> Doc
 
 auto Doc::hardlines(unsigned count) -> Doc
 {
-    if (count == 0) {
-        return Doc(makeEmpty());
-    }
     if (count == 1) {
         return Doc(makeHardLine());
     }

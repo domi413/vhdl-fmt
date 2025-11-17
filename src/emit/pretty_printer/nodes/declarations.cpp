@@ -33,7 +33,7 @@ auto PrettyPrinter::operator()(const ast::GenericParam &node) const -> Doc
         result += Doc::text(";");
     }
 
-    return withTrivia(node, result);
+    return result;
 }
 
 auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
@@ -60,19 +60,19 @@ auto PrettyPrinter::operator()(const ast::Port &node) const -> Doc
         result += Doc::text(";");
     }
 
-    return withTrivia(node, result);
+    return result;
 }
 
 auto PrettyPrinter::operator()([[maybe_unused]] const ast::SignalDecl &node) const -> Doc
 {
     // TODO(vedivad): Implement signal declaration printing
-    return withTrivia(node, Doc::text("-- signal"));
+    return Doc::text("-- signal");
 }
 
 auto PrettyPrinter::operator()([[maybe_unused]] const ast::ConstantDecl &node) const -> Doc
 {
     // TODO(vedivad): Implement constant declaration printing
-    return withTrivia(node, Doc::text("-- constant"));
+    return Doc::text("-- constant");
 }
 
 } // namespace emit

@@ -21,7 +21,7 @@ auto PrettyPrinter::operator()(const ast::GenericClause &node) const -> Doc
     const Doc doc = joinDocs(params, Doc::line(), false);
     const Doc result = Doc::align(doc);
 
-    return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
+    return Doc::group(Doc::bracket(opener, result, closer));
 }
 
 auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
@@ -38,7 +38,7 @@ auto PrettyPrinter::operator()(const ast::PortClause &node) const -> Doc
     const Doc doc = joinDocs(ports, Doc::line(), false);
     const Doc result = Doc::align(doc);
 
-    return withTrivia(node, Doc::group(Doc::bracket(opener, result, closer)));
+    return Doc::group(Doc::bracket(opener, result, closer));
 }
 
 } // namespace emit

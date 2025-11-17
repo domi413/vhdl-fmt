@@ -29,7 +29,7 @@ constexpr auto defaultConfig() -> common::Config
 auto render(const ASTNode auto &node) -> std::string
 {
     const emit::PrettyPrinter printer{};
-    const auto doc = printer(node);
+    const auto doc = printer.visit(node);
     return doc.render(defaultConfig());
 }
 
@@ -37,7 +37,7 @@ auto render(const ASTNode auto &node) -> std::string
 auto render(const ASTNode auto &node, const common::Config &config) -> std::string
 {
     const emit::PrettyPrinter printer{};
-    const auto doc = printer(node);
+    const auto doc = printer.visit(node);
     return doc.render(config);
 }
 
