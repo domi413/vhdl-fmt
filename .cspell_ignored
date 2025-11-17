@@ -8,11 +8,12 @@ cppcoreguidelines
 dedents
 domi
 doublestar
+fcoverage
 flto
 gersemi
 niekdomi
 nolintnextline
-RPAREN
+rparen
 subnature
 testbench
 vedivad

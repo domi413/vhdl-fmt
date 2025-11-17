@@ -7,10 +7,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_VERIFY_INTERFACE_HEADER_SETS ON)
 set(CMAKE_COLOR_DIAGNOSTICS ON)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# --------------------------------------------------------------------
+# Coverage Option
+# --------------------------------------------------------------------
+option(ENABLE_COVERAGE "Enable code coverage" OFF)
+
+if(ENABLE_COVERAGE)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "Coverage is only supported with Clang compiler")
+    endif()
+
+    message(STATUS "  Coverage: ENABLED")
+    add_compile_options(
+        -fprofile-instr-generate
+        -fcoverage-mapping
+    )
+    add_link_options(
+        -fprofile-instr-generate
+        -fcoverage-mapping
+    )
+endif()
 
 message(STATUS "Project: ${PROJECT_NAME}")
 message(STATUS "  Version:  ${PROJECT_VERSION}")
@@ -40,7 +60,6 @@ find_package(Catch2 CONFIG REQUIRED)
 # --------------------------------------------------------------------
 set(GRAMMAR_DIR ${CMAKE_SOURCE_DIR}/grammars)
 set(GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
-
 set(GRAMMAR_FILES
     ${GRAMMAR_DIR}/vhdlLexer.g4
     ${GRAMMAR_DIR}/vhdlParser.g4
@@ -48,7 +67,6 @@ set(GRAMMAR_FILES
 
 find_program(ANTLR4_EXECUTABLE antlr4 REQUIRED)
 
-# Tell CMake how to generate these sources
 add_custom_command(
     OUTPUT
         ${GENERATED_DIR}/vhdlLexer.cpp
@@ -68,7 +86,6 @@ add_custom_command(
     VERBATIM
 )
 
-# Create the library from the generated sources
 add_library(
     vhdl_generated
     STATIC
@@ -76,7 +93,6 @@ add_library(
     ${GENERATED_DIR}/vhdlParser.cpp
 )
 
-# Mark generated sources explicitly
 set_source_files_properties(
     ${GENERATED_DIR}/vhdlLexer.cpp
     ${GENERATED_DIR}/vhdlParser.cpp
@@ -85,7 +101,6 @@ set_source_files_properties(
             TRUE
 )
 
-# Mark generated headers as SYSTEM to suppress warnings in generated code
 target_include_directories(vhdl_generated SYSTEM PUBLIC ${GENERATED_DIR})
 target_link_libraries(vhdl_generated PUBLIC antlr4_static)
 
@@ -95,9 +110,7 @@ target_link_libraries(vhdl_generated PUBLIC antlr4_static)
 set(VERSION_IN_FILE "${CMAKE_SOURCE_DIR}/src/common/version.hpp.in")
 set(VERSION_OUT_FILE "${CMAKE_BINARY_DIR}/generated/version.hpp")
 
-# Ensure the output directory exists
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/generated")
-
 configure_file(${VERSION_IN_FILE} ${VERSION_OUT_FILE} @ONLY)
 
 # --------------------------------------------------------------------
@@ -107,3 +120,86 @@ add_subdirectory(src)
 
 enable_testing()
 add_subdirectory(tests)
+
+# --------------------------------------------------------------------
+# Coverage Targets
+# --------------------------------------------------------------------
+if(ENABLE_COVERAGE)
+    find_program(LLVM_PROFDATA llvm-profdata REQUIRED)
+    find_program(LLVM_COV llvm-cov REQUIRED)
+
+    message(STATUS "  llvm-profdata: ${LLVM_PROFDATA}")
+    message(STATUS "  llvm-cov: ${LLVM_COV}")
+
+    set(COVERAGE_DIR ${CMAKE_BINARY_DIR}/coverage)
+    set(PROFRAW_PATTERN ${COVERAGE_DIR}/vhdl_fmt-%p.profraw)
+    set(PROFDATA_FILE ${COVERAGE_DIR}/vhdl_fmt.profdata)
+    set(TARGET_BINARY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/vhdl_formatter)
+    set(COVERAGE_SOURCES ${CMAKE_SOURCE_DIR}/src/)
+    set(IGNORE_REGEX "'(${CMAKE_BINARY_DIR}|/tests/)'")
+
+    # Collect coverage data by running tests
+    add_custom_target(
+        coverage-data
+        COMMAND
+            ${CMAKE_COMMAND} -E rm -rf ${COVERAGE_DIR}
+        COMMAND
+            ${CMAKE_COMMAND} -E make_directory ${COVERAGE_DIR}
+        COMMAND
+            ${CMAKE_COMMAND} -E echo "Running tests with coverage..."
+        COMMAND
+            ${CMAKE_COMMAND} -E env LLVM_PROFILE_FILE=${PROFRAW_PATTERN}
+            ${CMAKE_CTEST_COMMAND} --test-dir ${CMAKE_BINARY_DIR}
+            --output-on-failure
+        COMMAND
+            ${CMAKE_COMMAND} -E echo "Merging coverage data..."
+        COMMAND
+            sh -c
+            "${LLVM_PROFDATA} merge -sparse ${COVERAGE_DIR}/*.profraw -o ${PROFDATA_FILE}"
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Collecting coverage data from tests"
+    )
+
+    # HTML report (for local development)
+    add_custom_target(
+        coverage
+        COMMAND
+            ${CMAKE_COMMAND} -E echo "Generating HTML coverage report..."
+        COMMAND
+            ${LLVM_COV} show ${TARGET_BINARY} -instr-profile=${PROFDATA_FILE}
+            -ignore-filename-regex=${IGNORE_REGEX} -format=html
+            -output-dir=${COVERAGE_DIR}/html ${COVERAGE_SOURCES}
+        COMMAND
+            ${CMAKE_COMMAND} -E echo "Coverage: ${COVERAGE_DIR}/html/index.html"
+        DEPENDS
+            coverage-data
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Generating HTML coverage report"
+    )
+
+    # Text summary (for CI)
+    add_custom_target(
+        coverage-report
+        COMMAND
+            ${CMAKE_COMMAND} -E echo "Generating coverage summary..."
+        COMMAND
+            ${LLVM_COV} report ${TARGET_BINARY} -instr-profile=${PROFDATA_FILE}
+            -ignore-filename-regex=${IGNORE_REGEX} -use-color=true
+            -show-region-summary=false ${COVERAGE_SOURCES} | tee
+            ${COVERAGE_DIR}/coverage.txt
+        DEPENDS
+            coverage-data
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Generating text coverage summary"
+    )
+
+    # Clean coverage data
+    add_custom_target(
+        coverage-clean
+        COMMAND
+            ${CMAKE_COMMAND} -E rm -rf ${COVERAGE_DIR}
+        COMMAND
+            ${CMAKE_COMMAND} -E echo "Coverage data cleaned"
+        COMMENT "Cleaning coverage data"
+    )
+endif()
