@@ -24,11 +24,9 @@ auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T;
 
 auto optimizeImpl(const DocPtr &doc) -> DocPtr;
 
-/**
- * @brief An immutable abstraction for a pretty-printable document.
- * @note This class is a lightweight handle (PImpl pattern) to the underlying
- * document structure (DocImpl).
- */
+/// @brief An immutable abstraction for a pretty-printable document.
+/// @note This class is a lightweight handle (PImpl pattern) to the underlying
+///       document structure (DocImpl).
 class Doc final
 {
   public:
@@ -109,35 +107,22 @@ class Doc final
     // High-Level Layout Patterns
     // ========================================================================
 
-    /**
-     * @brief Groups a document, giving the renderer a choice.
-     * @param doc The document to group.
-     * @return A `Union` node representing a choice between the "flat"
-     * version of this Doc and the "broken" (original) version.
-     */
+    /// @brief Groups a document, giving the renderer a choice.
+    /// @param doc The document to group.
+    /// @return A `Union` node representing a choice between the "flat"
+    ///         version of this Doc and the "broken" (original) version.
     [[nodiscard]]
     static auto group(const Doc &doc) -> Doc;
 
-    /**
-     * @brief A common "bracket" pattern: (left, inner, right).
-     *
-     * Creates a layout like:
-     * @code
-     * left
-     * inner
-     * right
-     * @endcode
-     * @note This is equivalent to `(left << inner) / right`.
-     */
+    /// @brief A common "bracket" pattern: (left, inner, right).
+    /// @note This is equivalent to `(left << inner) / right`.
     [[nodiscard]]
     static auto bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc;
 
-    /**
-     * @brief Defines a scope for alignment.
-     * @param doc The document sub-tree containing `Doc::alignText` texts.
-     * @return A new `Doc` node that instructs the renderer to process
-     * alignment for the `doc` sub-tree.
-     */
+    /// @brief Defines a scope for alignment.
+    /// @param doc The document sub-tree containing `Doc::alignText` texts.
+    /// @return A new `Doc` node that instructs the renderer to process
+    ///         alignment for the `doc` sub-tree.
     [[nodiscard]]
     static auto align(const Doc &doc) -> Doc;
 
@@ -145,25 +130,21 @@ class Doc final
     // Tree Traversal & Analysis
     // ========================================================================
 
-    /**
-     * @brief Recursively transforms the document tree.
-     * @param fn A callable that takes a `DocImpl` variant node (e.g., `Text`,
-     * `Concat`) and returns a new `DocPtr`.
-     * @return A new `Doc` with the transformed structure.
-     */
+    /// @brief Recursively transforms the document tree.
+    /// @param fn A callable that takes a `DocImpl` variant node (e.g., `Text`,
+    ///           `Concat`) and returns a new `DocPtr`.
+    /// @return A new `Doc` with the transformed structure.
     template<typename Fn>
     auto transform(Fn &&fn) const -> Doc
     {
         return Doc(transformImpl(impl_, std::forward<Fn>(fn)));
     }
 
-    /**
-     * @brief Folds (reduces) the document tree into a single value.
-     * @tparam T The type of the accumulated value.
-     * @param init The initial value for the accumulator.
-     * @param fn A callable: `T f(T accumulator, const auto& node_variant)`
-     * @return The final accumulated value.
-     */
+    /// @brief Folds (reduces) the document tree into a single value.
+    /// @tparam T The type of the accumulated value.
+    /// @param init The initial value for the accumulator.
+    /// @param fn A callable: `T f(T accumulator, const auto& node_variant)`
+    /// @return The final accumulated value.
     template<typename T, typename Fn>
     auto fold(T init, Fn &&fn) const -> T
     {
