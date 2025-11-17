@@ -32,14 +32,15 @@ auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
       Doc::line(),
       std::plus<>());
 
-    // Print last trivia with special rules
-    result += std::visit(
-      common::Overload{
-        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardlines(0); },
-        [](const ast::ParagraphBreak &p) -> Doc { return Doc::hardlines(p.blank_lines - 1); } },
-      list.back());
+    auto cm = [](const ast::Comment &c) -> Doc {
+        // `hardlines(0)` makes it so it can't be flattened
+        return Doc::text(c.text) + Doc::hardlines(0);
+    };
+    auto pb = [](const ast::ParagraphBreak &p) -> Doc {
+        return Doc::hardlines(std::max(p.blank_lines - 1, 0U));
+    };
 
-    return result;
+    return result + std::visit(common::Overload{ cm, pb }, list.back());
 }
 
 } // namespace

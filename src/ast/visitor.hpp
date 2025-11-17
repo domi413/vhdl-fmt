@@ -28,14 +28,14 @@ class VisitorBase
         }
     }
 
-    /// @brief Visit a variant node, rerouting to `visit(const T &node)`
+    /// @brief Visit a variant node, redirects to `visit(const T &node)`
     template<typename... Ts>
     auto visit(const std::variant<Ts...> &node) const -> ReturnType
     {
         return std::visit([this](const auto &n) -> ReturnType { return derived().visit(n); }, node);
     }
 
-    /// @brief Visit a vector of nodes, rerouting to `visit(const T &node)`
+    /// @brief Visit a vector of nodes, redirects to `visit(const T &node)`
     template<typename T>
     auto visit(const std::vector<T> &nodes) const
       -> std::conditional_t<std::is_void_v<ReturnType>, void, std::vector<ReturnType>>
