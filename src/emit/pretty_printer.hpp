@@ -53,6 +53,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::ForLoop &node) const -> Doc;
     auto operator()(const ast::WhileLoop &node) const -> Doc;
 
+    /// @brief Wraps the core doc with trivia for the given node.
     template<typename T>
     auto wrapResult(const T &node, Doc result) const -> Doc
     {
@@ -63,7 +64,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     [[nodiscard]]
     static auto withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc;
 
-    // Allow base class to call our private methods, so we can keep `wrapResult` private
+    // Allow base class to call `wrapResult`, so `wrapResult` can be private
     friend class ast::VisitorBase<PrettyPrinter, Doc>;
 };
 

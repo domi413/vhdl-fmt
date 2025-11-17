@@ -11,18 +11,7 @@
 namespace ast {
 
 /// @brief Base class for stateful visitors that need to traverse the AST
-///
-/// Implements CRTP pattern for compile-time polymorphism. Derived classes
-/// must implement operator() for each concrete AST node type they handle.
-///
-/// Example usage:
-///   struct MyFormatter : VisitorBase<MyFormatter> {
-///       std::string output;
-///
-///       void operator()(const TokenExpr& e) {
-///           output += e.text;
-///       }
-///   };
+/// @note Derived classes must implement operator() for each concrete AST node type they handle.
 template<typename Derived, typename ReturnType = void>
 class VisitorBase
 {

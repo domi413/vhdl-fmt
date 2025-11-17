@@ -52,18 +52,17 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
 
     const auto &trivia = *node.trivia;
 
-    Doc result = std::ranges::fold_left(
+    Doc leading = std::ranges::fold_left(
       trivia.leading | std::views::transform(printTrivia), Doc::empty(), std::plus<>());
 
-    result += core_doc;
+    Doc inline_comment
+      = trivia.inline_comment
+        ? Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::hardlines(0)
+        : Doc::empty();
 
-    result += trivia.inline_comment
-              ? Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::hardlines(0)
-              : Doc::empty();
+    Doc trailing = printTrailingTriviaList(trivia.trailing);
 
-    result += printTrailingTriviaList(trivia.trailing);
-
-    return result.optimize();
+    return leading + core_doc + inline_comment + trailing;
 }
 
 } // namespace emit

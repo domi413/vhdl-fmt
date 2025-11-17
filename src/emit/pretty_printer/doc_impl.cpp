@@ -72,23 +72,24 @@ auto flatten(const DocPtr &doc) -> DocPtr
         return doc;
     }
 
-    return transformImpl(doc, [](const auto &node) {
-        using T = std::decay_t<decltype(node)>;
-
-        if constexpr (std::is_same_v<T, SoftLine>) {
-            return makeText(" ");
-        } else if constexpr (std::is_same_v<T, Union>) {
+    return transformImpl(
+      doc,
+      common::Overload{
+        [](const SoftLine &) -> DocPtr { return makeText(" "); },
+        [](const Union &node) -> DocPtr {
+            // In flat mode, we just pick the 'flat' branch.
             return node.flat;
-        } else if constexpr (std::is_same_v<T, AlignText>) {
-            // In flat mode, an alignment text is just its text content.
+        },
+        [](const AlignText &node) -> DocPtr {
+            // In flat mode, alignment is just the text.
             return makeText(node.content);
-        } else if constexpr (std::is_same_v<T, Align>) {
-            // In flat mode, an align group is just its inner content.
+        },
+        [](const Align &node) -> DocPtr {
+            // In flat mode, the alignment group is just its content.
             return node.doc;
-        } else {
-            return std::make_shared<DocImpl>(node);
-        }
-    });
+        },
+        // For all other nodes (Concat, Nest, Text, Empty, HardLine, etc.),
+        [](const auto &node) -> DocPtr { return std::make_shared<DocImpl>(node); } });
 }
 
 auto resolveAlignment(const DocPtr &doc) -> DocPtr
