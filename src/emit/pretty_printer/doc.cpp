@@ -150,6 +150,10 @@ auto Doc::render(const common::Config &config) const -> std::string
     return renderer.render(impl_);
 }
 
+// =======================================================================
+// Utilities
+// ========================================================================
+
 auto Doc::isEmpty() const -> bool
 {
     if (!impl_) {
