@@ -37,7 +37,7 @@ class TriviaBinder final
     std::vector<bool> used_; ///< set of token indices already added as trivia
 
     void collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Token *const> tokens);
-    auto collectInline(std::optional<ast::Comment> &dst, std::size_t index);
+    void collectInline(std::optional<ast::Comment> &dst, std::size_t index);
 
     [[nodiscard]]
     auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;

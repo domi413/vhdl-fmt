@@ -57,7 +57,7 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
 // ---------------------- Interface declarations ----------------------
 
 auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx,
-                                  bool has_semi) -> ast::GenericParam
+                                  bool is_last) -> ast::GenericParam
 {
     auto param = make<ast::GenericParam>(ctx);
 
@@ -73,14 +73,14 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
         param.default_expr = makeExpr(expr);
     }
 
-    param.is_last = has_semi;
+    param.is_last = is_last;
 
     return param;
 }
 
 // ---------------------- Object declarations ----------------------
 
-auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx, bool has_semi)
+auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx, bool is_last)
   -> ast::Port
 {
     auto port = make<ast::Port>(ctx);
@@ -105,7 +105,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         port.default_expr = makeExpr(expr);
     }
 
-    port.is_last = has_semi;
+    port.is_last = is_last;
 
     return port;
 }

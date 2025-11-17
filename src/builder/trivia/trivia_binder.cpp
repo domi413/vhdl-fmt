@@ -49,7 +49,7 @@ void TriviaBinder::collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Toke
     process_linebreaks();
 }
 
-auto TriviaBinder::collectInline(std::optional<ast::Comment> &dst, const std::size_t index)
+void TriviaBinder::collectInline(std::optional<ast::Comment> &dst, const std::size_t index)
 {
     if (used_[index]) {
         return;

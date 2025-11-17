@@ -53,10 +53,10 @@ class Translator final
 
     // Declarations - return by value
     [[nodiscard]]
-    auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx, bool has_semi)
+    auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx, bool is_last)
       -> ast::GenericParam;
     [[nodiscard]]
-    auto makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx, bool has_semi)
+    auto makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx, bool is_last)
       -> ast::Port;
     [[nodiscard]]
     auto makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) -> ast::ConstantDecl;
