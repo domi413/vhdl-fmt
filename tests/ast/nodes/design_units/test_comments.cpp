@@ -99,7 +99,8 @@ TEST_CASE("Ports capture leading, trailing and inline comments", "[design_units]
     REQUIRE(rst_inline.contains("inline rst"));
 }
 
-TEST_CASE("Generic captures paragraph breaks after comments with blank lines", "[design_units][comments]")
+TEST_CASE("Generic captures paragraph breaks after comments with blank lines",
+          "[design_units][comments]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity ExampleEntity is
@@ -150,7 +151,8 @@ TEST_CASE("Generic captures paragraph breaks after comments with blank lines", "
     }
 }
 
-TEST_CASE("Generic with inline comment captures paragraph breaks correctly", "[design_units][comments]")
+TEST_CASE("Generic with inline comment captures paragraph breaks correctly",
+          "[design_units][comments]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity ExampleEntity is
@@ -172,7 +174,8 @@ TEST_CASE("Generic with inline comment captures paragraph breaks correctly", "[d
     const auto &one = entity->generic_clause.generics[0];
     const auto &two = entity->generic_clause.generics[1];
 
-    // 'one' should have an inline comment AND trailing trivia with: paragraph break, comment, paragraph break
+    // 'one' should have an inline comment AND trailing trivia with: paragraph break, comment,
+    // paragraph break
     REQUIRE(one.trivia.has_value());
     const auto &one_trivia = one.trivia.value();
 
@@ -205,7 +208,8 @@ TEST_CASE("Generic with inline comment captures paragraph breaks correctly", "[d
     }
 }
 
-TEST_CASE("Generic captures paragraph breaks after comments with 2 blank lines", "[design_units][comments]")
+TEST_CASE("Generic captures paragraph breaks after comments with 2 blank lines",
+          "[design_units][comments]")
 {
     constexpr std::string_view VHDL_FILE = R"(
         entity ExampleEntity is

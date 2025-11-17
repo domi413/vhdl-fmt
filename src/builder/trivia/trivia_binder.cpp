@@ -11,7 +11,8 @@
 
 namespace builder {
 
-void TriviaBinder::collect(std::vector<ast::Trivia> &dst, const std::vector<antlr4::Token *> &tokens)
+void TriviaBinder::collect(std::vector<ast::Trivia> &dst,
+                           const std::vector<antlr4::Token *> &tokens)
 {
     unsigned int linebreaks{ 0 };
 

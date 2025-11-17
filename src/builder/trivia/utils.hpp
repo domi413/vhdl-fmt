@@ -2,6 +2,7 @@
 #define BUILDER_TRIVIA_COMMENT_SINK_HPP
 
 #include "Token.h"
+
 #include <vhdlLexer.h>
 
 namespace builder {
