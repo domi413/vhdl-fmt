@@ -33,14 +33,20 @@ auto Doc::hardline() -> Doc
     return Doc(makeHardLine());
 }
 
+auto Doc::hardlines(unsigned count) -> Doc
+{
+    if (count == 0) {
+        return Doc(makeEmpty());
+    }
+    if (count == 1) {
+        return Doc(makeHardLine());
+    }
+    return Doc(makeHardLines(count));
+}
+
 auto Doc::alignText(std::string_view str, int level) -> Doc
 {
     return Doc(makeAlignText(str, level));
-}
-
-auto Doc::noGroup() -> Doc
-{
-    return Doc(makeNoGroup());
 }
 
 // ========================================================================

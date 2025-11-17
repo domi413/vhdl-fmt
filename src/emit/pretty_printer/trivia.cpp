@@ -4,6 +4,7 @@
 #include "emit/pretty_printer/doc.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <ranges>
 #include <span>
 #include <variant>
@@ -11,19 +12,12 @@
 namespace emit {
 
 namespace {
-
-constexpr auto printLines(const unsigned count) -> Doc
-{
-    auto hardlines = std::views::repeat(Doc::hardline(), count);
-    return std::ranges::fold_left(hardlines, Doc::empty(), std::plus<>());
-}
-
 constexpr auto printTrivia(const ast::Trivia &trivia) -> Doc
 {
     return std::visit(
       common::Overload{
         [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); },
-        [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines); } },
+        [](const ast::ParagraphBreak &p) -> Doc { return Doc::hardlines(p.blank_lines); } },
       trivia);
 }
 
@@ -41,8 +35,8 @@ auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
     // Print last trivia with special rules
     result += std::visit(
       common::Overload{
-        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::noGroup(); },
-        [](const ast::ParagraphBreak &p) -> Doc { return printLines(p.blank_lines - 1); } },
+        [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardlines(0); },
+        [](const ast::ParagraphBreak &p) -> Doc { return Doc::hardlines(p.blank_lines - 1); } },
       list.back());
 
     return result;
@@ -64,12 +58,12 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
     result += core_doc;
 
     result += trivia.inline_comment
-              ? Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::noGroup()
+              ? Doc::text(" ") + Doc::text(trivia.inline_comment->text) + Doc::hardlines(0)
               : Doc::empty();
 
     result += printTrailingTriviaList(trivia.trailing);
 
-    return result;
+    return result.optimize();
 }
 
 } // namespace emit

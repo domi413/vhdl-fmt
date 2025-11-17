@@ -1,5 +1,6 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 
+#include "common/overload.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
 #include <algorithm>
@@ -33,6 +34,11 @@ auto makeHardLine() -> DocPtr
     return std::make_shared<DocImpl>(HardLine{});
 }
 
+auto makeHardLines(unsigned count) -> DocPtr
+{
+    return std::make_shared<DocImpl>(HardLines{ count });
+}
+
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr
 {
     return std::make_shared<DocImpl>(Concat{ .left = std::move(left), .right = std::move(right) });
@@ -56,11 +62,6 @@ auto makeAlignText(std::string_view text, int level) -> DocPtr
 auto makeAlign(DocPtr doc) -> DocPtr
 {
     return std::make_shared<DocImpl>(Align{ .doc = std::move(doc) });
-}
-
-auto makeNoGroup() -> DocPtr
-{
-    return std::make_shared<DocImpl>(NoGroup{});
 }
 
 // Utility functions
@@ -122,6 +123,69 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
             return std::make_shared<DocImpl>(node);
         }
     });
+}
+
+auto optimizeImpl(const DocPtr &doc) -> DocPtr
+{
+    auto optimization_rules = common::Overload{
+
+        // === Concat nodes ===
+        [](const Concat &node) -> DocPtr {
+            // Rule 1: Identity (Empty) elimination
+            bool left_is_empty = std::holds_alternative<Empty>(node.left->value);
+            bool right_is_empty = std::holds_alternative<Empty>(node.right->value);
+
+            if (left_is_empty && right_is_empty) {
+                return makeEmpty(); // (empty + empty) -> empty
+            }
+            if (left_is_empty) {
+                return node.right; // (empty + a) -> a
+            }
+            if (right_is_empty) {
+                return node.left; // (a + empty) -> a
+            }
+
+            // Rule 2: Merge adjacent Text nodes
+            if (auto *left_text = std::get_if<Text>(&node.left->value)) {
+                if (auto *right_text = std::get_if<Text>(&node.right->value)) {
+                    // (text("a") + text("b")) -> text("ab")
+                    return makeText(left_text->content + right_text->content);
+                }
+            }
+
+            // Rule 3: Merge adjacent HardLines/HardLine nodes
+            auto get_lines = [](const DocPtr &d) -> unsigned {
+                if (std::holds_alternative<HardLine>(d->value)) {
+                    return 1;
+                }
+                if (auto *hl = std::get_if<HardLines>(&d->value)) {
+                    return hl->count;
+                }
+                return 0; // Not a line node
+            };
+
+            unsigned left_lines = get_lines(node.left);
+            if (left_lines > 0) {
+                unsigned right_lines = get_lines(node.right);
+                if (right_lines > 0) {
+                    // (hardlines(A) + hardlines(B)) -> hardlines(A + B)
+                    return makeHardLines(left_lines + right_lines);
+                }
+            }
+
+            // If no Concat-specific rule matched, just return the node
+            return std::make_shared<DocImpl>(node);
+        },
+
+        // === Default for all other nodes ===
+        // (Text, HardLines, Empty, etc.)
+        // These nodes have no optimization rules themselves, so we
+        // just return them as-is.
+        [](const auto &node) -> DocPtr { return std::make_shared<DocImpl>(node); }
+    };
+
+    // Apply the optimization rules recursively
+    return transformImpl(doc, optimization_rules);
 }
 
 } // namespace emit

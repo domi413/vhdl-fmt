@@ -22,6 +22,8 @@ auto transformImpl(const DocPtr &doc, Fn &&fn) -> DocPtr;
 template<typename T, typename Fn>
 auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T;
 
+auto optimizeImpl(const DocPtr& doc) -> DocPtr;
+
 /**
  * @brief An immutable abstraction for a pretty-printable document.
  * @note This class is a lightweight handle (PImpl pattern) to the underlying
@@ -48,15 +50,17 @@ class Doc final
     /// @brief A "hard" line break. Always renders as a newline.
     static auto hardline() -> Doc;
 
+    /// @brief Multiple "hard" line breaks. Always renders as newlines.
+    /// @param count The number of hard line breaks to insert.
+    /// @note Can be zero to mark something that should not break.
+    static auto hardlines(unsigned count) -> Doc;
+
     /// @brief Creates a special text for alignment.
     /// @note The renderer will append spaces based on other
     ///       texts within the same alignment group.
     /// @param str The text content for this text.
     /// @param level An integer key that defines the alignment group.
     static auto alignText(std::string_view str, int level) -> Doc;
-
-    /// @brief A marker indicating no grouping should occur. (trailing Comment)
-    static auto noGroup() -> Doc;
 
     // ========================================================================
     // Low-Level Combinators (Operators)
@@ -164,6 +168,14 @@ class Doc final
     auto fold(T init, Fn &&fn) const -> T
     {
         return foldImpl(impl_, std::move(init), std::forward<Fn>(fn));
+    }
+
+    /// @brief Optimizes the document tree by applying transformation rules.
+    /// @return A new optimized `Doc`.
+    [[nodiscard]]
+    auto optimize() const -> Doc
+    {
+        return Doc(optimizeImpl(impl_));
     }
 
     // ========================================================================

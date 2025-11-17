@@ -13,9 +13,7 @@
 
 namespace builder {
 
-TriviaBinder::TriviaBinder(antlr4::CommonTokenStream &ts) : tokens_(ts), used_(ts.size())
-{
-}
+TriviaBinder::TriviaBinder(antlr4::CommonTokenStream &ts) : tokens_(ts), used_(ts.size()) {}
 
 void TriviaBinder::collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Token *const> tokens)
 {

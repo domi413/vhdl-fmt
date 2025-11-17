@@ -88,6 +88,24 @@ struct HardLine
     }
 };
 
+/// Multiple hard line breaks
+struct HardLines
+{
+    unsigned count;
+
+    template<typename Fn>
+    auto fmap(Fn && /* fn */) const -> HardLines
+    {
+        return { count };
+    }
+
+    template<typename T, typename Fn>
+    auto fold(T init, Fn && /* fn */) const -> T
+    {
+        return init;
+    }
+};
+
 /// Concatenation of two documents
 struct Concat
 {
@@ -183,28 +201,12 @@ struct Align
     }
 };
 
-struct NoGroup
-{
-    template<typename Fn>
-    auto fmap(Fn && /* fn */) const -> NoGroup
-    {
-        return {};
-    }
-
-    template<typename T, typename Fn>
-    auto fold(T init, Fn && /* fn */) const -> T
-    {
-        // These nodes have no children, so they just return the accumulator.
-        return init;
-    }
-};
-
 /// Internal document representation using variant
 class DocImpl
 {
   public:
     // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
-    std::variant<Empty, Text, SoftLine, HardLine, Concat, Nest, Union, AlignText, Align, NoGroup>
+    std::variant<Empty, Text, SoftLine, HardLine, HardLines, Concat, Nest, Union, AlignText, Align>
       value;
 
     // Since all members are public, this class is considered an aggregate type and allows for
@@ -242,17 +244,19 @@ auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T
       doc->value);
 }
 
+auto optimizeImpl(const DocPtr& doc) -> DocPtr;
+
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;
 auto makeText(std::string_view text) -> DocPtr;
 auto makeLine() -> DocPtr;
 auto makeHardLine() -> DocPtr;
+auto makeHardLines(unsigned count) -> DocPtr;
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr;
 auto makeNest(DocPtr doc) -> DocPtr;
 auto makeUnion(DocPtr flat, DocPtr broken) -> DocPtr;
 auto makeAlignText(std::string_view text, int level) -> DocPtr;
 auto makeAlign(DocPtr doc) -> DocPtr;
-auto makeNoGroup() -> DocPtr;
 
 // Utility functions
 auto flatten(const DocPtr &doc) -> DocPtr;

@@ -36,9 +36,6 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
         // Empty produces nothing
         [](const Empty &) -> void {},
 
-        // NoGroup produces nothing
-        [](const NoGroup &) -> void {},
-
         // Text
         [&](const Text &node) -> void { write(node.content); },
 
@@ -53,6 +50,13 @@ void Renderer::renderDoc(int indent, Mode mode, const DocPtr &doc)
 
         // HardLine (always breaks)
         [&](const HardLine &) -> void { newline(indent); },
+
+        // HardLines (always breaks 'count' times)
+        [&](const HardLines &node) -> void {
+            for (unsigned i = 0; i < node.count; ++i) {
+                newline(indent);
+            }
+        },
 
         // Concat (recursively renders children)
         [&](const Concat &node) -> void {
@@ -141,9 +145,9 @@ auto Renderer::fitsImpl(int width, const DocPtr &doc) -> int
             return width - static_cast<int>(node.content.length());
         },
 
-        // All others (HardLine, NoGroup) do not fit
+        // All others (HardLine, HardLines) do not fit
         [](const HardLine &) -> int { return -1; },
-        [](const NoGroup &) -> int { return -1; }
+        [](const HardLines &) -> int { return -1; },
     };
 
     return std::visit(fits_visitor, doc->value);
