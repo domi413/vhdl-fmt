@@ -1,13 +1,18 @@
 #ifndef TESTS_COMMON_BENCHMARK_UTILS_HPP
 #define TESTS_COMMON_BENCHMARK_UTILS_HPP
 
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
 #include <memory>
 #include <string_view>
+
+namespace antlr4 {
+class ANTLRInputStream;
+class CommonTokenStream;
+class ParserRuleContext;
+class Token;
+} // namespace antlr4
 
 namespace utils {
 

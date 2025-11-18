@@ -4,6 +4,7 @@
 #include "builder/trivia/trivia_binder.hpp"
 #include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
+#include "nodes/design_file.hpp"
 
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -29,8 +30,8 @@ TEST_CASE("Toolchain Performance Breakdown", "[benchmark]")
     }
 
     // 3. Pre-build Doc
-    emit::PrettyPrinter printer{};
-    auto doc = printer.visit(ast);
+    const emit::PrettyPrinter printer{};
+    const auto doc = printer.visit(ast);
 
     // ==============================================================================
     // BENCHMARKS
@@ -65,7 +66,7 @@ TEST_CASE("Toolchain Performance Breakdown", "[benchmark]")
 
     BENCHMARK("Internal: PrettyPrinter Visit")
     {
-        emit::PrettyPrinter printer;
+        const emit::PrettyPrinter printer;
         return printer.visit(ast);
     };
 

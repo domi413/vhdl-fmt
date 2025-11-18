@@ -1,18 +1,26 @@
 #include "builder/ast_builder.hpp"
 
-#include "ANTLRInputStream.h"
-#include "CommonTokenStream.h"
-#include "antlr4-runtime/BailErrorStrategy.h"
-#include "antlr4-runtime/atn/PredictionMode.h"
 #include "ast/nodes/design_file.hpp"
 #include "builder/translator.hpp"
 #include "builder/trivia/trivia_binder.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
+#include <ANTLRInputStream.h>
+#include <CommonTokenStream.h>
+#include <antlr4-runtime/BailErrorStrategy.h>
+#include <antlr4-runtime/ConsoleErrorListener.h>
+#include <antlr4-runtime/DefaultErrorStrategy.h>
+#include <antlr4-runtime/Exceptions.h>
+#include <antlr4-runtime/atn/ParserATNSimulator.h>
+#include <antlr4-runtime/atn/PredictionMode.h>
+#include <filesystem>
 #include <fstream>
+#include <istream>
 #include <memory>
 #include <stdexcept>
+#include <string_view>
+#include <utility>
 
 namespace builder {
 
@@ -36,7 +44,6 @@ auto createParsingContext(std::unique_ptr<antlr4::ANTLRInputStream> input_stream
     ctx.tokens->fill();
     ctx.parser = std::make_unique<vhdlParser>(ctx.tokens.get());
 
-    // NOTE: Error listeners are managed inside executeParse now
     return ctx;
 }
 
@@ -55,8 +62,8 @@ void executeParse(ParsingContext &ctx)
         ctx.tree = ctx.parser->design_file();
     } catch (const antlr4::ParseCancellationException &) {
         // SLL failed. Rewind stream and reset parser for full LL analysis.
-        ctx.tokens->reset();
-        ctx.parser->reset();
+        (*ctx.tokens).reset();
+        (*ctx.parser).reset();
 
         // Restore default error handling so user sees useful error messages
         ctx.parser->addErrorListener(&antlr4::ConsoleErrorListener::INSTANCE);
@@ -103,7 +110,7 @@ auto buildFromStream(std::istream &input) -> ast::DesignFile
 
 auto buildFromString(std::string_view vhdl_code) -> ast::DesignFile
 {
-    auto antlr_input = std::make_unique<antlr4::ANTLRInputStream>(std::string(vhdl_code));
+    auto antlr_input = std::make_unique<antlr4::ANTLRInputStream>(vhdl_code);
     auto ctx = createParsingContext(std::move(antlr_input));
 
     executeParse(ctx);

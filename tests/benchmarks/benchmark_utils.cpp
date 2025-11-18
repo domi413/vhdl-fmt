@@ -1,7 +1,16 @@
 #include "benchmark_utils.hpp"
 
-#include "antlr4-runtime/BailErrorStrategy.h"
-#include "antlr4-runtime/atn/PredictionMode.h"
+#include <antlr4-runtime/ANTLRInputStream.h>
+#include <antlr4-runtime/BailErrorStrategy.h>
+#include <antlr4-runtime/CommonTokenStream.h>
+#include <antlr4-runtime/DefaultErrorStrategy.h>
+#include <antlr4-runtime/Exceptions.h>
+#include <antlr4-runtime/atn/ParserATNSimulator.h>
+#include <antlr4-runtime/atn/PredictionMode.h>
+#include <memory>
+#include <string_view>
+#include <vhdlLexer.h>
+#include <vhdlParser.h>
 
 namespace utils {
 
