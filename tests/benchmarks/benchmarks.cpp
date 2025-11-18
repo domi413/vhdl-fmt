@@ -1,7 +1,6 @@
 #include "benchmark_utils.hpp"
 #include "builder/ast_builder.hpp"
 #include "builder/translator.hpp"
-#include "builder/trivia/trivia_binder.hpp"
 #include "common/config.hpp"
 #include "emit/pretty_printer.hpp"
 #include "nodes/design_file.hpp"
@@ -24,8 +23,7 @@ TEST_CASE("Toolchain Performance Breakdown", "[benchmark]")
     // 2. Pre-build AST
     ast::DesignFile ast;
     {
-        builder::TriviaBinder binder(*context.tokens);
-        builder::Translator translator(binder, *context.tokens);
+        builder::Translator translator(*context.tokens);
         translator.buildDesignFile(ast, context.tree);
     }
 
@@ -56,9 +54,7 @@ TEST_CASE("Toolchain Performance Breakdown", "[benchmark]")
     BENCHMARK("Internal: AST Translation")
     {
         ast::DesignFile root;
-        // Note: TriviaBinder is stateful (tracks used tokens), so we need a fresh one.
-        builder::TriviaBinder binder(*context.tokens);
-        builder::Translator translator(binder, *context.tokens);
+        builder::Translator translator(*context.tokens);
 
         translator.buildDesignFile(root, context.tree);
         return root;

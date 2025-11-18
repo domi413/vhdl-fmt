@@ -20,13 +20,11 @@ namespace builder {
 
 class Translator final
 {
-    TriviaBinder &trivia_;
+    TriviaBinder trivia_;
     antlr4::CommonTokenStream &tokens_;
 
   public:
-    Translator(TriviaBinder &tv, antlr4::CommonTokenStream &tokens) : trivia_(tv), tokens_(tokens)
-    {
-    }
+    explicit Translator(antlr4::CommonTokenStream &tokens) : trivia_(tokens), tokens_(tokens) {}
 
     /// @brief Build the entire design file by walking the CST
     void buildDesignFile(ast::DesignFile &dest, vhdlParser::Design_fileContext *ctx);

@@ -2,7 +2,6 @@
 
 #include "ast/nodes/design_file.hpp"
 #include "builder/translator.hpp"
-#include "builder/trivia/trivia_binder.hpp"
 #include "vhdlLexer.h"
 #include "vhdlParser.h"
 
@@ -32,7 +31,7 @@ struct ParsingContext
     std::unique_ptr<vhdlLexer> lexer;
     std::unique_ptr<antlr4::CommonTokenStream> tokens;
     std::unique_ptr<vhdlParser> parser;
-    vhdlParser::Design_fileContext *tree{ nullptr };
+    vhdlParser::Design_fileContext *tree{};
 };
 
 auto createParsingContext(std::unique_ptr<antlr4::ANTLRInputStream> input_stream) -> ParsingContext
@@ -81,8 +80,7 @@ void executeParse(ParsingContext &ctx)
 auto translateToAST(ParsingContext &ctx) -> ast::DesignFile
 {
     ast::DesignFile root{};
-    TriviaBinder trivia(*ctx.tokens);
-    Translator translator(trivia, *ctx.tokens);
+    Translator translator(*ctx.tokens);
     translator.buildDesignFile(root, ctx.tree);
     return root;
 }
