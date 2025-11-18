@@ -13,7 +13,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -159,12 +158,12 @@ class Translator final
     /// @brief Helper to create binary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeBinary(const Ctx *ctx, std::string_view op, ast::Expr left, ast::Expr right)
+    auto makeBinary(const Ctx *ctx, std::string op, ast::Expr left, ast::Expr right)
       -> ast::Expr
     {
         ast::BinaryExpr bin{};
         trivia_.bind(bin, ctx);
-        bin.op = op;
+        bin.op = std::move(op);
         bin.left = std::make_unique<ast::Expr>(std::move(left));
         bin.right = std::make_unique<ast::Expr>(std::move(right));
         return bin;
@@ -173,11 +172,11 @@ class Translator final
     /// @brief Helper to create unary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeUnary(const Ctx *ctx, std::string_view op, ast::Expr value) -> ast::Expr
+    auto makeUnary(const Ctx *ctx, std::string op, ast::Expr value) -> ast::Expr
     {
         ast::UnaryExpr un{};
         trivia_.bind(un, ctx);
-        un.op = op;
+        un.op = std::move(op);
         un.value = std::make_unique<ast::Expr>(std::move(value));
         return un;
     }
@@ -185,11 +184,11 @@ class Translator final
     /// @brief Helper to create token expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeToken(const Ctx *ctx, std::string_view text) -> ast::Expr
+    auto makeToken(const Ctx *ctx, std::string text) -> ast::Expr
     {
         ast::TokenExpr tok{};
         trivia_.bind(tok, ctx);
-        tok.text = text;
+        tok.text = std::move(text);
         return tok;
     }
 };
