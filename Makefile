@@ -60,30 +60,28 @@ clean:
 # -----------------------------
 # Coverage Targets
 # -----------------------------
-# Build with coverage enabled
-coverage-build:
-	@echo "Building with coverage instrumentation..."
-	@$(MAKE) clean
-	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON
-
-# Generate full coverage report (HTML + text)
-coverage: coverage-build
-	@echo "Generating coverage report..."
+# Generate HTML coverage report
+coverage:
+	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON all
 	@cmake --build build/Debug --target coverage
+	@echo ""
+	@echo "✓ HTML coverage report: build/Debug/coverage/html/index.html"
 
-# Generate text-only coverage report (for CI/PR comments)
-coverage-report: coverage-build
-	@echo "Generating coverage summary..."
+# Generate text coverage summary
+coverage-report:
+	@$(MAKE) BUILD_TYPE=Debug ENABLE_COVERAGE=ON all
 	@cmake --build build/Debug --target coverage-report
 
-# Alias
-test-coverage: coverage-report
+# Open HTML coverage report in browser
+coverage-show: coverage
+	@xdg-open build/Debug/coverage/html/index.html 2>/dev/null || \
+		open build/Debug/coverage/html/index.html 2>/dev/null || \
+		echo "Please open build/Debug/coverage/html/index.html in your browser"
 
 # Clean coverage data
 coverage-clean:
-	@echo "Cleaning coverage data..."
-	@rm -rf build/Debug/coverage
-	@find build/Debug -name '*.profraw' -o -name '*.profdata' | xargs rm -f 2>/dev/null || true
+	@cmake --build build/Debug --target coverage-clean 2>/dev/null || \
+		rm -rf build/Debug/coverage
 
 # -----------------------------
 # Utility Targets
@@ -199,7 +197,7 @@ check-cspell-ignored:
 # Docker Development Environment
 # -----------------------------
 CONTAINER_CMD ?= docker
-CI_IMAGE_NAME ?= ghcr.io/vedivad/vhdlfmt-ci:latest
+CI_IMAGE_NAME ?= ghcr.io/niekdomi/vhdl-fmt/vhdlfmt-ci:latest
 
 docker-dev-build:
 	@echo "Building development environment with $(CONTAINER_CMD)..."

@@ -9,6 +9,7 @@ RUN dnf install -y --setopt=install_weak_deps=false \
     clang \
     clang-tools-extra \
     llvm \
+    compiler-rt \
     cmake \
     git \
     make \
@@ -28,7 +29,7 @@ ENV VIRTUAL_ENV="/opt/venv"
 
 WORKDIR /app
 
-# Copy only what’s needed for dependency resolution
+# Copy only what's needed for dependency resolution
 COPY conanfile.txt clang.profile ./
 
 # Prefill Conan dependencies (equivalent to `make conan`)
@@ -45,14 +46,14 @@ RUN conan install . \
 FROM builder AS dev
 
 RUN dnf install -y --setopt=install_weak_deps=false \
-    lldb ccache \
+    lldb \
+    ccache \
     && dnf clean all
 
 # Add colored prompt for root
 RUN echo 'export PS1="\[\e[31m\]\u\[\e[0m\]@\[\e[34m\]\h\[\e[0m\]:\[\e[36m\]\w\[\e[0m\] > "' >> /root/.bashrc
 
 WORKDIR /app
-
 CMD ["/bin/bash"]
 
 # ==================================================
