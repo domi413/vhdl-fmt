@@ -40,7 +40,7 @@ class TriviaBinder final
     void collectInline(std::optional<ast::Comment> &dst, std::size_t index);
 
     [[nodiscard]]
-    auto findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t;
+    auto findLastDefault(std::size_t start_index) const noexcept -> std::size_t;
 };
 
 } // namespace builder

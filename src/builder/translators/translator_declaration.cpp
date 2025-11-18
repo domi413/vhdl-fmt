@@ -54,7 +54,7 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
 // ---------------------- Interface declarations ----------------------
 
 auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx,
-                                  bool is_last) -> ast::GenericParam
+                                  const bool is_last) -> ast::GenericParam
 {
     auto param = make<ast::GenericParam>(ctx);
 
@@ -77,8 +77,8 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 
 // ---------------------- Object declarations ----------------------
 
-auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx, bool is_last)
-  -> ast::Port
+auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx,
+                                const bool is_last) -> ast::Port
 {
     auto port = make<ast::Port>(ctx);
 

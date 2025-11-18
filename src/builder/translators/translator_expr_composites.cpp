@@ -2,6 +2,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <utility>

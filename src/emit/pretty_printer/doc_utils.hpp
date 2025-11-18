@@ -34,7 +34,8 @@ auto toDocVector(Range &&items, Transform &&transform) -> std::vector<Doc>
 /// @param separator Separator doc (e.g., Doc::text(";"))
 /// @param with_trailing Whether to include separator after the last element
 /// @return Combined Doc
-inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool with_trailing) -> Doc
+inline auto joinDocs(const std::vector<Doc> &docs, const Doc &sep, const bool with_trailing)
+  -> Doc
 {
     if (docs.empty()) {
         return Doc::empty();
@@ -43,11 +44,11 @@ inline auto joinDocs(const std::vector<Doc> &docs, const Doc &separator, bool wi
     auto result = docs.front();
 
     for (const auto &doc : docs | std::views::drop(1)) {
-        result += separator + doc;
+        result += sep + doc;
     }
 
     if (with_trailing) {
-        result += separator;
+        result += sep;
     }
 
     return result;

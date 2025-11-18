@@ -2,6 +2,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <memory>
+
 namespace builder {
 
 auto Translator::makeExpr(vhdlParser::ExpressionContext *ctx) -> ast::Expr

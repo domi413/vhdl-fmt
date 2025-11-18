@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <optional>
+#include <ranges>
 #include <span>
 #include <vector>
 
@@ -26,7 +27,7 @@ void TriviaBinder::collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Toke
         linebreaks = 0; // Reset after processing
     };
 
-    for (const antlr4::Token *token : tokens) {
+    for (const auto *token : tokens) {
         const auto index = token->getTokenIndex();
 
         if (used_[index]) {
@@ -73,14 +74,14 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     auto &trivia = node.trivia.emplace();
 
     const auto start_index = ctx->getStart()->getTokenIndex();
-    const auto stop_index = findLastDefaultOnLine(ctx->getStop()->getTokenIndex());
+    const auto stop_index = findLastDefault(ctx->getStop()->getTokenIndex());
 
     collect(trivia.leading, tokens_.getHiddenTokensToLeft(start_index));
     collectInline(trivia.inline_comment, stop_index + 1);
     collect(trivia.trailing, tokens_.getHiddenTokensToRight(stop_index));
 }
 
-auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept -> std::size_t
+auto TriviaBinder::findLastDefault(const std::size_t start_index) const noexcept -> std::size_t
 {
     const auto *start_token = tokens_.get(start_index);
     if (start_token == nullptr || !isDefault(start_token)) {
@@ -91,7 +92,7 @@ auto TriviaBinder::findLastDefaultOnLine(std::size_t start_index) const noexcept
 
     std::size_t result = start_index;
 
-    for (std::size_t i = start_index + 1;; ++i) {
+    for (const auto i : std::views::iota(start_index + 1)) {
         const auto *token = tokens_.get(i);
 
         if (token == nullptr || token->getLine() != line) {

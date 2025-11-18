@@ -91,7 +91,7 @@ struct HardLine
 /// Multiple hard line breaks
 struct HardLines
 {
-    unsigned count;
+    unsigned count{};
 
     template<typename Fn>
     auto fmap(Fn && /* fn */) const -> HardLines
@@ -167,7 +167,7 @@ struct Union
 struct AlignText
 {
     std::string content;
-    int level;
+    int level{};
 
     template<typename Fn>
     auto fmap(Fn && /* fn */) const -> AlignText
@@ -219,7 +219,8 @@ auto transformImpl(const DocPtr &doc, Fn &&fn) -> DocPtr
 {
     return std::visit(
       [&fn](const DocNode auto &node) -> DocPtr {
-          auto mapped = node.fmap([&fn](const DocPtr &inner) { return transformImpl(inner, fn); });
+          const auto mapped
+            = node.fmap([&fn](const DocPtr &inner) { return transformImpl(inner, fn); });
           return std::forward<Fn>(fn)(mapped);
       },
       doc->value);
@@ -236,7 +237,7 @@ auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T
       [&](const DocNode auto &node) -> T {
           T new_value = std::forward<Fn>(fn)(std::move(init), node);
 
-          auto recurse_step
+          const auto recurse_step
             = [&fn](T acc, const DocPtr &child) { return foldImpl(child, std::move(acc), fn); };
 
           return node.fold(std::move(new_value), recurse_step);
