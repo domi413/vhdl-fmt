@@ -1,6 +1,7 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/translator.hpp"
+#include "common/range_helpers.hpp"
 #include "vhdlParser.h"
 
 #include <ranges>
@@ -13,18 +14,16 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
 {
     auto clause = make<ast::GenericClause>(ctx);
 
-    if (auto *list = ctx->generic_list()) {
-        const auto &decls = list->interface_constant_declaration();
-
-        clause.generics = decls
-                        | std::views::enumerate
-                        | std::views::transform([&](auto &&pair) {
-                              const auto [i, decl] = pair;
-                              const bool is_last = (i == decls.size() - 1);
-                              return makeGenericParam(decl, is_last);
-                          })
-                        | std::ranges::to<std::vector>();
+    auto *list = ctx->generic_list();
+    if (list == nullptr) {
+        return clause;
     }
+
+    const auto &declarations = list->interface_constant_declaration();
+    clause.generics
+      = common::transformWithLast(
+          declarations, [&](auto *decl, bool is_last) { return makeGenericParam(decl, is_last); })
+      | std::ranges::to<std::vector>();
 
     return clause;
 }
@@ -38,18 +37,16 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
         return clause;
     }
 
-    if (auto *iface = list->interface_port_list()) {
-        const auto &decls = iface->interface_port_declaration();
-
-        clause.ports = decls
-                     | std::views::enumerate
-                     | std::views::transform([&](auto &&pair) {
-                           const auto [i, decl] = pair;
-                           const bool is_last = (i == decls.size() - 1);
-                           return makeSignalPort(decl, is_last);
-                       })
-                     | std::ranges::to<std::vector>();
+    auto *iface = list->interface_port_list();
+    if (iface == nullptr) {
+        return clause;
     }
+
+    const auto &declarations = iface->interface_port_declaration();
+    clause.ports
+      = common::transformWithLast(
+          declarations, [&](auto *decl, bool is_last) { return makeSignalPort(decl, is_last); })
+      | std::ranges::to<std::vector>();
 
     return clause;
 }

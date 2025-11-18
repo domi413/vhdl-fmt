@@ -21,10 +21,10 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext *ctx) -> ast::Expr
         assoc.op = "=>";
 
         if (elem->choices() != nullptr) {
-            assoc.left = box(makeChoices(elem->choices()));
+            assoc.left = std::make_unique<ast::Expr>(makeChoices(elem->choices()));
         }
         if (elem->expression() != nullptr) {
-            assoc.right = box(makeExpr(elem->expression()));
+            assoc.right = std::make_unique<ast::Expr>(makeExpr(elem->expression()));
         }
 
         group.children.emplace_back(std::move(assoc));

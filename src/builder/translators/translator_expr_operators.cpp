@@ -78,7 +78,7 @@ auto Translator::makePrimary(vhdlParser::PrimaryContext *ctx) -> ast::Expr
 {
     if (ctx->expression() != nullptr) {
         auto paren = make<ast::ParenExpr>(ctx);
-        paren.inner = box(makeExpr(ctx->expression()));
+        paren.inner = std::make_unique<ast::Expr>(makeExpr(ctx->expression()));
         return paren;
     }
     if (ctx->aggregate() != nullptr) {

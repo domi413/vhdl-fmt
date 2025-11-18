@@ -10,6 +10,7 @@
 #include "vhdlParser.h"
 
 #include <CommonTokenStream.h>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -145,20 +146,12 @@ class Translator final
     auto makeRangeConstraint(vhdlParser::Range_constraintContext *ctx)
       -> std::optional<ast::RangeConstraint>;
 
-    /// @brief Helper to create a boxed expression
-    template<typename T = ast::Expr>
-    [[nodiscard]]
-    constexpr auto box(T &&expr) -> ast::Box<T>
-    {
-        return std::make_unique<T>(std::forward<T>(expr));
-    }
-
     /// @brief Helper to create and bind an AST node with trivia
     template<typename T, typename Ctx>
     [[nodiscard]]
     auto make(const Ctx *ctx) -> T
     {
-        T node;
+        T node{};
         trivia_.bind(node, ctx);
         return node;
     }
@@ -169,11 +162,11 @@ class Translator final
     auto makeBinary(const Ctx *ctx, std::string_view op, ast::Expr left, ast::Expr right)
       -> ast::Expr
     {
-        ast::BinaryExpr bin;
+        ast::BinaryExpr bin{};
         trivia_.bind(bin, ctx);
         bin.op = op;
-        bin.left = box(std::move(left));
-        bin.right = box(std::move(right));
+        bin.left = std::make_unique<ast::Expr>(std::move(left));
+        bin.right = std::make_unique<ast::Expr>(std::move(right));
         return bin;
     }
 
@@ -182,10 +175,10 @@ class Translator final
     [[nodiscard]]
     auto makeUnary(const Ctx *ctx, std::string_view op, ast::Expr value) -> ast::Expr
     {
-        ast::UnaryExpr un;
+        ast::UnaryExpr un{};
         trivia_.bind(un, ctx);
         un.op = op;
-        un.value = box(std::move(value));
+        un.value = std::make_unique<ast::Expr>(std::move(value));
         return un;
     }
 
@@ -194,7 +187,7 @@ class Translator final
     [[nodiscard]]
     auto makeToken(const Ctx *ctx, std::string_view text) -> ast::Expr
     {
-        ast::TokenExpr tok;
+        ast::TokenExpr tok{};
         trivia_.bind(tok, ctx);
         tok.text = text;
         return tok;
