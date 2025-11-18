@@ -1,7 +1,10 @@
 #include "emit/pretty_printer/doc_impl.hpp"
 
+#include <algorithm>
+#include <array>
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
+#include <utility>
 #include <variant>
 
 using emit::DocPtr;
@@ -16,106 +19,92 @@ namespace {
 constexpr auto NODE_COUNTER = [](int count, const auto & /*node*/) { return count + 1; };
 } // namespace
 
-TEST_CASE("Optimizer: Rule 1 (Identity) - a + empty", "[pretty_printer][optimizer]")
+TEST_CASE("Smart Constructor: Rule 1 (Identity)", "[pretty_printer][smart_ctor]")
 {
-    constexpr std::string_view EXPECTED = "a";
+    // Case: a + empty -> a
+    const DocPtr res1 = makeConcat(makeText("a"), makeEmpty());
+    // Should immediately be Text("a"), count = 1
+    REQUIRE(foldImpl(res1, 0, NODE_COUNTER) == 1);
+    const auto *text1 = std::get_if<emit::Text>(&res1->value);
+    REQUIRE(text1 != nullptr);
+    REQUIRE(text1->content == "a");
 
-    const DocPtr unoptimized = makeConcat(makeText("a"), makeEmpty());
-    const DocPtr optimized = optimizeImpl(unoptimized);
+    // Case: empty + a -> a
+    const DocPtr res2 = makeConcat(makeEmpty(), makeText("a"));
+    REQUIRE(foldImpl(res2, 0, NODE_COUNTER) == 1);
 
-    // Unoptimized: Concat(Text("a"), Empty) -> 3 nodes
-    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 3);
-    // Optimized: Text("a") -> 1 node
-    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
-
-    // Check that optimized doc matches expected
-    const auto *text_node = std::get_if<emit::Text>(&optimized->value);
-    REQUIRE(text_node != nullptr);
-    REQUIRE(text_node->content == EXPECTED);
+    // Case: empty + empty -> empty
+    const DocPtr res3 = makeConcat(makeEmpty(), makeEmpty());
+    REQUIRE(std::holds_alternative<emit::Empty>(res3->value));
 }
 
-TEST_CASE("Optimizer: Rule 1 (Identity) - empty + a", "[pretty_printer][optimizer]")
+TEST_CASE("Smart Constructor: Rule 2 (Text Merge)", "[pretty_printer][smart_ctor]")
 {
-    constexpr std::string_view EXPECTED = "a";
+    // makeConcat("a", "b") should returns Text("ab") directly
+    const DocPtr res = makeConcat(makeText("a"), makeText("b"));
 
-    const DocPtr unoptimized = makeConcat(makeEmpty(), makeText("a"));
-    const DocPtr optimized = optimizeImpl(unoptimized);
+    REQUIRE(foldImpl(res, 0, NODE_COUNTER) == 1); // 1 node, not 3
 
-    // Unoptimized: Concat(Empty, Text("a")) -> 3 nodes
-    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 3);
-    // Optimized: Text("a") -> 1 node
-    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
-
-    // Check that optimized doc matches expected
-    const auto *text_node = std::get_if<emit::Text>(&optimized->value);
-    REQUIRE(text_node != nullptr);
-    REQUIRE(text_node->content == EXPECTED);
+    const auto *text = std::get_if<emit::Text>(&res->value);
+    REQUIRE(text != nullptr);
+    REQUIRE(text->content == "ab");
 }
 
-TEST_CASE("Optimizer: Rule 1 (Identity) - empty + empty", "[pretty_printer][optimizer]")
+TEST_CASE("Smart Constructor: Rule 3 (HardLines Merge)", "[pretty_printer][smart_ctor]")
 {
-    const DocPtr unoptimized = makeConcat(makeEmpty(), makeEmpty());
-    const DocPtr optimized = optimizeImpl(unoptimized);
+    // (hardlines(2) + hardline()) + hardlines(3)
+    // Should collapse immediately into HardLines(6)
+    const DocPtr res1 = makeConcat(makeConcat(makeHardLines(2), makeHardLine()), makeHardLines(3));
 
-    // Unoptimized: Concat(Empty, Empty) -> 3 nodes
-    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 3);
-    // Optimized: Empty -> 1 node
-    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
+    REQUIRE(foldImpl(res1, 0, NODE_COUNTER) == 1); // 1 node, not 5
 
-    // Check that optimized doc is an Empty node
-    REQUIRE(std::holds_alternative<emit::Empty>(optimized->value));
+    const auto *lines1 = std::get_if<emit::HardLines>(&res1->value);
+    REQUIRE(lines1 != nullptr);
+    REQUIRE(lines1->count == 6);
+
+    const DocPtr res2 = makeConcat(makeHardLines(1), makeHardLines(0));
+
+    REQUIRE(foldImpl(res2, 0, NODE_COUNTER) == 1); // 1 node, not 2
+
+    REQUIRE(std::get_if<emit::HardLine>(&res2->value) != nullptr);
 }
 
-TEST_CASE("Optimizer: Rule 2 (Text Merge)", "[pretty_printer][optimizer]")
+TEST_CASE("Smart Constructor: Complex Text Chain (Fold)", "[pretty_printer][smart_ctor]")
 {
-    constexpr std::string_view EXPECTED = "ab";
+    // Simulate building a long string from many small parts (e.g., a large identifier)
+    constexpr auto PARTS = std::to_array<std::string_view>(
+      { "This", " ", "is", " ", "a", " ", "complex", " ", "merge." });
 
-    const DocPtr unoptimized = makeConcat(makeText("a"), makeText("b"));
-    const DocPtr optimized = optimizeImpl(unoptimized);
+    // Start with Empty (Rule 1 should eat this immediately)
+    const DocPtr result = std::ranges::fold_left(PARTS, makeEmpty(), [](auto acc, const auto &str) {
+        // Each makeConcat should trigger Rule 2 (Text Merge)
+        // fusing the new part into the accumulator immediately.
+        return makeConcat(std::move(acc), makeText(str));
+    });
 
-    // Unoptimized: Concat(Text("a"), Text("b")) -> 3 nodes
-    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 3);
-    // Optimized: Text("ab") -> 1 node
-    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
+    // Verify the structure is fully flattened
+    // Unoptimized: ((((((((Empty + "This") + " ") + "is") ... ) -> 19 nodes
+    // Optimized: Text("This is a complex merge.") -> 1 node
+    REQUIRE(foldImpl(result, 0, NODE_COUNTER) == 1);
 
-    // Check that optimized doc matches expected
-    const auto *text_node = std::get_if<emit::Text>(&optimized->value);
-    REQUIRE(text_node != nullptr);
-    REQUIRE(text_node->content == EXPECTED);
+    const auto *text = std::get_if<emit::Text>(&result->value);
+    REQUIRE(text != nullptr);
+    REQUIRE(text->content == "This is a complex merge.");
 }
 
-TEST_CASE("Optimizer: Rule 3 (HardLines Merge)", "[pretty_printer][optimizer]")
+TEST_CASE("Smart Constructor: Interleaved Optimization", "[pretty_printer][smart_ctor]")
 {
-    constexpr unsigned EXPECTED = 6;
+    // Test interaction between Rule 1 (Identity) and Rule 2 (Text Merge)
+    // Structure: ("A" + (Empty + "B")) + ("C" + Empty)
 
-    // Manually build: (hardlines(2) + hardline()) + hardlines(3)
-    const DocPtr unoptimized
-      = makeConcat(makeConcat(makeHardLines(2), makeHardLine()), makeHardLines(3));
-    const DocPtr optimized = optimizeImpl(unoptimized);
+    // -> "AB"
+    const DocPtr lhs = makeConcat(makeText("A"), makeConcat(makeEmpty(), makeText("B")));
+    const DocPtr rhs = makeConcat(makeText("C"), makeEmpty()); // -> "C"
+    const DocPtr final_doc = makeConcat(lhs, rhs);             // -> "ABC"
 
-    // Unoptimized: Concat(Concat(HardLines(2), HardLine), HardLines(3)) -> 5 nodes
-    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 5);
-    // Optimized: HardLines(6) -> 1 node
-    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
+    REQUIRE(foldImpl(final_doc, 0, NODE_COUNTER) == 1);
 
-    // Check that optimized doc matches expected
-    const auto *lines_node = std::get_if<emit::HardLines>(&optimized->value);
-    REQUIRE(lines_node != nullptr);
-    REQUIRE(lines_node->count == EXPECTED);
-}
-
-TEST_CASE("Optimizer: Rule 3 (1 HardLines merges to HardLine)", "[pretty_printer][optimizer]")
-{
-    constexpr unsigned EXPECTED = 0;
-
-    const DocPtr unoptimized = makeConcat(makeHardLines(0), makeHardLines(1));
-    const DocPtr optimized = optimizeImpl(unoptimized);
-
-    // Unoptimized: Concat(HardLines(0), HardLines(1)) -> 2 nodes
-    REQUIRE(foldImpl(unoptimized, 0, NODE_COUNTER) == 3);
-    // Optimized: HardLine -> 1 node
-    REQUIRE(foldImpl(optimized, 0, NODE_COUNTER) == 1);
-
-    // Check that optimized doc matches expected
-    REQUIRE(std::get_if<emit::HardLine>(&optimized->value) != nullptr);
+    const auto *text = std::get_if<emit::Text>(&final_doc->value);
+    REQUIRE(text != nullptr);
+    REQUIRE(text->content == "ABC");
 }

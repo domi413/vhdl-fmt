@@ -57,7 +57,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     template<typename T>
     auto wrapResult(const T &node, Doc result) const -> Doc
     {
-        return withTrivia(node, std::move(result)).optimize();
+        return withTrivia(node, std::move(result));
     }
 
     /// @brief Combines the core doc with leading, inline, and trailing trivia.

@@ -43,6 +43,46 @@ auto makeHardLines(unsigned count) -> DocPtr
 
 auto makeConcat(DocPtr left, DocPtr right) -> DocPtr
 {
+    // === Rule 1: Identity (Empty) elimination ===
+    const bool left_is_empty = !left || std::holds_alternative<Empty>(left->value);
+    if (left_is_empty) {
+        return right;
+    }
+
+    const bool right_is_empty = !right || std::holds_alternative<Empty>(right->value);
+    if (right_is_empty) {
+        return left;
+    }
+
+    // === Rule 2: Merge adjacent Text nodes ===
+    if (auto *left_text = std::get_if<Text>(&left->value)) {
+        if (auto *right_text = std::get_if<Text>(&right->value)) {
+            // Create a new merged text node directly
+            return makeText(left_text->content + right_text->content);
+        }
+    }
+
+    // === Rule 3: Merge adjacent HardLines/HardLine nodes ===
+    auto get_lines = [](const DocPtr &d) -> std::optional<unsigned> {
+        if (std::holds_alternative<HardLine>(d->value)) {
+            return 1;
+        }
+        if (auto *hl = std::get_if<HardLines>(&d->value)) {
+            return hl->count;
+        }
+        return std::nullopt;
+    };
+
+    if (auto lhs = get_lines(left), rhs = get_lines(right); lhs && rhs) {
+        const unsigned total_lines = *lhs + *rhs;
+        if (total_lines == 1) {
+            return makeHardLine();
+        }
+        // HardLines(0) acts as prevention for flattening
+        return makeHardLines(total_lines); 
+    }
+
+    // === Fallback: Actually create the Concat node ===
     return std::make_shared<DocImpl>(Concat{ .left = std::move(left), .right = std::move(right) });
 }
 
@@ -126,68 +166,6 @@ auto resolveAlignment(const DocPtr &doc) -> DocPtr
             return std::make_shared<DocImpl>(node);
         }
     });
-}
-
-auto optimizeImpl(const DocPtr &doc) -> DocPtr
-{
-    auto optimization_rules = common::Overload{
-
-        // === Concat nodes ===
-        [](const Concat &node) -> DocPtr {
-            // Rule 1: Identity (Empty) elimination
-            const bool left_is_empty = std::holds_alternative<Empty>(node.left->value);
-            const bool right_is_empty = std::holds_alternative<Empty>(node.right->value);
-
-            if (left_is_empty && right_is_empty) {
-                return makeEmpty(); // (empty + empty) -> empty
-            }
-            if (left_is_empty) {
-                return node.right; // (empty + a) -> a
-            }
-            if (right_is_empty) {
-                return node.left; // (a + empty) -> a
-            }
-
-            // Rule 2: Merge adjacent Text nodes
-            if (auto *left_text = std::get_if<Text>(&node.left->value)) {
-                if (auto *right_text = std::get_if<Text>(&node.right->value)) {
-                    // (text("a") + text("b")) -> text("ab")
-                    return makeText(left_text->content + right_text->content);
-                }
-            }
-
-            // Rule 3: Merge adjacent HardLines/HardLine nodes
-            auto get_lines = [](const DocPtr &d) -> std::optional<unsigned> {
-                if (std::holds_alternative<HardLine>(d->value)) {
-                    return 1;
-                }
-                if (auto *hl = std::get_if<HardLines>(&d->value)) {
-                    return hl->count;
-                }
-                return std::nullopt; // Not a line node
-            };
-
-            if (auto lhs = get_lines(node.left), rhs = get_lines(node.right); lhs && rhs) {
-                const unsigned total_lines = *lhs + *rhs;
-                if (total_lines == 1) {
-                    return makeHardLine();
-                }
-                return makeHardLines(total_lines);
-            }
-
-            // If no Concat-specific rule matched, just return the node
-            return std::make_shared<DocImpl>(node);
-        },
-
-        // === Default for all other nodes ===
-        // (Text, HardLines, Empty, etc.)
-        // These nodes have no optimization rules themselves, so we
-        // just return them as-is.
-        [](const auto &node) -> DocPtr { return std::make_shared<DocImpl>(node); }
-    };
-
-    // Apply the optimization rules recursively
-    return transformImpl(doc, optimization_rules);
 }
 
 } // namespace emit

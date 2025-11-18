@@ -151,14 +151,6 @@ class Doc final
         return foldImpl(impl_, std::move(init), std::forward<Fn>(fn));
     }
 
-    /// @brief Optimizes the document tree by applying transformation rules.
-    /// @return A new optimized `Doc`.
-    [[nodiscard]]
-    auto optimize() const -> Doc
-    {
-        return Doc(optimizeImpl(impl_));
-    }
-
     // ========================================================================
     // Rendering
     // ========================================================================

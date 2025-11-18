@@ -244,8 +244,6 @@ auto foldImpl(const DocPtr &doc, T init, Fn &&fn) -> T
       doc->value);
 }
 
-auto optimizeImpl(const DocPtr &doc) -> DocPtr;
-
 // Factory functions for creating documents
 auto makeEmpty() -> DocPtr;
 auto makeText(std::string_view text) -> DocPtr;
