@@ -11,7 +11,7 @@
 namespace emit {
 
 // Forward declaration for recursive type
-class DocImpl;
+struct DocImpl;
 using DocPtr = std::shared_ptr<DocImpl>;
 
 template<typename T>
@@ -202,15 +202,10 @@ struct Align
 };
 
 /// Internal document representation using variant
-class DocImpl
+struct DocImpl
 {
-  public:
-    // NOLINTNEXTLINE (misc-non-private-member-variables-in-classes)
     std::variant<Empty, Text, SoftLine, HardLine, HardLines, Concat, Nest, Union, AlignText, Align>
       value;
-
-    // Since all members are public, this class is considered an aggregate type and allows for
-    // aggregate initialization.
 };
 
 /// Recursive document transformer using fmap

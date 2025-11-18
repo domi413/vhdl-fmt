@@ -13,7 +13,7 @@ struct Config;
 
 namespace emit {
 
-class DocImpl;
+struct DocImpl;
 using DocPtr = std::shared_ptr<DocImpl>;
 
 template<typename Fn>
