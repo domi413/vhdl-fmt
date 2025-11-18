@@ -79,7 +79,7 @@ auto makeConcat(DocPtr left, DocPtr right) -> DocPtr
             return makeHardLine();
         }
         // HardLines(0) acts as prevention for flattening
-        return makeHardLines(total_lines); 
+        return makeHardLines(total_lines);
     }
 
     // === Fallback: Actually create the Concat node ===

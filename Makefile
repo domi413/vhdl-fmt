@@ -46,13 +46,13 @@ run: $(BUILD_STAMP)
 	@./$(TARGET) ./tests/data/vhdl/simple.vhd
 
 test: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET) --output-on-failure
+	@ctest --preset $(CMAKE_PRESET) --output-on-failure -LE "benchmark"
 
 test-rerun-failed: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure
+	@ctest --preset $(CMAKE_PRESET) --rerun-failed --output-on-failure -LE "benchmark"
 
 test-verbose: $(BUILD_STAMP)
-	@ctest --preset $(CMAKE_PRESET) --verbose
+	@ctest --preset $(CMAKE_PRESET) --verbose -LE "benchmark"
 
 clean:
 	@rm -rf build CMakeFiles CMakeCache.txt CMakeUserPresets.json .cache
@@ -224,3 +224,24 @@ docker-publish-ci:
 	@$(CONTAINER_CMD) build . -t $(CI_IMAGE_NAME) --target ci
 	@$(CONTAINER_CMD) push $(CI_IMAGE_NAME)
 	@echo "✓ CI image published."
+
+# -----------------------------
+# Benchmark Targets
+# -----------------------------
+# Benchmarks must run in Release mode.
+# We expect the binary in bin/ because CMAKE_RUNTIME_OUTPUT_DIRECTORY is set to bin/
+BENCHMARK_BIN := build/Release/bin/vhdl_benchmarks
+
+benchmark:
+	@echo "-------------------------------------------------------"
+	@echo "Preparing Release build for accurate benchmarking..."
+	@echo "-------------------------------------------------------"
+	@$(MAKE) BUILD_TYPE=Release
+	@echo ""
+	@echo "Running Benchmarks..."
+	@./$(BENCHMARK_BIN)
+
+# Run benchmarks using CTest (useful if you want XML output or filtering)
+benchmark-ctest:
+	@$(MAKE) BUILD_TYPE=Release
+	@ctest -C Release -L benchmark --verbose

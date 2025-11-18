@@ -158,8 +158,7 @@ class Translator final
     /// @brief Helper to create binary expressions
     template<typename Ctx>
     [[nodiscard]]
-    auto makeBinary(const Ctx *ctx, std::string op, ast::Expr left, ast::Expr right)
-      -> ast::Expr
+    auto makeBinary(const Ctx *ctx, std::string op, ast::Expr left, ast::Expr right) -> ast::Expr
     {
         ast::BinaryExpr bin{};
         trivia_.bind(bin, ctx);
