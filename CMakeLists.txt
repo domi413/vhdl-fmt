@@ -184,7 +184,7 @@ if(ENABLE_COVERAGE)
             ${CMAKE_COMMAND} -E echo "Generating coverage summary..."
         COMMAND
             ${LLVM_COV} report ${TARGET_BINARY} -instr-profile=${PROFDATA_FILE}
-            -ignore-filename-regex=${IGNORE_REGEX} -use-color=true
+            -ignore-filename-regex=${IGNORE_REGEX}
             -show-region-summary=false ${COVERAGE_SOURCES} | tee
             ${COVERAGE_DIR}/coverage.txt
         DEPENDS
