@@ -228,20 +228,41 @@ docker-publish-ci:
 # -----------------------------
 # Benchmark Targets
 # -----------------------------
-# Benchmarks must run in Release mode.
-# We expect the binary in bin/ because CMAKE_RUNTIME_OUTPUT_DIRECTORY is set to bin/
-BENCHMARK_BIN := build/Release/bin/vhdl_benchmarks
+# Benchmarks must run in Release mode for accuracy.
 
-benchmark:
-	@echo "-------------------------------------------------------"
+BENCHMARK_BIN       := ./build/Release/bin/vhdl_benchmarks
+BENCHMARK_RESULTS   := ./tests/benchmarks/.results
+BENCHMARK_SCRIPT    := ./tests/benchmarks/compare_benchmarks.py
+BENCHMARK_SAMPLES   := 200
+
+BENCHMARK_CMD       := $(BENCHMARK_BIN) --benchmark-samples $(BENCHMARK_SAMPLES)
+BENCHMARK_BASELINE  := $(BENCHMARK_RESULTS)/baseline.xml
+BENCHMARK_CURRENT   := $(BENCHMARK_RESULTS)/new.xml
+
+.PHONY: benchmark benchmark-build benchmark-baseline benchmark-compare benchmark-clean
+
+benchmark-build:
 	@echo "Preparing Release build for accurate benchmarking..."
-	@echo "-------------------------------------------------------"
-	@$(MAKE) BUILD_TYPE=Release
-	@echo ""
-	@echo "Running Benchmarks..."
-	@./$(BENCHMARK_BIN)
+	@$(MAKE) --no-print-directory BUILD_TYPE=Release
 
-# Run benchmarks using CTest (useful if you want XML output or filtering)
-benchmark-ctest:
-	@$(MAKE) BUILD_TYPE=Release
-	@ctest -C Release -L benchmark --verbose
+benchmark: benchmark-build
+	@echo "Running Benchmarks (Samples: $(BENCHMARK_SAMPLES))..."
+	@$(BENCHMARK_CMD)
+
+benchmark-baseline: benchmark-build
+	@echo "Creating baseline benchmark..."
+	@mkdir -p $(BENCHMARK_RESULTS)
+	@$(BENCHMARK_CMD) -r XML -o $(BENCHMARK_BASELINE)
+	@echo "✓ Baseline saved to $(BENCHMARK_BASELINE)"
+
+benchmark-compare: benchmark-build
+	@echo "Running benchmarks to compare against baseline..."
+	@mkdir -p $(BENCHMARK_RESULTS)
+	@$(BENCHMARK_CMD) -r XML -o $(BENCHMARK_CURRENT)
+	@echo "Comparing results..."
+	@$(BENCHMARK_SCRIPT) $(BENCHMARK_BASELINE) $(BENCHMARK_CURRENT)
+
+benchmark-clean:
+	@echo "Cleaning benchmark results..."
+	@rm -f $(BENCHMARK_BASELINE) $(BENCHMARK_CURRENT)
+	@echo "✓ Done"
