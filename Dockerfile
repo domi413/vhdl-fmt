@@ -48,6 +48,9 @@ FROM builder AS dev
 RUN dnf install -y --setopt=install_weak_deps=false \
     lldb \
     ccache \
+    which \
+    wget \
+    procps \
     && dnf clean all
 
 # Add colored prompt for root
