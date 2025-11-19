@@ -1,6 +1,7 @@
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_units.hpp"
 #include "builder/translator.hpp"
+#include "common/range_helpers.hpp"
 #include "vhdlParser.h"
 
 #include <ranges>
@@ -18,9 +19,11 @@ auto Translator::makeGenericClause(vhdlParser::Generic_clauseContext *ctx) -> as
         return clause;
     }
 
-    for (auto *decl : list->interface_constant_declaration()) {
-        clause.generics.push_back(makeGenericParam(decl));
-    }
+    const auto &declarations = list->interface_constant_declaration();
+    clause.generics
+      = common::transformWithLast(
+          declarations, [&](auto *decl, bool is_last) { return makeGenericParam(decl, is_last); })
+      | std::ranges::to<std::vector>();
 
     return clause;
 }
@@ -39,17 +42,19 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext *ctx) -> ast::Por
         return clause;
     }
 
-    for (auto *decl : iface->interface_port_declaration()) {
-        clause.ports.push_back(makeSignalPort(decl));
-    }
+    const auto &declarations = iface->interface_port_declaration();
+    clause.ports
+      = common::transformWithLast(
+          declarations, [&](auto *decl, bool is_last) { return makeSignalPort(decl, is_last); })
+      | std::ranges::to<std::vector>();
 
     return clause;
 }
 
 // ---------------------- Interface declarations ----------------------
 
-auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx)
-  -> ast::GenericParam
+auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx,
+                                  const bool is_last) -> ast::GenericParam
 {
     auto param = make<ast::GenericParam>(ctx);
 
@@ -61,12 +66,19 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
         param.type_name = stype->getText();
     }
 
+    if (auto *expr = ctx->expression()) {
+        param.default_expr = makeExpr(expr);
+    }
+
+    param.is_last = is_last;
+
     return param;
 }
 
 // ---------------------- Object declarations ----------------------
 
-auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx) -> ast::Port
+auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx,
+                                const bool is_last) -> ast::Port
 {
     auto port = make<ast::Port>(ctx);
 
@@ -89,6 +101,8 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
     if (auto *expr = ctx->expression()) {
         port.default_expr = makeExpr(expr);
     }
+
+    port.is_last = is_last;
 
     return port;
 }

@@ -15,28 +15,15 @@ namespace test_utils {
 /// @brief Extract comment texts from leading trivia (vector<Trivia>)
 /// @param tv Vector of trivia items
 /// @return Vector of comment text views
-inline auto leadingComments(const std::vector<ast::Trivia> &tv) -> std::vector<std::string_view>
+inline auto getComments(const std::vector<ast::Trivia> &tv) -> std::vector<std::string_view>
 {
     return tv
          | std::views::filter(
-             [](const ast::Trivia &t) -> bool { return std::holds_alternative<ast::Comments>(t); })
+             [](const ast::Trivia &t) -> bool { return std::holds_alternative<ast::Comment>(t); })
          | std::views::transform([](const ast::Trivia &t) -> std::string_view {
-               return std::get<ast::Comments>(t).text;
+               return std::get<ast::Comment>(t).text;
            })
          | std::ranges::to<std::vector<std::string_view>>();
-}
-
-/// @brief Extract comment texts from trailing trivia (vector<Comments>)
-/// @param tv Vector of comment trivia
-/// @return Vector of comment text views
-inline auto trailingComments(const std::vector<ast::Comments> &tv) -> std::vector<std::string_view>
-{
-    std::vector<std::string_view> out;
-    out.reserve(tv.size());
-    for (const auto &c : tv) {
-        out.emplace_back(c.text);
-    }
-    return out;
 }
 
 /// @brief Counts of different trivia types
@@ -54,7 +41,7 @@ inline auto tallyTrivia(const std::vector<ast::Trivia> &tv) -> TriviaCounts
 {
     return std::ranges::fold_left(
       tv, TriviaCounts{}, [](TriviaCounts c, const ast::Trivia &t) -> TriviaCounts {
-          if (std::holds_alternative<ast::Comments>(t)) {
+          if (std::holds_alternative<ast::Comment>(t)) {
               ++c.comments;
           } else if (const auto *pb = std::get_if<ast::ParagraphBreak>(&t)) {
               ++c.newlines_items;

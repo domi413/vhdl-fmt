@@ -4,6 +4,7 @@ add_library(
     pretty_printer/doc.cpp
     pretty_printer/doc_impl.cpp
     pretty_printer/renderer.cpp
+    pretty_printer/trivia.cpp
     pretty_printer/nodes/design_file.cpp
     pretty_printer/nodes/design_units.cpp
     pretty_printer/nodes/clauses.cpp

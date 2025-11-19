@@ -3,6 +3,7 @@
 #include "vhdlParser.h"
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -68,17 +69,17 @@ auto Translator::makeName(vhdlParser::NameContext *ctx) -> ast::Expr
 auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContext *ctx) -> ast::Expr
 {
     auto slice_expr = make<ast::CallExpr>(ctx);
-    slice_expr.callee = box(std::move(base));
+    slice_expr.callee = std::make_unique<ast::Expr>(std::move(base));
 
     if (auto *dr = ctx->discrete_range()) {
         if (auto *rd = dr->range_decl()) {
             if (auto *er = rd->explicit_range()) {
-                slice_expr.args = box(makeRange(er));
+                slice_expr.args = std::make_unique<ast::Expr>(makeRange(er));
             } else {
-                slice_expr.args = box(makeToken(rd, rd->getText()));
+                slice_expr.args = std::make_unique<ast::Expr>(makeToken(rd, rd->getText()));
             }
         } else if (auto *subtype = dr->subtype_indication()) {
-            slice_expr.args = box(makeToken(subtype, subtype->getText()));
+            slice_expr.args = std::make_unique<ast::Expr>(makeToken(subtype, subtype->getText()));
         }
     }
 
@@ -96,23 +97,23 @@ auto Translator::makeCallExpr(ast::Expr base,
   -> ast::Expr
 {
     auto call_expr = make<ast::CallExpr>(ctx);
-    call_expr.callee = box(std::move(base));
+    call_expr.callee = std::make_unique<ast::Expr>(std::move(base));
 
     if (auto *assoc_list = ctx->actual_parameter_part()) {
         if (auto *list_ctx = assoc_list->association_list()) {
             auto associations = list_ctx->association_element();
 
             if (associations.size() == 1) {
-                call_expr.args = box(makeCallArgument(associations[0]));
+                call_expr.args = std::make_unique<ast::Expr>(makeCallArgument(associations[0]));
             } else {
                 auto group = make<ast::GroupExpr>(list_ctx);
                 for (auto *elem : associations) {
                     group.children.push_back(makeCallArgument(elem));
                 }
-                call_expr.args = box(ast::Expr{ std::move(group) });
+                call_expr.args = std::make_unique<ast::Expr>(ast::Expr{ std::move(group) });
             }
         } else {
-            call_expr.args = box(makeToken(ctx, ctx->getText()));
+            call_expr.args = std::make_unique<ast::Expr>(makeToken(ctx, ctx->getText()));
         }
     }
 

@@ -7,3 +7,5 @@ include(Catch)
 add_subdirectory(ast)
 add_subdirectory(cli)
 add_subdirectory(emit)
+
+add_subdirectory(benchmarks)

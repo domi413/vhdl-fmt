@@ -6,12 +6,13 @@
 
 #include <string>
 #include <string_view>
+#include <variant>
 
 namespace emit {
+// ========================================================================
+// Static Factories (Document Primitives)
+// ========================================================================
 
-Doc::Doc() : impl_(makeEmpty()) {}
-
-// Basic constructors
 auto Doc::empty() -> Doc
 {
     return Doc(makeEmpty());
@@ -32,7 +33,24 @@ auto Doc::hardline() -> Doc
     return Doc(makeHardLine());
 }
 
-// Combinators
+auto Doc::hardlines(unsigned count) -> Doc
+{
+    if (count == 1) {
+        return Doc(makeHardLine());
+    }
+    // Count 0 can act as a marker to prevent flattening
+    return Doc(makeHardLines(count));
+}
+
+auto Doc::alignText(std::string_view str, int level) -> Doc
+{
+    return Doc(makeAlignText(str, level));
+}
+
+// ========================================================================
+// Low-Level Combinators (Operators)
+// ========================================================================
+
 auto Doc::operator+(const Doc &other) const -> Doc
 {
     return Doc(makeConcat(impl_, other.impl_));
@@ -55,19 +73,22 @@ auto Doc::operator|(const Doc &other) const -> Doc
 
 auto Doc::operator<<(const Doc &other) const -> Doc
 {
-    // *this + (line() + other).nest(DEFAULT_INDENT)
+    // *this + (line() + other).nest()
     auto nested = Doc(makeNest(makeConcat(line().impl_, other.impl_)));
     return *this + nested;
 }
 
 auto Doc::hardIndent(const Doc &other) const -> Doc
 {
-    // *this + (hardline() + other).nest(DEFAULT_INDENT)
+    // *this + (hardline() + other).nest()
     auto nested = Doc(makeNest(makeConcat(hardline().impl_, other.impl_)));
     return *this + nested;
 }
 
-// Compound assignment operators
+// ========================================================================
+// Compound Assignment Operators
+// ========================================================================
+
 auto Doc::operator+=(const Doc &other) -> Doc &
 {
     *this = *this + other;
@@ -98,21 +119,45 @@ auto Doc::operator<<=(const Doc &other) -> Doc &
     return *this;
 }
 
+// ========================================================================
+// High-Level Layout Patterns
+// ========================================================================
+
 auto Doc::bracket(const Doc &left, const Doc &inner, const Doc &right) -> Doc
 {
     return (left << inner) / right;
 }
 
-auto Doc::group() const -> Doc
+auto Doc::align(const Doc &doc) -> Doc
 {
-    return Doc(makeUnion(flatten(impl_), impl_));
+    return Doc(makeAlign(doc.impl_));
 }
 
+auto Doc::group(const Doc &doc) -> Doc
+{
+    return Doc(makeUnion(flatten(doc.impl_), doc.impl_));
+}
+
+// ========================================================================
 // Rendering
+// ========================================================================
+
 auto Doc::render(const common::Config &config) const -> std::string
 {
     Renderer renderer(config);
     return renderer.render(impl_);
+}
+
+// =======================================================================
+// Utilities
+// ========================================================================
+
+auto Doc::isEmpty() const -> bool
+{
+    if (!impl_) {
+        return true;
+    }
+    return std::holds_alternative<Empty>(impl_->value);
 }
 
 } // namespace emit
