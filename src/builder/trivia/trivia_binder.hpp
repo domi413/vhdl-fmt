@@ -3,8 +3,6 @@
 
 #include "ast/node.hpp"
 
-#include <cstddef>
-#include <optional>
 #include <span>
 #include <vector>
 
@@ -16,7 +14,6 @@ class Token;
 
 namespace builder {
 
-/// @brief Builds ordered trivia streams (comments + newlines) for AST nodes.
 class TriviaBinder final
 {
   public:
@@ -34,15 +31,17 @@ class TriviaBinder final
 
   private:
     antlr4::CommonTokenStream &tokens_;
-    std::vector<bool> used_; ///< set of token indices already added as trivia
+    std::vector<bool> used_;
 
-    void collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Token *const> tokens);
-    void collectInline(std::optional<ast::Comment> &dst, std::size_t index);
-
+    // Returns a vector of trivia from a specific range of tokens
     [[nodiscard]]
-    auto findLastDefault(std::size_t start_index) const noexcept -> std::size_t;
+    auto extractTrivia(std::span<antlr4::Token* const> range) -> std::vector<ast::Trivia>;
+
+    // Finds the index of the last meaningful token in the context
+    [[nodiscard]]
+    auto findContextEnd(const antlr4::ParserRuleContext *ctx) const -> std::size_t;
 };
 
 } // namespace builder
 
-#endif /* BUILDER_TRIVIA_TRIVIA_BINDER_HPP */
+#endif
