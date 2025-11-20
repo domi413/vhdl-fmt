@@ -3,65 +3,99 @@
 #include "emit/pretty_printer.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
-#include <algorithm>
-#include <functional>
 #include <ranges>
 #include <span>
+#include <utility>
 #include <variant>
 
 namespace emit {
 
 namespace {
 
-auto printTrivia(const ast::Trivia &trivia) -> Doc
+/// @brief Predicate to filter out ParagraphBreak trivia if suppressing newlines.
+constexpr auto shouldKeep(bool suppress_newlines)
+{
+    return [suppress_newlines](const ast::Trivia &t) -> bool {
+        return !(suppress_newlines && std::holds_alternative<ast::ParagraphBreak>(t));
+    };
+}
+
+/// @brief Format a standard trivia item (e.g., Leading or Middle of Trailing).
+/// Comments get a trailing hardline; Breaks get their full height.
+auto formatTrivia(const ast::Trivia &t) -> Doc
 {
     return std::visit(
       common::Overload{
         [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); },
         [](const ast::ParagraphBreak &p) -> Doc { return Doc::hardlines(p.blank_lines); } },
-      trivia);
+      t);
 }
 
-auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
+/// @brief Format specifically for the LAST item in a trailing block.
+/// Comments don't get a trailing hardline
+/// Breaks are reduced by 1 (since the block starts with \n).
+auto formatLastTrailing(const ast::Trivia &t) -> Doc
 {
-    if (list.empty()) {
+    return std::visit(
+      common::Overload{ [](const ast::Comment &c) -> Doc { return Doc::text(c.text); },
+                        [](const ast::ParagraphBreak &p) -> Doc {
+                            return Doc::hardlines(p.blank_lines > 0 ? p.blank_lines - 1 : 0);
+                        } },
+      t);
+}
+
+/// @brief Generic builder for a block of trivia.
+/// @tparam Formatter Function to handle the very last item in the list.
+template<typename Formatter>
+auto buildTrivia(std::span<const ast::Trivia> trivia,
+                 bool suppress,
+                 Doc prefix,
+                 Formatter format_last) -> Doc
+{
+    auto view = trivia | std::views::filter(shouldKeep(suppress));
+
+    auto it = view.begin();
+    if (it == view.end()) {
         return Doc::empty();
     }
 
-    // Process all items except the last one normally
-    const Doc result = std::ranges::fold_left(
-      list | std::views::take(list.size() - 1) | std::views::transform(printTrivia),
-      Doc::hardline(),
-      std::plus<>());
+    // Start with the specific prefix (Empty for Leading, Hardline for Trailing)
+    Doc doc = std::move(prefix);
 
-    auto com = [](const ast::Comment &c) -> Doc { return Doc::text(c.text); };
+    auto pending = *it++;
 
-    // Special handling for the very last trailing item
-    auto par = [](const ast::ParagraphBreak &p) -> Doc {
-        return Doc::hardlines((p.blank_lines > 0) ? p.blank_lines - 1 : 0);
-    };
+    // Process all items except the last one
+    for (const auto &item : std::ranges::subrange(it, view.end())) {
+        doc += formatTrivia(std::exchange(pending, item));
+    }
 
-    return result + std::visit(common::Overload{ com, par }, list.back());
+    // Apply the specific strategy for the last item
+    return doc + format_last(pending);
 }
 
 } // namespace
 
-auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
+auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core, bool suppress) -> Doc
 {
     if (!node.hasTrivia()) {
-        return core_doc;
+        return core;
     }
 
-    Doc result = std::ranges::fold_left(
-      node.getLeading() | std::views::transform(printTrivia), Doc::empty(), std::plus<>());
+    Doc result = Doc::empty();
 
-    result += core_doc;
+    // 1. Leading Trivia
+    result += buildTrivia(node.getLeading(), suppress, Doc::empty(), formatTrivia);
 
-    if (auto inline_text = node.getInlineComment()) {
-        result += Doc::text(" ") + Doc::text(*inline_text) + Doc::hardlines(0);
+    // 2. Core Doc
+    result += core;
+
+    // 3. Inline Comment
+    if (auto txt = node.getInlineComment()) {
+        result += Doc::text(" ") + Doc::text(*txt) + Doc::hardlines(0);
     }
 
-    result += printTrailingTriviaList(node.getTrailing());
+    // 4. Trailing Trivia
+    result += buildTrivia(node.getTrailing(), suppress, Doc::hardline(), formatLastTrailing);
 
     return result;
 }

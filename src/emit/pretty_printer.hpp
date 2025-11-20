@@ -14,6 +14,16 @@
 
 namespace emit {
 
+/// @brief Helper concept to identify AST nodes that are Expressions.
+/// Used to suppress paragraph breaks (blank lines) within expressions for tighter formatting.
+template<typename T>
+concept IsExpression = std::is_same_v<T, ast::TokenExpr>
+                    || std::is_same_v<T, ast::GroupExpr>
+                    || std::is_same_v<T, ast::UnaryExpr>
+                    || std::is_same_v<T, ast::BinaryExpr>
+                    || std::is_same_v<T, ast::ParenExpr>
+                    || std::is_same_v<T, ast::CallExpr>;
+
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 {
   private:
@@ -57,12 +67,13 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     template<typename T>
     auto wrapResult(const T &node, Doc result) const -> Doc
     {
-        return withTrivia(node, std::move(result));
+        return withTrivia(node, std::move(result), IsExpression<T>);
     }
 
     /// @brief Combines the core doc with leading, inline, and trailing trivia.
+    /// @param suppress_newlines If true, ParagraphBreak trivia (blank lines) will be ignored.
     [[nodiscard]]
-    static auto withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc;
+    static auto withTrivia(const ast::NodeBase &node, Doc core_doc, bool suppress_newlines) -> Doc;
 
     // Allow base class to call `wrapResult`, so `wrapResult` can be private
     friend class ast::VisitorBase<PrettyPrinter, Doc>;
