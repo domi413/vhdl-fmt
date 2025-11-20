@@ -13,7 +13,7 @@ namespace emit {
 
 namespace {
 
-constexpr auto printTrivia(const ast::Trivia &trivia) -> Doc
+auto printTrivia(const ast::Trivia &trivia) -> Doc
 {
     return std::visit(
       common::Overload{
@@ -52,16 +52,18 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
         return core_doc;
     }
 
-    const Doc leading = std::ranges::fold_left(
+    Doc result = std::ranges::fold_left(
       node.getLeading() | std::views::transform(printTrivia), Doc::empty(), std::plus<>());
 
-    const auto inline_text = node.getInlineComment();
-    const Doc inline_comment
-      = inline_text ? Doc::text(" ") + Doc::text(*inline_text) + Doc::hardlines(0) : Doc::empty();
+    result += core_doc;
 
-    const Doc trailing = printTrailingTriviaList(node.getTrailing());
+    if (auto inline_text = node.getInlineComment()) {
+        result += Doc::text(" ") + Doc::text(*inline_text) + Doc::hardlines(0);
+    }
 
-    return leading + core_doc + inline_comment + trailing;
+    result += printTrailingTriviaList(node.getTrailing());
+
+    return result;
 }
 
 } // namespace emit

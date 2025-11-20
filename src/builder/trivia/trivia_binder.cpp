@@ -81,7 +81,7 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     auto leading = extractTrivia(tokens_.getHiddenTokensToLeft(start_idx));
     auto trailing = extractTrivia(tokens_.getHiddenTokensToRight(stop_idx));
 
-    // 4. Commit to Node (Allocates only if data exists)
+    // Commit to Node
     if (!leading.empty() || !trailing.empty() || inline_comment.has_value()) {
         node.trivia = std::make_unique<ast::NodeTrivia>(
           ast::NodeTrivia{ .leading = std::move(leading),
