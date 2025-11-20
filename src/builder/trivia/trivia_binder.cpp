@@ -7,9 +7,11 @@
 #include "builder/trivia/utils.hpp"
 
 #include <cstddef>
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <span>
+#include <utility>
 #include <vector>
 
 namespace builder {
@@ -24,7 +26,7 @@ void TriviaBinder::collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Toke
         if (linebreaks >= 2) {
             dst.emplace_back(ast::ParagraphBreak{ .blank_lines = linebreaks - 1 });
         }
-        linebreaks = 0; // Reset after processing
+        linebreaks = 0;
     };
 
     for (const auto *token : tokens) {
@@ -45,8 +47,6 @@ void TriviaBinder::collect(std::vector<ast::Trivia> &dst, std::span<antlr4::Toke
             dst.emplace_back(ast::Comment{ token->getText() });
         }
     }
-
-    // Process any remaining linebreaks at the end
     process_linebreaks();
 }
 
@@ -61,7 +61,6 @@ void TriviaBinder::collectInline(std::optional<ast::Comment> &dst, const std::si
     if (isComment(token)) {
         used_[index] = true;
         dst.emplace(ast::Comment{ token->getText() });
-        return; // only one inline comment per node
     }
 }
 
@@ -71,14 +70,25 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
         return;
     }
 
-    auto &trivia = node.trivia.emplace();
+    std::vector<ast::Trivia> leading;
+    std::vector<ast::Trivia> trailing;
+    std::optional<ast::Comment> inline_comment;
 
     const auto start_index = ctx->getStart()->getTokenIndex();
     const auto stop_index = findLastDefault(ctx->getStop()->getTokenIndex());
 
-    collect(trivia.leading, tokens_.getHiddenTokensToLeft(start_index));
-    collectInline(trivia.inline_comment, stop_index + 1);
-    collect(trivia.trailing, tokens_.getHiddenTokensToRight(stop_index));
+    collect(leading, tokens_.getHiddenTokensToLeft(start_index));
+    collectInline(inline_comment, stop_index + 1);
+    collect(trailing, tokens_.getHiddenTokensToRight(stop_index));
+
+    const bool has_content = !leading.empty() || !trailing.empty() || inline_comment.has_value();
+
+    if (has_content) {
+        node.trivia = std::make_unique<ast::NodeTrivia>(
+          ast::NodeTrivia{ .leading = std::move(leading),
+                           .trailing = std::move(trailing),
+                           .inline_comment = std::move(inline_comment) });
+    }
 }
 
 auto TriviaBinder::findLastDefault(const std::size_t start_index) const noexcept -> std::size_t
@@ -89,21 +99,17 @@ auto TriviaBinder::findLastDefault(const std::size_t start_index) const noexcept
     }
 
     const auto line = start_token->getLine();
-
     std::size_t result = start_index;
 
     for (const auto i : std::views::iota(start_index + 1)) {
         const auto *token = tokens_.get(i);
-
         if (token == nullptr || token->getLine() != line) {
             break;
         }
-
         if (isDefault(token)) {
             result = i;
         }
     }
-
     return result;
 }
 
