@@ -31,17 +31,14 @@ auto printTrailingTriviaList(const std::span<const ast::Trivia> list) -> Doc
     // Process all items except the last one normally
     const Doc result = std::ranges::fold_left(
       list | std::views::take(list.size() - 1) | std::views::transform(printTrivia),
-      Doc::line(),
+      Doc::hardline(),
       std::plus<>());
 
-    // Special handling for the very last trailing item to prevent flattening
-    auto com = [](const ast::Comment &c) -> Doc {
-        // `hardlines(0)` forces a break that cannot be flattened by groups
-        return Doc::text(c.text) + Doc::hardlines(0);
-    };
+    auto com = [](const ast::Comment &c) -> Doc { return Doc::text(c.text); };
 
+    // Special handling for the very last trailing item
     auto par = [](const ast::ParagraphBreak &p) -> Doc {
-        return Doc::hardlines(std::max(p.blank_lines - 1, 0U));
+        return Doc::hardlines((p.blank_lines > 0) ? p.blank_lines - 1 : 0);
     };
 
     return result + std::visit(common::Overload{ com, par }, list.back());
@@ -59,12 +56,12 @@ auto PrettyPrinter::withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc
       node.getLeading() | std::views::transform(printTrivia), Doc::empty(), std::plus<>());
 
     const auto inline_text = node.getInlineComment();
-    const Doc inline_doc
+    const Doc inline_comment
       = inline_text ? Doc::text(" ") + Doc::text(*inline_text) + Doc::hardlines(0) : Doc::empty();
 
     const Doc trailing = printTrailingTriviaList(node.getTrailing());
 
-    return leading + core_doc + inline_doc + trailing;
+    return leading + core_doc + inline_comment + trailing;
 }
 
 } // namespace emit
