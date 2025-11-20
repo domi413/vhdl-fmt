@@ -28,7 +28,7 @@ auto TriviaBinder::extractTrivia(std::span<antlr4::Token *const> range) -> std::
 
         if (isComment(token)) {
             if (pending_newlines >= 2) {
-                result.emplace_back(ast::ParagraphBreak{ .blank_lines = pending_newlines - 1 });
+                result.emplace_back(ast::Break{ .blank_lines = pending_newlines - 1 });
             }
             pending_newlines = 0;
 
@@ -37,7 +37,7 @@ auto TriviaBinder::extractTrivia(std::span<antlr4::Token *const> range) -> std::
     }
 
     if (pending_newlines >= 2) {
-        result.emplace_back(ast::ParagraphBreak{ .blank_lines = pending_newlines - 1 });
+        result.emplace_back(ast::Break{ .blank_lines = pending_newlines - 1 });
     }
 
     return result;

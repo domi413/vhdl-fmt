@@ -40,7 +40,7 @@ TEST_CASE("withTrivia: Leading paragraph break (1 blank line)", "[pretty_printer
 {
     ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
 
-    param.addLeading(ast::ParagraphBreak{ .blank_lines = 1 });
+    param.addLeading(ast::Break{ .blank_lines = 1 });
 
     const auto result = emit::test::render(param);
     REQUIRE(result == "\nWIDTH : integer");
@@ -50,7 +50,7 @@ TEST_CASE("withTrivia: Leading paragraph break (2 blank lines)", "[pretty_printe
 {
     ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
 
-    param.addLeading(ast::ParagraphBreak{ .blank_lines = 2 });
+    param.addLeading(ast::Break{ .blank_lines = 2 });
 
     const auto result = emit::test::render(param);
     REQUIRE(result == "\n\nWIDTH : integer");
@@ -61,7 +61,7 @@ TEST_CASE("withTrivia: Leading comments and newlines", "[pretty_printer][trivia]
     ast::GenericParam param{ .names = { "WIDTH" }, .type_name = "integer", .is_last = true };
 
     param.addLeading(ast::Comment{ "-- header" });
-    param.addLeading(ast::ParagraphBreak{ .blank_lines = 1 });
+    param.addLeading(ast::Break{ .blank_lines = 1 });
     param.addLeading(ast::Comment{ "-- description" });
 
     const auto result = emit::test::render(param);
@@ -110,7 +110,7 @@ TEST_CASE("withTrivia: Complex mix", "[pretty_printer][trivia]")
 
     // Leading
     param.addLeading(ast::Comment{ "-- header comment" });
-    param.addLeading(ast::ParagraphBreak{ .blank_lines = 2 });
+    param.addLeading(ast::Break{ .blank_lines = 2 });
     param.addLeading(ast::Comment{ "-- description" });
 
     // Inline
@@ -118,7 +118,7 @@ TEST_CASE("withTrivia: Complex mix", "[pretty_printer][trivia]")
 
     // Trailing
     param.addTrailing(ast::Comment{ "-- trailing comment" });
-    param.addTrailing(ast::ParagraphBreak{ .blank_lines = 2 });
+    param.addTrailing(ast::Break{ .blank_lines = 2 });
     param.addTrailing(ast::Comment{ "-- footer comment" });
 
     const auto result = emit::test::render(param);

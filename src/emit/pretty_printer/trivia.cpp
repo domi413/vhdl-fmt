@@ -12,11 +12,11 @@ namespace emit {
 
 namespace {
 
-/// @brief Predicate to filter out ParagraphBreak trivia if suppressing newlines.
+/// @brief Predicate to filter out Break trivia if suppressing newlines.
 constexpr auto shouldKeep(bool suppress_newlines)
 {
     return [suppress_newlines](const ast::Trivia &t) -> bool {
-        return !(suppress_newlines && std::holds_alternative<ast::ParagraphBreak>(t));
+        return !(suppress_newlines && std::holds_alternative<ast::Break>(t));
     };
 }
 
@@ -27,7 +27,7 @@ auto formatTrivia(const ast::Trivia &t) -> Doc
     return std::visit(
       common::Overload{
         [](const ast::Comment &c) -> Doc { return Doc::text(c.text) + Doc::hardline(); },
-        [](const ast::ParagraphBreak &p) -> Doc { return Doc::hardlines(p.blank_lines); } },
+        [](const ast::Break &p) -> Doc { return Doc::hardlines(p.blank_lines); } },
       t);
 }
 
@@ -38,7 +38,7 @@ auto formatLastTrailing(const ast::Trivia &t) -> Doc
 {
     return std::visit(
       common::Overload{ [](const ast::Comment &c) -> Doc { return Doc::text(c.text); },
-                        [](const ast::ParagraphBreak &p) -> Doc {
+                        [](const ast::Break &p) -> Doc {
                             return Doc::hardlines(p.blank_lines > 0 ? p.blank_lines - 1 : 0);
                         } },
       t);

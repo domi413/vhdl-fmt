@@ -15,7 +15,7 @@
 namespace emit {
 
 /// @brief Helper concept to identify AST nodes that are Expressions.
-/// Used to suppress paragraph breaks (blank lines) within expressions for tighter formatting.
+/// Used to suppress breaks (blank lines) within expressions for tighter formatting.
 template<typename T>
 concept IsExpression = std::is_same_v<T, ast::TokenExpr>
                     || std::is_same_v<T, ast::GroupExpr>
@@ -71,7 +71,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     }
 
     /// @brief Combines the core doc with leading, inline, and trailing trivia.
-    /// @param suppress_newlines If true, ParagraphBreak trivia (blank lines) will be ignored.
+    /// @param suppress_newlines If true, Break trivia (blank lines) will be ignored.
     [[nodiscard]]
     static auto withTrivia(const ast::NodeBase &node, Doc core_doc, bool suppress_newlines) -> Doc;
 

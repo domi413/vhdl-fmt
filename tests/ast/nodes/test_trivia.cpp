@@ -126,16 +126,16 @@ TEST_CASE("Generic captures paragraph breaks (1 blank line)", "[design_units][tr
     REQUIRE(trailing.size() == 3); // Break, Comment, Break
 
     // Break before comment
-    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(trailing[0]));
-    REQUIRE(std::get<ast::ParagraphBreak>(trailing[0]).blank_lines == 1);
+    REQUIRE(std::holds_alternative<ast::Break>(trailing[0]));
+    REQUIRE(std::get<ast::Break>(trailing[0]).blank_lines == 1);
 
     // Comment
     REQUIRE(std::holds_alternative<ast::Comment>(trailing[1]));
     REQUIRE(std::get<ast::Comment>(trailing[1]).text.contains("test"));
 
     // Break after comment
-    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(trailing[2]));
-    REQUIRE(std::get<ast::ParagraphBreak>(trailing[2]).blank_lines == 1);
+    REQUIRE(std::holds_alternative<ast::Break>(trailing[2]));
+    REQUIRE(std::get<ast::Break>(trailing[2]).blank_lines == 1);
 
     // Ensure 'two' didn't steal the trailing trivia as leading
     REQUIRE(two.getLeading().empty());
@@ -166,12 +166,12 @@ TEST_CASE("Generic captures paragraph breaks (2 blank lines)", "[design_units][t
     REQUIRE(trailing.size() == 3);
 
     // Break before (2 blank lines)
-    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(trailing[0]));
-    REQUIRE(std::get<ast::ParagraphBreak>(trailing[0]).blank_lines == 2);
+    REQUIRE(std::holds_alternative<ast::Break>(trailing[0]));
+    REQUIRE(std::get<ast::Break>(trailing[0]).blank_lines == 2);
 
     // Break after (2 blank lines)
-    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(trailing[2]));
-    REQUIRE(std::get<ast::ParagraphBreak>(trailing[2]).blank_lines == 2);
+    REQUIRE(std::holds_alternative<ast::Break>(trailing[2]));
+    REQUIRE(std::get<ast::Break>(trailing[2]).blank_lines == 2);
 }
 
 TEST_CASE("Generic with inline comment + paragraph breaks", "[design_units][trivia]")
@@ -201,8 +201,8 @@ TEST_CASE("Generic with inline comment + paragraph breaks", "[design_units][triv
     REQUIRE(trailing.size() == 3);
 
     // Ensure inline comment didn't bleed into trailing
-    REQUIRE(std::holds_alternative<ast::ParagraphBreak>(trailing[0]));
-    REQUIRE(std::get<ast::ParagraphBreak>(trailing[0]).blank_lines == 1);
+    REQUIRE(std::holds_alternative<ast::Break>(trailing[0]));
+    REQUIRE(std::get<ast::Break>(trailing[0]).blank_lines == 1);
 
     REQUIRE(std::holds_alternative<ast::Comment>(trailing[1]));
     REQUIRE(std::get<ast::Comment>(trailing[1]).text.contains("test"));
