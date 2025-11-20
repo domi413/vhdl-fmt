@@ -18,12 +18,8 @@ auto TriviaBinder::extractTrivia(std::span<antlr4::Token *const> range) -> std::
 
     unsigned int pending_newlines{ 0 };
 
-    auto available_tokens
-      = range | std::views::filter([this](auto *t) { return !used_[t->getTokenIndex()]; });
-
-    for (auto *token : available_tokens) {
-        // Mark as used immediately so we don't double-bind
-        used_[token->getTokenIndex()] = true;
+    for (auto *token : range | std::views::filter([this](auto *t) { return !isUsed(t); })) {
+        markAsUsed(token);
 
         if (isNewline(token)) {
             ++pending_newlines;
@@ -31,7 +27,6 @@ auto TriviaBinder::extractTrivia(std::span<antlr4::Token *const> range) -> std::
         }
 
         if (isComment(token)) {
-            // State machine: If we hit a comment, flush pending newlines as a break
             if (pending_newlines >= 2) {
                 result.emplace_back(ast::ParagraphBreak{ .blank_lines = pending_newlines - 1 });
             }
@@ -41,7 +36,6 @@ auto TriviaBinder::extractTrivia(std::span<antlr4::Token *const> range) -> std::
         }
     }
 
-    // 3. Flush: Handle trailing line breaks
     if (pending_newlines >= 2) {
         result.emplace_back(ast::ParagraphBreak{ .blank_lines = pending_newlines - 1 });
     }
@@ -79,9 +73,9 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
 
     // Extract Inline (Immediate Right of stop)
     std::optional<ast::Comment> inline_comment;
-    if (auto *next_token = tokens_.get(stop_idx + 1); isComment(next_token)) {
-        inline_comment = ast::Comment{ next_token->getText() };
-        used_[next_token->getTokenIndex()] = true;
+    if (auto *token = tokens_.get(stop_idx + 1); isComment(token) && !isUsed(token)) {
+        inline_comment = ast::Comment{ token->getText() };
+        markAsUsed(token);
     }
 
     auto leading = extractTrivia(tokens_.getHiddenTokensToLeft(start_idx));
@@ -94,6 +88,16 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
                            .trailing = std::move(trailing),
                            .inline_comment = std::move(inline_comment) });
     }
+}
+
+auto TriviaBinder::isUsed(const antlr4::Token *token) const -> bool
+{
+    return used_[token->getTokenIndex()];
+}
+
+auto TriviaBinder::markAsUsed(const antlr4::Token *token) -> void
+{
+    used_[token->getTokenIndex()] = true;
 }
 
 } // namespace builder

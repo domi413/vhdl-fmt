@@ -40,6 +40,13 @@ class TriviaBinder final
     // Finds the index of the last meaningful token in the context
     [[nodiscard]]
     auto findContextEnd(const antlr4::ParserRuleContext *ctx) const -> std::size_t;
+
+    // Checks if a token is already taken
+    [[nodiscard]]
+    auto isUsed(const antlr4::Token *token) const -> bool;
+
+    // Marks a token as used
+    auto markAsUsed(const antlr4::Token *token) -> void;
 };
 
 } // namespace builder
