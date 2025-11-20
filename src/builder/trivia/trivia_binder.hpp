@@ -35,7 +35,7 @@ class TriviaBinder final
 
     // Returns a vector of trivia from a specific range of tokens
     [[nodiscard]]
-    auto extractTrivia(std::span<antlr4::Token* const> range) -> std::vector<ast::Trivia>;
+    auto extractTrivia(std::span<antlr4::Token *const> range) -> std::vector<ast::Trivia>;
 
     // Finds the index of the last meaningful token in the context
     [[nodiscard]]
