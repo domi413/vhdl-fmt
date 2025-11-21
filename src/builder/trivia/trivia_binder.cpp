@@ -3,10 +3,17 @@
 #include "CommonTokenStream.h"
 #include "ParserRuleContext.h"
 #include "Token.h"
+#include "ast/node.hpp"
 #include "builder/trivia/utils.hpp"
 
 #include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <optional>
 #include <ranges>
+#include <span>
+#include <utility>
+#include <vector>
 
 namespace builder {
 

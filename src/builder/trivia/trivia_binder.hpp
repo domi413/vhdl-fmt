@@ -3,6 +3,7 @@
 
 #include "ast/node.hpp"
 
+#include <cstddef>
 #include <span>
 #include <vector>
 
