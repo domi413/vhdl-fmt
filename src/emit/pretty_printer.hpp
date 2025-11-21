@@ -24,7 +24,7 @@ concept IsExpression = std::is_same_v<T, ast::TokenExpr>
                     || std::is_same_v<T, ast::ParenExpr>
                     || std::is_same_v<T, ast::CallExpr>;
 
-class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
+class PrettyPrinter final : public ast::VisitorBase<Doc>
 {
   private:
     // Node visitors
@@ -76,7 +76,7 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     static auto withTrivia(const ast::NodeBase &node, Doc core_doc, bool suppress_newlines) -> Doc;
 
     // Allow base class to call `wrapResult`, so `wrapResult` can be private
-    friend class ast::VisitorBase<PrettyPrinter, Doc>;
+    friend class ast::VisitorBase<Doc>;
 };
 
 } // namespace emit
