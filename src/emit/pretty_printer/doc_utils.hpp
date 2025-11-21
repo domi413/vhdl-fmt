@@ -4,6 +4,7 @@
 #include "emit/pretty_printer/doc.hpp"
 
 #include <algorithm>
+#include <functional>
 #include <ranges>
 
 namespace emit {
@@ -15,13 +16,19 @@ namespace emit {
 /// @param with_trailing Whether to include the separator after the last element.
 /// @return Combined Doc.
 template<std::ranges::input_range Range, typename Transform>
-auto joinMap(Range &&items, const Doc &sep, Transform &&transform, bool with_trailing) -> Doc
+auto joinMap(Range &&items, const Doc &sep, Transform transform, bool with_trailing) -> Doc
 {
-    return std::ranges::fold_left_first(
-             std::forward<Range>(items) | std::views::transform(std::forward<Transform>(transform)),
-             [&](const Doc &acc, const Doc &item) { return acc + sep + item; })
-      .transform([&](const Doc &d) { return with_trailing ? d + sep : d; })
-      .value_or(Doc::empty());
+    const auto result = std::ranges::fold_left(
+      std::forward<Range>(items), Doc::empty(), [&](const Doc &acc, const auto &item) {
+          const auto doc = std::invoke(transform, item);
+          return acc.isEmpty() ? doc : acc + sep + doc;
+      });
+
+    if (with_trailing && !result.isEmpty()) {
+        return result + sep;
+    }
+
+    return result;
 }
 
 } // namespace emit
