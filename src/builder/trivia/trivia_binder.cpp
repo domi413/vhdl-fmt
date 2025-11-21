@@ -74,15 +74,13 @@ void TriviaBinder::bind(ast::NodeBase &node, const antlr4::ParserRuleContext *ct
     const auto start_idx = ctx->getStart()->getTokenIndex();
     const auto stop_idx = findContextEnd(ctx);
 
-    if (stop_idx + 1 >= tokens_.size()) {
-        return;
-    }
-
     // Extract Inline (Immediate Right of stop)
-    std::optional<ast::Comment> inline_comment;
-    if (auto *token = tokens_.get(stop_idx + 1); isComment(token) && !isUsed(token)) {
-        inline_comment = ast::Comment{ token->getText() };
-        markAsUsed(token);
+    std::optional<ast::Comment> inline_comment{};
+    if (stop_idx + 1 < tokens_.size()) {
+        if (auto *token = tokens_.get(stop_idx + 1); isComment(token) && !isUsed(token)) {
+            inline_comment = ast::Comment{ token->getText() };
+            markAsUsed(token);
+        }
     }
 
     auto leading = extractTrivia(tokens_.getHiddenTokensToLeft(start_idx));
