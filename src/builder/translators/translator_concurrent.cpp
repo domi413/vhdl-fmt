@@ -2,6 +2,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <algorithm>
+#include <optional>
 #include <ranges>
 
 namespace builder {
@@ -25,6 +27,15 @@ auto Translator::makeConcurrentAssign(
 auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext &ctx)
   -> ast::ConcurrentAssign
 {
+    const auto extract_wave_expr
+      = [this](vhdlParser::WaveformContext &wave_ctx) -> std::optional<ast::Expr> {
+        const auto elems = wave_ctx.waveform_element();
+        if (elems.empty() || elems[0]->expression().empty()) {
+            return std::nullopt;
+        }
+        return makeExpr(*elems[0]->expression(0));
+    };
+
     auto assign = make<ast::ConcurrentAssign>(ctx);
 
     if (auto *target_ctx = ctx.target()) {
@@ -36,14 +47,32 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
         return assign;
     }
 
-    auto *wave = cond_wave->waveform();
-    if (wave == nullptr) {
-        return assign;
+    for (auto *current = cond_wave; current != nullptr;
+         current = current->conditional_waveforms()) {
+        auto *wave = current->waveform();
+        if (wave == nullptr) {
+            continue;
+        }
+
+        auto value = extract_wave_expr(*wave);
+        if (!value.has_value()) {
+            continue;
+        }
+
+        ast::ConditionalWaveform waveform{};
+        waveform.value = std::move(*value);
+
+        if (auto *cond_ctx = current->condition()) {
+            if (auto *expr_ctx = cond_ctx->expression()) {
+                waveform.condition = makeExpr(*expr_ctx);
+            }
+        }
+
+        assign.conditional_waveforms.push_back(std::move(waveform));
     }
 
-    const auto wave_elems = wave->waveform_element();
-    if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-        assign.value = makeExpr(*wave_elems[0]->expression(0));
+    if (!assign.conditional_waveforms.empty()) {
+        assign.value = assign.conditional_waveforms.front().value;
     }
 
     return assign;
@@ -52,27 +81,52 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
 auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext &ctx)
   -> ast::ConcurrentAssign
 {
+    const auto extract_wave_expr
+      = [this](vhdlParser::WaveformContext &wave_ctx) -> std::optional<ast::Expr> {
+        const auto elems = wave_ctx.waveform_element();
+        if (elems.empty() || elems[0]->expression().empty()) {
+            return std::nullopt;
+        }
+        return makeExpr(*elems[0]->expression(0));
+    };
+
     auto assign = make<ast::ConcurrentAssign>(ctx);
 
     if (auto *target_ctx = ctx.target()) {
         assign.target = makeTarget(*target_ctx);
     }
 
-    // For selected assignments (with...select), we'll take the first waveform
-    // TODO(someone): Handle full selected waveforms structure
+    if (auto *selector = ctx.expression()) {
+        assign.select = makeExpr(*selector);
+    }
+
     auto *sel_waves = ctx.selected_waveforms();
     if (sel_waves == nullptr) {
         return assign;
     }
 
     const auto waves = sel_waves->waveform();
-    if (waves.empty()) {
-        return assign;
+    const auto choices = sel_waves->choices();
+    const auto count = std::min(waves.size(), choices.size());
+
+    for (std::size_t i = 0; i < count; ++i) {
+        auto value = extract_wave_expr(*waves[i]);
+        if (!value.has_value()) {
+            continue;
+        }
+
+        ast::SelectedWaveform waveform{};
+        waveform.value = std::move(*value);
+
+        waveform.choices = choices[i]->choice()
+                         | std::views::transform([this](auto *ch) { return makeChoice(*ch); })
+                         | std::ranges::to<std::vector>();
+
+        assign.selected_waveforms.push_back(std::move(waveform));
     }
 
-    const auto wave_elems = waves[0]->waveform_element();
-    if (!wave_elems.empty() && !wave_elems[0]->expression().empty()) {
-        assign.value = makeExpr(*wave_elems[0]->expression(0));
+    if (!assign.selected_waveforms.empty()) {
+        assign.value = assign.selected_waveforms.front().value;
     }
 
     return assign;

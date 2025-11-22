@@ -85,4 +85,17 @@ TEST_CASE("TokenExpr: Character literal token", "[expressions][token_expr]")
 
     const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(if_stmt.if_branch.body.size() == 1);
+
+    const auto &condition = std::get<ast::BinaryExpr>(if_stmt.if_branch.condition);
+    REQUIRE(condition.op == "=");
+    REQUIRE(condition.left != nullptr);
+    REQUIRE(condition.right != nullptr);
+    const auto &left_token = std::get<ast::TokenExpr>(*condition.left);
+    const auto &right_token = std::get<ast::TokenExpr>(*condition.right);
+    REQUIRE(left_token.text == "a");
+    REQUIRE(right_token.text == "'1'");
+
+    const auto &assign_stmt = std::get<ast::SequentialAssign>(if_stmt.if_branch.body[0]);
+    const auto &value_token = std::get<ast::TokenExpr>(assign_stmt.value);
+    REQUIRE(value_token.text == "'0'");
 }

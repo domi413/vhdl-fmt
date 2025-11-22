@@ -3,10 +3,21 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <optional>
+#include <ranges>
 #include <utility>
 #include <vector>
 
 namespace builder {
+
+auto Translator::tryMakeExpr(vhdlParser::ExpressionContext *ctx) -> std::optional<ast::Expr>
+{
+    if (ctx == nullptr) {
+        return std::nullopt;
+    }
+
+    return makeExpr(*ctx);
+}
 
 auto Translator::makeTarget(vhdlParser::TargetContext &ctx) -> ast::Expr
 {
@@ -254,15 +265,15 @@ auto Translator::makeBreakStatement(vhdlParser::Break_statementContext &ctx) -> 
     // Extract break elements (quantity => expression pairs)
     if (auto *break_list = ctx.break_list()) {
         auto make_element = [this](auto *elem) {
-            auto assoc = make<ast::BinaryExpr>(elem);
+            auto assoc = make<ast::BinaryExpr>(*elem);
             assoc.op = "=>";
 
             if (auto *name = elem->name()) {
-                assoc.left = box(makeName(*name));
+                assoc.left = std::make_unique<ast::Expr>(makeName(*name));
             }
 
             if (auto *expr = elem->expression()) {
-                assoc.right = box(makeExpr(*expr));
+                assoc.right = std::make_unique<ast::Expr>(makeExpr(*expr));
             }
 
             return ast::Expr{ std::move(assoc) };
@@ -288,7 +299,7 @@ auto Translator::makeProcedureCall(vhdlParser::Procedure_call_statementContext &
 
     if (auto *proc_call = ctx.procedure_call()) {
         if (auto *name = proc_call->selected_name()) {
-            stmt.call = makeToken(*name, name->getText());
+            stmt.call = makeToken(name, name->getText());
         }
     }
 

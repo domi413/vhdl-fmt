@@ -27,6 +27,15 @@ TEST_CASE("GroupExpr: Aggregate with others clause", "[expressions][group_expr]"
 
     const auto &group = std::get<ast::GroupExpr>(signal.init_expr.value());
     REQUIRE_FALSE(group.children.empty());
+
+    const auto &assoc = std::get<ast::BinaryExpr>(group.children[0]);
+    REQUIRE(assoc.op == "=>");
+    REQUIRE(assoc.left != nullptr);
+    REQUIRE(assoc.right != nullptr);
+    const auto &choice = std::get<ast::TokenExpr>(*assoc.left);
+    REQUIRE(choice.text == "others");
+    const auto &value = std::get<ast::TokenExpr>(*assoc.right);
+    REQUIRE(value.text == "'0'");
 }
 
 TEST_CASE("GroupExpr: Positional aggregate", "[expressions][group_expr]")
@@ -50,4 +59,9 @@ TEST_CASE("GroupExpr: Positional aggregate", "[expressions][group_expr]")
 
     const auto &group = std::get<ast::GroupExpr>(signal.init_expr.value());
     REQUIRE(group.children.size() == 4);
+
+    REQUIRE(std::get<ast::TokenExpr>(group.children[0]).text == "'1'");
+    REQUIRE(std::get<ast::TokenExpr>(group.children[1]).text == "'0'");
+    REQUIRE(std::get<ast::TokenExpr>(group.children[2]).text == "'1'");
+    REQUIRE(std::get<ast::TokenExpr>(group.children[3]).text == "'0'");
 }

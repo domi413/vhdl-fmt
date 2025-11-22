@@ -54,6 +54,12 @@ TEST_CASE("Name: Selected name (qualified)", "[expressions][name]")
 
     // Indexed/selected names are represented as CallExpr
     const auto &indexed = std::get<ast::CallExpr>(assign.target);
+    REQUIRE(indexed.callee != nullptr);
+    const auto &callee_token = std::get<ast::TokenExpr>(*indexed.callee);
+    REQUIRE(callee_token.text == "vec");
+    REQUIRE(indexed.args != nullptr);
+    const auto &arg_token = std::get<ast::TokenExpr>(*indexed.args);
+    REQUIRE(arg_token.text == "0");
 }
 
 TEST_CASE("Name: Aggregate in assignment", "[expressions][name]")
@@ -78,7 +84,11 @@ TEST_CASE("Name: Aggregate in assignment", "[expressions][name]")
 
     // Aggregates are represented as GroupExpr
     const auto &agg = std::get<ast::GroupExpr>(assign.value);
-    REQUIRE_FALSE(agg.children.empty());
+    REQUIRE(agg.children.size() == 1);
+    const auto &assoc = std::get<ast::BinaryExpr>(agg.children[0]);
+    REQUIRE(assoc.op == "=>");
+    REQUIRE(std::get<ast::TokenExpr>(*assoc.left).text == "others");
+    REQUIRE(std::get<ast::TokenExpr>(*assoc.right).text == "'0'");
 }
 
 TEST_CASE("Name: Function call expression", "[expressions][name]")
@@ -111,6 +121,12 @@ TEST_CASE("Name: Function call expression", "[expressions][name]")
 
     // Function calls are represented as CallExpr
     const auto &call = std::get<ast::CallExpr>(if_stmt.if_branch.condition);
+    REQUIRE(call.callee != nullptr);
+    const auto &callee_token = std::get<ast::TokenExpr>(*call.callee);
+    REQUIRE(callee_token.text == "rising_edge");
+    REQUIRE(call.args != nullptr);
+    const auto &arg_token = std::get<ast::TokenExpr>(*call.args);
+    REQUIRE(arg_token.text == "clk");
 }
 
 TEST_CASE("Name: Slice expression", "[expressions][name]")
@@ -136,6 +152,14 @@ TEST_CASE("Name: Slice expression", "[expressions][name]")
 
     // Slice expressions are represented as CallExpr with range argument
     const auto &slice = std::get<ast::CallExpr>(assign.value);
+    REQUIRE(slice.callee != nullptr);
+    const auto &callee_token = std::get<ast::TokenExpr>(*slice.callee);
+    REQUIRE(callee_token.text == "vec");
+    REQUIRE(slice.args != nullptr);
+    const auto &range_expr = std::get<ast::BinaryExpr>(*slice.args);
+    REQUIRE(range_expr.op == "downto");
+    REQUIRE(std::get<ast::TokenExpr>(*range_expr.left).text == "5");
+    REQUIRE(std::get<ast::TokenExpr>(*range_expr.right).text == "2");
 }
 
 TEST_CASE("Name: Attribute name", "[expressions][name]")
@@ -164,7 +188,11 @@ TEST_CASE("Name: Attribute name", "[expressions][name]")
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2); // assignment + wait
 
-    // Just verify the process parses correctly
-    // Attribute names are complex and may be represented differently
-    REQUIRE_FALSE(proc.body.empty());
+    const auto &assign = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &attribute = std::get<ast::BinaryExpr>(assign.value);
+    REQUIRE(attribute.op == "'");
+    REQUIRE(attribute.left != nullptr);
+    REQUIRE(attribute.right != nullptr);
+    REQUIRE(std::get<ast::TokenExpr>(*attribute.left).text == "vec");
+    REQUIRE(std::get<ast::TokenExpr>(*attribute.right).text == "length");
 }

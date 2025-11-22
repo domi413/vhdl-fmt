@@ -4,6 +4,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
+
 TEST_CASE("RangeConstraint: Range constraint with integer subtype",
           "[constraints_ranges][range_constraint]")
 {
@@ -20,6 +21,20 @@ TEST_CASE("RangeConstraint: Range constraint with integer subtype",
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
+
+    const auto &subtype = std::get<ast::SubtypeDecl>(arch.decls[0]);
+    REQUIRE(subtype.constraint.has_value());
+
+    const auto &range_constraint = std::get<ast::RangeConstraint>(subtype.constraint.value());
+    const auto &range = range_constraint.range;
+    REQUIRE(range.op == "to");
+    REQUIRE(range.left != nullptr);
+    REQUIRE(range.right != nullptr);
+
+    const auto &left_token = std::get<ast::TokenExpr>(*range.left);
+    const auto &right_token = std::get<ast::TokenExpr>(*range.right);
+    REQUIRE(left_token.text == "0");
+    REQUIRE(right_token.text == "255");
 }
 
 TEST_CASE("RangeConstraint: Range constraint with downto direction",
@@ -38,4 +53,16 @@ TEST_CASE("RangeConstraint: Range constraint with downto direction",
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
     REQUIRE(arch.decls.size() == 1);
+
+    const auto &subtype = std::get<ast::SubtypeDecl>(arch.decls[0]);
+    REQUIRE(subtype.constraint.has_value());
+    const auto &range_constraint = std::get<ast::RangeConstraint>(subtype.constraint.value());
+    const auto &range = range_constraint.range;
+    REQUIRE(range.op == "downto");
+    REQUIRE(range.left != nullptr);
+    REQUIRE(range.right != nullptr);
+    const auto &left_token = std::get<ast::TokenExpr>(*range.left);
+    const auto &right_token = std::get<ast::TokenExpr>(*range.right);
+    REQUIRE(left_token.text == "100");
+    REQUIRE(right_token.text == "0");
 }

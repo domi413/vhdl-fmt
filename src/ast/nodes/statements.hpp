@@ -48,11 +48,28 @@ using SequentialStatement = std::variant<SequentialAssign,
                                          BreakStatement,
                                          ProcedureCall>;
 
+/// @brief Waveform element in a conditional concurrent assignment
+struct ConditionalWaveform
+{
+    Expr value;                    ///< Assigned value
+    std::optional<Expr> condition; ///< Optional condition for the waveform (else branch when empty)
+};
+
+/// @brief Waveform element in a selected concurrent assignment
+struct SelectedWaveform
+{
+    Expr value;                ///< Assigned value
+    std::vector<Expr> choices; ///< Selector choices triggering this waveform
+};
+
 /// @brief Concurrent signal assignment: target <= value;
 struct ConcurrentAssign : NodeBase
 {
     Expr target;
     Expr value;
+    std::vector<ConditionalWaveform> conditional_waveforms; ///< Ordered conditional waveforms
+    std::optional<Expr> select;                       ///< Selector for with-select assignments
+    std::vector<SelectedWaveform> selected_waveforms; ///< Waveforms for each choice set
 };
 
 /// @brief Sequential signal/variable assignment: target := value;

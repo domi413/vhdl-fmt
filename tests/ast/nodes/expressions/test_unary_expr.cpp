@@ -29,6 +29,9 @@ TEST_CASE("UnaryExpr: Logical not operator", "[expressions][unary_expr]")
 
     const auto &unary = std::get<ast::UnaryExpr>(assign.value);
     REQUIRE(unary.op == "not");
+    REQUIRE(unary.value != nullptr);
+    const auto &operand = std::get<ast::TokenExpr>(*unary.value);
+    REQUIRE(operand.text == "a");
 }
 
 TEST_CASE("UnaryExpr: Unary minus operator", "[expressions][unary_expr]")
@@ -52,4 +55,7 @@ TEST_CASE("UnaryExpr: Unary minus operator", "[expressions][unary_expr]")
 
     const auto &unary = std::get<ast::UnaryExpr>(constant.init_expr.value());
     REQUIRE(unary.op == "-");
+    REQUIRE(unary.value != nullptr);
+    const auto &operand = std::get<ast::TokenExpr>(*unary.value);
+    REQUIRE(operand.text == "42");
 }

@@ -30,12 +30,14 @@ TEST_CASE("Aggregate: Positional aggregate", "[expressions][aggregate]")
     const auto &agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(agg.children.size() == 3);
 
-    // Each element is wrapped in a BinaryExpr with "=>" operator
-    // For positional aggregates, the left side is null and right side has the value
-    for (const auto &child : agg.children) {
-        const auto &assoc = std::get<ast::BinaryExpr>(child);
-        REQUIRE(assoc.op == "=>");
-    }
+    const auto &first = std::get<ast::TokenExpr>(agg.children[0]);
+    REQUIRE(first.text == "'1'");
+
+    const auto &second = std::get<ast::TokenExpr>(agg.children[1]);
+    REQUIRE(second.text == "'0'");
+
+    const auto &third = std::get<ast::TokenExpr>(agg.children[2]);
+    REQUIRE(third.text == "'1'");
 }
 
 TEST_CASE("Aggregate: Named aggregate with others", "[expressions][aggregate]")
@@ -66,6 +68,8 @@ TEST_CASE("Aggregate: Named aggregate with others", "[expressions][aggregate]")
     // The first child should be a BinaryExpr representing "others => '0'"
     const auto &assoc = std::get<ast::BinaryExpr>(agg.children[0]);
     REQUIRE(assoc.op == "=>");
+    REQUIRE(assoc.left != nullptr);
+    REQUIRE(std::get<ast::TokenExpr>(*assoc.left).text == "others");
 }
 
 TEST_CASE("Aggregate: Mixed positional and named", "[expressions][aggregate]")
@@ -91,6 +95,19 @@ TEST_CASE("Aggregate: Mixed positional and named", "[expressions][aggregate]")
     // Mixed aggregates are also GroupExpr
     const auto &agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(agg.children.size() == 3);
+
+    const auto &first = std::get<ast::TokenExpr>(agg.children[0]);
+    REQUIRE(first.text == "'1'");
+
+    const auto &second = std::get<ast::BinaryExpr>(agg.children[1]);
+    REQUIRE(second.left != nullptr);
+    REQUIRE(std::get<ast::TokenExpr>(*second.left).text == "1");
+    REQUIRE(std::get<ast::TokenExpr>(*second.right).text == "'0'");
+
+    const auto &third = std::get<ast::BinaryExpr>(agg.children[2]);
+    REQUIRE(third.left != nullptr);
+    REQUIRE(std::get<ast::TokenExpr>(*third.left).text == "others");
+    REQUIRE(std::get<ast::TokenExpr>(*third.right).text == "'1'");
 }
 
 TEST_CASE("Aggregate: Nested aggregate", "[expressions][aggregate]")
@@ -118,13 +135,16 @@ TEST_CASE("Aggregate: Nested aggregate", "[expressions][aggregate]")
     const auto &outer_agg = std::get<ast::GroupExpr>(assign.value);
     REQUIRE(outer_agg.children.size() == 2);
 
-    // Each child of outer aggregate is a BinaryExpr (element association)
-    const auto &first_assoc = std::get<ast::BinaryExpr>(outer_agg.children[0]);
-    REQUIRE(first_assoc.op == "=>");
+    // Each child of outer aggregate is itself a positional aggregate
+    const auto &first_inner = std::get<ast::GroupExpr>(outer_agg.children[0]);
+    REQUIRE(first_inner.children.size() == 2);
+    REQUIRE(std::get<ast::TokenExpr>(first_inner.children[0]).text == "'0'");
+    REQUIRE(std::get<ast::TokenExpr>(first_inner.children[1]).text == "'1'");
 
-    // The right side of the association should be the inner aggregate
-    const auto *inner_agg = std::get_if<ast::GroupExpr>(first_assoc.right.get());
-    REQUIRE(inner_agg->children.size() == 2);
+    const auto &second_inner = std::get<ast::GroupExpr>(outer_agg.children[1]);
+    REQUIRE(second_inner.children.size() == 2);
+    REQUIRE(std::get<ast::TokenExpr>(second_inner.children[0]).text == "'1'");
+    REQUIRE(std::get<ast::TokenExpr>(second_inner.children[1]).text == "'0'");
 }
 
 TEST_CASE("Aggregate: Range choice in aggregate", "[expressions][aggregate]")
@@ -155,5 +175,11 @@ TEST_CASE("Aggregate: Range choice in aggregate", "[expressions][aggregate]")
     for (const auto &child : agg.children) {
         const auto &assoc = std::get<ast::BinaryExpr>(child);
         REQUIRE(assoc.op == "=>");
+        const auto &range = std::get<ast::BinaryExpr>(*assoc.left);
+        REQUIRE(range.op == "downto");
+        REQUIRE(range.left != nullptr);
+        REQUIRE(range.right != nullptr);
+        REQUIRE(std::holds_alternative<ast::TokenExpr>(*range.left));
+        REQUIRE(std::holds_alternative<ast::TokenExpr>(*range.right));
     }
 }

@@ -18,11 +18,10 @@ TEST_CASE("Leading trivia preserves pure blank lines between comments", "[design
     )";
 
     auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->trivia.has_value());
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.trivia.has_value());
 
-    const auto &trivia = entity->trivia.value();
+    const auto &trivia = entity.trivia.value();
     const auto &lead = trivia.leading;
 
     // Expect: Comment("A"), ParagraphBreak(1 blank line), Comment("B")

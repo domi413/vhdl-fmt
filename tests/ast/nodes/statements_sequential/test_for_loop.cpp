@@ -32,6 +32,8 @@ TEST_CASE("ForLoop: Simple for loop with range", "[statements_sequential][for_lo
 
     const auto &for_loop = std::get<ast::ForLoop>(proc.body[0]);
     REQUIRE(for_loop.iterator == "i");
+    const auto &range = std::get<ast::BinaryExpr>(for_loop.range);
+    REQUIRE(range.op == "to");
     REQUIRE(for_loop.body.empty());
 }
 
@@ -62,6 +64,8 @@ TEST_CASE("ForLoop: For loop with downto range", "[statements_sequential][for_lo
 
     const auto &for_loop = std::get<ast::ForLoop>(proc.body[0]);
     REQUIRE(for_loop.iterator == "j");
+    const auto &range = std::get<ast::BinaryExpr>(for_loop.range);
+    REQUIRE(range.op == "downto");
 }
 
 TEST_CASE("ForLoop: For loop with body statements", "[statements_sequential][for_loop]")
@@ -92,7 +96,10 @@ TEST_CASE("ForLoop: For loop with body statements", "[statements_sequential][for
 
     const auto &for_loop = std::get<ast::ForLoop>(proc.body[0]);
     REQUIRE(for_loop.iterator == "k");
+    const auto &range = std::get<ast::BinaryExpr>(for_loop.range);
+    REQUIRE(range.op == "to");
     REQUIRE(for_loop.body.size() == 1);
 
     const auto &assign = std::get<ast::SequentialAssign>(for_loop.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(assign.value).text == "'1'");
 }

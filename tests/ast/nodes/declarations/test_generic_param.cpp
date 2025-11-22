@@ -14,14 +14,13 @@ TEST_CASE("GenericParam: Single generic with default", "[declarations][generic]"
         end E;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
+    const auto design = builder::buildFromString(VHDL_FILE);
     REQUIRE(design.units.size() == 1);
 
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    auto &generic = entity->generic_clause.generics[0];
+    const auto &generic = entity.generic_clause.generics[0];
     REQUIRE(generic.names.size() == 1);
     REQUIRE(generic.names[0] == "WIDTH");
     REQUIRE(generic.type_name == "integer");
@@ -36,12 +35,12 @@ TEST_CASE("GenericParam: Generic without default", "[declarations][generic]")
         end E;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 1);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    auto &generic = entity->generic_clause.generics[0];
+    const auto &generic = entity.generic_clause.generics[0];
     REQUIRE(generic.names[0] == "WIDTH");
     REQUIRE(generic.type_name == "integer");
     REQUIRE_FALSE(generic.default_expr.has_value());
@@ -55,12 +54,12 @@ TEST_CASE("GenericParam: Multiple generics same declaration", "[declarations][ge
         end E;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    REQUIRE(design.units.size() == 1);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    auto &generic = entity->generic_clause.generics[0];
+    const auto &generic = entity.generic_clause.generics[0];
     REQUIRE(generic.names.size() == 3);
     REQUIRE(generic.names[0] == "WIDTH");
     REQUIRE(generic.names[1] == "HEIGHT");

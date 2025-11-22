@@ -37,6 +37,8 @@ TEST_CASE("CaseStatement: Simple case statement", "[statements_sequential][case_
     REQUIRE(proc.body.size() == 1);
 
     const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    const auto &selector = std::get<ast::TokenExpr>(case_stmt.selector);
+    REQUIRE(selector.text == "sel");
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].body.size() == 1);
     REQUIRE(case_stmt.when_clauses[1].body.size() == 1);
@@ -75,6 +77,7 @@ TEST_CASE("CaseStatement: Case with multiple choices", "[statements_sequential][
     REQUIRE(proc.body.size() == 1);
 
     const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.selector).text == "sel");
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].choices.size() == 3);
     REQUIRE(case_stmt.when_clauses[1].choices.size() == 3);
@@ -116,6 +119,7 @@ TEST_CASE("CaseStatement: Case with multiple statements per when",
     REQUIRE(proc.body.size() == 1);
 
     const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.selector).text == "sel");
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].body.size() == 2);
     REQUIRE(case_stmt.when_clauses[1].body.size() == 2);

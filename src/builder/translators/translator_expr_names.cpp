@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <utility>
 
@@ -25,7 +26,7 @@ auto Translator::makeName(vhdlParser::NameContext &ctx) -> ast::Expr
 
     if (!has_structure) {
         // Simple name (possibly with dots like "rec.field") - keep as one token
-        return makeToken(ctx, ctx.getText());
+        return makeToken(&ctx, ctx.getText());
     }
 
     // Has structural parts - build up the base, then apply operations
@@ -37,7 +38,7 @@ auto Translator::makeName(vhdlParser::NameContext &ctx) -> ast::Expr
         base_text = ctx.STRING_LITERAL()->getText();
     } else {
         // Shouldn't happen, but fallback
-        return makeToken(ctx, ctx.getText());
+        return makeToken(&ctx, ctx.getText());
     }
 
     // Consume consecutive selected_name_parts into base
@@ -46,7 +47,7 @@ auto Translator::makeName(vhdlParser::NameContext &ctx) -> ast::Expr
         base_text += (*it)->getText();
     }
 
-    ast::Expr base = makeToken(ctx, std::move(base_text));
+    ast::Expr base = makeToken(&ctx, std::move(base_text));
 
     // Process remaining structural parts
     for (; it != parts.end(); ++it) {
@@ -70,22 +71,16 @@ auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContex
     auto slice_expr = make<ast::CallExpr>(ctx);
     slice_expr.callee = std::make_unique<ast::Expr>(std::move(base));
 
-    if (auto *dr = ctx->discrete_range()) {
+    if (auto *dr = ctx.discrete_range()) {
         if (auto *rd = dr->range_decl()) {
             if (auto *er = rd->explicit_range()) {
-                slice_expr.args = std::make_unique<ast::Expr>(makeRange(er));
+                slice_expr.args = std::make_unique<ast::Expr>(makeRange(*er));
             } else {
                 slice_expr.args = std::make_unique<ast::Expr>(makeToken(rd, rd->getText()));
             }
         } else if (auto *subtype = dr->subtype_indication()) {
             slice_expr.args = std::make_unique<ast::Expr>(makeToken(subtype, subtype->getText()));
         }
-        return slice_expr;
-    }
-
-    // Try subtype_indication
-    if (auto *subtype = discrete->subtype_indication()) {
-        slice_expr.args = box(makeToken(subtype, subtype->getText()));
     }
 
     return slice_expr;
@@ -94,7 +89,7 @@ auto Translator::makeSliceExpr(ast::Expr base, vhdlParser::Slice_name_partContex
 auto Translator::makeSelectExpr(ast::Expr base, vhdlParser::Selected_name_partContext &ctx)
   -> ast::Expr
 {
-    return makeBinary(ctx, ".", std::move(base), makeToken(ctx, ctx.getText().substr(1)));
+    return makeBinary(&ctx, ".", std::move(base), makeToken(&ctx, ctx.getText().substr(1)));
 }
 
 auto Translator::makeCallExpr(ast::Expr base,
@@ -104,60 +99,44 @@ auto Translator::makeCallExpr(ast::Expr base,
     auto call_expr = make<ast::CallExpr>(ctx);
     call_expr.callee = std::make_unique<ast::Expr>(std::move(base));
 
-    if (auto *assoc_list = ctx->actual_parameter_part()) {
-        if (auto *list_ctx = assoc_list->association_list()) {
-            auto associations = list_ctx->association_element();
-
-            if (associations.size() == 1) {
-                call_expr.args = std::make_unique<ast::Expr>(makeCallArgument(associations[0]));
-            } else {
-                auto group = make<ast::GroupExpr>(list_ctx);
-                for (auto *elem : associations) {
-                    group.children.push_back(makeCallArgument(elem));
-                }
-                call_expr.args = std::make_unique<ast::Expr>(ast::Expr{ std::move(group) });
-            }
-        } else {
-            call_expr.args = std::make_unique<ast::Expr>(makeToken(ctx, ctx->getText()));
-        }
+    auto *param_part = ctx.actual_parameter_part();
+    if (param_part == nullptr) {
+        return call_expr;
     }
 
     auto *list_ctx = param_part->association_list();
     if (list_ctx == nullptr) {
-        call_expr.args = box(makeToken(ctx, ctx.getText()));
+        call_expr.args = std::make_unique<ast::Expr>(makeToken(param_part, param_part->getText()));
         return call_expr;
     }
 
     const auto &associations = list_ctx->association_element();
 
-    // Single argument - no need for group
     if (associations.size() == 1) {
-        call_expr.args = box(makeCallArgument(*associations[0]));
+        call_expr.args = std::make_unique<ast::Expr>(makeCallArgument(*associations[0]));
         return call_expr;
     }
 
-    // Multiple arguments - create group
-    auto group = make<ast::GroupExpr>(list_ctx);
+    auto group = make<ast::GroupExpr>(*list_ctx);
     group.children = associations
                    | std::views::transform([this](auto *elem) { return makeCallArgument(*elem); })
                    | std::ranges::to<std::vector>();
 
-    call_expr.args = box(ast::Expr{ std::move(group) });
-
+    call_expr.args = std::make_unique<ast::Expr>(ast::Expr{ std::move(group) });
     return call_expr;
 }
 
 auto Translator::makeAttributeExpr(ast::Expr base, vhdlParser::Attribute_name_partContext &ctx)
   -> ast::Expr
 {
-    return makeBinary(ctx, "'", std::move(base), makeToken(ctx, ctx.getText().substr(1)));
+    return makeBinary(&ctx, "'", std::move(base), makeToken(&ctx, ctx.getText().substr(1)));
 }
 
 auto Translator::makeCallArgument(vhdlParser::Association_elementContext &ctx) -> ast::Expr
 {
     auto *actual = ctx.actual_part();
     if (actual == nullptr) {
-        return makeToken(ctx, ctx.getText());
+        return makeToken(&ctx, ctx.getText());
     }
 
     auto *designator = actual->actual_designator();

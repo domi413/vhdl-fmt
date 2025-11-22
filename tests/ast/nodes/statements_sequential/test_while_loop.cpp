@@ -32,6 +32,8 @@ TEST_CASE("WhileLoop: Simple while loop", "[statements_sequential][while_loop]")
     REQUIRE(proc.body.size() == 1);
 
     const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    const auto &condition = std::get<ast::BinaryExpr>(while_loop.condition);
+    REQUIRE(condition.op == "<");
     REQUIRE(while_loop.body.empty());
 }
 
@@ -62,6 +64,8 @@ TEST_CASE("WhileLoop: While loop with boolean condition", "[statements_sequentia
     REQUIRE(proc.body.size() == 1);
 
     const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    const auto &condition = std::get<ast::UnaryExpr>(while_loop.condition);
+    REQUIRE(condition.op == "not");
 }
 
 TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential][while_loop]")
@@ -92,7 +96,9 @@ TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential]
     REQUIRE(proc.body.size() == 1);
 
     const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
+    REQUIRE(std::get<ast::BinaryExpr>(while_loop.condition).op == "<");
     REQUIRE(while_loop.body.size() == 1);
 
     const auto &assign = std::get<ast::SequentialAssign>(while_loop.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(assign.value).text == "'1'");
 }

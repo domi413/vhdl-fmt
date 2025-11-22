@@ -50,6 +50,16 @@ TEST_CASE("BinaryExpr: Range expression with downto", "[expressions][binary_expr
     REQUIRE(port.constraint.has_value());
 
     const auto &index_constraint = std::get<ast::IndexConstraint>(port.constraint.value());
+    REQUIRE(index_constraint.ranges.children.size() == 1);
+
+    const auto &range_expr = std::get<ast::BinaryExpr>(index_constraint.ranges.children[0]);
+    REQUIRE(range_expr.op == "downto");
+    REQUIRE(range_expr.left != nullptr);
+    REQUIRE(range_expr.right != nullptr);
+    const auto &left_token = std::get<ast::TokenExpr>(*range_expr.left);
+    const auto &right_token = std::get<ast::TokenExpr>(*range_expr.right);
+    REQUIRE(left_token.text == "7");
+    REQUIRE(right_token.text == "0");
 }
 
 TEST_CASE("BinaryExpr: Arithmetic expression with multiple operators", "[expressions][binary_expr]")

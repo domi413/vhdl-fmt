@@ -1,6 +1,6 @@
+#include "../../test_utils.hpp"
 #include "ast/node.hpp"
 #include "ast/nodes/design_units.hpp"
-#include "ast/test_utils.hpp"
 #include "builder/ast_builder.hpp"
 
 #include <catch2/catch_test_macros.hpp>
@@ -17,14 +17,12 @@ TEST_CASE("Entity captures top-level leading comments", "[design_units][comments
         entity MyEntity is end MyEntity;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->trivia.has_value());
+    const auto design = builder::buildFromString(VHDL_FILE);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.trivia.has_value());
 
-    const auto &trivia = entity->trivia.value();
+    const auto &trivia = entity.trivia.value();
     const auto texts = getComments(trivia.leading);
-
     REQUIRE(texts.size() == 2);
     REQUIRE(texts.front().contains("License text"));
     REQUIRE(texts.back().contains("Entity declaration"));
@@ -41,21 +39,19 @@ TEST_CASE("Generic captures both leading and inline comments", "[design_units][c
         end Example;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 1);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 1);
 
-    const auto &g = entity->generic_clause.generics[0];
+    const auto &g = entity.generic_clause.generics[0];
     REQUIRE(g.trivia.has_value());
 
     const auto &trivia = g.trivia.value();
     const auto lead = getComments(trivia.leading);
-    const auto in = trivia.inline_comment->text;
-
     REQUIRE_FALSE(lead.empty());
     REQUIRE(lead.front().contains("Leading for CONST_V"));
 
+    const auto in = trivia.inline_comment->text;
     REQUIRE_FALSE(in.empty());
     REQUIRE(in.contains("Inline for CONST_V"));
 }
@@ -74,12 +70,11 @@ TEST_CASE("Ports capture leading, trailing and inline comments", "[design_units]
         end Example;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->port_clause.ports.size() == 2);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.port_clause.ports.size() == 2);
 
-    const auto &clk = entity->port_clause.ports.front();
+    const auto &clk = entity.port_clause.ports.front();
     const auto &clk_trivia = clk.trivia.value();
     const auto &clk_lead = getComments(clk_trivia.leading);
     const auto &clk_trail = getComments(clk_trivia.trailing);
@@ -89,7 +84,7 @@ TEST_CASE("Ports capture leading, trailing and inline comments", "[design_units]
     REQUIRE(clk_trail.front().contains("trailing clk"));
     REQUIRE(clk_inline.contains("inline clk"));
 
-    const auto &rst = entity->port_clause.ports.back();
+    const auto &rst = entity.port_clause.ports.back();
     const auto &rst_trivia = rst.trivia.value();
     const auto &rst_lead = getComments(rst_trivia.leading);
     const auto &rst_trail = getComments(rst_trivia.trailing);
@@ -114,13 +109,12 @@ TEST_CASE("Generic captures paragraph breaks after comments with blank lines",
         end ExampleEntity;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 2);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 2);
 
-    const auto &one = entity->generic_clause.generics[0];
-    const auto &two = entity->generic_clause.generics[1];
+    const auto &one = entity.generic_clause.generics[0];
+    const auto &two = entity.generic_clause.generics[1];
 
     // 'one' should have trailing trivia with: paragraph break, comment, paragraph break
     REQUIRE(one.trivia.has_value());
@@ -166,13 +160,12 @@ TEST_CASE("Generic with inline comment captures paragraph breaks correctly",
         end ExampleEntity;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 2);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 2);
 
-    const auto &one = entity->generic_clause.generics[0];
-    const auto &two = entity->generic_clause.generics[1];
+    const auto &one = entity.generic_clause.generics[0];
+    const auto &two = entity.generic_clause.generics[1];
 
     // 'one' should have an inline comment AND trailing trivia with: paragraph break, comment,
     // paragraph break
@@ -225,13 +218,12 @@ TEST_CASE("Generic captures paragraph breaks after comments with 2 blank lines",
         end ExampleEntity;
     )";
 
-    auto design = builder::buildFromString(VHDL_FILE);
-    auto *entity = std::get_if<ast::Entity>(design.units.data());
-    REQUIRE(entity != nullptr);
-    REQUIRE(entity->generic_clause.generics.size() == 2);
+    const auto design = builder::buildFromString(VHDL_FILE);
+    const auto &entity = std::get<ast::Entity>(design.units[0]);
+    REQUIRE(entity.generic_clause.generics.size() == 2);
 
-    const auto &one = entity->generic_clause.generics[0];
-    const auto &two = entity->generic_clause.generics[1];
+    const auto &one = entity.generic_clause.generics[0];
+    const auto &two = entity.generic_clause.generics[1];
 
     // 'one' should have trailing trivia with: paragraph break, comment, paragraph break
     REQUIRE(one.trivia.has_value());

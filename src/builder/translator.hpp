@@ -100,7 +100,6 @@ class Translator final
     // clang-format on
 
     /// @brief Helper to safely extract optional expression from nullable context
-    template<typename Ctx>
     [[nodiscard]]
     auto makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx, bool is_last)
       -> ast::GenericParam;
@@ -184,6 +183,8 @@ class Translator final
       -> ast::Expr;
     [[nodiscard]]
     auto makeCallArgument(vhdlParser::Association_elementContext *ctx) -> ast::Expr;
+    [[nodiscard]]
+    auto tryMakeExpr(vhdlParser::ExpressionContext *ctx) -> std::optional<ast::Expr>;
 
     // Constraints
     [[nodiscard]]
@@ -200,7 +201,7 @@ class Translator final
     auto make(const Ctx &ctx) -> T
     {
         T node{};
-        trivia_.bind(node, ctx);
+        trivia_.bind(node, &ctx);
         return node;
     }
 

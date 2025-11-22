@@ -56,18 +56,22 @@ auto Translator::makePortClause(vhdlParser::Port_clauseContext &ctx) -> ast::Por
 auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationContext *ctx,
                                   const bool is_last) -> ast::GenericParam
 {
-    auto param = make<ast::GenericParam>(ctx);
+    if (ctx == nullptr) {
+        return {};
+    }
 
-    param.names = ctx.identifier_list()->identifier()
+    auto param = make<ast::GenericParam>(*ctx);
+
+    param.names = ctx->identifier_list()->identifier()
                 | std::views::transform([](auto *id) { return id->getText(); })
                 | std::ranges::to<std::vector>();
 
-    if (auto *stype = ctx.subtype_indication()) {
+    if (auto *stype = ctx->subtype_indication()) {
         param.type_name = stype->getText();
     }
 
     if (auto *expr = ctx->expression()) {
-        param.default_expr = makeExpr(expr);
+        param.default_expr = makeExpr(*expr);
     }
 
     param.is_last = is_last;
@@ -80,17 +84,21 @@ auto Translator::makeGenericParam(vhdlParser::Interface_constant_declarationCont
 auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *ctx,
                                 const bool is_last) -> ast::Port
 {
-    auto port = make<ast::Port>(ctx);
+    if (ctx == nullptr) {
+        return {};
+    }
 
-    port.names = ctx.identifier_list()->identifier()
+    auto port = make<ast::Port>(*ctx);
+
+    port.names = ctx->identifier_list()->identifier()
                | std::views::transform([](auto *id) { return id->getText(); })
                | std::ranges::to<std::vector>();
 
-    if (auto *mode = ctx.signal_mode()) {
+    if (auto *mode = ctx->signal_mode()) {
         port.mode = mode->getText();
     }
 
-    if (auto *stype = ctx.subtype_indication()) {
+    if (auto *stype = ctx->subtype_indication()) {
         port.type_name = stype->selected_name(0)->getText();
 
         if (auto *constraint_ctx = stype->constraint()) {
@@ -98,7 +106,7 @@ auto Translator::makeSignalPort(vhdlParser::Interface_port_declarationContext *c
         }
     }
 
-    if (auto *expr = ctx.expression()) {
+    if (auto *expr = ctx->expression()) {
         port.default_expr = makeExpr(*expr);
     }
 

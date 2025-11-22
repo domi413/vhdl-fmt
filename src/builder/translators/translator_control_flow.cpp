@@ -14,8 +14,8 @@ auto Translator::makeIfStatement(vhdlParser::If_statementContext &ctx) -> ast::I
     auto stmt = make<ast::IfStatement>(ctx);
 
     // Main if branch
-    auto conditions = ctx.condition();
-    auto sequences = ctx.sequence_of_statements();
+    const auto conditions = ctx.condition();
+    const auto sequences = ctx.sequence_of_statements();
 
     if (conditions.empty() || sequences.empty()) {
         return stmt;

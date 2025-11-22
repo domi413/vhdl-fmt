@@ -35,6 +35,12 @@ TEST_CASE("CallExpr: Function call expression", "[expressions][call_expr]")
     const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
 
     const auto &call = std::get<ast::CallExpr>(if_stmt.if_branch.condition);
+    REQUIRE(call.callee != nullptr);
+    const auto &callee_token = std::get<ast::TokenExpr>(*call.callee);
+    REQUIRE(callee_token.text == "rising_edge");
+    REQUIRE(call.args != nullptr);
+    const auto &arg_token = std::get<ast::TokenExpr>(*call.args);
+    REQUIRE(arg_token.text == "clk");
 }
 
 TEST_CASE("CallExpr: Array indexing as call expression", "[expressions][call_expr]")
@@ -58,4 +64,10 @@ TEST_CASE("CallExpr: Array indexing as call expression", "[expressions][call_exp
     const auto &assign = std::get<ast::ConcurrentAssign>(arch.stmts[0]);
 
     const auto &call = std::get<ast::CallExpr>(assign.value);
+    REQUIRE(call.callee != nullptr);
+    const auto &callee_token = std::get<ast::TokenExpr>(*call.callee);
+    REQUIRE(callee_token.text == "data");
+    REQUIRE(call.args != nullptr);
+    const auto &arg_token = std::get<ast::TokenExpr>(*call.args);
+    REQUIRE(arg_token.text == "3");
 }

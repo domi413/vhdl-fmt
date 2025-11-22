@@ -29,6 +29,12 @@ TEST_CASE("AssertStatement: Simple assert without message",
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+
+    const auto &assert_stmt = std::get<ast::AssertStatement>(proc.body[0]);
+    const auto &cond = std::get<ast::BinaryExpr>(assert_stmt.condition);
+    REQUIRE(cond.op == "=");
+    REQUIRE_FALSE(assert_stmt.message.has_value());
+    REQUIRE_FALSE(assert_stmt.severity.has_value());
 }
 
 TEST_CASE("AssertStatement: Assert with report message",
@@ -57,6 +63,11 @@ TEST_CASE("AssertStatement: Assert with report message",
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+
+    const auto &assert_stmt = std::get<ast::AssertStatement>(proc.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(assert_stmt.condition).text == "valid");
+    REQUIRE(assert_stmt.message.has_value());
+    REQUIRE(assert_stmt.severity.has_value());
 }
 
 TEST_CASE("AssertStatement: Assert with complex condition",
@@ -85,4 +96,10 @@ TEST_CASE("AssertStatement: Assert with complex condition",
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+
+    const auto &assert_stmt = std::get<ast::AssertStatement>(proc.body[0]);
+    const auto &cond = std::get<ast::BinaryExpr>(assert_stmt.condition);
+    REQUIRE(cond.op == "and");
+    REQUIRE(assert_stmt.message.has_value());
+    REQUIRE(assert_stmt.severity.has_value());
 }

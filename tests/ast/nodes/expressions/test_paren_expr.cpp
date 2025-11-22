@@ -29,6 +29,16 @@ TEST_CASE("ParenExpr: Parenthesized expression for precedence", "[expressions][p
 
     const auto &binary = std::get<ast::BinaryExpr>(assign.value);
     REQUIRE(binary.op == "or");
+    REQUIRE(binary.left != nullptr);
+    REQUIRE(binary.right != nullptr);
+
+    const auto &left_paren = std::get<ast::ParenExpr>(*binary.left);
+    REQUIRE(left_paren.inner != nullptr);
+    const auto &inner_binary = std::get<ast::BinaryExpr>(*left_paren.inner);
+    REQUIRE(inner_binary.op == "and");
+
+    const auto &right_token = std::get<ast::TokenExpr>(*binary.right);
+    REQUIRE(right_token.text == "c");
 }
 
 TEST_CASE("ParenExpr: Nested parentheses", "[expressions][paren_expr]")
@@ -50,5 +60,16 @@ TEST_CASE("ParenExpr: Nested parentheses", "[expressions][paren_expr]")
     const auto &constant = std::get<ast::ConstantDecl>(arch.decls[0]);
     REQUIRE(constant.init_expr.has_value());
 
-    const auto &paren = std::get<ast::ParenExpr>(constant.init_expr.value());
+    const auto &outer_paren = std::get<ast::ParenExpr>(constant.init_expr.value());
+    REQUIRE(outer_paren.inner != nullptr);
+
+    const auto &mul_expr = std::get<ast::BinaryExpr>(*outer_paren.inner);
+    REQUIRE(mul_expr.op == "*");
+    REQUIRE(mul_expr.left != nullptr);
+    REQUIRE(mul_expr.right != nullptr);
+
+    const auto &inner_paren = std::get<ast::ParenExpr>(*mul_expr.left);
+    REQUIRE(inner_paren.inner != nullptr);
+    const auto &add_expr = std::get<ast::BinaryExpr>(*inner_paren.inner);
+    REQUIRE(add_expr.op == "+");
 }

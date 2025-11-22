@@ -138,8 +138,19 @@ auto Translator::makeAliasDecl(vhdlParser::Alias_declarationContext &ctx) -> ast
     // Get type indication if present
     if (auto *indication = ctx.alias_indication()) {
         if (auto *subtype_ind = indication->subtype_indication()) {
-            if (!subtype_ind->selected_name().empty()) {
-                alias_decl.type_name = subtype_ind->selected_name(0)->getText();
+            const auto &selected = subtype_ind->selected_name();
+            if (!selected.empty() && selected[0] != nullptr) {
+                alias_decl.type_name = selected[0]->getText();
+            }
+        }
+
+        if (alias_decl.type_name.empty()) {
+            auto type_text = indication->getText();
+            const auto paren_pos = type_text.find_first_of("( ");
+            if (paren_pos != std::string::npos) {
+                alias_decl.type_name = type_text.substr(0, paren_pos);
+            } else {
+                alias_decl.type_name = std::move(type_text);
             }
         }
     }
@@ -166,7 +177,7 @@ auto Translator::makeTypeDecl(vhdlParser::Type_declarationContext &ctx) -> ast::
     if (auto *def = ctx.type_definition()) {
         // For now, just store the text representation
         // TODO(domi): Parse specific type definitions if needed
-        type_decl.definition = makeToken(ctx, def->getText());
+        type_decl.definition = makeToken(&ctx, def->getText());
     }
 
     return type_decl;

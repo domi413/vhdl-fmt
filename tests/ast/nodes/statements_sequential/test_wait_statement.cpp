@@ -29,8 +29,10 @@ TEST_CASE("WaitStatement: Simple wait statement", "[statements_sequential][wait_
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
 
-    // Check if wait statement exists in body
-    REQUIRE_FALSE(proc.body.empty());
+    const auto &wait_stmt = std::get<ast::WaitStatement>(proc.body[0]);
+    REQUIRE_FALSE(wait_stmt.condition.has_value());
+    REQUIRE(wait_stmt.sensitivity_list.empty());
+    REQUIRE_FALSE(wait_stmt.timeout.has_value());
 }
 
 TEST_CASE("WaitStatement: Wait until with condition", "[statements_sequential][wait_statement]")
@@ -56,6 +58,12 @@ TEST_CASE("WaitStatement: Wait until with condition", "[statements_sequential][w
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+
+    const auto &wait_stmt = std::get<ast::WaitStatement>(proc.body[0]);
+    REQUIRE(wait_stmt.condition.has_value());
+    const auto &cond = std::get<ast::BinaryExpr>(wait_stmt.condition.value());
+    REQUIRE(cond.op == "=");
+    REQUIRE(wait_stmt.sensitivity_list.empty());
 }
 
 TEST_CASE("WaitStatement: Wait on sensitivity list", "[statements_sequential][wait_statement]")
@@ -81,4 +89,10 @@ TEST_CASE("WaitStatement: Wait on sensitivity list", "[statements_sequential][wa
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+
+    const auto &wait_stmt = std::get<ast::WaitStatement>(proc.body[0]);
+    REQUIRE_FALSE(wait_stmt.condition.has_value());
+    REQUIRE(wait_stmt.sensitivity_list.size() == 2);
+    REQUIRE(wait_stmt.sensitivity_list[0] == "clk");
+    REQUIRE(wait_stmt.sensitivity_list[1] == "reset");
 }

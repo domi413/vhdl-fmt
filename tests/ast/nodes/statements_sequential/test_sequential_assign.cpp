@@ -31,6 +31,10 @@ TEST_CASE("SequentialAssign: Simple signal assignment in process",
     REQUIRE(proc.body.size() == 1);
 
     const auto &assign = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &target = std::get<ast::TokenExpr>(assign.target);
+    REQUIRE(target.text == "b");
+    const auto &value = std::get<ast::TokenExpr>(assign.value);
+    REQUIRE(value.text == "a");
 }
 
 TEST_CASE("SequentialAssign: Variable assignment with expression",
@@ -60,6 +64,10 @@ TEST_CASE("SequentialAssign: Variable assignment with expression",
     REQUIRE(proc.body.size() == 1);
 
     const auto &assign = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &target = std::get<ast::TokenExpr>(assign.target);
+    REQUIRE(target.text == "temp");
+    const auto &value = std::get<ast::TokenExpr>(assign.value);
+    REQUIRE(value.text == "42");
 }
 
 TEST_CASE("SequentialAssign: Multiple sequential assignments",
@@ -89,6 +97,14 @@ TEST_CASE("SequentialAssign: Multiple sequential assignments",
     REQUIRE(proc.body.size() == 2);
 
     const auto &assign1 = std::get<ast::SequentialAssign>(proc.body[0]);
+    const auto &target1 = std::get<ast::TokenExpr>(assign1.target);
+    REQUIRE(target1.text == "x");
+    const auto &value1 = std::get<ast::TokenExpr>(assign1.value);
+    REQUIRE(value1.text == "a");
 
     const auto &assign2 = std::get<ast::SequentialAssign>(proc.body[1]);
+    const auto &target2 = std::get<ast::TokenExpr>(assign2.target);
+    REQUIRE(target2.text == "y");
+    const auto &value2 = std::get<ast::TokenExpr>(assign2.value);
+    REQUIRE(value2.text == "b");
 }

@@ -17,18 +17,24 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext &ctx) -> ast::Expr
 {
     auto group = make<ast::GroupExpr>(ctx);
 
-    auto make_association = [this](auto *elem) {
-        auto assoc = make<ast::BinaryExpr>(elem);
-        assoc.op = "=>";
+    auto make_association = [this](auto *elem) -> ast::Expr {
+        if (auto *choices = elem->choices()) {
+            auto assoc = make<ast::BinaryExpr>(*elem);
+            assoc.op = "=>";
+            assoc.left = std::make_unique<ast::Expr>(makeChoices(*choices));
 
-        if (elem->choices() != nullptr) {
-            assoc.left = std::make_unique<ast::Expr>(makeChoices(elem->choices()));
-        }
-        if (elem->expression() != nullptr) {
-            assoc.right = std::make_unique<ast::Expr>(makeExpr(elem->expression()));
+            if (auto *expr = elem->expression()) {
+                assoc.right = std::make_unique<ast::Expr>(makeExpr(*expr));
+            }
+
+            return ast::Expr{ std::move(assoc) };
         }
 
-        return ast::Expr{ std::move(assoc) };
+        if (auto *expr = elem->expression()) {
+            return makeExpr(*expr);
+        }
+
+        return makeToken(elem, elem->getText());
     };
 
     group.children = ctx.element_association()
@@ -55,12 +61,12 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext &ctx) -> ast::Expr
 {
     // Handle OTHERS keyword
     if (ctx.OTHERS() != nullptr) {
-        return makeToken(ctx, "others");
+        return makeToken(&ctx, "others");
     }
 
     // Handle identifier
     if (auto *id = ctx.identifier()) {
-        return makeToken(ctx, id->getText());
+        return makeToken(&ctx, id->getText());
     }
 
     // Handle simple expression
@@ -71,12 +77,12 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext &ctx) -> ast::Expr
     // Handle range
     auto *discrete = ctx.discrete_range();
     if (discrete == nullptr) {
-        return makeToken(ctx, ctx.getText());
+        return makeToken(&ctx, ctx.getText());
     }
 
     auto *range_decl = discrete->range_decl();
     if (range_decl == nullptr) {
-        return makeToken(ctx, ctx.getText());
+        return makeToken(&ctx, ctx.getText());
     }
 
     if (auto *explicit_r = range_decl->explicit_range()) {
@@ -84,7 +90,7 @@ auto Translator::makeChoice(vhdlParser::ChoiceContext &ctx) -> ast::Expr
     }
 
     // Fallback to raw text
-    return makeToken(ctx, ctx.getText());
+    return makeToken(&ctx, ctx.getText());
 }
 
 // ---------------------- Constraints/Ranges ----------------------
@@ -167,7 +173,7 @@ auto Translator::makeRange(vhdlParser::Explicit_rangeContext &ctx) -> ast::Expr
         return makeSimpleExpr(*ctx.simple_expression(0));
     }
 
-    return makeBinary(ctx,
+    return makeBinary(&ctx,
                       ctx.direction()->getText(),
                       makeSimpleExpr(*ctx.simple_expression(0)),
                       makeSimpleExpr(*ctx.simple_expression(1)));
