@@ -30,7 +30,8 @@ TEST_CASE("Entity with generics", "[pretty_printer][design_units]")
 
     ast::GenericParam param{ .names = { "WIDTH" },
                              .type_name = "positive",
-                             .default_expr = ast::TokenExpr{ .text = "8" } };
+                             .default_expr = ast::TokenExpr{ .text = "8" },
+                             .is_last = true };
 
     entity.generic_clause.generics.emplace_back(std::move(param));
 
@@ -47,9 +48,9 @@ TEST_CASE("Entity with ports", "[pretty_printer][design_units]")
     ast::Entity entity{ .name = "counter" };
 
     // Add ports
-    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic" };
+    ast::Port port1{ .names = { "clk" }, .mode = "in", .type_name = "std_logic", .is_last = false };
 
-    ast::Port port2{ .names = { "count" }, .mode = "out", .type_name = "natural" };
+    ast::Port port2{ .names = { "count" }, .mode = "out", .type_name = "natural", .is_last = true };
 
     entity.port_clause.ports.emplace_back(std::move(port1));
     entity.port_clause.ports.emplace_back(std::move(port2));
@@ -68,7 +69,8 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
     // Add generic
     ast::GenericParam param{ .names = { "DEPTH" },
                              .type_name = "positive",
-                             .default_expr = ast::TokenExpr{ .text = "16" } };
+                             .default_expr = ast::TokenExpr{ .text = "16" },
+                             .is_last = true };
     entity.generic_clause.generics.emplace_back(std::move(param));
 
     // Add constraint
@@ -87,7 +89,8 @@ TEST_CASE("Entity with generics and ports", "[pretty_printer][design_units]")
                     .mode = "in",
                     .type_name = "std_logic_vector",
                     .default_expr = std::nullopt,
-                    .constraint = ast::Constraint(std::move(idx_constraint)) };
+                    .constraint = ast::Constraint(std::move(idx_constraint)),
+                    .is_last = true };
 
     entity.port_clause.ports.emplace_back(std::move(port));
 
@@ -117,7 +120,8 @@ TEST_CASE("Entity with custom indent size (4 spaces)", "[pretty_printer][design_
 
     ast::GenericParam param{ .names = { "WIDTH" },
                              .type_name = "positive",
-                             .default_expr = ast::TokenExpr{ .text = "8" } };
+                             .default_expr = ast::TokenExpr{ .text = "8" },
+                             .is_last = true };
 
     entity.generic_clause.generics.emplace_back(std::move(param));
 

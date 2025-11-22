@@ -2,6 +2,8 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <memory>
+
 namespace builder {
 
 auto Translator::makeExpr(vhdlParser::ExpressionContext &ctx) -> ast::Expr
@@ -87,7 +89,7 @@ auto Translator::makePrimary(vhdlParser::PrimaryContext &ctx) -> ast::Expr
 {
     if (ctx.expression() != nullptr) {
         auto paren = make<ast::ParenExpr>(ctx);
-        paren.inner = box(makeExpr(*ctx.expression()));
+        paren.inner = std::make_unique<ast::Expr>(makeExpr(ctx->expression()));
         return paren;
     }
 

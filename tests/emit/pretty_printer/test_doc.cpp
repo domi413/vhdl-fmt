@@ -53,13 +53,13 @@ TEST_CASE("Nested indentation accumulates", "[doc]")
 
 TEST_CASE("Soft line becomes space when grouped and fits", "[doc]")
 {
-    const Doc doc = (Doc::text("hello") / Doc::text("world")).group();
+    const Doc doc = Doc::group(Doc::text("hello") / Doc::text("world"));
     REQUIRE(doc.render(defaultConfig()) == "hello world");
 }
 
 TEST_CASE("Hard line never becomes space", "[doc]")
 {
-    const Doc doc = (Doc::text("hello") | Doc::text("world")).group();
+    const Doc doc = Doc::group(Doc::text("hello") | Doc::text("world"));
     REQUIRE(doc.render(defaultConfig()) == "hello\nworld");
 }
 
@@ -109,7 +109,7 @@ TEST_CASE("Structural sharing works correctly", "[doc]")
 
 TEST_CASE("Render with different widths", "[doc]")
 {
-    const Doc doc = (Doc::text("short") + Doc::line() + Doc::text("text")).group();
+    const Doc doc = Doc::group(Doc::text("short") + Doc::line() + Doc::text("text"));
 
     // Wide enough - should fit on one line
     REQUIRE(doc.render(defaultConfig()) == "short text");
@@ -132,7 +132,7 @@ TEST_CASE("hardIndent forces line break with indentation", "[doc]")
 
 TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
 {
-    const Doc doc = Doc::text("begin").hardIndent(Doc::text("end")).group();
+    const Doc doc = Doc::group(Doc::text("begin").hardIndent(Doc::text("end")));
 
     // Hard line never becomes space, even in a group
     REQUIRE(doc.render(defaultConfig()) == "begin\n  end");
@@ -140,12 +140,57 @@ TEST_CASE("hardIndent always breaks even when grouped", "[doc]")
 
 TEST_CASE("Soft vs hard indent comparison", "[doc]")
 {
-    const Doc soft = (Doc::text("x") << Doc::text("y")).group();
-    const Doc hard = Doc::text("x").hardIndent(Doc::text("y")).group();
+    const Doc soft = Doc::group(Doc::text("x") << Doc::text("y"));
+    const Doc hard = Doc::group(Doc::text("x").hardIndent(Doc::text("y")));
 
     // Soft can collapse when grouped and fits
     REQUIRE(soft.render(defaultConfig()) == "x y");
 
     // Hard always breaks, even when grouped
     REQUIRE(hard.render(defaultConfig()) == "x\n  y");
+}
+
+TEST_CASE("Multiple hardlines with hardlines()", "[doc]")
+{
+    const Doc doc = Doc::text("start") + Doc::hardlines(3) + Doc::text("end");
+
+    REQUIRE(doc.render(defaultConfig()) == "start\n\n\nend");
+}
+
+TEST_CASE("hardlines(0) prevents flattening", "[doc]")
+{
+    const Doc doc
+      = Doc::group(Doc::text("this text") / Doc::text("should not flatten") + Doc::hardlines(0));
+
+    // Should always break due to hardlines(0)
+    REQUIRE(doc.render(defaultConfig()) == "this text\nshould not flatten");
+}
+
+TEST_CASE("AlignText aligns correctly", "[doc]")
+{
+    const Doc doc
+      = Doc::align(Doc::alignText("1", 1) / Doc::alignText("12", 1) / Doc::alignText("123", 1));
+
+    common::Config config = defaultConfig();
+    config.port_map.align_signals = true;
+
+    REQUIRE(doc.render(config) == "1  \n12 \n123");
+}
+
+TEST_CASE("AlignText with varying alignment columns", "[doc]")
+{
+    constexpr std::string_view EXPECTED = "a  : bbb :\n"
+                                          "aa : bb  :";
+
+    const Doc doc1
+      = Doc::alignText("a", 1) & Doc::text(":") & Doc::alignText("bbb", 2) & Doc::text(":");
+    const Doc doc2
+      = Doc::alignText("aa", 1) & Doc::text(":") & Doc::alignText("bb", 2) & Doc::text(":");
+
+    const Doc doc = Doc::align(doc1 / doc2);
+
+    common::Config config = defaultConfig();
+    config.port_map.align_signals = true;
+
+    REQUIRE(doc.render(config) == EXPECTED);
 }

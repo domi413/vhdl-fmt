@@ -18,7 +18,7 @@ auto PrettyPrinter::operator()(const ast::GroupExpr &node) const -> Doc
 
 auto PrettyPrinter::operator()(const ast::UnaryExpr &node) const -> Doc
 {
-    return Doc::text(node.op) & visit(*node.value);
+    return Doc::text(node.op) + visit(*node.value);
 }
 
 auto PrettyPrinter::operator()(const ast::BinaryExpr &node) const -> Doc

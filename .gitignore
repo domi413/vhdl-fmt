@@ -22,3 +22,8 @@ CMakeUserPresets.json
 # ---------------------------
 .vscode/
 .idea/
+
+# ---------------------------
+# Benchmark output
+# ---------------------------
+tests/benchmarks/.results

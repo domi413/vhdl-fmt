@@ -1,6 +1,7 @@
 #ifndef EMIT_PRETTY_PRINTER_HPP
 #define EMIT_PRETTY_PRINTER_HPP
 
+#include "ast/node.hpp"
 #include "ast/nodes/declarations.hpp"
 #include "ast/nodes/design_file.hpp"
 #include "ast/nodes/design_units.hpp"
@@ -9,11 +10,13 @@
 #include "ast/visitor.hpp"
 #include "emit/pretty_printer/doc.hpp"
 
+#include <utility>
+
 namespace emit {
 
 class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
 {
-  public:
+  private:
     // Node visitors
     auto operator()(const ast::DesignFile &node) const -> Doc;
     auto operator()(const ast::Entity &node) const -> Doc;
@@ -53,6 +56,20 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::CaseStatement &node) const -> Doc;
     auto operator()(const ast::ForLoop &node) const -> Doc;
     auto operator()(const ast::WhileLoop &node) const -> Doc;
+
+    /// @brief Wraps the core doc with trivia for the given node.
+    template<typename T>
+    auto wrapResult(const T &node, Doc result) const -> Doc
+    {
+        return withTrivia(node, std::move(result));
+    }
+
+    /// @brief Combines the core doc with leading, inline, and trailing trivia.
+    [[nodiscard]]
+    static auto withTrivia(const ast::NodeBase &node, Doc core_doc) -> Doc;
+
+    // Allow base class to call `wrapResult`, so `wrapResult` can be private
+    friend class ast::VisitorBase<PrettyPrinter, Doc>;
 };
 
 } // namespace emit

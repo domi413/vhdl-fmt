@@ -2,6 +2,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <utility>
@@ -20,11 +21,11 @@ auto Translator::makeAggregate(vhdlParser::AggregateContext &ctx) -> ast::Expr
         auto assoc = make<ast::BinaryExpr>(elem);
         assoc.op = "=>";
 
-        if (auto *choices = elem->choices()) {
-            assoc.left = box(makeChoices(*choices));
+        if (elem->choices() != nullptr) {
+            assoc.left = std::make_unique<ast::Expr>(makeChoices(elem->choices()));
         }
-        if (auto *expr = elem->expression()) {
-            assoc.right = box(makeExpr(*expr));
+        if (elem->expression() != nullptr) {
+            assoc.right = std::make_unique<ast::Expr>(makeExpr(elem->expression()));
         }
 
         return ast::Expr{ std::move(assoc) };

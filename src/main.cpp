@@ -26,7 +26,7 @@ auto main(int argc, char *argv[]) -> int
 
         // Pretty print the AST
         const emit::PrettyPrinter printer{};
-        const auto doc = printer(root);
+        const auto doc = printer.visit(root);
         std::cout << doc.render(config);
 
     } catch (const std::exception &e) {
