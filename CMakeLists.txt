@@ -97,8 +97,7 @@ set_source_files_properties(
     ${GENERATED_DIR}/vhdlLexer.cpp
     ${GENERATED_DIR}/vhdlParser.cpp
     PROPERTIES
-        GENERATED
-            TRUE
+        GENERATED TRUE
 )
 
 target_include_directories(vhdl_generated SYSTEM PUBLIC ${GENERATED_DIR})
