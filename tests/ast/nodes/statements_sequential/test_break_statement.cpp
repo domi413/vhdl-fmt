@@ -30,7 +30,7 @@ TEST_CASE("BreakStatement: Simple break statement", "[statements_sequential][bre
     const auto &break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
     REQUIRE(break_stmt.break_elements.empty());
     // Simple break with when condition
-    REQUIRE(break_stmt.condition.has_value());
+    REQUIRE(std::get<ast::TokenExpr>(break_stmt.condition.value()).text == "true");
 }
 
 TEST_CASE("BreakStatement: Break with elements", "[statements_sequential][break_statement]")
@@ -57,7 +57,17 @@ TEST_CASE("BreakStatement: Break with elements", "[statements_sequential][break_
     REQUIRE(proc.body.size() == 1);
 
     const auto &break_stmt = std::get<ast::BreakStatement>(proc.body[0]);
-    // Break with elements and when condition
-    REQUIRE_FALSE(break_stmt.break_elements.empty());
-    REQUIRE(break_stmt.condition.has_value());
+    REQUIRE(break_stmt.break_elements.size() == 2);
+    const auto &first = std::get<ast::BinaryExpr>(break_stmt.break_elements[0]);
+    REQUIRE(first.op == "=>");
+    REQUIRE(std::get<ast::TokenExpr>(*first.left).text == "q1");
+    REQUIRE(std::get<ast::TokenExpr>(*first.right).text == "1.0");
+    const auto &second = std::get<ast::BinaryExpr>(break_stmt.break_elements[1]);
+    REQUIRE(second.op == "=>");
+    REQUIRE(std::get<ast::TokenExpr>(*second.left).text == "q2");
+    REQUIRE(std::get<ast::TokenExpr>(*second.right).text == "2.0");
+    const auto &cond = std::get<ast::BinaryExpr>(break_stmt.condition.value());
+    REQUIRE(cond.op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.left).text == "clk");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.right).text == "'1'");
 }

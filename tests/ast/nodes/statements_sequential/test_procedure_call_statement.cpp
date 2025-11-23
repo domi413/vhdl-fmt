@@ -28,10 +28,10 @@ TEST_CASE("ProcedureCallStatement: Simple procedure call without parameters",
     REQUIRE(design.units.size() == 2);
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
-    REQUIRE(arch.stmts.size() == 1);
-
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
-    REQUIRE(proc.body.size() == 2);
+    const auto &call = std::get<ast::ProcedureCall>(proc.body[0]);
+    const auto &callee = std::get<ast::TokenExpr>(call.call);
+    REQUIRE(callee.text == "reset_counter");
 }
 
 TEST_CASE("ProcedureCallStatement: Procedure call with parameters",
@@ -59,10 +59,13 @@ TEST_CASE("ProcedureCallStatement: Procedure call with parameters",
     REQUIRE(design.units.size() == 2);
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
-    REQUIRE(arch.stmts.size() == 1);
-
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
-    REQUIRE(proc.body.size() == 2);
+    const auto &call = std::get<ast::ProcedureCall>(proc.body[0]);
+    const auto &call_expr = std::get<ast::CallExpr>(call.call);
+    const auto &callee = std::get<ast::TokenExpr>(*call_expr.callee);
+    REQUIRE(callee.text == "increment");
+    const auto &arg = std::get<ast::TokenExpr>(*call_expr.args);
+    REQUIRE(arg.text == "count");
 }
 
 TEST_CASE("ProcedureCallStatement: Built-in procedure call",
@@ -86,8 +89,13 @@ TEST_CASE("ProcedureCallStatement: Built-in procedure call",
     REQUIRE(design.units.size() == 2);
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
-    REQUIRE(arch.stmts.size() == 1);
-
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
-    REQUIRE(proc.body.size() == 2);
+    const auto &call = std::get<ast::ProcedureCall>(proc.body[0]);
+    const auto &call_expr = std::get<ast::CallExpr>(call.call);
+    const auto &callee = std::get<ast::TokenExpr>(*call_expr.callee);
+    REQUIRE(callee.text == "write");
+    const auto &args = std::get<ast::GroupExpr>(*call_expr.args);
+    REQUIRE(args.children.size() == 2);
+    REQUIRE(std::get<ast::TokenExpr>(args.children[0]).text == "line_buf");
+    REQUIRE(std::get<ast::TokenExpr>(args.children[1]).text == "\"Test message\"");
 }

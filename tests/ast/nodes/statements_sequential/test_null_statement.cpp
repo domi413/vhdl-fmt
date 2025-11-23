@@ -28,6 +28,8 @@ TEST_CASE("NullStatement: Simple null statement", "[statements_sequential][null_
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
+    REQUIRE(std::holds_alternative<ast::NullStatement>(proc.body[0]));
+    REQUIRE(std::holds_alternative<ast::WaitStatement>(proc.body[1]));
 }
 
 TEST_CASE("NullStatement: Null in case branch", "[statements_sequential][null_statement]")
@@ -58,6 +60,11 @@ TEST_CASE("NullStatement: Null in case branch", "[statements_sequential][null_st
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+    const auto &case_stmt = std::get<ast::CaseStatement>(proc.body[0]);
+    REQUIRE(case_stmt.when_clauses.size() == 2);
+    REQUIRE(case_stmt.when_clauses[0].body.size() == 1);
+    REQUIRE(std::holds_alternative<ast::NullStatement>(case_stmt.when_clauses[0].body[0]));
+    REQUIRE(std::holds_alternative<ast::NullStatement>(case_stmt.when_clauses[1].body[0]));
 }
 
 TEST_CASE("NullStatement: Null in if branch", "[statements_sequential][null_statement]")
@@ -87,4 +94,7 @@ TEST_CASE("NullStatement: Null in if branch", "[statements_sequential][null_stat
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 1);
+    const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
+    REQUIRE(std::holds_alternative<ast::NullStatement>(if_stmt.if_branch.body[0]));
+    REQUIRE(std::holds_alternative<ast::NullStatement>(if_stmt.else_branch->body[0]));
 }

@@ -5,6 +5,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <string_view>
+
 TEST_CASE("ReportStatement: Simple report statement", "[statements_sequential][report_statement]")
 {
     constexpr std::string_view VHDL_FILE = R"(
@@ -24,10 +25,10 @@ TEST_CASE("ReportStatement: Simple report statement", "[statements_sequential][r
     REQUIRE(design.units.size() == 2);
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
-    REQUIRE(arch.stmts.size() == 1);
-
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
-    REQUIRE(proc.body.size() == 2);
+    const auto &report_stmt = std::get<ast::ReportStatement>(proc.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(report_stmt.message).text == "\"Test message\"");
+    REQUIRE_FALSE(report_stmt.severity.has_value());
 }
 
 TEST_CASE("ReportStatement: Report with severity level",
@@ -50,10 +51,10 @@ TEST_CASE("ReportStatement: Report with severity level",
     REQUIRE(design.units.size() == 2);
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
-    REQUIRE(arch.stmts.size() == 1);
-
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
-    REQUIRE(proc.body.size() == 2);
+    const auto &report_stmt = std::get<ast::ReportStatement>(proc.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(report_stmt.message).text == "\"Warning message\"");
+    REQUIRE(std::get<ast::TokenExpr>(report_stmt.severity.value()).text == "warning");
 }
 
 TEST_CASE("ReportStatement: Report with error severity",
@@ -76,8 +77,8 @@ TEST_CASE("ReportStatement: Report with error severity",
     REQUIRE(design.units.size() == 2);
 
     const auto &arch = std::get<ast::Architecture>(design.units[1]);
-    REQUIRE(arch.stmts.size() == 1);
-
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
-    REQUIRE(proc.body.size() == 2);
+    const auto &report_stmt = std::get<ast::ReportStatement>(proc.body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(report_stmt.message).text == "\"Critical error occurred\"");
+    REQUIRE(std::get<ast::TokenExpr>(report_stmt.severity.value()).text == "error");
 }

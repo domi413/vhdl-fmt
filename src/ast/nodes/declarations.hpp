@@ -3,6 +3,7 @@
 
 #include "ast/node.hpp"
 #include "nodes/expressions.hpp"
+#include "nodes/statements.hpp"
 
 #include <optional>
 #include <string>
@@ -19,10 +20,20 @@ struct Port;
 struct AliasDecl;
 struct TypeDecl;
 struct SubtypeDecl;
+struct SubprogramParam;
+struct ProcedureDecl;
+struct FunctionDecl;
 
 /// Variant type for all declarations
-using Declaration
-  = std::variant<ConstantDecl, SignalDecl, GenericParam, Port, AliasDecl, TypeDecl, SubtypeDecl>;
+using Declaration = std::variant<ConstantDecl,
+                                 SignalDecl,
+                                 GenericParam,
+                                 Port,
+                                 AliasDecl,
+                                 TypeDecl,
+                                 SubtypeDecl,
+                                 ProcedureDecl,
+                                 FunctionDecl>;
 
 // Constant declaration: constant WIDTH : integer := 8;
 struct ConstantDecl : NodeBase
@@ -85,6 +96,35 @@ struct SubtypeDecl : NodeBase
     std::string name;
     std::string base_type;
     std::optional<Constraint> constraint;
+};
+
+// Subprogram parameter (procedure/function)
+struct SubprogramParam : NodeBase
+{
+    std::vector<std::string> names;
+    std::string mode; // in/out/inout/buffer/ linkage depending on decl
+    std::string type_name;
+    std::optional<Expr> default_expr;
+    bool is_last{};
+};
+
+// Procedure declaration/body
+struct ProcedureDecl : NodeBase
+{
+    std::string name;
+    std::vector<SubprogramParam> parameters;
+    std::vector<Declaration> decls;
+    std::vector<SequentialStatement> body;
+};
+
+// Function declaration/body
+struct FunctionDecl : NodeBase
+{
+    std::string name;
+    std::vector<SubprogramParam> parameters;
+    std::string return_type;
+    std::vector<Declaration> decls;
+    std::vector<SequentialStatement> body;
 };
 
 } // namespace ast

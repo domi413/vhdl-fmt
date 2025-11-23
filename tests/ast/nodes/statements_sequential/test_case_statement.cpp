@@ -43,6 +43,12 @@ TEST_CASE("CaseStatement: Simple case statement", "[statements_sequential][case_
     REQUIRE(case_stmt.when_clauses[0].body.size() == 1);
     REQUIRE(case_stmt.when_clauses[1].body.size() == 1);
     REQUIRE(case_stmt.when_clauses[2].body.size() == 1);
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[0].choices[0]).text == "0");
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[1].choices[0]).text == "1");
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[2].choices[0]).text == "others");
+    const auto &assign0 = std::get<ast::SequentialAssign>(case_stmt.when_clauses[0].body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(assign0.target).text == "y");
+    REQUIRE(std::get<ast::TokenExpr>(assign0.value).text == "'0'");
 }
 
 TEST_CASE("CaseStatement: Case with multiple choices", "[statements_sequential][case_statement]")
@@ -81,6 +87,10 @@ TEST_CASE("CaseStatement: Case with multiple choices", "[statements_sequential][
     REQUIRE(case_stmt.when_clauses.size() == 3);
     REQUIRE(case_stmt.when_clauses[0].choices.size() == 3);
     REQUIRE(case_stmt.when_clauses[1].choices.size() == 3);
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[0].choices[0]).text == "0");
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[0].choices[1]).text == "2");
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[0].choices[2]).text == "4");
+    REQUIRE(std::get<ast::TokenExpr>(case_stmt.when_clauses[1].choices[0]).text == "1");
 }
 
 TEST_CASE("CaseStatement: Case with multiple statements per when",
@@ -124,4 +134,7 @@ TEST_CASE("CaseStatement: Case with multiple statements per when",
     REQUIRE(case_stmt.when_clauses[0].body.size() == 2);
     REQUIRE(case_stmt.when_clauses[1].body.size() == 2);
     REQUIRE(case_stmt.when_clauses[2].body.size() == 2);
+    const auto &assign = std::get<ast::SequentialAssign>(case_stmt.when_clauses[1].body[0]);
+    REQUIRE(std::get<ast::TokenExpr>(assign.target).text == "x");
+    REQUIRE(std::get<ast::TokenExpr>(assign.value).text == "'1'");
 }

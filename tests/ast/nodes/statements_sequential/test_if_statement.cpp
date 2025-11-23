@@ -34,6 +34,8 @@ TEST_CASE("IfStatement: Simple if statement", "[statements_sequential][if_statem
     const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
     const auto &condition = std::get<ast::BinaryExpr>(if_stmt.if_branch.condition);
     REQUIRE(condition.op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(*condition.left).text == "a");
+    REQUIRE(std::get<ast::TokenExpr>(*condition.right).text == "'1'");
     REQUIRE(if_stmt.if_branch.body.size() == 1);
     REQUIRE(if_stmt.elsif_branches.empty());
     REQUIRE_FALSE(if_stmt.else_branch.has_value());
@@ -71,9 +73,19 @@ TEST_CASE("IfStatement: If-elsif-else statement", "[statements_sequential][if_st
 
     const auto &if_stmt = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(std::get<ast::BinaryExpr>(if_stmt.if_branch.condition).op == "=");
+    REQUIRE(
+      std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(if_stmt.if_branch.condition).left).text
+      == "sel");
+    REQUIRE(
+      std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(if_stmt.if_branch.condition).right).text
+      == "0");
     REQUIRE(if_stmt.if_branch.body.size() == 1);
     REQUIRE(if_stmt.elsif_branches.size() == 1);
     REQUIRE(std::get<ast::BinaryExpr>(if_stmt.elsif_branches[0].condition).op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(
+              *std::get<ast::BinaryExpr>(if_stmt.elsif_branches[0].condition).right)
+              .text
+            == "1");
     REQUIRE(if_stmt.elsif_branches[0].body.size() == 1);
     REQUIRE(if_stmt.else_branch.has_value());
     REQUIRE(if_stmt.else_branch->body.size() == 1);
@@ -109,9 +121,21 @@ TEST_CASE("IfStatement: Nested if statements", "[statements_sequential][if_state
 
     const auto &outer_if = std::get<ast::IfStatement>(proc.body[0]);
     REQUIRE(std::get<ast::BinaryExpr>(outer_if.if_branch.condition).op == "=");
+    REQUIRE(
+      std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(outer_if.if_branch.condition).left).text
+      == "a");
+    REQUIRE(
+      std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(outer_if.if_branch.condition).right).text
+      == "'1'");
     REQUIRE(outer_if.if_branch.body.size() == 1);
 
     const auto &inner_if = std::get<ast::IfStatement>(outer_if.if_branch.body[0]);
     REQUIRE(std::get<ast::BinaryExpr>(inner_if.if_branch.condition).op == "=");
+    REQUIRE(
+      std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(inner_if.if_branch.condition).left).text
+      == "b");
+    REQUIRE(
+      std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(inner_if.if_branch.condition).right).text
+      == "'1'");
     REQUIRE(inner_if.if_branch.body.size() == 1);
 }

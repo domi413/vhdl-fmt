@@ -33,6 +33,9 @@ class PrettyPrinter final : public ast::VisitorBase<PrettyPrinter, Doc>
     auto operator()(const ast::AliasDecl &node) const -> Doc;
     auto operator()(const ast::TypeDecl &node) const -> Doc;
     auto operator()(const ast::SubtypeDecl &node) const -> Doc;
+    auto operator()(const ast::SubprogramParam &node) const -> Doc;
+    auto operator()(const ast::ProcedureDecl &node) const -> Doc;
+    auto operator()(const ast::FunctionDecl &node) const -> Doc;
 
     // Expressions
     auto operator()(const ast::TokenExpr &node) const -> Doc;

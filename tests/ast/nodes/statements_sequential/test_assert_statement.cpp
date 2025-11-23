@@ -33,6 +33,10 @@ TEST_CASE("AssertStatement: Simple assert without message",
     const auto &assert_stmt = std::get<ast::AssertStatement>(proc.body[0]);
     const auto &cond = std::get<ast::BinaryExpr>(assert_stmt.condition);
     REQUIRE(cond.op == "=");
+    REQUIRE(cond.left != nullptr);
+    REQUIRE(cond.right != nullptr);
+    REQUIRE(std::get<ast::TokenExpr>(*cond.left).text == "data");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.right).text == "'1'");
     REQUIRE_FALSE(assert_stmt.message.has_value());
     REQUIRE_FALSE(assert_stmt.severity.has_value());
 }
@@ -66,8 +70,8 @@ TEST_CASE("AssertStatement: Assert with report message",
 
     const auto &assert_stmt = std::get<ast::AssertStatement>(proc.body[0]);
     REQUIRE(std::get<ast::TokenExpr>(assert_stmt.condition).text == "valid");
-    REQUIRE(assert_stmt.message.has_value());
-    REQUIRE(assert_stmt.severity.has_value());
+    REQUIRE(std::get<ast::TokenExpr>(assert_stmt.message.value()).text == "\"Validation failed\"");
+    REQUIRE(std::get<ast::TokenExpr>(assert_stmt.severity.value()).text == "error");
 }
 
 TEST_CASE("AssertStatement: Assert with complex condition",
@@ -98,8 +102,67 @@ TEST_CASE("AssertStatement: Assert with complex condition",
     REQUIRE(proc.body.size() == 1);
 
     const auto &assert_stmt = std::get<ast::AssertStatement>(proc.body[0]);
-    const auto &cond = std::get<ast::BinaryExpr>(assert_stmt.condition);
-    REQUIRE(cond.op == "and");
-    REQUIRE(assert_stmt.message.has_value());
-    REQUIRE(assert_stmt.severity.has_value());
+    const ast::BinaryExpr *cond = nullptr;
+    if (std::holds_alternative<ast::BinaryExpr>(assert_stmt.condition)) {
+        cond = &std::get<ast::BinaryExpr>(assert_stmt.condition);
+    } else if (std::holds_alternative<ast::ParenExpr>(assert_stmt.condition)) {
+        const auto &inner = *std::get<ast::ParenExpr>(assert_stmt.condition).inner;
+        REQUIRE(std::holds_alternative<ast::BinaryExpr>(inner));
+        cond = &std::get<ast::BinaryExpr>(inner);
+    }
+    REQUIRE(cond != nullptr);
+    REQUIRE(cond->op == "and");
+    REQUIRE(cond->left != nullptr);
+    REQUIRE(cond->right != nullptr);
+    const auto type_of = [](const ast::Expr &expr) {
+        if (std::holds_alternative<ast::BinaryExpr>(expr)) {
+            return "binary";
+        }
+        if (std::holds_alternative<ast::ParenExpr>(expr)) {
+            return "paren";
+        }
+        if (std::holds_alternative<ast::TokenExpr>(expr)) {
+            return "token";
+        }
+        if (std::holds_alternative<ast::UnaryExpr>(expr)) {
+            return "unary";
+        }
+        if (std::holds_alternative<ast::CallExpr>(expr)) {
+            return "call";
+        }
+        if (std::holds_alternative<ast::GroupExpr>(expr)) {
+            return "group";
+        }
+        return "other";
+    };
+    INFO("left type: " << type_of(*cond->left));
+    INFO("right type: " << type_of(*cond->right));
+    const ast::BinaryExpr *left_cond = nullptr;
+    if (std::holds_alternative<ast::BinaryExpr>(*cond->left)) {
+        left_cond = &std::get<ast::BinaryExpr>(*cond->left);
+    } else if (std::holds_alternative<ast::ParenExpr>(*cond->left)) {
+        const auto &inner = *std::get<ast::ParenExpr>(*cond->left).inner;
+        REQUIRE(std::holds_alternative<ast::BinaryExpr>(inner));
+        left_cond = &std::get<ast::BinaryExpr>(inner);
+    }
+    REQUIRE(left_cond != nullptr);
+    REQUIRE(left_cond->op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(*left_cond->left).text == "clk");
+    REQUIRE(std::get<ast::TokenExpr>(*left_cond->right).text == "'1'");
+
+    const ast::BinaryExpr *right_cond = nullptr;
+    if (std::holds_alternative<ast::BinaryExpr>(*cond->right)) {
+        right_cond = &std::get<ast::BinaryExpr>(*cond->right);
+    } else if (std::holds_alternative<ast::ParenExpr>(*cond->right)) {
+        const auto &inner = *std::get<ast::ParenExpr>(*cond->right).inner;
+        REQUIRE(std::holds_alternative<ast::BinaryExpr>(inner));
+        right_cond = &std::get<ast::BinaryExpr>(inner);
+    }
+    REQUIRE(right_cond != nullptr);
+    REQUIRE(right_cond->op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(*right_cond->left).text == "reset");
+    REQUIRE(std::get<ast::TokenExpr>(*right_cond->right).text == "'0'");
+    REQUIRE(std::get<ast::TokenExpr>(assert_stmt.message.value()).text
+            == "\"Invalid clock/reset combination\"");
+    REQUIRE(std::get<ast::TokenExpr>(assert_stmt.severity.value()).text == "warning");
 }

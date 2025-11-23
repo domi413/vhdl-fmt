@@ -56,6 +56,15 @@ class Translator final
     [[nodiscard]] auto makeAliasDecl(vhdlParser::Alias_declarationContext &ctx) -> ast::AliasDecl;
     [[nodiscard]] auto makeTypeDecl(vhdlParser::Type_declarationContext &ctx) -> ast::TypeDecl;
     [[nodiscard]] auto makeSubtypeDecl(vhdlParser::Subtype_declarationContext &ctx) -> ast::SubtypeDecl;
+    [[nodiscard]] auto makeProcedure(vhdlParser::Procedure_specificationContext &ctx) -> ast::ProcedureDecl;
+    [[nodiscard]] auto makeFunction(vhdlParser::Function_specificationContext &ctx) -> ast::FunctionDecl;
+    [[nodiscard]] auto makeSubprogramParam(vhdlParser::Interface_declarationContext &ctx, bool is_last)
+      -> ast::SubprogramParam;
+    [[nodiscard]] auto makeParameterList(vhdlParser::Formal_parameter_listContext &ctx)
+      -> std::vector<ast::SubprogramParam>;
+    [[nodiscard]] auto makeSubprogramDeclaration(vhdlParser::Subprogram_declarationContext &ctx)
+      -> ast::Declaration;
+    [[nodiscard]] auto makeSubprogramBody(vhdlParser::Subprogram_bodyContext &ctx) -> ast::Declaration;
     [[nodiscard]] auto makeConcurrentAssign(vhdlParser::Concurrent_signal_assignment_statementContext &ctx) -> ast::ConcurrentAssign;
     [[nodiscard]] auto makeConditionalAssign(vhdlParser::Conditional_signal_assignmentContext &ctx) -> ast::ConcurrentAssign;
     [[nodiscard]] auto makeSelectedAssign(vhdlParser::Selected_signal_assignmentContext &ctx) -> ast::ConcurrentAssign;
@@ -110,6 +119,24 @@ class Translator final
     auto makeConstantDecl(vhdlParser::Constant_declarationContext *ctx) -> ast::ConstantDecl;
     [[nodiscard]]
     auto makeSignalDecl(vhdlParser::Signal_declarationContext *ctx) -> ast::SignalDecl;
+    [[nodiscard]]
+    auto makeSubprogramDeclaration(vhdlParser::Subprogram_declarationContext *ctx)
+      -> std::optional<ast::Declaration>;
+    [[nodiscard]]
+    auto makeSubprogramBody(vhdlParser::Subprogram_bodyContext *ctx)
+      -> std::optional<ast::Declaration>;
+    [[nodiscard]]
+    auto makeParameterList(vhdlParser::Formal_parameter_listContext *ctx)
+      -> std::vector<ast::SubprogramParam>;
+    [[nodiscard]]
+    auto makeSubprogramParam(vhdlParser::Interface_declarationContext *ctx, bool is_last)
+      -> ast::SubprogramParam;
+    [[nodiscard]]
+    auto makeSubprogramDecls(vhdlParser::Subprogram_declarative_partContext *ctx)
+      -> std::vector<ast::Declaration>;
+    [[nodiscard]]
+    auto makeSubprogramStatements(vhdlParser::Subprogram_statement_partContext *ctx)
+      -> std::vector<ast::SequentialStatement>;
 
     // Statements - return by value
     [[nodiscard]]

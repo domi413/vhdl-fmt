@@ -34,6 +34,8 @@ TEST_CASE("WhileLoop: Simple while loop", "[statements_sequential][while_loop]")
     const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
     const auto &condition = std::get<ast::BinaryExpr>(while_loop.condition);
     REQUIRE(condition.op == "<");
+    REQUIRE(std::get<ast::TokenExpr>(*condition.left).text == "counter");
+    REQUIRE(std::get<ast::TokenExpr>(*condition.right).text == "10");
     REQUIRE(while_loop.body.empty());
 }
 
@@ -66,6 +68,7 @@ TEST_CASE("WhileLoop: While loop with boolean condition", "[statements_sequentia
     const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
     const auto &condition = std::get<ast::UnaryExpr>(while_loop.condition);
     REQUIRE(condition.op == "not");
+    REQUIRE(std::get<ast::TokenExpr>(*condition.value).text == "done");
 }
 
 TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential][while_loop]")
@@ -97,6 +100,10 @@ TEST_CASE("WhileLoop: While loop with body statements", "[statements_sequential]
 
     const auto &while_loop = std::get<ast::WhileLoop>(proc.body[0]);
     REQUIRE(std::get<ast::BinaryExpr>(while_loop.condition).op == "<");
+    REQUIRE(std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(while_loop.condition).left).text
+            == "count");
+    REQUIRE(std::get<ast::TokenExpr>(*std::get<ast::BinaryExpr>(while_loop.condition).right).text
+            == "5");
     REQUIRE(while_loop.body.size() == 1);
 
     const auto &assign = std::get<ast::SequentialAssign>(while_loop.body[0]);

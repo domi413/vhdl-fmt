@@ -64,6 +64,8 @@ TEST_CASE("WaitStatement: Wait until with condition", "[statements_sequential][w
     const auto &cond = std::get<ast::BinaryExpr>(wait_stmt.condition.value());
     REQUIRE(cond.op == "=");
     REQUIRE(wait_stmt.sensitivity_list.empty());
+    REQUIRE(std::get<ast::TokenExpr>(*cond.left).text == "clk");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.right).text == "'1'");
 }
 
 TEST_CASE("WaitStatement: Wait on sensitivity list", "[statements_sequential][wait_statement]")

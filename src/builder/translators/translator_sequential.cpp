@@ -3,6 +3,7 @@
 #include "builder/translator.hpp"
 #include "vhdlParser.h"
 
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <utility>
@@ -297,9 +298,45 @@ auto Translator::makeProcedureCall(vhdlParser::Procedure_call_statementContext &
 {
     auto stmt = make<ast::ProcedureCall>(ctx);
 
+    auto makeArgs = [this](auto *actual_part) -> std::unique_ptr<ast::Expr> {
+        if (actual_part == nullptr) {
+            return nullptr;
+        }
+
+        auto *assoc_list = actual_part->association_list();
+        if (assoc_list == nullptr) {
+            return nullptr;
+        }
+
+        const auto &assocs = assoc_list->association_element();
+        if (assocs.empty()) {
+            return nullptr;
+        }
+
+        if (assocs.size() == 1) {
+            return std::make_unique<ast::Expr>(makeCallArgument(*assocs[0]));
+        }
+
+        auto group = make<ast::GroupExpr>(*assoc_list);
+        group.children
+          = assocs
+          | std::views::transform([this](auto *elem) { return makeCallArgument(*elem); })
+          | std::ranges::to<std::vector>();
+
+        return std::make_unique<ast::Expr>(ast::Expr{ std::move(group) });
+    };
+
     if (auto *proc_call = ctx.procedure_call()) {
         if (auto *name = proc_call->selected_name()) {
-            stmt.call = makeToken(name, name->getText());
+            auto callee = makeToken(name, name->getText());
+            if (auto *actuals = proc_call->actual_parameter_part()) {
+                auto call_expr = make<ast::CallExpr>(*proc_call);
+                call_expr.callee = std::make_unique<ast::Expr>(std::move(callee));
+                call_expr.args = makeArgs(actuals);
+                stmt.call = ast::Expr{ std::move(call_expr) };
+            } else {
+                stmt.call = std::move(callee);
+            }
         }
     }
 

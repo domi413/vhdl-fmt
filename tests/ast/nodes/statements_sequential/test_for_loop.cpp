@@ -34,6 +34,8 @@ TEST_CASE("ForLoop: Simple for loop with range", "[statements_sequential][for_lo
     REQUIRE(for_loop.iterator == "i");
     const auto &range = std::get<ast::BinaryExpr>(for_loop.range);
     REQUIRE(range.op == "to");
+    REQUIRE(std::get<ast::TokenExpr>(*range.left).text == "0");
+    REQUIRE(std::get<ast::TokenExpr>(*range.right).text == "7");
     REQUIRE(for_loop.body.empty());
 }
 
@@ -66,6 +68,8 @@ TEST_CASE("ForLoop: For loop with downto range", "[statements_sequential][for_lo
     REQUIRE(for_loop.iterator == "j");
     const auto &range = std::get<ast::BinaryExpr>(for_loop.range);
     REQUIRE(range.op == "downto");
+    REQUIRE(std::get<ast::TokenExpr>(*range.left).text == "15");
+    REQUIRE(std::get<ast::TokenExpr>(*range.right).text == "0");
 }
 
 TEST_CASE("ForLoop: For loop with body statements", "[statements_sequential][for_loop]")
@@ -98,6 +102,8 @@ TEST_CASE("ForLoop: For loop with body statements", "[statements_sequential][for
     REQUIRE(for_loop.iterator == "k");
     const auto &range = std::get<ast::BinaryExpr>(for_loop.range);
     REQUIRE(range.op == "to");
+    REQUIRE(std::get<ast::TokenExpr>(*range.left).text == "0");
+    REQUIRE(std::get<ast::TokenExpr>(*range.right).text == "3");
     REQUIRE(for_loop.body.size() == 1);
 
     const auto &assign = std::get<ast::SequentialAssign>(for_loop.body[0]);

@@ -30,6 +30,12 @@ TEST_CASE("ExitStatement: Simple exit in for loop", "[statements_sequential][exi
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
+    const auto &loop = std::get<ast::ForLoop>(proc.body[0]);
+    REQUIRE(loop.body.size() == 1);
+    const auto &exit_stmt = std::get<ast::ExitStatement>(loop.body[0]);
+    REQUIRE_FALSE(exit_stmt.loop_label.has_value());
+    REQUIRE_FALSE(exit_stmt.condition.has_value());
+    REQUIRE(std::holds_alternative<ast::WaitStatement>(proc.body[1]));
 }
 
 TEST_CASE("ExitStatement: Exit with condition", "[statements_sequential][exit_statement]")
@@ -59,6 +65,14 @@ TEST_CASE("ExitStatement: Exit with condition", "[statements_sequential][exit_st
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
+    const auto &loop = std::get<ast::ForLoop>(proc.body[0]);
+    REQUIRE(loop.body.size() == 2);
+    const auto &exit_stmt = std::get<ast::ExitStatement>(loop.body[0]);
+    REQUIRE_FALSE(exit_stmt.loop_label.has_value());
+    const auto &cond = std::get<ast::BinaryExpr>(exit_stmt.condition.value());
+    REQUIRE(cond.op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.left).text == "i");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.right).text == "50");
 }
 
 TEST_CASE("ExitStatement: Exit with loop label", "[statements_sequential][exit_statement]")
@@ -88,4 +102,14 @@ TEST_CASE("ExitStatement: Exit with loop label", "[statements_sequential][exit_s
 
     const auto &proc = std::get<ast::Process>(arch.stmts[0]);
     REQUIRE(proc.body.size() == 2);
+    const auto &outer_loop = std::get<ast::ForLoop>(proc.body[0]);
+    REQUIRE(outer_loop.body.size() == 1);
+    const auto &inner_loop = std::get<ast::ForLoop>(outer_loop.body[0]);
+    REQUIRE(inner_loop.body.size() == 1);
+    const auto &exit_stmt = std::get<ast::ExitStatement>(inner_loop.body[0]);
+    REQUIRE(exit_stmt.loop_label.value() == "outer");
+    const auto &cond = std::get<ast::BinaryExpr>(exit_stmt.condition.value());
+    REQUIRE(cond.op == "=");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.left).text == "j");
+    REQUIRE(std::get<ast::TokenExpr>(*cond.right).text == "3");
 }

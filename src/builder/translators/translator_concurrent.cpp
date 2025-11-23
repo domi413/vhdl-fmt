@@ -5,8 +5,71 @@
 #include <algorithm>
 #include <optional>
 #include <ranges>
+#include <type_traits>
+#include <utility>
 
 namespace builder {
+
+namespace {
+
+auto cloneExpr(const ast::Expr &expr) -> ast::Expr
+{
+    return std::visit(
+      [](const auto &node) -> ast::Expr {
+          using T = std::decay_t<decltype(node)>;
+          if constexpr (std::is_same_v<T, ast::TokenExpr>) {
+              return node;
+          } else if constexpr (std::is_same_v<T, ast::GroupExpr>) {
+              ast::GroupExpr copy{};
+              copy.trivia = node.trivia;
+              copy.children.reserve(node.children.size());
+              for (const auto &child : node.children) {
+                  copy.children.push_back(cloneExpr(child));
+              }
+              return copy;
+          } else if constexpr (std::is_same_v<T, ast::UnaryExpr>) {
+              ast::UnaryExpr copy{};
+              copy.trivia = node.trivia;
+              copy.op = node.op;
+              if (node.value != nullptr) {
+                  copy.value = std::make_unique<ast::Expr>(cloneExpr(*node.value));
+              }
+              return copy;
+          } else if constexpr (std::is_same_v<T, ast::BinaryExpr>) {
+              ast::BinaryExpr copy{};
+              copy.trivia = node.trivia;
+              copy.op = node.op;
+              if (node.left != nullptr) {
+                  copy.left = std::make_unique<ast::Expr>(cloneExpr(*node.left));
+              }
+              if (node.right != nullptr) {
+                  copy.right = std::make_unique<ast::Expr>(cloneExpr(*node.right));
+              }
+              return copy;
+          } else if constexpr (std::is_same_v<T, ast::ParenExpr>) {
+              ast::ParenExpr copy{};
+              copy.trivia = node.trivia;
+              if (node.inner != nullptr) {
+                  copy.inner = std::make_unique<ast::Expr>(cloneExpr(*node.inner));
+              }
+              return copy;
+          } else if constexpr (std::is_same_v<T, ast::CallExpr>) {
+              ast::CallExpr copy{};
+              copy.trivia = node.trivia;
+              if (node.callee != nullptr) {
+                  copy.callee = std::make_unique<ast::Expr>(cloneExpr(*node.callee));
+              }
+              if (node.args != nullptr) {
+                  copy.args = std::make_unique<ast::Expr>(cloneExpr(*node.args));
+              }
+              return copy;
+          }
+          return ast::Expr{};
+      },
+      expr);
+}
+
+} // namespace
 
 auto Translator::makeConcurrentAssign(
   vhdlParser::Concurrent_signal_assignment_statementContext &ctx) -> ast::ConcurrentAssign
@@ -72,7 +135,7 @@ auto Translator::makeConditionalAssign(vhdlParser::Conditional_signal_assignment
     }
 
     if (!assign.conditional_waveforms.empty()) {
-        assign.value = assign.conditional_waveforms.front().value;
+        assign.value = cloneExpr(assign.conditional_waveforms.front().value);
     }
 
     return assign;
@@ -126,7 +189,7 @@ auto Translator::makeSelectedAssign(vhdlParser::Selected_signal_assignmentContex
     }
 
     if (!assign.selected_waveforms.empty()) {
-        assign.value = assign.selected_waveforms.front().value;
+        assign.value = cloneExpr(assign.selected_waveforms.front().value);
     }
 
     return assign;
